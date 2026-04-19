@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+  <html lang="he" dir="rtl">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#F5EAD5">
+  <title>ספר מלכים · בגרות 2551 · תשפ״ו</title>
+  <meta property="og:title" content="ספר מלכים · בגרות תשפ״ו · שאלון 2551">
+  <meta property="og:description" content="אתר הכנה לבגרות בתנ״ך לתלמידי יא - 6 יחידות, 178 שאלות, לוח דירוג חי בין הכיתות">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='78' font-size='80'%3E📖%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+  :root{--bg:#FBF6EB;--bg2:#F5EAD5;--ink:#1C1814;--ink2:#3D342B;--mute:#6B5E52;--line:#D7C6A8;--gold:#C89B3C;--goldD:#8B6F1F;--red:#B83A4B;--green:#4A7B4E;--fire:#E67E22;--purple:#7D4C9C;--bronze:#7A5E4A;--ash:#5A6270;--card:#FFFFFF;--shadow:0 1px 3px rgba(60,40,15,0.06)}
+  [data-theme="dark"]{--bg:#14100B;--bg2:#1F1914;--ink:#F5EAD5;--ink2:#D7C6A8;--mute:#8A7E6F;--line:#3D342B;--card:#1F1914;--shadow:0 1px 3px rgba(0,0,0,0.4)}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Heebo',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;touch-action:manipulation}
+body{min-height:100vh;background-image:radial-gradient(circle at 10% 0%,rgba(200,155,60,0.06),transparent 40%),radial-gradient(circle at 90% 100%,rgba(122,94,74,0.05),transparent 40%);background-attachment:fixed;transition:background 0.3s}
+#root{min-height:100vh}
+  h1,h2,h3,h4{font-family:'Frank Ruhl Libre',serif;font-weight:700;color:var(--ink);letter-spacing:-0.01em;margin:0}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit;padding:0}
+::selection{background:var(--gold);color:#fff}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+input{caret-color:var(--goldD)}
+  button:focus-visible,[role="button"]:focus-visible,.tap:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:8px}
+.app{max-width:720px;margin:0 auto;padding-bottom:88px;min-height:100vh;position:relative}
+.topbar{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--line);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(10px);background:color-mix(in srgb,var(--bg) 92%,transparent)}
+.tb-t{font-family:'Frank Ruhl Libre',serif;font-size:20px;font-weight:700}
+.tb-s{font-size:12px;color:var(--mute);font-weight:500}
+.tb-r{display:flex;gap:10px;align-items:center}
+.av-sm{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:18px;background:var(--bg2);border:1.5px solid var(--line);cursor:pointer}
+  .darkT{width:36px;height:36px;border-radius:50%;background:var(--bg2);border:1.5px solid var(--line);display:grid;place-items:center;font-size:16px;cursor:pointer}
+.bn{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:720px;background:var(--bg);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);z-index:50;padding-bottom:env(safe-area-inset-bottom,0)}
+.nb{padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--mute);transition:color 0.2s;min-height:60px;cursor:pointer}
+.nb svg{width:24px;height:24px;stroke-width:1.6;stroke:currentColor;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nb.on{color:var(--goldD)}
+.nb.on svg{fill:var(--goldD);fill-opacity:0.15}
+.nb-l{font-size:11px;font-weight:600}
+.page{padding:20px;animation:fade 0.3s}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;border-radius:14px;font-weight:700;font-size:15px;transition:all 0.2s;text-align:center;border:none;cursor:pointer;width:100%;min-height:52px;font-family:inherit}
+.btn:active{transform:scale(0.98)}
+.btn:disabled{opacity:0.4;pointer-events:none}
+.btn-p{background:var(--ink);color:var(--bg)}
+.btn-o{background:transparent;border:1.5px solid var(--ink);color:var(--ink)}
+.btn-s{background:var(--bg2);color:var(--ink)}
+.btn-g{background:var(--gold);color:#fff}
+.inp{width:100%;padding:14px 16px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;background:var(--card);color:var(--ink);font-family:inherit}
+.inp:focus{outline:none;border-color:var(--ink)}
+</style>
+  <style>
+  .st{font-family:'Frank Ruhl Libre',serif;font-size:22px;font-weight:700;margin:4px 0 14px}
+.ss{font-size:13px;color:var(--mute);margin:-8px 0 16px;line-height:1.5}
+.muted{color:var(--mute)}.bold{font-weight:700}.center{text-align:center}
+.ab{display:flex;align-items:center;width:100%;padding:18px 20px;margin-bottom:10px;background:var(--card);border:2px solid var(--line);border-radius:16px;text-align:right;font-size:16px;font-weight:500;color:var(--ink);transition:all 0.15s;min-height:58px;cursor:pointer;font-family:inherit;gap:14px}
+.ab:hover{border-color:var(--ink2);transform:translateY(-1px)}
+.ab:active{transform:scale(0.98)}
+  .ab.ok{background:color-mix(in srgb,var(--green) 12%,var(--card));border-color:var(--green);color:var(--green)}
+.ab.bad{background:color-mix(in srgb,var(--red) 10%,var(--card));border-color:var(--red);color:var(--red)}
+.ab.dim{opacity:0.5}
+.al{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--goldD));color:#fff;font-family:'Frank Ruhl Libre',serif;font-size:18px;font-weight:900;flex-shrink:0;box-shadow:0 2px 4px rgba(139,111,31,0.3)}
+.ab.ok .al{background:linear-gradient(135deg,#6BA06F,var(--green))}
+.ab.bad .al{background:linear-gradient(135deg,#D05464,var(--red))}
+  .txt{flex:1;line-height:1.5}
+.exp{background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 8%,var(--card)),var(--card));border:1.5px solid var(--gold);border-radius:18px;padding:20px;margin-top:14px;animation:slide 0.4s}
+@keyframes slide{from{opacity:0;max-height:0}to{opacity:1;max-height:2000px}}
+.exp-t{font-family:'Frank Ruhl Libre',serif;font-weight:700;color:var(--goldD);font-size:15px;margin-bottom:8px}
+.exp-b{font-size:14px;line-height:1.7;color:var(--ink2)}
+.exp-s{display:inline-block;margin-top:10px;padding:5px 11px;background:var(--card);border:1px solid var(--gold);border-radius:8px;font-size:12px;color:var(--goldD);font-weight:700}
+.qh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px}
+.qp{flex:1}
+  .qn{font-size:12px;color:var(--mute);font-weight:600;margin-bottom:6px}
+.prog{height:8px;background:var(--bg2);border-radius:999px;overflow:hidden}
+.prog-f{height:100%;background:linear-gradient(90deg,var(--goldD),var(--gold));border-radius:999px;transition:width 0.4s}
+.tm{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:18px;color:var(--ink);background:var(--bg2);padding:6px 12px;border-radius:10px}
+.tm.wrn{color:var(--red);background:color-mix(in srgb,var(--red) 12%,var(--card))}
+.stky{position:sticky;bottom:88px;z-index:5;margin-top:16px;padding-top:10px;background:linear-gradient(to top,var(--bg) 80%,transparent)}
+.qb{font-family:'Frank Ruhl Libre',serif;font-size:22px;font-weight:700;line-height:1.4;margin-bottom:20px;color:var(--ink)}
+.lb-podium{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:8px;align-items:end;margin-bottom:24px;padding:20px 10px 10px}
+.pod{display:flex;flex-direction:column;align-items:center;padding:16px 10px;border-radius:16px 16px 8px 8px;position:relative}
+.pod-1{background:linear-gradient(180deg,#F5D670,#C89B3C);color:#5C4812;min-height:180px;order:2;transform:translateY(-20px)}
+  .pod-2{background:linear-gradient(180deg,#D8D8D8,#9C9C9C);color:#333;min-height:150px;order:1}
+  .pod-3{background:linear-gradient(180deg,#D9A877,#A06636);color:#fff;min-height:130px;order:3}
+  .pod-av{width:56px;height:56px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:28px;margin-bottom:8px;border:3px solid rgba(255,255,255,0.6);box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.pod-1 .pod-av{width:68px;height:68px;font-size:34px}
+.pod-r{font-family:'Frank Ruhl Libre',serif;font-size:32px;font-weight:900;line-height:1;margin-bottom:4px}
+.pod-n{font-weight:700;font-size:13px;text-align:center;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pod-p{font-family:'Frank Ruhl Libre',serif;font-size:20px;font-weight:800;margin-top:4px}
+.lb-row{display:flex;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);gap:12px}
+.lb-row:last-child{border-bottom:none}
+  .lb-me{background:color-mix(in srgb,var(--gold) 15%,var(--card));border-radius:12px;padding:10px 12px;margin:4px 0;border:1.5px solid var(--gold);position:relative}
+.lb-me::before{content:'◀';position:absolute;left:-20px;color:var(--gold);font-size:14px}
+.lb-rk{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:18px;width:32px;text-align:center;color:var(--mute)}
+.lb-av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:20px;background:var(--bg2);border:1.5px solid var(--line);flex-shrink:0}
+.lb-n{flex:1;font-weight:600;font-size:15px}
+.lb-c{font-size:12px;color:var(--mute);margin-top:2px}
+.lb-pt{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:17px}
+.sk{background:linear-gradient(90deg,var(--bg2) 0%,var(--line) 50%,var(--bg2) 100%);background-size:200% 100%;animation:shm 1.5s infinite;border-radius:8px;height:14px;margin:4px 0}
+@keyframes shm{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk-r{padding:12px 4px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center}
+.sk-av{width:40px;height:40px;border-radius:50%;background:var(--bg2);flex-shrink:0}
+.sk-b{flex:1}
+  </style>
+  <style>
+  .onb{background:var(--bg);min-height:100vh;padding:40px 24px;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative}
+.onb-s{width:100%;max-width:400px}
+.onb-t{font-family:'Frank Ruhl Libre',serif;font-size:40px;font-weight:900;line-height:1.1;text-align:center;margin-bottom:8px}
+.onb-u{color:var(--mute);font-size:15px;text-align:center;margin-bottom:32px}
+.onb-d{display:flex;justify-content:center;gap:6px;margin-bottom:24px}
+.onb-dt{width:8px;height:8px;border-radius:50%;background:var(--line);transition:all 0.3s}
+.onb-dt.on{background:var(--ink);width:24px;border-radius:4px}
+.ct{padding:20px;background:var(--card);border:2px solid var(--line);border-radius:16px;text-align:center;cursor:pointer;font-family:'Frank Ruhl Libre',serif;font-size:22px;font-weight:700;transition:all 0.15s}
+.ct.on{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ag{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.at{aspect-ratio:1;display:grid;place-items:center;font-size:24px;background:var(--card);border:2px solid var(--line);border-radius:12px;cursor:pointer;transition:all 0.15s}
+.at.on{border-color:var(--ink);background:var(--bg2);transform:scale(1.08)}
+.wg{font-family:'Frank Ruhl Libre',serif;font-size:28px;font-weight:700;line-height:1.2}
+.wgn{color:var(--goldD)}
+.cnt{background:var(--bg2);border-radius:16px;padding:16px;text-align:center;margin-bottom:16px;border:1px solid var(--line)}
+.cnt-d{font-family:'Frank Ruhl Libre',serif;font-size:44px;font-weight:900;color:var(--goldD);line-height:1;direction:ltr}
+  .cnt-l{font-size:12px;color:var(--mute);font-weight:600;margin-top:4px}
+.cnt-dt{font-size:13px;font-weight:600;margin-top:6px}
+.cnt-x{display:flex;gap:12px;justify-content:center;margin-top:8px;direction:ltr}
+  .cnt-x span{font-family:'Frank Ruhl Libre',serif}
+  .cnt-x b{font-size:18px;font-weight:800;color:var(--goldD)}
+.cnt-x i{font-size:10px;color:var(--mute);font-style:normal;display:block}
+  .dy{background:linear-gradient(135deg,#1C1814,#3D342B);color:var(--bg);border-radius:20px;padding:22px;margin-bottom:16px;position:relative;overflow:hidden;cursor:pointer}
+.dy::after{content:'';position:absolute;top:-50px;right:-50px;width:150px;height:150px;background:radial-gradient(circle,var(--gold),transparent 70%);opacity:0.4}
+  .dy-l{font-size:11px;letter-spacing:0.1em;color:var(--gold);font-weight:700;text-transform:uppercase}
+.dy-t{font-family:'Frank Ruhl Libre',serif;font-size:22px;font-weight:700;margin-top:4px}
+.dy-u{font-size:13px;opacity:0.75;margin-top:4px}
+.dy-b{margin-top:14px;background:var(--gold);color:var(--ink);padding:10px 18px;border-radius:12px;font-weight:700;font-size:13px;display:inline-block}
+.sr{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.st-v{font-family:'Frank Ruhl Libre',serif;font-size:26px;font-weight:700}
+.st-l{font-size:11px;color:var(--mute);font-weight:600;margin-top:2px}
+.sx{background:var(--bg2);border-radius:16px;padding:14px 12px;text-align:center}
+.ut{position:relative;padding:22px 20px;border-radius:20px;color:#fff;font-family:'Frank Ruhl Libre',serif;cursor:pointer;overflow:hidden;transition:transform 0.15s;display:block;text-align:right;width:100%;border:none;margin-bottom:10px}
+.ut:active{transform:scale(0.98)}
+  .ut-e{font-size:32px;display:block;margin-bottom:8px}
+.ut-n{font-size:11px;letter-spacing:0.1em;opacity:0.8;font-weight:700;text-transform:uppercase}
+.ut-t{font-size:22px;font-weight:700;margin-top:4px}
+.ut-u{font-size:12px;opacity:0.9;font-weight:400;margin-top:4px;font-family:'Heebo',sans-serif}
+  .chip{display:inline-flex;align-items:center;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;background:var(--bg2);color:var(--mute)}
+.chip-g{background:color-mix(in srgb,var(--green) 20%,transparent);color:var(--green)}
+.chip-r{background:color-mix(in srgb,var(--red) 15%,transparent);color:var(--red)}
+.chip-y{background:color-mix(in srgb,var(--gold) 20%,transparent);color:var(--goldD)}
+.tst{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:14px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,0.2);z-index:100;animation:dr 0.3s}
+@keyframes dr{from{transform:translate(-50%,-100px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+.tabs{display:flex;gap:4px;background:var(--bg2);padding:4px;border-radius:14px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tb{padding:10px 14px;border-radius:11px;font-size:13px;font-weight:600;color:var(--mute);white-space:nowrap;transition:all 0.2s;cursor:pointer}
+.tb.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.num{direction:ltr;display:inline-block;unicode-bidi:embed}
+.result-c{width:180px;height:180px;border-radius:50%;display:grid;place-items:center;margin:24px auto;position:relative;background:conic-gradient(var(--gold) calc(var(--pct)*1%),var(--bg2) 0)}
+.result-i{width:150px;height:150px;border-radius:50%;background:var(--card);display:grid;place-items:center}
+.result-p{font-family:'Frank Ruhl Libre',serif;font-size:44px;font-weight:900;line-height:1}
+.bigc{width:140px;height:140px;border-radius:50%;background:var(--bg2);display:grid;place-items:center;margin:0 auto 16px;font-size:56px;border:2px solid var(--line)}
+.ftr{text-align:center;padding:24px 16px 16px;color:var(--mute);font-size:11px;font-weight:500}
+.ftr-n{color:var(--goldD);font-weight:700;font-family:'Frank Ruhl Libre',serif}
+@media (max-width:380px){.page{padding:16px}.onb-t{font-size:32px}.wg{font-size:24px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms !important;transition-duration:0.01ms !important}}
+</style>
+  </head>
+  <body>
+  <div id="root"></div>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="module">
+  import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import{getDatabase,ref,onValue,update,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+const cfg={apiKey:"AIzaSyCo5J2Ei8Bhz14bYlxTvMYbmYGHDrGZHKg",authDomain:"melakhim-bagrut.firebaseapp.com",databaseURL:"https://melakhim-bagrut-default-rtdb.firebaseio.com",projectId:"melakhim-bagrut",appId:"1:24271927252:web:68ed7dabf721e9c22c8841"};
+try{const app=initializeApp(cfg);window._db=getDatabase(app);window._fb={ref,onValue,update,serverTimestamp};window.dispatchEvent(new Event('fb'));}catch(e){console.warn('Firebase failed',e);}
+</script>
+  <script type="text/babel" data-presets="react">
+  const{useState,useEffect,useMemo,useRef}=React;
+const EXAM_DATE='2026-04-30T08:00:00+03:00';
+const EXAM_CODE='2551';
+const CLASSES=['יא1','יא2','יא3','יא6'];
+const AVATARS=['👑','🦁','🕊️','📜','🔥','🛡️','⭐','🌿','🦅','🐏','🌾','🕎','✡️','⚔️','📖','🏺','🏛️','🌄'];
+
+const UNITS=[
+{id:1,num:'יחידה 1',title:'מלכות שלמה',subtitle:'בניית הבית, שיא התהילה, תחילת הדעיכה',chapters:'מל״א א׳–י״א',emoji:'👑',colors:{p:'#C89B3C',a:'#8B6F1F'},intro:'היחידה הראשונה עוסקת בעליית שלמה המלך, חלום גבעון, בניית בית המקדש הראשון, ביקור מלכת שבא, ולבסוף חטאי שלמה בנשים ובעבודה זרה שמובילים לפילוג הממלכה. סיבתיות כפולה דומיננטית: חטאי שלמה הם הסיבה האלוקית, אבל מריבת רחבעם עם העם היא הסיבה האנושית.',events:['דוד ממליך את שלמה במעין רוגל','בית דין של שלמה על שתי הזונות','חלום גבעון - בקשת חכמה','ברית עם חירם מלך צור לבניית המקדש','בניית בית המקדש ושבע שנים','חנוכת הבית וברכת שלמה','ביקור מלכת שבא','חטאי שלמה - נשים נכריות ועבודה זרה'],characters:[{n:'שלמה',d:'בן דוד, המלך שבנה את המקדש. סמל החכמה. חטא בנשים ובעבודה זרה.'},{n:'חירם מלך צור',d:'שותף אסטרטגי - שלח ארזים, זהב, ואומנים לבניית המקדש.'},{n:'מלכת שבא',d:'באה לבחון את חכמת שלמה - ״לא הוגד לי החצי״.'},{n:'ירבעם בן נבט',d:'עבד של שלמה, קיבל נבואה מאחיה השילוני על 10 שבטים.'},{n:'נתן הנביא',d:'בצד שלמה במאבק על המלוכה נגד אדוניה.'},{n:'אדוניה',d:'אחיו של שלמה שניסה להמליך עצמו. הוצא להורג.'}],places:[{n:'גבעון',d:'שם חלם שלמה על החכמה - במה הגדולה לפני שנבנה המקדש.'},{n:'ירושלים',d:'בירת המלכות. מקום בניית המקדש בהר המוריה.'},{n:'צור',d:'עיר חירם - מקור הארזים והזהב למקדש.'},{n:'מגידו, גזר, חצור',d:'ערי מסכנות ורכב שבנה שלמה להגנת הממלכה.'},{n:'עציון גבר',d:'נמל שלמה על ים סוף - משם הפליג צי לאופיר.'}],quotes:[{t:'ונתת לעבדך לב שומע לשפוט את עמך',c:'ג',w:'שלמה',x:'בחלום גבעון - מבקש חכמה במקום עושר'},{t:'לא היה דבר נעלם מן המלך',c:'י',w:'המספר על מלכת שבא',x:'שלמה עונה על כל שאלותיה'},{t:'יען אשר נטיתם לבבך מעם ה׳',c:'יא',w:'ה׳ לשלמה',x:'העונש על חטאי הזקנה - קריעת הממלכה'},{t:'קח לך עשרה קרעים',c:'יא',w:'אחיה השילוני לירבעם',x:'נבואה על 10 שבטים שיהיו לירבעם'},{t:'תנו לי חלקו',c:'ג',w:'האם האמיתית',x:'משפט שלמה - מי האם האמיתית'},{t:'לא ידעתי צאת ובא',c:'ג',w:'שלמה',x:'בחלום - מתאר את גילו הצעיר'}]},
+];
+UNITS.push({id:2,num:'יחידה 2',title:'פילוג הממלכה',subtitle:'רחבעם, ירבעם, ותחילת שתי הממלכות',chapters:'מל״א י״ב–ט״ז',emoji:'⚔️',colors:{p:'#B83A4B',a:'#8B2830'},intro:'הפילוג בין ממלכת יהודה (רחבעם) לממלכת ישראל (ירבעם). ירבעם יוצר עבודה זרה - עגלי הזהב בבית-אל ובדן. שושלות החלופות בצפון: נדב, בעשא, זמרי, עמרי. הקמת שומרון כבירה.',events:['מרד רחבעם בשכם - ״אבי ייסר אתכם בשוטים״','פילוג לעשרת השבטים תחת ירבעם','הקמת עגלי הזהב בבית-אל ובדן','נבואות איש האלוהים נגד מזבח בית-אל','מות ירבעם ועליית שושלות מתחלפות','הקמת שומרון ע״י עמרי'],characters:[{n:'רחבעם',d:'בן שלמה. דחה עצת הזקנים, איבד 10 שבטים.'},{n:'ירבעם',d:'מלך ראשון של ישראל. הקים עגלי זהב - ״חטאת ירבעם״.'},{n:'עמרי',d:'אבי בית עמרי. בנה את שומרון.'},{n:'אחאב',d:'בן עמרי. נשא את איזבל הצידונית.'},{n:'בעשא',d:'הרג את נדב, שחט כל בית ירבעם.'},{n:'איש האלוהים',d:'ניבא נגד מזבח בית-אל. נהרג ע״י אריה.'}],places:[{n:'שכם',d:'שם התכנסו ישראל להמליך את רחבעם.'},{n:'בית-אל',d:'אחד ממקומות עגלי הזהב של ירבעם - בדרום.'},{n:'דן',d:'המקום השני של עגלי הזהב - בצפון.'},{n:'תרצה',d:'בירה זמנית של ישראל לפני שומרון.'},{n:'שומרון',d:'בירת ישראל שעמרי בנה. נקנתה משמר.'}],quotes:[{t:'לך לאהליך ישראל',c:'יב',w:'העם לרחבעם',x:'אחרי דחיית עצת הזקנים'},{t:'הנה אלהיך ישראל',c:'יב',w:'ירבעם',x:'בהקמת עגלי הזהב'},{t:'מעתה בנים אתי אתן',c:'יב',w:'רחבעם',x:'מענה הקשה לעם ישראל'},{t:'כי בדרך לא ישוב',c:'יג',w:'ה׳ לאיש האלוהים',x:'הציווי לא לאכול ולא לשתות'},{t:'החטאת את ישראל',c:'טו',w:'המספר על ירבעם',x:'סיכום חטאיו'},{t:'ויקן את ההר שמרון',c:'טז',w:'המספר',x:'עמרי קונה את שומרון'}]});
+UNITS.push({id:3,num:'יחידה 3',title:'אליהו ואחאב',subtitle:'המאבק בעבודה הזרה',chapters:'מל״א ט״ז – מל״ב ב׳',emoji:'🔥',colors:{p:'#E67E22',a:'#B8621A'},intro:'אליהו הנביא נלחם בעבודה הזרה של אחאב ואיזבל. מעמד הר הכרמל, בריחה לחורב, פרשת כרם נבות, מלחמות ארם. עליית אלישע כיורשו של אליהו בסערה השמימה.',events:['הכרזת אליהו על עצירת הגשמים','נחל כרית ואלמנת צרפתה','מעמד הר הכרמל - ״ה׳ הוא האלוהים״','בריחת אליהו לחורב','פרשת כרם נבות היזרעאלי','אליהו עולה בסערה השמימה'],characters:[{n:'אליהו התשבי',d:'הנביא הגדול. לחם בעבודה זרה. עלה בסערה.'},{n:'אחאב',d:'מלך ישראל הרשע. נישא לאיזבל.'},{n:'איזבל',d:'מלכת צור שגררה את ישראל לעבודה זרה.'},{n:'אלישע',d:'תלמיד אליהו. קיבל פי שניים מרוחו.'},{n:'נבות היזרעאלי',d:'נהרג ע״י איזבל על סירוב למכור כרמו.'},{n:'עובדיהו',d:'על הבית של אחאב שהחביא 100 נביאים.'}],places:[{n:'הר הכרמל',d:'מקום הנס הגדול - אש מהשמים.'},{n:'נחל כרית',d:'שם התחבא אליהו, הורג הבו לו אוכל.'},{n:'צרפת',d:'אלמנת צרפתה - הניסים של הקמח והשמן.'},{n:'חורב',d:'שם גילוי ה׳ לאליהו בקול דממה דקה.'},{n:'יזרעאל',d:'כרם נבות וארמון חורף של אחאב.'}],quotes:[{t:'ה׳ הוא האלהים',c:'יח',w:'העם בהר הכרמל',x:'אחרי הנס - אש מהשמים'},{t:'קנא קנאתי לה׳ צבאות',c:'יט',w:'אליהו',x:'בחורב כשהקב״ה שואל אותו מה לו פה'},{t:'המצאתני אויבי',c:'כא',w:'אחאב לאליהו',x:'אחרי פרשת כרם נבות'},{t:'עד מתי אתם פוסחים',c:'יח',w:'אליהו לעם',x:'בקריאה בהר הכרמל'},{t:'ויהי פי שנים ברוחך אלי',c:'ב',w:'אלישע לאליהו',x:'בבקשת הירושה הרוחנית'},{t:'אבי אבי רכב ישראל',c:'ב',w:'אלישע',x:'כשאליהו עולה בסערה'}]});
+UNITS.push({id:4,num:'יחידה 4',title:'מהפכות ותמורות',subtitle:'יהוא, אלישע, והפיכות',chapters:'מל״ב ח׳–ט״ו',emoji:'🛡️',colors:{p:'#7D4C9C',a:'#5A3573'},intro:'יהוא מקבל נבואה ממשיחת אלישע, מחסל את בית אחאב ואת איזבל, עוקר את הבעל מישראל. אלישע פועל נסים רבים. יואש הצעיר מוצל ע״י יהוידע הכהן. רעידה במלכות יהודה וישראל.',events:['משיחת יהוא ע״י תלמיד אלישע','טבח בית אחאב ומות איזבל','השמדת עובדי הבעל','יואש מוחבא בבית המקדש','מרד יהוידע - יואש ממלך','נסי אלישע - שמן האלמנה, השונמית, נעמן'],characters:[{n:'יהוא',d:'מלך הפך את בית אחאב. לחם בבעל. אך עבד עגלי ירבעם.'},{n:'אלישע',d:'יורש אליהו. פעל נסים. עסק בפוליטיקה.'},{n:'יהוידע הכהן',d:'הציל את יואש. ארגן מרד נגד עתליה.'},{n:'עתליה',d:'בת איזבל. המליכה עצמה ביהודה. נהרגה.'},{n:'יואש',d:'מלך יהודה. שיקם המקדש. בסוף חטא.'},{n:'נעמן הארמי',d:'שר צבא ארם. נרפא מצרעת ע״י אלישע.'}],places:[{n:'יזרעאל',d:'מקום טבח בית אחאב וזריקת איזבל מהחלון.'},{n:'שומרון',d:'מקום השמדת הבעל.'},{n:'ירושלים',d:'המקדש - שם הוחבא יואש 6 שנים.'},{n:'שונם',d:'שם הייתה השונמית שאלישע החיה את בנה.'},{n:'דמשק',d:'עיר נעמן.'}],quotes:[{t:'השלום כרית זמרי',c:'ט',w:'איזבל ליהוא',x:'מנסה ללעוג לו - נזרקה מהחלון'},{t:'הנה המלך',c:'יא',w:'יהוידע',x:'בחשיפת יואש'},{t:'אבי אבי רכב ישראל',c:'יג',w:'יואש מלך ישראל',x:'בחולי אלישע'},{t:'וחי הילד',c:'ד',w:'אלישע',x:'בהחייאת בן השונמית'},{t:'רק לא סרו מחטאות ירבעם',c:'י',w:'המספר על יהוא',x:'הערכה שיפוטית'},{t:'אם אין אני חי',c:'ה',w:'אלישע לגיחזי',x:'על עונש הצרעת'}]});
+UNITS.push({id:5,num:'יחידה 5',title:'הכיבוש האשורי',subtitle:'גלות עשרת השבטים',chapters:'מל״ב ט״ו–כ׳',emoji:'⚡',colors:{p:'#7A5E4A',a:'#5A4536'},intro:'אשור עולה ומחליש את ישראל. פקח מלך ישראל, חזקיהו מלך יהודה. סנחריב צר על ירושלים - נס ההצלה. גלות עשרת השבטים ע״י שלמנאסר. ישעיהו הנביא. חולי חזקיהו והתארכות ימיו.',events:['גלות חלקי ישראל ע״י תגלת פלאסר','גלות עשרת השבטים ע״י שלמנאסר','מצור סנחריב על ירושלים','חזקיהו מתפלל - נס ההצלה','חולי חזקיהו - 15 שנה נוספות','ביקור שליחי מרודך בלאדן מבבל'],characters:[{n:'חזקיהו',d:'מלך צדיק ביהודה. ניצל מסנחריב. תיקן דתית.'},{n:'ישעיהו',d:'הנביא שליווה את חזקיהו. ניבא נחמה וגנאי.'},{n:'סנחריב',d:'מלך אשור. צר על ירושלים ונכשל.'},{n:'רבשקה',d:'שליח סנחריב. דיבר יהודית מול החומה.'},{n:'הושע בן אלה',d:'אחרון מלכי ישראל. בימיו גלתה שומרון.'},{n:'שלמנאסר',d:'מלך אשור שכבש את שומרון.'}],places:[{n:'שומרון',d:'בירת ישראל שנכבשה ע״י אשור - סוף עשרת השבטים.'},{n:'ירושלים',d:'הותקפה ע״י סנחריב, נושעה בנס.'},{n:'לכיש',d:'עיר חשובה ביהודה שנכבשה ע״י סנחריב.'},{n:'נינוה',d:'בירת אשור - שם נרצח סנחריב ע״י בניו.'},{n:'אשור',d:'שם הוגלו ישראל. לבוא הלח וחבור ונהר גוזן.'}],quotes:[{t:'על ה׳ אלהי ישראל בטח',c:'יח',w:'המספר על חזקיהו',x:'הערכה שיפוטית חיובית'},{t:'מי בכל אלהי הארצות',c:'יח',w:'רבשקה',x:'דברי חירוף ליד החומה'},{t:'בטרם בשרה',c:'יט',w:'ישעיהו לחזקיהו',x:'ברכה - מה שיעלה מעצמו'},{t:'חזק ואמץ',c:'יט',w:'חזקיהו לעם',x:'מפגש העם מול המצור'},{t:'צאו וראו',c:'יט',w:'המספר',x:'אחרי נס ההצלה'},{t:'הלא אם שלום ואמת',c:'כ',w:'חזקיהו',x:'על הנבואה שבניו יגלו'}]});
+UNITS.push({id:6,num:'יחידה 6',title:'חורבן יהודה',subtitle:'מנשה, יאשיהו, והחורבן',chapters:'מל״ב כ״א–כ״ה',emoji:'🕯️',colors:{p:'#5A6270',a:'#3A424A'},intro:'מנשה הרשע ממלא את ירושלים דם נקי. יאשיהו הצדיק מוצא את ספר התורה ועושה רפורמה. אחרי מותו במגידו - ירידה מהירה. נבוכדנצר בא, גלות יהויכין, ולבסוף חורבן המקדש ע״י צדקיהו.',events:['חטאי מנשה - מזבחות בעל, אשרה במקדש','מציאת ספר התורה ע״י חלקיהו','רפורמת יאשיהו וביטול הבמות','מות יאשיהו במגידו נגד פרעה נכו','גלות יהויכין והחרשים','חורבן בית המקדש בתשעה באב'],characters:[{n:'מנשה',d:'55 שנות רשע. הקים אשרה במקדש.'},{n:'יאשיהו',d:'המלך הצדיק. עשה רפורמה. נהרג במגידו.'},{n:'חלקיהו הכהן',d:'מצא את ספר התורה במקדש.'},{n:'חולדה הנביאה',d:'ניבאה ליאשיהו על החורבן העתיד.'},{n:'צדקיהו',d:'האחרון במלכי יהודה. מרד בבבל - החורבן.'},{n:'נבוכדנצר',d:'מלך בבל שהחריב את המקדש.'}],places:[{n:'ירושלים',d:'הבירה שנחרבה בתשעה באב.'},{n:'מגידו',d:'שם נהרג יאשיהו נגד פרעה נכו.'},{n:'בבל',d:'שם הוגלו יהודה.'},{n:'רבלה',d:'שם נשפט צדקיהו - בניו נשחטו לעיניו.'},{n:'המקדש',d:'נשרף. הכלים נלקחו לבבל.'}],quotes:[{t:'רק על אף ה׳',c:'כג',w:'המספר',x:'על רשעות מנשה שלא נמחקה'},{t:'כי על אף ה׳',c:'כד',w:'המספר',x:'סיבת החורבן'},{t:'לך אל חלקיהו',c:'כב',w:'יאשיהו',x:'כשמצאו ספר התורה'},{t:'אמרו לאיש',c:'כב',w:'חולדה הנביאה',x:'בנבואתה על יאשיהו'},{t:'פקד אפקד אתכם',c:'כה',w:'המספר',x:'בסוף הספר - נחמה קלה'},{t:'נשא את ראש יהויכין',c:'כה',w:'המספר',x:'בסוף הספר - יהויכין משוחרר'}]});
+
+const Q=[
+{u:1,t:'short',q:'מה ביקש שלמה בחלום גבעון?',a:['עושר וכבוד','חכמה ולב שומע','ניצחונות במלחמה','אריכות ימים'],c:1,exp:'שלמה ביקש ״לב שומע לשפוט את עמך״ ולא ביקש עושר, כבוד או נפש אויביו. ה׳ נתן לו גם מה שלא ביקש.',src:'מל״א ג׳ 9'},
+{u:1,t:'who',q:'מי אמר: ״ונתת לעבדך לב שומע לשפוט את עמך״?',a:['דוד לה׳','שלמה לה׳','נתן לשלמה','אחיה לירבעם'],c:1,exp:'שלמה בחלום גבעון, כשה׳ שאל אותו מה לתת לו.',src:'מל״א ג׳'},
+{u:1,t:'place',q:'היכן בנה שלמה את בית המקדש?',a:['בגבעון','בחברון','בהר המוריה בירושלים','בשכם'],c:2,exp:'בהר המוריה בירושלים, במקום שבו עקד אברהם את יצחק וגם גורן ארונה היבוסי שדוד קנה.',src:'מל״א ו׳'},
+{u:1,t:'about',q:'על מי נאמר ״לא הוגד לי החצי״?',a:['על חכמת שלמה ע״י מלכת שבא','על גבורות דוד ע״י אחימעץ','על מעשי אחאב ע״י אליהו','על רשעות איזבל ע״י יהוא'],c:0,exp:'מלכת שבא אחרי שראתה את חכמת שלמה, עושרו, עבדיו ובית המקדש.',src:'מל״א י׳'},
+{u:1,t:'short',q:'מה נתן חירם מלך צור לשלמה לבניית המקדש?',a:['רק עצי ברוש','רק זהב','ארזים, ברושים וזהב','כסף בלבד'],c:2,exp:'חירם שלח ארזים, ברושים וזהב ובתמורה קיבל חיטה ושמן מדי שנה.',src:'מל״א ה׳'},
+{u:2,t:'short',q:'מי היה המלך הראשון של ממלכת ישראל אחרי הפילוג?',a:['רחבעם','ירבעם בן נבט','בעשא','עמרי'],c:1,exp:'ירבעם בן נבט משבט אפרים, שקיבל נבואה מאחיה השילוני על 10 שבטים.',src:'מל״א יב'},
+{u:2,t:'who',q:'מי אמר ״אבי ייסר אתכם בשוטים ואני אייסר אתכם בעקרבים״?',a:['רחבעם','שלמה','ירבעם','אחאב'],c:0,exp:'רחבעם בשכם, אחרי שהעדיף את עצת הילדים על פני עצת הזקנים.',src:'מל״א יב'},
+{u:2,t:'place',q:'באילו שני מקומות הקים ירבעם עגלי זהב?',a:['שכם ושומרון','בית-אל ודן','ירושלים וחברון','גזר ומגידו'],c:1,exp:'בית-אל בדרום ודן בצפון - כדי שלא יעלו לירושלים לחגים.',src:'מל״א יב'},
+{u:2,t:'short',q:'מי בנה את העיר שומרון?',a:['ירבעם','אחאב','עמרי','יהוא'],c:2,exp:'עמרי קנה את ההר משמר בככרי כסף ובנה עליו את שומרון כבירת ישראל.',src:'מל״א טז'},
+{u:3,t:'who',q:'מי אמר ״ה׳ הוא האלוהים״?',a:['אליהו הנביא','עובדיהו','כל העם בהר הכרמל','נביאי הבעל'],c:2,exp:'העם אחרי שראו אש ה׳ יורדת מהשמים ואוכלת את הזבח בהר הכרמל.',src:'מל״א יח'},
+{u:3,t:'short',q:'איפה התחבא אליהו אחרי שהכריז על עצירת הגשמים?',a:['בהר חורב','בנחל כרית','בצרפת','בהר הכרמל'],c:1,exp:'בנחל כרית מזרחית לירדן, ושם עורבים הביאו לו לחם ובשר.',src:'מל״א יז'},
+{u:3,t:'about',q:'על מי נאמר ״קנא קנאתי לה׳ צבאות״?',a:['אליהו על עצמו','אלישע על אליהו','נתן על דוד','יהוא על עצמו'],c:0,exp:'אליהו בחורב, כשהקב״ה שאל אותו ״מה לך פה אליהו״.',src:'מל״א יט'},
+{u:3,t:'short',q:'מי הרג את נבות היזרעאלי?',a:['אחאב בעצמו','איזבל באמצעות זקני העיר','אליהו','יהוא'],c:1,exp:'איזבל תכננה את המעשה - שלחה מכתבים לזקני יזרעאל שיושיבו אותו בראש העם ויעמידו עדי שקר.',src:'מל״א כא'},
+{u:3,t:'place',q:'איפה נגלה ה׳ לאליהו ב״קול דממה דקה״?',a:['בהר סיני','בהר הכרמל','בחורב','בגלגל'],c:2,exp:'בחורב, אחרי שאליהו ברח מפני איזבל 40 יום ו-40 לילה.',src:'מל״א יט'},
+{u:4,t:'short',q:'מי משח את יהוא למלך?',a:['אלישע בעצמו','תלמיד של אלישע','הכהן יהוידע','ישעיהו'],c:1,exp:'אלישע שלח אחד מבני הנביאים (״נער״) לרמות גלעד כדי שלא יתעכב ותתגלה הכוונה.',src:'מל״ב ט'},
+{u:4,t:'who',q:'מי אמר ״השלום זמרי הורג אדוניו״?',a:['יהוא לאיזבל','איזבל ליהוא','אחאב לאליהו','יהורם ליהוא'],c:1,exp:'איזבל מהחלון, מנסה לעורר פחד ביהוא - אבל הסריסים השליכו אותה החוצה.',src:'מל״ב ט'},
+{u:4,t:'short',q:'מי הציל את יואש בן אחזיה מעתליה?',a:['יהוידע הכהן','יהושבע אחותו','נתן הנביא','אלישע'],c:1,exp:'יהושבע אחות אחזיה לקחה את יואש התינוק והחביאה אותו בבית המקדש 6 שנים.',src:'מל״ב יא'},
+{u:4,t:'about',q:'על מי נאמר ״רק חטאת ירבעם לא סר מאחריהם״?',a:['על יהוא','על יואש','על יהואחז','על כל בית יהוא'],c:0,exp:'יהוא עצמו - למרות שביטל את עבודת הבעל, המשיך בעגלי הזהב של ירבעם.',src:'מל״ב י'},
+{u:5,t:'short',q:'בימי איזה מלך ביהודה נפלה שומרון?',a:['אחז','חזקיהו','יהושפט','אמציה'],c:1,exp:'בשנה השישית לחזקיהו מלך יהודה - היא שנת 9 להושע בן אלה מלך ישראל.',src:'מל״ב יח'},
+{u:5,t:'who',q:'מי אמר ״מי בכל אלהי הארצות אשר הצילו את ארצם מידי״?',a:['סנחריב','רבשקה','חזקיהו','ישעיהו'],c:1,exp:'רבשקה שליח סנחריב, בדבריו לחזקיהו ליד החומה - מחרף את ה׳.',src:'מל״ב יח'},
+{u:5,t:'short',q:'איך ניצלה ירושלים ממצור סנחריב?',a:['חזקיהו שילם כופר','צבא מצרים בא לעזרה','מלאך ה׳ היכה 185 אלף באשור בלילה','נחתם הסכם שלום'],c:2,exp:'בתפילת חזקיהו, נבואת ישעיהו - בלילה אחד מלאך ה׳ היכה 185 אלף חיילי אשור.',src:'מל״ב יט'},
+{u:5,t:'about',q:'על מי נאמר ״ויעש הישר בעיני ה׳ ככל אשר עשה דוד אביו״?',a:['על יאשיהו','על חזקיהו','על יהושפט','על אסא'],c:1,exp:'על חזקיהו - המלך הצדיק שבטח בה׳, סגר את הבמות, ושבר את נחש הנחושת.',src:'מל״ב יח'},
+{u:6,t:'short',q:'מה מצא חלקיהו הכהן במקדש בימי יאשיהו?',a:['כלי המקדש של שלמה','ספר התורה','לוחות הברית','שמן ה
+const RANKS=[{p:0,t:'תלמיד',e:'📖'},{p:100,t:'לומד',e:'🌱'},{p:300,t:'נאמן',e:'🕊️'},{p:700,t:'יודע',e:'📜'},{p:1500,t:'חכם',e:'🦉'},{p:3000,t:'חכם כשלמה',e:'👑'}];
+const getRank=p=>{for(let i=RANKS.length-1;i>=0;i--)if(p>=RANKS[i].p)return{...RANKS[i],idx:i};return RANKS[0]};
+const LS='mlk_v1';
+const load=()=>{try{return JSON.parse(localStorage.getItem(LS))||{}}catch{return{}}};
+const save=s=>localStorage.setItem(LS,JSON.stringify(s));
+const EXAM_TS=new Date(EXAM_DATE).getTime();
+const plur=n=>n===1?'יום':n===2?'יומיים':n+' ימים';
+const shuffle=a=>{const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r};
+const shuffleQ=q=>{const i=[0,1,2,3];const s=shuffle(i);return{...q,a:s.map(x=>q.a[x]),c:s.indexOf(q.c)}};
+
+let _dbReady=false;
+const initDB=()=>{if(window._db){_dbReady=true;return true}return false};
+window.addEventListener('fb',initDB);
+const pushScore=(u)=>{if(!_dbReady||!window._db||!u.id)return;try{const{ref,update,serverTimestamp}=window._fb;update(ref(window._db,`users/${u.id}`),{name:u.name,avatar:u.avatar,cls:u.cls,points:u.points||0,correct:u.correct||0,lastActive:serverTimestamp()})}catch(e){}};
+const subLB=(cb)=>{if(!_dbReady||!window._db){cb([]);return()=>{}}try{const{ref,onValue}=window._fb;const r=ref(window._db,'users');const unsub=onValue(r,s=>{const v=s.val()||{};cb(Object.entries(v).map(([id,u])=>({id,...u})))},()=>cb([]));return unsub}catch(e){cb([]);return()=>{}}};
+
+const Icon={
+  home:React.createElement('svg',{viewBox:'0 0 24 24'},React.createElement('path',{d:'M3 9l9-7 9 7v11a2 2 0 01-2 2h-4v-7H9v7H5a2 2 0 01-2-2z'})),
+  book:React.createElement('svg',{viewBox:'0 0 24 24'},React.createElement('path',{d:'M4 19.5A2.5 2.5 0 016.5 17H20'}),React.createElement('path',{d:'M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z'})),
+  target:React.createElement('svg',{viewBox:'0 0 24 24'},React.createElement('circle',{cx:12,cy:12,r:10}),React.createElement('circle',{cx:12,cy:12,r:6}),React.createElement('circle',{cx:12,cy:12,r:2})),
+  trophy:React.createElement('svg',{viewBox:'0 0 24 24'},React.createElement('path',{d:'M6 9H4.5a2.5 2.5 0 010-5H6'}),React.createElement('path',{d:'M18 9h1.5a2.5 2.5 0 000-5H18'}),React.createElement('path',{d:'M4 22h16'}),React.createElement('path',{d:'M18 2H6v7a6 6 0 0012 0V2z'})),
+  user:React.createElement('svg',{viewBox:'0 0 24 24'},React.createElement('path',{d:'M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2'}),React.createElement('circle',{cx:12,cy:7,r:4}))
+};
+
+function Onboarding({onDone}){
+  const[step,setStep]=useState(0);
+  const[name,setName]=useState('');
+  const[cls,setCls]=useState('');
+  const[avatar,setAvatar]=useState('👑');
+  const go=()=>{if(step<2)setStep(step+1);else onDone({name:name.trim(),cls,avatar,id:'u'+Date.now()+Math.random().toString(36).slice(2,6)})};
+  const ok=step===0?name.trim().length>=2:step===1?cls:avatar;
+  return React.createElement('div',{className:'onb'},
+    React.createElement('div',{className:'onb-s'},
+      React.createElement('div',{className:'onb-d'},[0,1,2].map(i=>React.createElement('div',{key:i,className:'onb-dt'+(i===step?' on':'')}))),
+      step===0&&React.createElement('div',null,
+        React.createElement('div',{className:'center',style:{marginBottom:24}},
+          React.createElement('div',{style:{fontSize:64,marginBottom:8}},'📖'),
+          React.createElement('div',{className:'onb-t'},'ספר מלכים'),
+          React.createElement('div',{className:'onb-u'},'האתר של השכבה · בגרות '+EXAM_CODE)),
+        React.createElement('div',{style:{marginBottom:24}},
+          React.createElement('label',{style:{fontSize:13,fontWeight:700,marginBottom:8,display:'block'}},'איך קוראים לך?'),
+          React.createElement('input',{className:'inp',value:name,onChange:e=>setName(e.target.value),placeholder:'שם מלא',maxLength:30,autoFocus:true,autoCapitalize:'words'}))),
+      step===1&&React.createElement('div',null,
+        React.createElement('div',{className:'center',style:{marginBottom:24}},
+          React.createElement('div',{style:{fontSize:56,marginBottom:8}},'🏫'),
+          React.createElement('div',{className:'onb-t'},'באיזו כיתה?'),
+          React.createElement('div',{className:'onb-u'},'בחר את הכיתה שלך')),
+        React.createElement('div',{className:'g2',style:{marginBottom:24}},CLASSES.map(c=>React.createElement('div',{key:c,className:'ct'+(cls===c?' on':''),onClick:()=>setCls(c),role:'button','aria-pressed':cls===c},c)))),
+      step===2&&React.createElement('div',null,
+        React.createElement('div',{className:'center',style:{marginBottom:24}},
+          React.createElement('div',{style:{fontSize:56,marginBottom:8}},avatar),
+          React.createElement('div',{className:'onb-t'},'בחר דמות'),
+          React.createElement('div',{className:'onb-u'},'תופיע בלוח הדירוג עם הדמות הזו')),
+        React.createElement('div',{className:'ag',style:{marginBottom:24}},AVATARS.map(a=>React.createElement('div',{key:a,className:'at'+(avatar===a?' on':''),onClick:()=>setAvatar(a),role:'button','aria-label':'אווטאר '+a},a)))),
+      React.createElement('button',{className:'btn btn-p',onClick:go,disabled:!ok},step<2?'המשך ←':'מתחילים! 🚀')),
+    React.createElement('div',{className:'ftr',style:{position:'absolute',bottom:8,left:0,right:0}},
+      'אתר נבנה ע״י ',React.createElement('span',{className:'ftr-n'},'יאיר בראוס'))
+  );
+}
+
+function useCountdown(){
+  const[n,setN]=useState(Date.now());
+  useEffect(()=>{const t=setInterval(()=>setN(Date.now()),60000);return()=>clearInterval(t)},[]);
+  const ms=Math.max(0,EXAM_TS-n);
+  const d=Math.floor(ms/86400000);
+  const h=Math.floor((ms%86400000)/3600000);
+  const m=Math.floor((ms%3600000)/60000);
+  return{d,h,m};
+}
+
+function Home({user,store,nav}){
+  const r=getRank(store.points||0);
+  const rn=RANKS[r.idx+1];
+  const dd=store.dailyDone===new Date().toDateString();
+  const{d,h,m}=useCountdown();
+  return React.createElement('div',{className:'page'},
+    React.createElement('div',{className:'wg'},'שלום, ',React.createElement('span',{className:'wgn'},user.name)),
+    React.createElement('div',{className:'muted',style:{fontSize:14,marginTop:4,marginBottom:24}},r.e+' '+r.t+' · ',React.createElement('span',{className:'num'},store.points||0),' נק׳ · כיתה '+user.cls),
+    React.createElement('div',{className:'cnt'},
+      React.createElement('div',{className:'cnt-x'},
+        React.createElement('span',null,React.createElement('b',null,React.createElement('span',{className:'num'},d)),React.createElement('i',null,plur(d).replace(String(d),'').trim()||'ימים')),
+        React.createElement('span',null,React.createElement('b',null,React.createElement('span',{className:'num'},h)),React.createElement('i',null,'שעות')),
+        React.createElement('span',null,React.createElement('b',null,React.createElement('span',{className:'num'},m)),React.createElement('i',null,'דקות'))),
+      React.createElement('div',{className:'cnt-l'},'עד הבגרות · ',React.createElement('span',{className:'num'},'30.4.2026'),' · י״ג אייר תשפ״ו')),
+    React.createElement('div',{className:'dy',onClick:()=>!dd&&nav('daily'),style:{cursor:dd?'default':'pointer'}},
+      React.createElement('div',{className:'dy-l'},'אתגר יומי ✨'),
+      React.createElement('div',{className:'dy-t'},dd?'הושלם היום! 🎉':'שאלה יומית'),
+      React.createElement('div',{className:'dy-u'},dd?'חזור מחר לאתגר חדש':'ענה נכון וקבל 20 נקודות'),
+      !dd&&React.createElement('div',{className:'dy-b'},'התחל ←')),
+    React.createElement('div',{className:'sr'},
+      React.createElement('div',{className:'sx'},React.createElement('div',{className:'st-v'},React.createElement('span',{className:'num'},store.streak||0)),React.createElement('div',{className:'st-l'},'🔥 רצף')),
+      React.createElement('div',{className:'sx'},React.createElement('div',{className:'st-v'},React.createElement('span',{className:'num'},store.correct||0)),React.createElement('div',{className:'st-l'},'✓ נכונות')),
+      React.createElement('div',{className:'sx'},React.createElement('div',{className:'st-v'},React.createElement('span',{className:'num'},Math.round(((store.correct||0)/Math.max(store.totalAnswered||1,1))*100)+'%')),React.createElement('div',{className:'st-l'},'דיוק'))),
+    rn&&React.createElement('div',{className:'card'},
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}},
+        React.createElement('div',null,React.createElement('span',{style:{fontSize:18}},r.e),' ',React.createElement('span',{className:'bold'},r.t)),
+        React.createElement('div',{className:'muted',style:{fontSize:12}},'עד '+rn.t+': ',React.createElement('span',{className:'num'},rn.p-(store.points||0)),' נק׳')),
+      React.createElement('div',{className:'prog'},React.createElement('div',{className:'prog-f',style:{width:Math.min(100,100*((store.points||0)-r.p)/(rn.p-r.p))+'%'}})))
+function Quiz({qs,title,timed,onDone}){
+  const[idx,setIdx]=useState(0);
+  const[ans,setAns]=useState(null);
+  const[correct,setCorrect]=useState(0);
+  const[exp,setExp]=useState(false);
+  const[missed,setMissed]=useState([]);
+  const[sec,setSec]=useState(timed||0);
+  const qsRef=useRef(null);
+  if(!qsRef.current)qsRef.current=qs.map(shuffleQ);
+  const Q=qsRef.current;
+  const q=Q[idx];
+  useEffect(()=>{if(!timed)return;const t=setInterval(()=>setSec(s=>Math.max(0,s-1)),1000);return()=>clearInterval(t)},[timed]);
+  useEffect(()=>{if(timed>0&&sec===0)onDone({correct,total:Q.length,missed,timeUp:true})},[sec]);
+  if(!q)return null;
+  const pick=(i)=>{
+    if(ans!==null)return;
+    setAns(i);
+    if(i===q.c){setCorrect(c=>c+1)}else{setMissed(m=>[...m,{...q,userAns:i}]);setExp(true)}
+};
+  const next=()=>{
+    setAns(null);setExp(false);
+    if(idx+1>=Q.length)onDone({correct:correct+(ans===q.c?0:0),total:Q.length,missed});
+    else setIdx(idx+1)
+};
+  const pct=((idx+(ans!==null?1:0))/Q.length)*100;
+  return React.createElement('div',{className:'page'},
+    React.createElement('div',{className:'qh'},
+      React.createElement('div',{className:'qp'},
+        React.createElement('div',{className:'qn'},'שאלה ',React.createElement('span',{className:'num'},idx+1),'/',React.createElement('span',{className:'num'},Q.length),' · '+title),
+        React.createElement('div',{className:'prog'},React.createElement('div',{className:'prog-f',style:{width:pct+'%'}}))),
+      timed>0&&React.createElement('div',{className:'tm'+(sec<60?' wrn':'')},React.createElement('span',{className:'num'},Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')))),
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'qb'},q.q),
+      q.a.map((a,i)=>{
+        let cls='ab';
+        if(ans!==null){if(i===q.c)cls+=' ok';else if(i===ans)cls+=' bad';else cls+=' dim'}
+        return React.createElement('button',{key:i,className:cls,onClick:()=>pick(i),'aria-label':'תשובה '+['א','ב','ג','ד'][i]+': '+a},
+          React.createElement('span',{className:'al'},['א','ב','ג','ד'][i]),
+          React.createElement('span',{className:'txt'},a),
+          ans!==null&&i===q.c&&React.createElement('span',{style:{fontSize:20}},'✓'),
+          ans!==null&&i===ans&&i!==q.c&&React.createElement('span',{style:{fontSize:20}},'✗'))
+})),
+    ans!==null&&React.createElement('div',null,
+      ans===q.c&&!exp&&React.createElement('button',{className:'btn btn-o',onClick:()=>setExp(true),style:{marginBottom:10}},'🔍 הרחבה · הסבר ומקור'),
+      exp&&React.createElement('div',{className:'exp'},
+        React.createElement('div',{className:'exp-t'},'📖 הסבר'),
+        React.createElement('div',{className:'exp-b'},q.exp),
+        q.src&&React.createElement('div',{className:'exp-s'},'📚 מקור: '+q.src)),
+      React
+function Practice({startQuiz}){
+  const[tab,setTab]=useState('quick');
+  const TN={short:'שאלות קצרות',who:'מי אמר למי',about:'על מי נאמר',place:'מה קרה במקום',breadth:'שאלות רוחב'};
+  return React.createElement('div',{className:'page'},
+    React.createElement('h2',{className:'st'},'תרגול'),
+    React.createElement('div',{className:'ss'},'תרגל עם שאלות מבוססות על שאלות החזרה בחוברת'),
+    React.createElement('div',{className:'tabs'},
+      ['quick','unit','type'].map(t=>React.createElement('div',{key:t,className:'tb'+(tab===t?' on':''),onClick:()=>setTab(t),role:'tab'},t==='quick'?'מהיר':t==='unit'?'לפי יחידה':'לפי סוג'))),
+    tab==='quick'&&React.createElement('div',{className:'card'},
+      React.createElement('h3',{style:{fontSize:20,marginBottom:6}},'⚡ חידון מהיר'),
+      React.createElement('div',{className:'muted',style:{fontSize:14,marginBottom:16,lineHeight:1.6}},'10 שאלות אקראיות מכל 6 היחידות. הדרך הטובה ביותר לבדוק את עצמך.'),
+      React.createElement('button',{className:'btn btn-p',onClick:()=>startQuiz(shuffle(Q).slice(0,10),'חידון מהיר')},'התחל חידון ←')),
+    tab==='unit'&&React.createElement('div',null,
+      UNITS.map(u=>{const n=Q.filter(q=>q.u===u.id).length;return React.createElement('button',{key:u.id,className:'ut',style:{background:'linear-gradient(135deg,'+u.colors.p+','+u.colors.a+')'},onClick:()=>startQuiz(shuffle(Q.filter(q=>q.u===u.id)).slice(0,Math.min(10,n)),u.title)},
+        React.createElement('span',{className:'ut-e'},u.emoji),
+        React.createElement('span',{className:'ut-n'},u.num),
+        React.createElement('div',{className:'ut-t'},u.title),
+        React.createElement('div',{className:'ut-u'},React.createElement('span',{className:'num'},n),' שאלות · '+u.chapters))})),
+    tab==='type'&&React.createElement('div',null,
+      Object.entries(TN).map(([t,name])=>{const c=Q.filter(q=>q.t===t).length;return React.createElement('div',{key:t,className:'card',style:{cursor:'pointer'},onClick:()=>c>0&&startQuiz(shuffle(Q.filter(q=>q.t===t)).slice(0,Math.min(10,c)),name)},
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
+          React.createElement('div',null,
+            React.createElement('div',{className:'bold',style:{fontSize:17,fontFamily:"'Frank Ruhl Libre',serif"}},name),
+            React.createElement('div',{className:'muted',style:{fontSize:13,marginTop:2}},React.createElement('span',{className:'num'},c),' שאלות')),
+          React.createElement('div',{style:{fontSize:20,color:'var(--mute)'}},'←')))}))
+  );
+}
+
+function Learn({nav}){
+  return React.createElement('div',{className:'page'},
+    React.createElement('h2',{className:'st'},'למידה'),
+    React.createElement('div',{className:'ss'},'6 יחידות לימוד - דמויות, אירועים, מקומות וציטוטים מכל יחידה'),
+    React.createElement('div',{className:'g2'},UNITS.map(u=>React.createElement('div',{key:u.id,className:'ut',style:{background:'linear-gradient(135deg,'+u.colors.p+','+u.colors.a+')',marginBottom:0},onClick:()=>nav('unit',u.id)},
+      React.createElement('span',{className:'ut-e'},u.emoji),
+      React.createElement('span',{className:'ut-n'},u.num),
+      React.createElement('div',{className:'ut-t'},u.title),
+      React.createElement('div',{className:'ut-u'},u.chapters))))
+  );
+}
+
+function UnitView({unitId,onBack}){
+  const u=UNITS.find(x=>x.id===unitId);
+  const[tab,setTab]=useState('ov');
+  const[rev,setRev]=useState({});
+  if(!u)return null;
+  return React.createElement('div',{className:'page'},
+    React.createElement('div',{style:{color:'var(--mute)',cursor:'pointer',marginBottom:12,fontSize:14,fontWeight:600},onClick:onBack},'← חזרה ללמידה'),
+    React.createElement('div',{className:'ut',style:{background:'linear-gradient(135deg,'+u.colors.p+','+u.colors.a+')',padding:'28px 22px'}},
+      React.createElement('span',{className:'ut-e',style:{fontSize:44}},u.emoji),
+      React.createElement('div',{className:'ut-n'},u.num),
+      React.createElement('div',{style:{fontSize:30,fontWeight:700,marginTop:4,color:'#fff'}},u.title),
+      React.createElement('div',{style:{fontSize:14,opacity:0.85,marginTop:4}},u.subtitle)),
+    React.createElement('div',{className:'tabs'},
+      [['ov','סקירה'],['ev','אירועים'],['ch','דמויות'],['pl','מקומות'],['qu','ציטוטים']].map(([k,l])=>React.createElement('div',{key:k,className:'tb'+(tab===k?' on':''),onClick:()=>setTab(k)},l))),
+    tab==='ov'&&React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'bold',style:{fontSize:16,fontFamily:"'Frank Ruhl Libre',serif",marginBottom:8}},'מבוא ליחידה'),
+      React.createElement('div',{style:{lineHeight:1.8,fontSize:15}},u.intro)),
+    tab==='ev'&&React.createElement('div',{className:'card'},u.events.map((e,i)=>React.createElement('div',{key:i,style:{padding:'14px 0',borderBottom:i<u.events.length-1?'1px solid var(--line)':'none',display:'flex',gap:10,alignItems:'start'}},
+      React.createElement('div',{style:{minWidth:28,height:28,background:u.colors.p,color:'#fff',borderRadius:'50%',display:'grid',placeItems:'center',fontSize:12,fontWeight:700,fontFamily:"'Frank Ruhl Libre',serif"}},React.createElement('span',{className:'num'},i+1)),
+      React.createElement('div',{style:{fontSize:15,lineHeight:1.6}},e)))),
+    tab==='ch'&&React.createEle
+function Leaderboard({user,store}){
+  const[tab,setTab]=useState('cls');
+  const[users,setUsers]=useState([]);
+  const[prevRank,setPrevRank]=useState(null);
+  const[toast,setToast]=useState(null);
+  useEffect(()=>{const u=subLB(us=>setUsers(us));pushScore({...user,points:store.points||0,correct:store.correct||0});return()=>{try{u()}catch(e){}}},[user.id,store.points]);
+  const all=useMemo(()=>{const l=[...users];if(!l.find(u=>u.id===user.id))l.push({...user,points:store.points||0,correct:store.correct||0});return l},[users,store.points]);
+  const clsL=all.filter(u=>u.cls===user.cls).sort((a,b)=>(b.points||0)-(a.points||0));
+  const gradeL=[...all].sort((a,b)=>(b.points||0)-(a.points||0));
+  const list=tab==='cls'?clsL:tab==='grade'?gradeL:null;
+  const myRank=list?list.findIndex(u=>u.id===user.id)+1:0;
+  useEffect(()=>{if(prevRank!==null&&myRank>0&&myRank<prevRank&&list){const passed=list[myRank];if(passed&&passed.id!==user.id){setToast('עקפת את '+passed.name+'! 🔥');setTimeout(()=>setToast(null),3000)}}if(myRank)setPrevRank(myRank)},[myRank]);
+  const agg=CLASSES.map(c=>{const m=all.filter(u=>u.cls===c);const tot=m.reduce((s,u)=>s+(u.points||0),0);return{cls:c,tot,avg:m.length?Math.round(tot/m.length):0,count:m.length}}).sort((a,b)=>b.avg-a.avg);
+  return React.createElement('div',{className:'page'},
+    toast&&React.createElement('div',{className:'tst'},toast),
+    React.createElement('h2',{className:'st'},'🏆 לוח דירוג'),
+    React.createElement('div',{className:'ss'},'כל 4 הכיתות: '+CLASSES.join(' · ')),
+    React.createElement('div',{className:'tabs'},
+      React.createElement('div',{className:'tb'+(tab==='cls'?' on':''),onClick:()=>setTab('cls')},'כיתה '+user.cls),
+      React.createElement('div',{className:'tb'+(tab==='grade'?' on':''),onClick:()=>setTab('grade')},'שכבה'),
+      React.createElement('div',{className:'tb'+(tab==='agg'?' on':''),onClick:()=>setTab('agg')},'לפי כיתות')),
+    !_dbReady&&React.createElement('div',{className:'card',style:{background:'color-mix(in srgb,var(--gold) 15%,var(--card))',borderColor:'var(--gold)'}},
+      React.createElement('div',{style:{fontSize:13,lineHeight:1.6}},'💡 מתחבר ל-Firebase...')),
+    tab==='agg'?React.createElement('div',{className:'card'},agg.map((c,i)=>React.createElement('div',{key:c.cls,className:'lb-row'},
+      React.createElement('div',{className:'lb-rk'+(i===0?' top-1':'')},React.createElement('span',{className:'num'},i+1)),
+      React.createElement('div',{className:'lb-av',style:{background:'var(--ink)',color:'var(--bg)',fontFamily:"'Frank Ruhl Libre',serif",fontSize:14,fontWeight:700}},c.cls),
+      React.createElement('div',{style:{flex:1}},React.createElement('div',{className:'lb-n'},'כיתה '+c.cls),React.createElement('div',{className:'lb-c'},React.createElement('span',{className:'num'},c.count),' משתתפים · ממוצע ',React.createElement('span',{className:'num'},c.avg))),
+      React.createElement('div',{className:'lb-pt'},React.createElement('span',{className:'num'},c.tot))))):
+    list&&list.length>0?React.createElement('div',null,
+      list.length>=3&&React.createElement('div',{className:'lb-podium'},
+        list.slice(0,3).map((u,i)=>React.createElement('div',{key:u.id,className:'pod pod-'+(i+1)},
+          React.createElement('div',{className:'pod-r'},React.createElement('span',{className:'num'},i+1)),
+          React.createElement('div',{className:'pod-av'},u.avatar),
+          React.createElement('div',{className:'pod-n'},u.name),
+          React.createElement('div',{className:'pod-p'},React.createElement('span',{className:'num'},u.points||0))))),
+      React.createElement('div',{className:'card'},list.slice(list.length>=3?3:0).map((u,i)=>React.createElement('div',{key:u.id,className:'lb-row'+(u.id===user.id?' lb-me':'')},
+        React.createElement('div',{className:'lb-rk'},React.createElement('span',{className:'num'},(list.length>=3?3:0)+i+1)),
+        React.createElement('div',{className:'lb-av'},u.avatar),
+        React.createElement('div',{style:{flex:1}},
+          React.createElement('div',{className:'lb-n'},u.name,u.id===user.id&&' (אתה)'),
+          React.createElement('div',{className:'lb-c'},'כיתה '+u.cls+' · ',React.createElement('span',{className:'num'},u.correct||0),' נכונות')),
+        React.createElement('div',{className:'lb-pt'},React.createElement('span',{className:'num'},u.points||0)))))):
+    React.createElement('div',{className:'card center',style:{padding:40}},
+      users.length===0&&_dbReady?[0,1,2,3].map(i=>React.createElement('div',{key:i,className:'sk-r'},React.createElement('div',{className:'sk-av'}),React.createElement('div',{className:'sk-b'},React.createElement('div',{className:'sk',style:{width:'60%'}}),React.createElement('div',{className:'sk',style:{width:'40%'}})))):
+      React.createElement('div',null,
+        React.createElement('div',{style:{fontSize:40,marginBottom:12}},'🎯'),
+        React.createElement('div',{className:'bold'},'עדיין אין תוצאות'),
+        React.createElement('div',{className:'muted',style:{fontSize:13,marginTop:4}},'ענה על שאלות כדי להופיע בלוח')))
+  );
+}
+
+function Profile({user,store,onReset,setStore,setUser,theme,setTheme}){
+  const[edit,setEdit]=useState(false);
+  const[av,setAv]=useState(user.avatar);
+  const[cls,setCls]=useState(user.cls);
+  const r=getRank(store.points||0);
+  const save2=()=>{setUser({...user,avatar:av,cls});setEdit(false);pushScore({...user,avatar:av,cls,points:store.points||0,correct:store.correct||0})};
+  return React.createElement('div',{className:'page'},
+    React.createElement('div',{className:'center',style:{marginBottom:16}},
+      React.createElement('div',{className:'bigc'},user.avatar),
+      React.createElement('h2',{style:{fontSize:26,margin:'4px 0'}},user.name),
+      React.createElement('div',{className:'muted'},'כיתה '+user.cls+' · '+r.e+' '+r.t)),
+    React.createElement('div',{className:'sr'},
+      React.createElement('div',{className:'sx'},React.createElement('div',{className:'st-v'},React.createElement('span',{className:'num'},store.points||0)),React.createElement('div',{className:'st-l'},'נקודות')),
+      React.createElement('div',{className:'sx'},React.createElement('div',{className:'st-v'},React.createElement('span',{className:'num'},store.correct||0)),React.createElement('div',{className:'st-l'},'נכונות')),
+      React.createElement('div',{className:'sx'},React.createElement('div',{className:'st-v'},React.createElement('span',{className:'num'},store.totalAnswered||0)),React.createElement('div',{className:'st-l'},'סה״כ'))),
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}},
+        React.createElement('div',{className:'bold',style:{fontSize:16,fontFamily:"'Frank Ruhl Libre',serif"}},'🎨 מראה'),
+        React.createElement('button',{className:'btn btn-s',style:{width:'auto',padding:'8px 16px',minHeight:36,fontSize:13},onClick:()=>setTheme(theme==='dark'?'light':'dark')},theme==='dark'?'☀️ בהיר':'🌙 כהה')),
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
+        React.createElement('div',{className:'bold',style:{fontSize:16,fontFamily:"'Frank Ruhl Libre',serif"}},'✏️ עריכת פרופיל'),
+        React.createElement('button',{className:'btn btn-s',style:{width:'auto',padding:'8px 16px',minHeight:36,fontSize:13},onClick:()=>setEdit(!edit)},edit?'סגור':'ערוך'))),
+    edit&&React.createElement('div',{className:'card'},
+      React.createElement('div',{style:{fontSize:13,fontWeight:700,marginBottom:8}},'דמות:'),
+      React.createElement('div',{className:'ag',style:{marginBottom:16}},AVATARS.map(a=>React.createElement('div',{key:a,className:'at'+(av===a?' on':''),onClick:()=>setAv(a)},a))),
+      React.createElement('div',{style:{fontSize:13,fontWeight:700,marginBottom:8}},'כיתה:'),
+      React.createElement('div',{className:'g2',style:{marginBottom:16}},CLASSES.map(c=>React.createElement('div',{key:c,className:'ct'+(cls===c?' on':''),onClick:()=>setCls(c),style:{padding:12,fontSize:18}},c))),
+      React.createElement('button',{className:'btn btn-p',onClick:save2},'שמור שינויים')),
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'bold',style:{fontSize:14,fontFamily:"'Frank Ruhl Libre',serif",marginBottom:8}},'ℹ️ אודות'),
+      React.createElement('div',{style:{fontSize:13,lineHeight:1.7,color:'var(--ink2)'}},'אתר להכנה לבגרות בתנ״ך · שאלון '+EXAM_CODE+' · ספר מלכים. התוכן מבוסס על חוברת החזרה הרשמית של מנהל החינוך הדתי. לוח דירוג חי בין כל 4 כיתות היא.'),
+      React.createElement('div',{style:{fontSize:13,marginTop:12,fontFamily:"'Frank Ruhl Libre',serif"}},'אתר נבנה ע״י ',React.createElement('span',{style:{color:'var(--goldD)',fontWeight:700}},'יאיר בראוס'))),
+    React.createElement('button',{className:'btn btn-o',onClick:()=>{if(confirm('לאפס את כל הנתונים?'))onReset()}},'🔄 איפוס מלא')
+  );
+}
+
+function TopBar({user,onTap,theme,setTheme}){
+  const{d,h,m}=useCountdown();
+  return React.createElement('div',{className:'topbar'},
+    React.createElement('div',null,
+      React.createElement('div',{className:'tb-t'},'ספר מלכים'),
+      React.createElement('div',{className:'tb-s'},'בגרות ',React.createElement('span',{className:'num'},EXAM_CODE),' · ',React.createElement('span',{className:'num'},d),' ',plur(d).replace(String(d),'').trim()||'ימים')),
+    React.createElement('div',{className:'tb-r'},
+      React.createElement('button',{className:'darkT',onClick:()=>setTheme(theme==='dark'?'light':'dark'),'aria-label':'החלף מצב תצוגה'},theme==='dark'?'☀️':'🌙'),
+      React.createElement('div',{className:'av-sm',onClick:onTap,role:'button','aria-label':'פרופיל'},user.avatar))
+  );
+}
+
+function BN({active,onNav}){
+  const items=[['home','בית',Icon.home],['learn','למידה',Icon.book],['practice','תרגול',Icon.target],['board','דירוג',Icon.trophy],['profile','אני',Icon.user]];
+  return React.createElement('div',{className:'bn'},items.map(([id,l,ic])=>React.createElement('button',{key:id,className:'nb'+(active===id?' on':''),onClick:()=>onNav(id),'aria-label':l},ic,React.createElement('div',{className:'nb-l'},l))));
+}
+
+function App(){
+  const[user,setUser]=useState(null);
+  const[store,setStore]=useState(load());
+  const[route,setRoute]=useState({p:'home',d:null});
+  const[quiz,setQuiz]=useState(null);
+  const[result,setResult]=useState(null);
+  const[theme,setTheme]=useState(()=>localStorage.getItem('theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+  useEffect(()=>{document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme)},[theme]);
+  useEffect(()=>{const s=load();if(s.user)setUser(s.user)},[]);
+  useEffect(()=>{save({...store,user})},[store,user]);
+  const nav=(p,d=null)=>{setQuiz(null);setResult(null);setRoute({p,d})};
+  const startQuiz=(qs,title,timed=0)=>{setResult(null);setQuiz({qs,title,timed})};
+  const onQuizDone=(r)=>{const g=r.correct*10;setStore(s=>{const today=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Jerusalem'});const yd=new Date(Date.now()-86400000).toLocaleDateString('en-CA',{timeZone:'Asia/Jerusalem'});const ns=s.lastActiveDate===today?(s.streak||1):s.lastActiveDate===yd?(s.streak||0)+1:1;const n={...s,points:(s.points||0)+g,correct:(s.correct||0)+r.correct,totalAnswered:(s.totalAnswered||0)+r.total,streak:ns,lastActiveDate:today};pushScore({...user,points:n.points,correct:n.correct});return n});setQuiz(null);setResult(r)};
+const reset=()=>{localStorage.removeItem(LS);setStore({});setUser(null)};
+if(!user)return React.createElement(Onboarding,{onDone:u=>{setUser(u);setStore(s=>({...s,user:u}))}});
+let body;
+if(quiz)body=React.createElement(Quiz,{qs:quiz.qs,title:quiz.title,timed:quiz.timed,onDone:onQuizDone});
+else if(result)body=React.createElement(Results,{r:result,onBack:()=>{setResult(null);nav('home')},onAgain:()=>{setResult(null);nav('practice')}});
+else if(route.p==='home')body=React.createElement(Home,{user,store,nav});
+else if(route.p==='learn')body=React.createElement(Learn,{nav});
+else if(route.p==='unit')body=React.createElement(UnitView,{unitId:route.d,onBack:()=>nav('learn')});
+else if(route.p==='practice')body=React.createElement(Practice,{startQuiz});
+else if(route.p==='board')body=React.createElement(Leaderboard,{user,store});
+else if(route.p==='profile')body=React.createElement(Profile,{user,store,onReset:reset,setStore,setUser,theme,setTheme});
+return React.createElement('div',{className:'app'},
+  !quiz&&!result&&React.createElement(TopBar,{user,onTap:()=>nav('profile'),theme,setTheme}),
+  body,
+  !quiz&&React.createElement(BN,{active:route.p,onNav:nav})
+);
+}
+
+class EB extends React.Component{
+constructor(p){super(p);this.state={err:null}}
+static getDerivedStateFromError(e){return{err:e}}
+render(){return this.state.err?React.createElement('div',{className:'page',style:{textAlign:'center',paddingTop:80}},React.createElement('div',{style:{fontSize:48,marginBottom:16}},'⚠️'),React.createElement('h2',null,'משהו השתבש'),React.createElement('div',{style:{color:'var(--mute)',marginBottom:20}},'רענן את הדף'),React.createElement('button',{className:'btn btn-p',onClick:()=>location.reload()},'רענן')):this.props.children}
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(EB,null,React.createElement(App)));
+</script>
+</body>
+</html>
