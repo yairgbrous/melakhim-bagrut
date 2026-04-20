@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1e40af">
+  <title>מלכים - תרגול לבגרות בתנ"ך</title>
+  <meta name="description" content="אתר תרגול אינטראקטיבי ללימוד ספר מלכים לבגרות. שאלות, ציטוטים ומבחנים עם טבלת מובילים.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yairgbrous.github.io/melakhim-bagrut/share.html">
+  <meta property="og:title" content="מלכים - תרגול לבגרות בתנ״ך">
+  <meta property="og:description" content="הצטרפו לתרגול ספר מלכים! שאלות, ציטוטים ומבחנים עם טבלת מובילים 📖🏆">
+  <meta property="og:image" content="https://yairgbrous.github.io/melakhim-bagrut/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="he_IL">
+  <meta property="og:site_name" content="מלכים בגרות">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="מלכים - תרגול לבגרות בתנ״ך">
+  <meta name="twitter:description" content="הצטרפו לתרגול ספר מלכים! שאלות, ציטוטים ומבחנים 📖">
+  <meta name="twitter:image" content="https://yairgbrous.github.io/melakhim-bagrut/assets/og-image.png">
+
+  <link rel="canonical" href="https://yairgbrous.github.io/melakhim-bagrut/">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3730a3 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .emoji {
+      font-size: 4.5rem;
+      display: block;
+      margin-bottom: 0.5rem;
+      line-height: 1;
+    }
+
+    h1 {
+      font-size: clamp(1.75rem, 5vw, 2.25rem);
+      margin: 0.5rem 0;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .tagline {
+      font-size: 1.1rem;
+      color: #cbd5e1;
+      margin: 0.5rem 0 2rem;
+    }
+
+    .features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 2rem;
+      text-align: start;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .features li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1rem;
+      padding: 0.5rem 0;
+    }
+
+    .features li::before {
+      content: "✓";
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      background: #10b981;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0f172a;
+      padding: 1rem 2.5rem;
+      border-radius: 16px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      text-decoration: none;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      min-height: 56px;
+    }
+
+    .cta:hover, .cta:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(245, 158, 11, 0.5);
+      outline: none;
+    }
+
+    .cta:active { transform: translateY(0); }
+
+    .meta {
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .whatsapp-hint {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #a7f3d0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cta { transition: none; }
+      .cta:hover, .cta:focus-visible { transform: none; }
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 2rem 1.25rem; }
+      .emoji { font-size: 3.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <span class="emoji" aria-hidden="true">📖</span>
+    <h1>מלכים - בגרות בתנ"ך</h1>
+    <p class="tagline">הדרך החכמה להתכונן לבגרות בספר מלכים</p>
+
+    <ul class="features">
+      <li>מאות שאלות תרגול עם הסברים מפורטים</li>
+      <li>ציטוטים מרכזיים ומבחני חזרה</li>
+      <li>טבלת מובילים ורצף יומי</li>
+      <li>עובד גם ללא אינטרנט 📱</li>
+    </ul>
+
+    <a href="./index.html" class="cta" aria-label="כניסה לאתר התרגול">
+      <span>התחל תרגול עכשיו</span>
+      <span aria-hidden="true">←</span>
+    </a>
+
+    <p class="whatsapp-hint">
+      <span aria-hidden="true">💬</span>
+      <span>שותף ב-WhatsApp? הקליקו וקדימה!</span>
+    </p>
+
+    <p class="meta">חינמי · ללא הרשמה · בעברית מלאה</p>
+  </main>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    try {
+      const ref = document.referrer || '';
+      if (/whatsapp|wa\.me|api\.whatsapp/i.test(ref)) {
+        document.documentElement.dataset.source = 'whatsapp';
+      }
+    } catch (e) {}
+  </script>
+</body>
+</html>

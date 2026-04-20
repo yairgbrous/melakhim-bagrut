@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /old%20index.html
+
+Sitemap: https://yairgbrous.github.io/melakhim-bagrut/sitemap.xml
