@@ -1,17 +1,42 @@
 {
-  "name": "ספר מלכים · בגרות 2551",
-  "short_name": "מלכים 2551",
-  "description": "הכנה לבגרות בתנ״ך — ספר מלכים, שאלון 2551",
-  "start_url": "./",
+  "name": "מלכים - בגרות בתנ\"ך",
+  "short_name": "מלכים בגרות",
+  "description": "אתר תרגול לבגרות בספר מלכים - שאלות, ציטוטים ומבחנים",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#1e40af",
   "lang": "he",
   "dir": "rtl",
-  "background_color": "#0A1628",
-  "theme_color": "#D4A574",
+  "categories": ["education", "books", "productivity"],
   "icons": [
-    { "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%230A1628'/%3E%3Ctext x='50%25' y='62%25' text-anchor='middle' font-size='130'%3E📖%3C/text%3E%3C/svg%3E", "sizes": "192x192", "type": "image/svg+xml" },
-    { "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='84' fill='%230A1628'/%3E%3Ctext x='50%25' y='62%25' text-anchor='middle' font-size='340'%3E📖%3C/text%3E%3C/svg%3E", "sizes": "512x512", "type": "image/svg+xml" }
+    {
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231e40af'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-size='120'>📖</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='96' fill='%231e40af'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-size='320'>📖</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "תרגול מהיר",
+      "short_name": "תרגול",
+      "url": "./index.html?mode=quick",
+      "description": "התחל תרגול מהיר של 10 שאלות"
+    },
+    {
+      "name": "טבלת מובילים",
+      "short_name": "מובילים",
+      "url": "./index.html?screen=leaderboard",
+      "description": "צפה בטבלת המובילים"
+    }
   ]
 }
