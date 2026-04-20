@@ -17,7 +17,8 @@
 <link rel="manifest" href="manifest.json"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;700;800;900&family=Noto+Serif+Hebrew:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/quote-cards.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -32,7 +33,7 @@
   .num{direction:ltr;display:inline-block;unicode-bidi:embed}
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;font-family:'Heebo',sans-serif;background:#0A1628;color:#F7F1E1;min-height:100vh;overflow-x:hidden}
+html,body{margin:0;padding:0;font-family:'Heebo','Frank Ruhl Libre','Noto Serif Hebrew','Times New Roman',serif;background:#0A1628;color:#F7F1E1;min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 15% 20%,rgba(212,165,116,.10),transparent 50%),radial-gradient(circle at 85% 75%,rgba(107,91,149,.10),transparent 55%),radial-gradient(circle at 50% 95%,rgba(168,50,64,.06),transparent 50%);pointer-events:none;z-index:0}
 #root{position:relative;z-index:1}
 .font-display{font-family:'Frank Ruhl Libre',Georgia,serif}
@@ -95,6 +96,72 @@ html[data-theme='light'] .text-amber-100\/60,html[data-theme='light'] .text-ambe
 html[data-theme='light'] input,html[data-theme='light'] textarea{background:#fff!important;color:#1A1611!important}
 .theme-tog{padding:.35rem .55rem;border-radius:999px;background:rgba(212,165,116,.18);border:1px solid rgba(212,165,116,.45);color:#F4D58D;font-size:14px}
 html[data-theme='light'] .theme-tog{color:#1A1611;background:rgba(139,111,71,.15)}
+/* ---- Home redesign v1 + 20 polish ---- */
+body{padding-bottom:72px}
+.bottom-nav{position:fixed;bottom:0;inset-inline:0;z-index:45;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:rgba(10,22,40,.92);backdrop-filter:blur(14px);border-top:1px solid rgba(212,165,116,.35);box-shadow:0 -4px 16px rgba(0,0,0,.35)}
+html[data-theme='light'] .bottom-nav{background:rgba(247,241,225,.92);border-top-color:rgba(139,111,71,.35)}
+.bn-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 4px;border-radius:12px;color:rgba(247,241,225,.55);font-size:11px;font-weight:700;transition:color .15s ease,background .15s ease;background:none;border:0;cursor:pointer;min-height:56px}
+html[data-theme='light'] .bn-item{color:rgba(26,22,17,.6)}
+.bn-item .bn-ico{font-size:22px;line-height:1;filter:grayscale(.3);transition:filter .18s ease,transform .18s ease,text-shadow .18s ease}
+.bn-item.active{color:#F4D58D;background:rgba(212,165,116,.12)}
+.bn-item.active .bn-ico{filter:drop-shadow(0 0 6px rgba(244,213,141,.85)) drop-shadow(0 0 2px #F5D670);text-shadow:0 0 18px rgba(244,213,141,.9),0 0 8px #FFD77A;transform:scale(1.08)}
+html[data-theme='light'] .bn-item.active{color:#8B6F1F;background:rgba(212,165,116,.28)}
+/* Drawer */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:60;animation:fadeUp .2s ease-out}
+.drawer{position:fixed;top:0;bottom:0;inset-inline-end:0;width:min(320px,85vw);background:linear-gradient(180deg,#0A1628 0%,#0F1F3A 100%);border-inline-start:1px solid rgba(212,165,116,.35);z-index:61;padding:18px 14px calc(18px + env(safe-area-inset-bottom));overflow-y:auto;animation:drawerIn .22s cubic-bezier(.3,.8,.3,1)}
+html[data-theme='light'] .drawer{background:linear-gradient(180deg,#F7F1E1 0%,#EEE2C4 100%);color:#1A1611;border-inline-start-color:rgba(139,111,71,.35)}
+@keyframes drawerIn{from{transform:translateX(-20px);opacity:0}to{transform:translateX(0);opacity:1}}
+.drawer-link{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:12px;background:transparent;border:1px solid transparent;color:inherit;font-size:14px;font-weight:700;text-align:start;cursor:pointer}
+.drawer-link:hover,.drawer-link:focus-visible{background:rgba(212,165,116,.12);border-color:rgba(212,165,116,.35)}
+.drawer-link.active{background:linear-gradient(135deg,#D4A574,#8B6F47);color:#1A1611}
+.drawer-link .dico{font-size:20px;width:26px;text-align:center}
+/* Horizontal 3-card scroll */
+.hrow{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(230px,80%);gap:12px;overflow-x:auto;overflow-y:hidden;padding:4px 2px 10px;scroll-snap-type:x mandatory;scrollbar-width:thin}
+@media (min-width:768px){.hrow{grid-auto-columns:minmax(260px,1fr)}}
+.hrow>*{scroll-snap-align:start}
+.hrow::-webkit-scrollbar{height:6px}
+.hrow::-webkit-scrollbar-thumb{background:#8B6F47;border-radius:4px}
+/* Rank chip + mini-stats chips */
+.rank-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;background:linear-gradient(135deg,#F5D670,#C89B3C);color:#1A1611;font-weight:800;font-size:11px;border:1px solid #F4D58D;white-space:nowrap}
+.mini-stats{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#F4D58D;font-weight:700}
+.mini-stats .ms{display:inline-flex;align-items:center;gap:3px}
+html[data-theme='light'] .mini-stats{color:#8B6F1F}
+.me-chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:linear-gradient(135deg,#F5D670,#C89B3C);color:#1A1611;font-weight:900;font-size:10px;margin-inline-start:6px;border:1px solid #F4D58D;letter-spacing:.02em}
+/* Hamburger button */
+.hmb{width:38px;height:38px;border-radius:12px;background:rgba(212,165,116,.15);border:1px solid rgba(212,165,116,.4);color:#F4D58D;display:inline-flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+.hmb:hover{background:rgba(212,165,116,.3)}
+html[data-theme='light'] .hmb{color:#8B6F1F;background:rgba(139,111,71,.15)}
+/* Period filter chips */
+.period-chip{padding:6px 14px;border-radius:999px;border:1px solid rgba(212,165,116,.4);background:rgba(212,165,116,.08);color:#F4D58D;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.period-chip.active{background:linear-gradient(135deg,#D4A574,#8B6F47);color:#1A1611;border-color:#F4D58D}
+.period-chip:hover:not(.active){background:rgba(212,165,116,.18)}
+/* Sync indicator */
+.sync-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#5FB39F;margin-inline-end:5px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sync-ind{font-size:11px;color:rgba(244,213,141,.75);display:inline-flex;align-items:center}
+/* 50/50 hint button */
+.hint-btn{padding:6px 12px;border-radius:10px;background:rgba(107,91,149,.22);border:1px solid rgba(107,91,149,.55);color:#C9B8E0;font-size:12px;font-weight:700;cursor:pointer}
+.hint-btn:hover:not(:disabled){background:rgba(107,91,149,.35)}
+.hint-btn:disabled{opacity:.35;cursor:not-allowed}
+@keyframes halfHide{from{opacity:1}to{opacity:.1}}
+.half-hide{animation:halfHide .3s forwards;pointer-events:none}
+/* Achievement locked */
+.ach-locked{opacity:.35;filter:grayscale(.6);position:relative}
+.ach-locked::after{content:'🔒';position:absolute;top:4px;inset-inline-end:6px;font-size:14px;opacity:.8}
+/* Empty state */
+.empty-state{text-align:center;padding:32px 16px}
+.empty-state svg{width:96px;height:96px;margin:0 auto 12px;color:#F4D58D;filter:drop-shadow(0 4px 12px rgba(244,213,141,.3))}
+/* Print */
+@media print{
+  .bottom-nav,.drawer,.drawer-overlay,.hmb,button,.next-btn{display:none!important}
+  header{position:static!important;background:#fff!important;border:0!important}
+  body,html{background:#fff!important;color:#000!important;padding:0!important}
+  body::before{display:none!important}
+  .card,.parchment{background:#fff!important;color:#000!important;border:1px solid #888!important;box-shadow:none!important;page-break-inside:avoid}
+  .hebrew,.font-display{color:#000!important}
+  .bottom-nav,footer{display:none!important}
+}
+/* Service worker update toast already uses .toast */
 </style>
 </head>
 <body>
@@ -502,10 +569,10 @@ const MELAKHIM_DATA = {
       icon: "⚖️",
       summary: "כל אירוע בספר קורה משני מישורים: השגחת ה' מחד, ופעילות אנושית על בסיס בחירה חופשית מאידך. הסיבה האלוקית והסיבה ההיסטורית־אנושית שלובות זו בזו.",
       examples: [
-        { event: "פילוג הממלכה", verse: "'ולא שמע המלך אל העם כי היתה סבה מעם ה' למען הקים את דברו' (י\"ב, טו)", explain: "מצד אחד - רחבעם בחר בעצת הילדים. מצד שני - ה' סיבב זאת כדי שיתקיים דברו לירבעם ביד אחיה השילוני." },
+        { event: "פילוג הממלכה", verse: "'וְלֹא שָׁמַע הַמֶּלֶךְ אֶל הָעָם כִּי הָיְתָה סִבָּה מֵעִם ה' לְמַעַן הָקִים אֶת דְּבָרוֹ' (י\"ב, טו)", explain: "מצד אחד - רחבעם בחר בעצת הילדים. מצד שני - ה' סיבב זאת כדי שיתקיים דברו לירבעם ביד אחיה השילוני." },
         { event: "מרד יהוא בבית אחאב", verse: "אלישע שלח נער למשוח את יהוא", explain: "יהוא בחר למרוד מסיבות פוליטיות - אך כל זה היה ציווי ה' מאז חורב (למשוח יהוא + חזאל + אלישע)." },
         { event: "חורבן ממלכת ישראל", verse: "מל\"ב י\"ז מפרט בהרחבה", explain: "מבחינה מדינית: מרד הושע בשלמנאסר וקשר עם סוא. מבחינה דתית: ה' 'הסיר את ישראל מעל פניו' בעבור חטאיהם (במות, עגלי ירבעם, מעביר באש, עבודת גילולים)." },
-        { event: "אחאב נהרג ברמות גלעד", verse: "'ואיש משך בקשת לתומו' (כ\"ב, לד)", explain: "החץ 'לתומו' - מקרי לחלוטין, אך מגשים את נבואת מיכיהו ונבואת אליהו על אחאב ('במקום אשר לקקו הכלבים...')" }
+        { event: "אחאב נהרג ברמות גלעד", verse: "'וְאִישׁ מָשַׁךְ בַּקֶּשֶׁת לְתֻמּוֹ' (כ\"ב, לד)", explain: "החץ 'לתומו' - מקרי לחלוטין, אך מגשים את נבואת מיכיהו ונבואת אליהו על אחאב ('בִּמְקוֹם אֲשֶׁר לָקְקוּ הַכְּלָבִים...')" }
       ]
     },
     {
@@ -514,10 +581,10 @@ const MELAKHIM_DATA = {
       icon: "👑",
       summary: "ספר מלכים בוחן את דמויות המנהיגים - מלכי יהודה וישראל. אמת המידה היא 'עשיית הישר בעיני ה''. הפרקים בוחנים אחריות מנהיג, תכונות הנדרשות, השפעה על הדור ועל הדורות.",
       examples: [
-        { event: "שלמה", verse: "'ונתת לעבדך לב שומע' (ג', ט)", explain: "דגם מנהיגות חיובי בתחילת דרכו - ענווה, חכמה. אך בסוף - נכשל בקשרי חוץ ונשים." },
-        { event: "רחבעם", verse: "'קטני עבה ממתני אבי' (י\"ב, י)", explain: "מנהיג שבחר בעצת צעירים על פני זקנים - דגם של כישלון מנהיגותי גאה." },
-        { event: "אחאב לעומת חזקיהו", verse: "השוואה", explain: "אחאב - נכנע לאשתו איזבל. חזקיה - 'לא היה כמוהו... בה' בטח' (י\"ח, ה). שני מנהיגים בעת משבר - תגובות הפוכות." },
-        { event: "יאשיהו", verse: "'וכמוהו לא היה לפניו מלך... ואחריו לא קם כמוהו' (כ\"ג, כה)", explain: "דגם המלך האידאלי - שמע, נכנע, פעל, תיקן. ומנגד: גם מנהיגות צדקת לא יכולה תמיד לבטל גזירה." },
+        { event: "שלמה", verse: "'וְנָתַתָּ לְעַבְדְּךָ לֵב שֹׁמֵעַ' (ג', ט)", explain: "דגם מנהיגות חיובי בתחילת דרכו - ענווה, חכמה. אך בסוף - נכשל בקשרי חוץ ונשים." },
+        { event: "רחבעם", verse: "'קָטָנִּי עָבָה מִמָּתְנֵי אָבִי' (י\"ב, י)", explain: "מנהיג שבחר בעצת צעירים על פני זקנים - דגם של כישלון מנהיגותי גאה." },
+        { event: "אחאב לעומת חזקיהו", verse: "השוואה", explain: "אחאב - נכנע לאשתו איזבל. חזקיה - 'לֹא הָיָה כָמֹהוּ... בַּה' בָּטָח' (י\"ח, ה). שני מנהיגים בעת משבר - תגובות הפוכות." },
+        { event: "יאשיהו", verse: "'וְכָמֹהוּ לֹא הָיָה לְפָנָיו מֶלֶךְ... וְאַחֲרָיו לֹא קָם כָּמֹהוּ' (כ\"ג, כה)", explain: "דגם המלך האידאלי - שמע, נכנע, פעל, תיקן. ומנגד: גם מנהיגות צדקת לא יכולה תמיד לבטל גזירה." },
         { event: "צדקיהו לעומת יהויכין", verse: "שניהם עמדו מול מצור", explain: "יהויכין יצא אל נבוכדנצר - ניצל. צדקיהו מרד - הרג בניו ועור עיניו. מנהיגות במציאות קשה." }
       ]
     },
@@ -531,7 +598,7 @@ const MELAKHIM_DATA = {
         { event: "שישק עולה על ירושלים", verse: "מל\"א י\"ד, כה-כו", explain: "ה-5 לרחבעם - לקח את אוצרות בית ה'. פגיעה ראשונה במקדש." },
         { event: "אסא נותן אוצרות לבן הדד", verse: "מל\"א ט\"ו, יח", explain: "הוריד כסף וזהב מבית ה' כדי לקנות ברית עם ארם נגד בעשא." },
         { event: "אחז במקדש", verse: "מל\"ב ט\"ז", explain: "הציב מזבח כתבנית דמשק. הזיז מזבח הנחושת. פירק המכונות והכיור. פגיעה חמורה." },
-        { event: "מנשה במקדש", verse: "מל\"ב כ\"א, ז", explain: "שם פסל האשרה בבית אשר אמר ה' 'בבית הזה אשים את שמי' - החטא שגזר גלות." },
+        { event: "מנשה במקדש", verse: "מל\"ב כ\"א, ז", explain: "שם פסל האשרה בבית אשר אמר ה' 'בַּבַּיִת הַזֶּה אָשִׂים אֶת שְׁמִי' - החטא שגזר גלות." },
         { event: "יאשיהו - בדק הבית", verse: "מל\"ב כ\"ב-כ\"ג", explain: "שיפוץ המקדש, מציאת ספר תורה, ביעור העבודה הזרה, טיהור המקדש." },
         { event: "חורבן הבית", verse: "מל\"ב כ\"ה, ט", explain: "נבוזראדן שורף את בית ה' - סוף החזון הגדול של שלמה." }
       ]
@@ -563,8 +630,8 @@ const MELAKHIM_DATA = {
         { event: "שלמה ונשים נוכריות", verse: "מל\"א י\"א", explain: "הצד השלילי של קשרי חוץ - אובדן אמונה." },
         { event: "אחאב ואיזבל", verse: "מל\"א ט\"ז", explain: "נישואין עם צידון - עבודת בעל ממלכתית." },
         { event: "אסא ובן הדד", verse: "מל\"א ט\"ו", explain: "תשלום שוחד נגד בעשא - ברית ארעית." },
-        { event: "אחז ואשור", verse: "מל\"ב ט\"ז", explain: "'עבדך ובנך אני' - כניעה דתית ומדינית." },
-        { event: "הושע וסוא", verse: "מל\"ב י\"ז", explain: "'משענת הקנה הרצוץ' - הברית עם מצרים הביאה לגלות." },
+        { event: "אחז ואשור", verse: "מל\"ב ט\"ז", explain: "'עַבְדְּךָ וּבִנְךָ אָנִי' - כניעה דתית ומדינית." },
+        { event: "הושע וסוא", verse: "מל\"ב י\"ז", explain: "'מִשְׁעֶנֶת הַקָּנֶה הָרָצוּץ' - הברית עם מצרים הביאה לגלות." },
         { event: "סנחריב וחזקיהו", verse: "מל\"ב י\"ח-י\"ט", explain: "איום, נאום רבשקה, נס ההצלה." },
         { event: "יאשיהו ופרעה נכה", verse: "מל\"ב כ\"ג", explain: "יאשיהו מת במגידו - התערבות במלחמה בין־עמית." },
         { event: "צדקיהו ונבוכדנצר", verse: "מל\"ב כ\"ה", explain: "המרד הסופי - החורבן." }
@@ -576,8 +643,8 @@ const MELAKHIM_DATA = {
       icon: "✂️",
       summary: "הספר פותח בממלכה מאוחדת וגדולה ונסגר בגלות. הפילוג הוביל לעוינות, מלחמות אחים בעירוב עמים זרים, וחורבן שתי הממלכות.",
       examples: [
-        { event: "ימי שלמה - אחדות ושגשוג", verse: "'וישב יהודה וישראל לבטח' (ה', ה)", explain: "דוגמה לשגשוג באחדות - רוחנית, כלכלית, צבאית." },
-        { event: "פילוג בשכם", verse: "מל\"א י\"ב", explain: "השבר הגדול - 'מה לנו חלק בדוד'." },
+        { event: "ימי שלמה - אחדות ושגשוג", verse: "'וַיֵּשֶׁב יְהוּדָה וְיִשְׂרָאֵל לָבֶטַח' (ה', ה)", explain: "דוגמה לשגשוג באחדות - רוחנית, כלכלית, צבאית." },
+        { event: "פילוג בשכם", verse: "מל\"א י\"ב", explain: "השבר הגדול - 'מַה לָּנוּ חֵלֶק בְּדָוִד'." },
         { event: "מלחמות ירבעם-רחבעם ואבים", verse: "מל\"א י\"ד-ט\"ו", explain: "מלחמות אחים מתמשכות." },
         { event: "אסא ובעשא", verse: "מל\"א ט\"ו", explain: "אסא שוכר את בן הדד הארמי נגד בעשא - עירוב עמים." },
         { event: "אחאב ויהושפט", verse: "מל\"א כ\"ב", explain: "שיתוף פעולה - אך יהושפט ניצל בנס." },
@@ -916,8 +983,12 @@ const fbPost = async (p,d) => { const u=getFB(); if(!u) return false; try{const 
 function App(){
   const [S, setS] = useState(load);
   const [route, setRoute] = useState({page:"home"});
-  const [firstTime, setFirstTime] = useState(!S.name);
+  const isTeacher = typeof window!=='undefined' && /[?&]teacher=1/.test(window.location.search);
+  const [firstTime, setFirstTime] = useState(!S.name && !isTeacher);
   const [theme, setTheme] = useState(()=>document.documentElement.getAttribute('data-theme')||'dark');
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [soundOn, setSoundOn] = useState(()=>{ try{return localStorage.getItem('mb_sound')!=='0'}catch{return true} });
+  const toggleSound = ()=>{ setSoundOn(v=>{ const nv=!v; try{localStorage.setItem('mb_sound',nv?'1':'0')}catch{} return nv; }); };
   const toggleTheme = ()=>{ const t=theme==='dark'?'light':'dark'; setTheme(t); document.documentElement.setAttribute('data-theme',t); try{localStorage.setItem('mb_theme',t);}catch{} };
 
   useEffect(() => {
@@ -975,59 +1046,164 @@ function App(){
     {p:"exam",l:"סימולציה",i:"📝"},
     {p:"class",l:"הכיתה",i:"🏆"}
   ];
+  const bottomNavs = [
+    {p:"home",l:"בית",i:"🏠"},
+    {p:"quiz",l:"חידון",i:"⚡"},
+    {p:"class",l:"דירוג",i:"🏆"},
+    {p:"profile",l:"אני",i:"👤"}
+  ];
+  const go = p => { setRoute({page:p}); setDrawerOpen(false); };
 
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-40 backdrop-blur-lg bg-slate-900/85 border-b border-amber-600/30">
         <div className="max-w-6xl mx-auto px-3 py-2 flex items-center justify-between gap-2">
-          <button onClick={()=>setRoute({page:"home"})} className="flex items-center gap-2 min-w-0">
-            <span className="text-2xl">👑</span>
-            <div className="text-right leading-tight min-w-0">
-              <div className="font-display text-sm md:text-base font-bold text-amber-300">ספר מלכים</div>
-              <div className="text-[9px] text-amber-100/60 truncate">בגרות 2551 · י״א 5 יח״ל</div>
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <button onClick={()=>setRoute({page:"profile"})} className="text-2xl md:text-3xl avatar-btn shrink-0" aria-label="פרופיל">{S.avatar}</button>
+            <div className="text-right leading-tight min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="font-display text-sm md:text-base font-bold text-amber-200 truncate">{S.name||"אורח"}</span>
+                <span className="rank-chip">{level.icon} {level.title}</span>
+              </div>
+              <div className="mini-stats mt-0.5">
+                <span className="ms">🔥 <span dir="ltr" className="num">{S.streak||0}</span></span>
+                <span className="ms">⭐ <span dir="ltr" className="num">{S.xp||0}</span></span>
+                <span className="ms">📅 <span dir="ltr" className="num">{daysTo(EXAM_DATE)}</span></span>
+              </div>
             </div>
-          </button>
-          <div className="flex items-center gap-1">
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
             <button onClick={toggleTheme} className="theme-tog" aria-label="החלף מצב כהה/בהיר" title="החלף מצב כהה/בהיר">
               {theme==='light'?'🌙':'☀️'}
             </button>
-            <Pill i={level.icon} v={level.title} c="amber"/>
-            <Pill i="🔥" v={S.streak} c="crimson"/>
-            <Pill i="⭐" v={S.xp} c="purple"/>
-            <button onClick={()=>setRoute({page:"profile"})} className="text-2xl md:text-3xl avatar-btn">{S.avatar}</button>
+            <button onClick={()=>setDrawerOpen(true)} className="hmb" aria-label="תפריט ראשי" aria-expanded={drawerOpen}>☰</button>
           </div>
         </div>
-        <nav className="max-w-6xl mx-auto px-2 pb-2 flex gap-1 overflow-x-auto fancy-scroll">
-          {navs.map(n => (
-            <button key={n.p} onClick={()=>setRoute({page:n.p})}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition ${route.page===n.p?"tab-active":"card hover:border-amber-400/50"}`}>
-              <span className="ml-1">{n.i}</span>{n.l}
-            </button>
-          ))}
-        </nav>
       </header>
 
+      {drawerOpen && (
+        <>
+          <div className="drawer-overlay" onClick={()=>setDrawerOpen(false)} aria-hidden="true"/>
+          <aside className="drawer" role="dialog" aria-label="תפריט ניווט">
+            <div className="flex items-center justify-between mb-4">
+              <div className="font-display text-lg font-bold text-amber-300">📖 תפריט</div>
+              <button onClick={()=>setDrawerOpen(false)} className="hmb" aria-label="סגור תפריט">✕</button>
+            </div>
+            <div className="space-y-1">
+              {navs.map(n => (
+                <button key={n.p} onClick={()=>go(n.p)} className={`drawer-link ${route.page===n.p?"active":""}`}>
+                  <span className="dico">{n.i}</span><span>{n.l}</span>
+                </button>
+              ))}
+              <button onClick={()=>go("profile")} className={`drawer-link ${route.page==="profile"?"active":""}`}>
+                <span className="dico">👤</span><span>הפרופיל שלי</span>
+              </button>
+              <div className="divider my-2"/>
+              <button onClick={toggleSound} className="drawer-link" aria-pressed={soundOn}>
+                <span className="dico">{soundOn?"🔊":"🔇"}</span><span>צלילים: {soundOn?"מופעל":"כבוי"}</span>
+              </button>
+              <button onClick={toggleTheme} className="drawer-link">
+                <span className="dico">{theme==='light'?'🌙':'☀️'}</span><span>מצב {theme==='light'?'כהה':'בהיר'}</span>
+              </button>
+            </div>
+          </aside>
+        </>
+      )}
+
       <main className="flex-1 max-w-6xl w-full mx-auto px-3 md:px-5 py-4 md:py-6 fade-up">
+        {isTeacher ? <TeacherView S={S}/> : <>
         {route.page==="home" && <Home S={S} setRoute={setRoute} level={level} nextLv={nextLv}/>}
         {route.page==="path" && <UnitsPath S={S} setRoute={setRoute}/>}
         {route.page==="unit" && <UnitDetail unitId={route.unitId} S={S} setRoute={setRoute} awardXP={awardXP} update={update}/>}
         {route.page==="lesson" && <Lesson unitId={route.unitId} mode={route.mode} setRoute={setRoute} S={S} awardXP={awardXP} update={update}/>}
         {route.page==="quiz" && <QuizLobby S={S} setRoute={setRoute}/>}
-        {route.page==="quizPlay" && <QuizRun params={route} S={S} setRoute={setRoute} awardXP={awardXP} update={update} publishActivity={publishActivity}/>}
+        {route.page==="quizPlay" && <QuizRun params={route} S={S} setRoute={setRoute} awardXP={awardXP} update={update} publishActivity={publishActivity} soundOn={soundOn}/>}
         {route.page==="quizResult" && <QuizResult {...route} S={S} setRoute={setRoute}/>}
         {route.page==="themes" && <Themes S={S} update={update}/>}
         {route.page==="quotes" && <QuotesBrowser S={S} update={update} awardXP={awardXP}/>}
         {route.page==="timeline" && <Timeline/>}
         {route.page==="maps" && <MapsPage S={S} update={update} awardXP={awardXP}/>}
         {route.page==="exam" && <ExamSim S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/>}
-        {route.page==="class" && <ClassBoard S={S} update={update}/>}
+        {route.page==="class" && <ClassBoard S={S} update={update} setRoute={setRoute}/>}
         {route.page==="profile" && <Profile S={S} update={update} setRoute={setRoute}/>}
+        </>}
       </main>
 
-      <footer className="py-3 text-center text-[10px] text-amber-100/40 border-t border-amber-900/30">
-        אתר נבנה ע״י <button onClick={()=>alert("יאיר בראוס · י״א · תשפ״ו\\nנבנה לטובת כל כיתה י״א הלומדת ספר מלכים לבגרות 2551.\\nהתוכן מבוסס על חוברת בקיאות חמ״ד משרד החינוך.")} className="text-amber-300 font-bold hover:underline">יאיר בראוס</button>
-        {' · '}תוכן: חוברת בקיאות מלכים · חמ״ד משרד החינוך · תשפ״ד
+      {!isTeacher && (
+        <nav className="bottom-nav" role="navigation" aria-label="ניווט תחתון">
+          {bottomNavs.map(n => (
+            <button key={n.p} onClick={()=>setRoute({page:n.p})} className={`bn-item ${route.page===n.p?"active":""}`} aria-label={n.l} aria-current={route.page===n.p?"page":undefined}>
+              <span className="bn-ico" aria-hidden="true">{n.i}</span>
+              <span>{n.l}</span>
+            </button>
+          ))}
+        </nav>
+      )}
+
+      <footer className="py-3 text-center text-[10px] text-amber-100/50 border-t border-amber-900/30">
+        אתר נבנה ע״י <span className="text-amber-300 font-bold">יאיר בראוס</span> · שאלון 2551 · תשפ״ו
       </footer>
+    </div>
+  );
+}
+
+// Teacher mode: read-only leaderboard + CSV export
+function TeacherView({S}){
+  const [data, setData] = useState(null);
+  const [code, setCode] = useState(S.classCode||"");
+  const [loading, setLoading] = useState(false);
+  const hasFB = !!getFB();
+  const load = useCallback(async () => {
+    if (!hasFB || !code) return;
+    setLoading(true);
+    const members = await fbGet(`classes/${code}/members`);
+    setData(members || {});
+    setLoading(false);
+  }, [code, hasFB]);
+  useEffect(()=>{ load(); },[load]);
+  const rows = data ? Object.values(data).sort((a,b)=>(b.xp||0)-(a.xp||0)) : [];
+  const exportCSV = () => {
+    const header = "name,class,points,correct,total,lastActive";
+    const lines = rows.map(m => {
+      const name = (m.name||"").replace(/,/g,' ');
+      const lastActive = m.ts ? new Date(m.ts).toISOString() : "";
+      return [name, code, m.xp||0, m.details?.correct||"", m.details?.total||"", lastActive].join(",");
+    });
+    const csv = "\uFEFF" + [header, ...lines].join("\n");
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `melakhim_class_${code}_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+  return (
+    <div className="space-y-4">
+      <div className="card rounded-2xl p-4">
+        <h1 className="font-display text-2xl font-bold text-amber-300">🧑‍🏫 מצב מורה</h1>
+        <p className="text-amber-100/70 text-sm mt-1">תצוגת דירוג לקריאה בלבד. ייצוא CSV לגיליון ציונים.</p>
+        <div className="mt-3 flex gap-2 flex-wrap">
+          <input value={code} onChange={e=>setCode(e.target.value.toUpperCase())} maxLength={8} placeholder="קוד כיתה" className="flex-1 min-w-[140px] px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-amber-100 font-mono"/>
+          <button onClick={load} className="gold-btn px-4 py-2 rounded-lg">טען</button>
+          <button onClick={exportCSV} disabled={!rows.length} className="gold-btn px-4 py-2 rounded-lg">📥 ייצא תוצאות CSV</button>
+        </div>
+      </div>
+      {loading && <div className="text-amber-200 text-center py-6">טוען…</div>}
+      {!loading && rows.length===0 && <div className="card rounded-xl p-4 text-center text-amber-100/60">אין נתונים לקוד זה.</div>}
+      {rows.length>0 && (
+        <div className="space-y-2">
+          {rows.map((m,i)=>(
+            <div key={i} className="card rounded-xl p-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-amber-500/20 flex items-center justify-center font-bold text-amber-200"><span dir="ltr" className="num">{i+1}</span></div>
+              <div className="text-3xl">{m.avatar}</div>
+              <div className="flex-1 min-w-0">
+                <div className="font-bold text-amber-100 truncate">{m.name}</div>
+                <div className="text-[11px] text-amber-100/60">⭐ <span dir="ltr" className="num">{m.xp||0}</span> · 🔥 <span dir="ltr" className="num">{m.streak||0}</span></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -1060,7 +1236,6 @@ function Onboarding({onDone}){
           <div className="text-6xl mb-3">👑</div>
           <h1 className="font-display text-3xl md:text-4xl font-black text-amber-900">ברוכים הבאים</h1>
           <p className="text-amber-950/80 mt-2 text-sm">הכלי להצלחה בבגרות על ספר מלכים.</p>
-          <p className="text-amber-700 text-xs mt-1">נבנה ע״י יאיר בראוס</p>
         </div>
         {step===0 && (
           <div className="space-y-4">
@@ -1106,86 +1281,84 @@ function Home({S, setRoute, level, nextLv}){
     const seed = new Date().toDateString().split('').reduce((a,c)=>a+c.charCodeAt(0),0);
     return QUESTIONS[seed % QUESTIONS.length];
   }, []);
-  const xpInLv = S.xp - level.min;
-  const xpForNext = nextLv ? nextLv.min - level.min : 1;
-  const lvPct = nextLv ? (xpInLv / xpForNext) * 100 : 100;
-  const dMock = daysTo(MOCK_DATE);
   const dExam = daysTo(EXAM_DATE);
   const [tick, setTick] = useState(0);
-  useEffect(()=>{ const id=setInterval(()=>setTick(t=>t+1),1000); return ()=>clearInterval(id); },[]);
-  const cd = useMemo(()=>{
-    const ms = EXAM_DATE.getTime() - Date.now();
-    if (ms<=0) return null;
-    const s = Math.floor(ms/1000);
-    return { d: Math.floor(s/86400), h: Math.floor((s%86400)/3600), m: Math.floor((s%3600)/60), s: s%60 };
-  },[tick]);
-  const heDays = d => d===0?'היום':d===1?'יום':d===2?'יומיים':`${d} ימים`;
-  const heMock = d => d===0?'היום':d===1?'מחר':d===2?'מחרתיים':`בעוד ${d} ימים`;
+  useEffect(()=>{ const id=setInterval(()=>setTick(t=>t+1),60000); return ()=>clearInterval(id); },[]);
+  const heDays = d => d===0?'היום':d===1?'יום אחד':d===2?'יומיים':`${d} ימים`;
+
+  // current unit = first unit without a quiz score, fallback to unit 1
+  const currentUnit = MELAKHIM_DATA.units.find(u => !(S.quizScores||{})[u.id]) || MELAKHIM_DATA.units[0];
+  const doneCount = MELAKHIM_DATA.units.filter(u => (S.quizScores||{})[u.id]).length;
+  const pathPct = Math.round((doneCount / MELAKHIM_DATA.units.length) * 100);
 
   return (
     <div className="space-y-5">
-      <section className="relative overflow-hidden rounded-3xl parchment p-5 md:p-8">
-        <div className="absolute top-0 left-0 text-[160px] opacity-[.06] select-none pointer-events-none leading-none">📜</div>
-        <div className="relative">
-          <div className="inline-block px-3 py-1 rounded-full bg-red-700 text-red-50 text-xs font-bold mb-3">⏰ בגרות י״ג אייר תשפ״ו · 30.4.2026 · {cd ? <><span dir="ltr" className="num">{cd.d}</span> {heDays(cd.d)} · <span dir="ltr" className="num">{String(cd.h).padStart(2,'0')}:{String(cd.m).padStart(2,'0')}:{String(cd.s).padStart(2,'0')}</span></> : "התחיל!"}{dMock>0?` · מתכונת ${heMock(dMock)}`:""}</div>
+      {/* Hero: countdown + single CTA */}
+      <section className="relative overflow-hidden rounded-3xl parchment p-5 md:p-7">
+        <div className="absolute top-0 left-0 text-[140px] opacity-[.06] select-none pointer-events-none leading-none">📜</div>
+        <div className="relative text-center">
+          <div className="inline-block px-3 py-1 rounded-full bg-red-700 text-red-50 text-xs font-bold mb-3">⏰ נותרו {heDays(dExam)} · 30.4.2026</div>
           <h1 className="font-display text-2xl md:text-4xl font-black text-amber-900 leading-tight">
-            שלום {S.name}! {S.avatar}<br/>
-            <span className="text-amber-700 text-xl md:text-3xl">נצליח בבגרות 2551 יחד</span>
+            שלום {S.name} {S.avatar}
           </h1>
-          <p className="text-amber-950/80 mt-2 text-sm md:text-base max-w-2xl">
-            {QUESTIONS.length} שאלות מכוונות בחינה · 3 רמות קושי · 4 סוגי שאלות · סימולציה מלאה · לוח כיתתי חי
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button onClick={()=>setRoute({page:"exam"})} className="gold-btn px-4 py-2.5 rounded-xl text-sm md:text-base">📝 סימולציית בגרות</button>
-            <button onClick={()=>setRoute({page:"quiz"})} className="px-4 py-2.5 rounded-xl bg-slate-900 text-amber-200 font-bold hover:bg-slate-800 text-sm md:text-base">⚔️ חידונים</button>
-            <button onClick={()=>setRoute({page:"path"})} className="px-4 py-2.5 rounded-xl bg-white/60 text-amber-900 font-bold hover:bg-white/80 text-sm md:text-base">🗺 מסלול</button>
-          </div>
+          <p className="text-amber-800/80 text-sm mt-1">בגרות 2551 · ספר מלכים · י״א 5 יח״ל</p>
+          <button onClick={()=>setRoute({page:"quizPlay",mode:"quick"})} className="gold-btn w-full md:w-auto md:px-10 py-4 rounded-2xl text-lg md:text-xl mt-4 glow">
+            ⚡ חידון מהיר · 10 שאלות
+          </button>
         </div>
       </section>
 
-      <section className="card rounded-2xl p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">{level.icon}</span>
-            <div>
-              <div className="font-display font-bold text-amber-200">{level.title}</div>
-              {nextLv && <div className="text-xs text-amber-100/60">עד {nextLv.title}: {nextLv.min - S.xp} XP</div>}
-            </div>
-          </div>
-          <div className="text-right">
-            <div className="font-display text-2xl font-black text-amber-300">{S.xp}</div>
-            <div className="text-xs text-amber-100/60">XP</div>
-          </div>
-        </div>
-        <div className="h-2.5 rounded-full bg-slate-800 overflow-hidden">
-          <div className="h-full bg-gradient-to-l from-amber-300 via-amber-500 to-amber-700 transition-all" style={{width:lvPct+"%"}}/>
-        </div>
-      </section>
-
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <Stat i="⏳" v={dMock} l={dMock===0?"היום מתכונת!":"ימים למתכונת"} c="crimson"/>
-        <Stat i="📅" v={dExam} l="ימים לבגרות" c="gold"/>
-        <Stat i="🔥" v={S.streak} l="רצף ימים" c="emerald"/>
-        <Stat i="🎯" v={S.totalQuizzes||0} l="חידונים" c="purple"/>
-      </section>
-
-      <section className="card rounded-2xl p-5">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-display text-lg font-bold text-amber-300 flex items-center gap-1.5">☀️ אתגר היום</h2>
-          <span className="text-[10px] text-amber-100/60">{new Date().toLocaleDateString('he-IL')}</span>
-        </div>
-        <DailyQ q={dailyQ}/>
-      </section>
-
+      {/* 3-card horizontal scroll */}
       <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-display text-xl md:text-2xl font-bold text-amber-200">📚 ששת היחידות</h2>
-          <button onClick={()=>setRoute({page:"path"})} className="text-amber-300 text-sm hover:underline">מסלול מלא ←</button>
+        <h2 className="font-display text-sm font-bold text-amber-200/90 mb-2 px-1">בחר את הדרך שלך היום</h2>
+        <div className="hrow fancy-scroll">
+          <button onClick={()=>setRoute({page:"unit",unitId:currentUnit.id})} className="card rounded-2xl p-4 text-right relative overflow-hidden">
+            <div className="absolute -top-4 -left-4 w-20 h-20 rounded-full opacity-25 blur-2xl bg-amber-400"/>
+            <div className="relative">
+              <div className="text-3xl">🗺</div>
+              <h3 className="font-display text-base font-bold text-amber-100 mt-1">המשך מסלול</h3>
+              <p className="text-xs text-amber-200/70 mt-0.5 line-clamp-1">יחידה {currentUnit.num}: {currentUnit.title}</p>
+              <div className="mt-2 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div className="h-full bg-gradient-to-l from-amber-300 to-amber-600 transition-all" style={{width:pathPct+"%"}}/>
+              </div>
+              <div className="text-[10px] text-amber-100/60 mt-1"><span dir="ltr" className="num">{doneCount}/6</span> יחידות · {pathPct}%</div>
+            </div>
+          </button>
+          <button onClick={()=>setRoute({page:"quizPlay",mode:"daily"})} className="card rounded-2xl p-4 text-right relative overflow-hidden">
+            <div className="absolute -top-4 -left-4 w-20 h-20 rounded-full opacity-25 blur-2xl bg-purple-400"/>
+            <div className="relative">
+              <div className="text-3xl">☀️</div>
+              <h3 className="font-display text-base font-bold text-amber-100 mt-1">אתגר היום</h3>
+              <p className="text-xs text-amber-200/70 mt-0.5 line-clamp-2 hebrew">{dailyQ.q.length>70?dailyQ.q.slice(0,70)+'…':dailyQ.q}</p>
+              <div className="mt-2 flex items-center gap-1 text-[10px]"><DiffBadge d={dailyQ.d}/><span className="text-amber-100/60">{new Date().toLocaleDateString('he-IL')}</span></div>
+            </div>
+          </button>
+          <button onClick={()=>setRoute({page:"exam"})} className="card rounded-2xl p-4 text-right relative overflow-hidden">
+            <div className="absolute -top-4 -left-4 w-20 h-20 rounded-full opacity-25 blur-2xl bg-red-400"/>
+            <div className="relative">
+              <div className="text-3xl">📝</div>
+              <h3 className="font-display text-base font-bold text-amber-100 mt-1">סימולציה מלאה</h3>
+              <p className="text-xs text-amber-200/70 mt-0.5">שעתיים · 100 נקודות · מבנה אמיתי</p>
+              <div className="mt-2 text-[10px] text-amber-300 font-bold">לחץ להתחלה ←</div>
+            </div>
+          </button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      </section>
+
+      {/* Collapsed units */}
+      <details className="card rounded-2xl overflow-hidden">
+        <summary className="px-4 py-3 cursor-pointer flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">📚</span>
+            <span className="font-display font-bold text-amber-200">יחידות לימוד</span>
+            <span className="text-[10px] text-amber-100/60">({MELAKHIM_DATA.units.length})</span>
+          </div>
+          <span className="text-amber-300 text-sm">▾</span>
+        </summary>
+        <div className="p-4 pt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {MELAKHIM_DATA.units.map(u => <UnitCard key={u.id} u={u} S={S} onClick={()=>setRoute({page:"unit",unitId:u.id})}/>)}
         </div>
-      </section>
+      </details>
     </div>
   );
 }
@@ -1579,7 +1752,7 @@ function QuizRun({params,S,setRoute,awardXP,update,publishActivity}){
   return <QuizPlay mode={mode} unit={finalUnit} diff={finalDiff} setRoute={setRoute} S={S} awardXP={awardXP} update={update} publishActivity={publishActivity}/>;
 }
 
-function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity}){
+function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity,soundOn}){
   const questions = useMemo(() => {
     let pool = QUESTIONS;
     if (unit) pool = pool.filter(q => q.u === unit);
@@ -1599,7 +1772,53 @@ function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity}){
   const [expanded, setExpanded] = useState(false);
   const [time, setTime] = useState(mode==="battle"?180:0);
   const [waitingNext, setWaitingNext] = useState(false);
+  const [hintUsed, setHintUsed] = useState(0);
+  const [hiddenOptions, setHiddenOptions] = useState([]);
   const timed = mode === "battle";
+  const audioRef = useRef(null);
+  const getAudio = () => {
+    if (audioRef.current) return audioRef.current;
+    try{
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audioRef.current = new AC();
+      return audioRef.current;
+    }catch{return null}
+  };
+  const playChord = (freqs, dur=0.15) => {
+    if (!soundOn) return;
+    const ac = getAudio(); if (!ac) return;
+    const now = ac.currentTime;
+    freqs.forEach(f => {
+      const o = ac.createOscillator(); const g = ac.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(.0001, now);
+      g.gain.exponentialRampToValueAtTime(.18, now+.01);
+      g.gain.exponentialRampToValueAtTime(.0001, now+dur);
+      o.connect(g); g.connect(ac.destination);
+      o.start(now); o.stop(now+dur+.02);
+    });
+  };
+  const playCorrect = () => playChord([523.25, 659.25, 783.99], .15); // C major triad
+  const playWrong = () => {
+    if (!soundOn) return;
+    const ac = getAudio(); if (!ac) return;
+    const now = ac.currentTime;
+    const o = ac.createOscillator(); const g = ac.createGain();
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(180, now); o.frequency.exponentialRampToValueAtTime(90, now+.2);
+    g.gain.setValueAtTime(.0001, now); g.gain.exponentialRampToValueAtTime(.2, now+.01); g.gain.exponentialRampToValueAtTime(.0001, now+.2);
+    o.connect(g); g.connect(ac.destination);
+    o.start(now); o.stop(now+.22);
+  };
+  const vibrate = pat => { try{ if (navigator.vibrate && window.matchMedia('(pointer:coarse)').matches) navigator.vibrate(pat); }catch{} };
+  const useHint = () => {
+    if (hintUsed || picked !== null) return;
+    const q = questions[idx];
+    const wrongIdx = q.a.map((_,i)=>i).filter(i=>i!==q.c);
+    const fy = (arr)=>{ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+    setHiddenOptions(fy(wrongIdx).slice(0,2));
+    setHintUsed(1);
+  };
 
   useEffect(() => {
     if (!timed || waitingNext) return;
@@ -1623,6 +1842,7 @@ function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity}){
     setPicked(i);
     const right = i === q.c;
     if (right) {
+      playCorrect(); vibrate([50]);
       setCorrect(x => x+1);
       setExpanded(false);
       if (q.d === "hard") update(p => {
@@ -1632,6 +1852,7 @@ function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity}){
         return {...p, hardCorrect:nhc, achievements:ach};
       });
     } else {
+      playWrong(); vibrate([100,50,100]);
       update(p => ({...p, hearts:Math.max(0, p.hearts-1)}));
       setMissed(m => [...m, {...q, picked:i}]);
       setExpanded(true);
@@ -1641,7 +1862,7 @@ function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity}){
 
   const nextQ = () => {
     if (idx+1 >= questions.length) finish(correct);
-    else { setIdx(idx+1); setPicked(null); setWaitingNext(false); setExpanded(false); }
+    else { setIdx(idx+1); setPicked(null); setWaitingNext(false); setExpanded(false); setHiddenOptions([]); }
   };
 
   const finish = async (finalCorrect) => {
@@ -1692,15 +1913,23 @@ function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity}){
         <h2 className="font-display text-lg md:text-xl font-bold text-amber-950 leading-snug">{q.q}</h2>
       </div>
 
+      {picked===null && !hintUsed && (
+        <div className="flex justify-end">
+          <button onClick={useHint} className="hint-btn" aria-label="הסר שתי תשובות שגויות">🤝 רמז מחבר (50/50)</button>
+        </div>
+      )}
+
       <div className="space-y-2">
         {q.a.map((a,i) => {
+          const hidden = hiddenOptions.includes(i);
           let cls = "w-full text-right px-4 py-3.5 rounded-xl font-semibold text-base transition border-2 ";
-          if (picked===null) cls += "card border-slate-700 hover:border-amber-400 hover:bg-amber-500/10 text-amber-100";
+          if (hidden) cls += "border-slate-800 opacity-20 text-amber-100/30 pointer-events-none line-through";
+          else if (picked===null) cls += "card border-slate-700 hover:border-amber-400 hover:bg-amber-500/10 text-amber-100";
           else if (i===q.c) cls += "correct-ans border-emerald-400 text-white";
           else if (i===picked) cls += "wrong-ans border-red-500 text-white shake";
           else cls += "border-slate-800 opacity-40 text-amber-100/60";
           return (
-            <button key={i} disabled={picked!==null} onClick={()=>pick(i)} className={cls} aria-label={`תשובה ${["א׳","ב׳","ג׳","ד׳"][i]}`}>
+            <button key={i} disabled={picked!==null || hidden} onClick={()=>pick(i)} className={cls} aria-label={`תשובה ${["א׳","ב׳","ג׳","ד׳"][i]}`} aria-hidden={hidden?"true":undefined}>
               <span className="al ml-2" aria-hidden="true">{["א","ב","ג","ד"][i]}</span>
               {a}
             </button>
@@ -2243,16 +2472,20 @@ function ExamSim({S,update,awardXP,setRoute,publishActivity}){
 }
 
 // ============ CLASS BOARD ============
-function ClassBoard({S,update}){
+function ClassBoard({S,update,setRoute}){
   const [classData, setClassData] = useState(null);
   const [activity, setActivity] = useState([]);
   const [loading, setLoading] = useState(true);
   const [code, setCode] = useState("");
   const [err, setErr] = useState("");
   const [toast, setToast] = useState("");
+  const [period, setPeriod] = useState("week"); // week|month|all
+  const [lastSync, setLastSync] = useState(null);
+  const [nowTick, setNowTick] = useState(0);
   const prevRankRef = useRef(null);
   const hasFB = !!getFB();
   useEffect(()=>{ if(!toast) return; const id=setTimeout(()=>setToast(""), 3500); return ()=>clearTimeout(id); },[toast]);
+  useEffect(()=>{ const id=setInterval(()=>setNowTick(t=>t+1),30000); return ()=>clearInterval(id); },[]);
 
   const loadClass = useCallback(async () => {
     setLoading(true);
@@ -2261,11 +2494,21 @@ function ClassBoard({S,update}){
       const act = await fbGet(`classes/${S.classCode}/activity`);
       setClassData(members || {});
       setActivity(act ? Object.values(act).sort((a,b)=>b.ts-a.ts).slice(0,150) : []);
+      setLastSync(Date.now());
     }
     setLoading(false);
   }, [S.classCode, hasFB]);
 
   useEffect(() => { loadClass(); const iv = setInterval(loadClass, 15000); return ()=>clearInterval(iv); }, [loadClass]);
+
+  const syncLabel = useMemo(() => {
+    if (!lastSync) return "מסנכרן...";
+    const mins = Math.floor((Date.now()-lastSync)/60000);
+    if (mins<1) return "עודכן זה עתה";
+    if (mins===1) return "עודכן לפני דקה";
+    return `עודכן לפני ${mins} דק׳`;
+  // eslint-disable-next-line
+  }, [lastSync, nowTick]);
 
   const addFriend = () => {
     const o = decodeShare(code);
@@ -2281,7 +2524,10 @@ function ClassBoard({S,update}){
     setCode(""); setErr("");
   };
 
-  const liveMembers = classData ? Object.values(classData).sort((a,b)=>(b.xp||0)-(a.xp||0)) : [];
+  const periodCutoff = period==="week" ? Date.now() - 7*86400000 : period==="month" ? Date.now() - 30*86400000 : 0;
+  const liveMembers = classData ? Object.values(classData)
+    .filter(m => period==="all" || !m.ts || m.ts >= periodCutoff)
+    .sort((a,b)=>(b.xp||0)-(a.xp||0)) : [];
   useEffect(()=>{
     if(!liveMembers.length || !S.name) return;
     const myIdx = liveMembers.findIndex(m=>m.name===S.name);
@@ -2323,7 +2569,15 @@ function ClassBoard({S,update}){
       {hasFB && S.classCode && (
         <>
           <section>
-            <h2 className="font-display text-lg font-bold text-amber-200 mb-2">📊 דירוג הכיתה · חי</h2>
+            <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+              <h2 className="font-display text-lg font-bold text-amber-200">📊 דירוג הכיתה · חי</h2>
+              <span className="sync-ind"><span className="sync-dot"/>{syncLabel}</span>
+            </div>
+            <div className="flex gap-2 mb-3" role="tablist" aria-label="טווח זמן דירוג">
+              <button role="tab" aria-selected={period==="week"} onClick={()=>setPeriod("week")} className={`period-chip ${period==="week"?"active":""}`}>השבוע</button>
+              <button role="tab" aria-selected={period==="month"} onClick={()=>setPeriod("month")} className={`period-chip ${period==="month"?"active":""}`}>החודש</button>
+              <button role="tab" aria-selected={period==="all"} onClick={()=>setPeriod("all")} className={`period-chip ${period==="all"?"active":""}`}>הכל</button>
+            </div>
             {loading ? (
               <div className="space-y-2" aria-busy="true" aria-label="טוען דירוג">
                 {[0,1,2,3,4].map(i=>(
@@ -2335,7 +2589,17 @@ function ClassBoard({S,update}){
                 ))}
               </div>
             ) :
-            liveMembers.length === 0 ? <div className="card rounded-xl p-4 text-center text-amber-100/60">📭 עדיין אין חברים. שתף את קוד הכיתה: <strong>{S.classCode}</strong></div> : (
+            liveMembers.length === 0 ? (
+              <div className="card rounded-2xl empty-state">
+                <svg viewBox="0 0 64 64" fill="currentColor" aria-hidden="true">
+                  <path d="M12 10h34a6 6 0 016 6v32a6 6 0 01-6 6H12a4 4 0 01-4-4V14a4 4 0 014-4zm0 4v36h34a2 2 0 002-2V16a2 2 0 00-2-2H12zm4 8h22v2H16v-2zm0 6h22v2H16v-2zm0 6h16v2H16v-2z" fillOpacity=".9"/>
+                  <circle cx="50" cy="14" r="5" fill="#F5D670"/>
+                </svg>
+                <h3 className="font-display text-xl font-bold text-amber-200">היה ראשון בכיתה</h3>
+                <p className="text-amber-100/70 text-sm mt-1">שתף את קוד הכיתה: <strong className="text-amber-300">{S.classCode}</strong></p>
+                <button onClick={()=>setRoute && setRoute({page:"quizPlay",mode:"quick"})} className="gold-btn mt-4 px-5 py-2.5 rounded-xl">⚡ התחל חידון</button>
+              </div>
+            ) : (
               <div>
                 {podium.length>0 && (
                   <div className="podium-row">
@@ -2351,7 +2615,7 @@ function ClassBoard({S,update}){
                             <div className="rank-bubble"><span dir="ltr" className="num">{o.place}</span></div>
                             <div className="crown">{crown}</div>
                             <div className="av">{o.m.avatar}</div>
-                            <div className="nm">{o.m.name}{o.m.name===S.name?' (אני)':''}</div>
+                            <div className="nm">{o.m.name}{o.m.name===S.name && <span className="me-chip">אתה</span>}</div>
                             <div className="meta">🔥 <span dir="ltr" className="num">{o.m.streak||0}</span> · ⭐ <span dir="ltr" className="num">{o.m.xp||0}</span></div>
                           </div>
                         );
@@ -2367,7 +2631,7 @@ function ClassBoard({S,update}){
                         <div className="w-9 h-9 rounded-full font-bold flex items-center justify-center font-display shrink-0 bg-slate-800 text-amber-200" aria-label={`מקום ${place}`}><span dir="ltr" className="num">{place}</span></div>
                         <div className="text-3xl">{m.avatar}</div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-bold truncate text-amber-100">{m.name}{m.name===S.name?" (אני)":""}</div>
+                          <div className="font-bold truncate text-amber-100">{m.name}{m.name===S.name && <span className="me-chip">אתה</span>}</div>
                           <div className="text-[10px] text-amber-100/60">🔥 <span dir="ltr" className="num">{m.streak||0}</span> · ⭐ <span dir="ltr" className="num">{m.xp||0}</span></div>
                         </div>
                       </div>
@@ -2409,7 +2673,7 @@ function ClassBoard({S,update}){
           <div className="space-y-2">
             <div className="flex items-center gap-3 p-3 rounded-xl parchment ring-2 ring-amber-500">
               <div className="text-3xl">{S.avatar}</div>
-              <div className="flex-1"><div className="font-bold text-amber-950">{S.name} (אני)</div></div>
+              <div className="flex-1"><div className="font-bold text-amber-950">{S.name}<span className="me-chip">אתה</span></div></div>
               <div className="font-display text-2xl font-black text-amber-900">{myBest}%</div>
             </div>
             {localFriends.map((f,i) => (
@@ -2480,8 +2744,8 @@ function Profile({S,update,setRoute}){
             </div>
           ))}
           {locked.map(a => (
-            <div key={a.id} className="card rounded-xl p-3 text-center opacity-50">
-              <div className="text-3xl">🔒</div>
+            <div key={a.id} className="card rounded-xl p-3 text-center ach-locked" aria-label={`הישג נעול: ${a.name}`}>
+              <div className="text-3xl">{a.icon}</div>
               <div className="font-display font-bold text-amber-200 text-xs mt-1">{a.name}</div>
               <div className="text-[10px] text-amber-100/60 mt-0.5">{a.desc}</div>
             </div>
@@ -2529,6 +2793,13 @@ class EB extends React.Component {
   }catch{ document.documentElement.setAttribute('data-theme','dark'); }
 })();
 ReactDOM.createRoot(document.getElementById("root")).render(<EB><App/></EB>);
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('./sw.js').catch(function(){});
+    });
+  }
 </script>
 </body>
 </html>
