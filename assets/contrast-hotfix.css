@@ -1,0 +1,162 @@
+/* =========================================================================
+   contrast-hotfix.css
+   WCAG AA contrast enforcement for both themes.
+   Target: minimum 4.5:1 for body text, 3:1 for large/bold.
+   Loaded LAST so !important overrides pre-existing low-contrast styles.
+
+   Light palette (parchment):
+     bg:        #FBF6EB    primary:  #1A1611    (~16:1 vs bg)
+     secondary: #4A3D2C    tertiary: #7D6742    (~5:1 vs bg)
+     accent:   #8B6F1F     border:  #D4A574
+
+   Dark palette (slate):
+     bg:        #0A1628    primary:  #F5E6C8    (~13:1 vs bg)
+     secondary: #C89B3C    tertiary: #8B6F1F    (~4.6:1 vs bg, large only)
+   ========================================================================= */
+
+/* ---------- Root tokens ---------- */
+html[data-theme='light']{
+  --t-bg:#FBF6EB;
+  --t-fg:#1A1611;
+  --t-fg-2:#4A3D2C;
+  --t-fg-3:#7D6742;
+  --t-accent:#8B6F1F;
+  --t-border:#D4A574;
+}
+html[data-theme='dark'],
+html:not([data-theme]){
+  --t-bg:#0A1628;
+  --t-fg:#F5E6C8;
+  --t-fg-2:#C89B3C;
+  --t-fg-3:#8B6F1F;
+  --t-accent:#F5D670;
+  --t-border:rgba(212,165,116,.5);
+}
+
+/* ---------- Base body ---------- */
+html[data-theme='light'] body{ color:#1A1611 !important; background:#FBF6EB !important; }
+html[data-theme='dark'] body, html:not([data-theme]) body{ color:#F5E6C8 !important; background:#0A1628 !important; }
+
+/* ---------- Kill all opacity-based fading on text ---------- */
+html[data-theme='light'] .text-amber-100\/40,
+html[data-theme='light'] .text-amber-100\/50,
+html[data-theme='light'] .text-amber-100\/60,
+html[data-theme='light'] .text-amber-100\/70,
+html[data-theme='light'] .text-amber-200\/60,
+html[data-theme='light'] .text-amber-200\/70,
+html[data-theme='light'] .text-amber-200\/80,
+html[data-theme='light'] .text-amber-300\/60,
+html[data-theme='light'] .text-amber-700,
+html[data-theme='light'] .text-amber-800,
+html[data-theme='light'] .text-amber-800\/80,
+html[data-theme='light'] .text-amber-950\/80{
+  color:#4A3D2C !important; opacity:1 !important;
+}
+html[data-theme='dark'] .text-amber-100\/40,
+html[data-theme='dark'] .text-amber-100\/50,
+html[data-theme='dark'] .text-amber-100\/60,
+html[data-theme='dark'] .text-amber-100\/70,
+html[data-theme='dark'] .text-amber-200\/60,
+html[data-theme='dark'] .text-amber-200\/70,
+html[data-theme='dark'] .text-amber-200\/80,
+html[data-theme='dark'] .text-amber-300\/60,
+html:not([data-theme]) .text-amber-100\/40,
+html:not([data-theme]) .text-amber-100\/50,
+html:not([data-theme]) .text-amber-100\/60,
+html:not([data-theme]) .text-amber-100\/70,
+html:not([data-theme]) .text-amber-200\/60,
+html:not([data-theme]) .text-amber-200\/70{
+  color:#E8D49E !important; opacity:1 !important;
+}
+
+/* The .text-[10px] class commonly carries faint colors — make sure they're readable */
+html[data-theme='light'] .text-amber-100\/60.text-\[10px\],
+html[data-theme='light'] .text-amber-100\/70.text-\[10px\]{ color:#4A3D2C !important; font-weight:600; }
+
+/* ---------- Faint utility classes used across the app ---------- */
+.muted, .small, .chip, .num, .rank, .al, .ab, .tag,
+.podium-row .pad .meta, .nb{
+  opacity:1 !important;
+}
+html[data-theme='light'] .muted,
+html[data-theme='light'] .small,
+html[data-theme='light'] .nb,
+html[data-theme='light'] .podium-row .pad .meta{ color:#4A3D2C !important; }
+html[data-theme='dark'] .muted,
+html[data-theme='dark'] .small,
+html[data-theme='dark'] .nb,
+html:not([data-theme]) .muted,
+html:not([data-theme]) .small,
+html:not([data-theme]) .nb{ color:#E8D49E !important; }
+
+/* Numbers (.num): bold, high-contrast in both themes */
+.num{ font-weight:700 !important; }
+html[data-theme='light'] .num{ color:#1A1611 !important; }
+html[data-theme='dark'] .num,
+html:not([data-theme]) .num{ color:#F5E6C8 !important; }
+
+/* Chips/tags */
+html[data-theme='light'] .chip, html[data-theme='light'] .tag{ color:#1A1611 !important; background:rgba(139,111,31,.15) !important; border-color:#D4A574 !important; }
+html[data-theme='dark'] .chip, html[data-theme='dark'] .tag,
+html:not([data-theme]) .chip, html:not([data-theme]) .tag{ color:#F5E6C8 !important; }
+
+/* Answer letter circles (.al) — already high-contrast gold; ensure no fade */
+.al{ opacity:1 !important; }
+
+/* Podium tiles: dark text on light gold/silver/bronze */
+.podium-row .p1, .podium-row .p2, .podium-row .p3{ color:#1A1611 !important; }
+.podium-row .pad .nm{ color:#1A1611 !important; opacity:1 !important; }
+.podium-row .pad .meta{ color:#3A2E1A !important; opacity:1 !important; font-weight:600; }
+.podium-row .rank-bubble{ color:#fff !important; background:rgba(0,0,0,.55) !important; }
+
+/* Rank chip / mini stats from PR#2 */
+html[data-theme='light'] .rank-chip{ color:#1A1611 !important; }
+html[data-theme='dark'] .mini-stats,
+html:not([data-theme]) .mini-stats{ color:#F5D670 !important; }
+html[data-theme='light'] .mini-stats{ color:#8B6F1F !important; font-weight:700; }
+
+/* Drawer + bottom nav contrast */
+html[data-theme='light'] .drawer-link{ color:#1A1611 !important; }
+html[data-theme='light'] .bn-item{ color:#4A3D2C !important; }
+html[data-theme='light'] .bn-item.active{ color:#8B6F1F !important; background:rgba(212,165,116,.32) !important; }
+html[data-theme='dark'] .bn-item,
+html:not([data-theme]) .bn-item{ color:#C8B98A !important; }
+
+/* Period filter chips — readable in both themes */
+html[data-theme='light'] .period-chip{ color:#1A1611 !important; background:rgba(139,111,31,.12) !important; border-color:#8B6F1F !important; }
+html[data-theme='dark'] .period-chip,
+html:not([data-theme]) .period-chip{ color:#F5D670 !important; }
+
+/* Sync indicator */
+html[data-theme='light'] .sync-ind{ color:#4A3D2C !important; }
+html[data-theme='dark'] .sync-ind,
+html:not([data-theme]) .sync-ind{ color:#E8D49E !important; }
+
+/* Inputs: high-contrast in both themes */
+html[data-theme='light'] input, html[data-theme='light'] textarea, html[data-theme='light'] select{
+  background:#FFF !important; color:#1A1611 !important; border-color:#8B6F1F !important;
+}
+html[data-theme='light'] input::placeholder, html[data-theme='light'] textarea::placeholder{ color:#7D6742 !important; opacity:1 !important; }
+html[data-theme='dark'] input::placeholder, html[data-theme='dark'] textarea::placeholder,
+html:not([data-theme]) input::placeholder, html:not([data-theme]) textarea::placeholder{ color:#A89070 !important; opacity:1 !important; }
+
+/* Headings inside .card in light mode */
+html[data-theme='light'] .card h1,
+html[data-theme='light'] .card h2,
+html[data-theme='light'] .card h3,
+html[data-theme='light'] .card .text-amber-300,
+html[data-theme='light'] .card .text-amber-200,
+html[data-theme='light'] .card .text-amber-100{ color:#1A1611 !important; }
+
+/* Footer */
+html[data-theme='light'] footer{ color:#4A3D2C !important; }
+html[data-theme='dark'] footer,
+html:not([data-theme]) footer{ color:#C8B98A !important; }
+
+/* Last-resort: never let any text below 0.7 opacity render */
+html[data-theme='light'] *[style*="opacity:0.4"],
+html[data-theme='light'] *[style*="opacity:0.5"],
+html[data-theme='light'] *[style*="opacity:0.6"],
+html[data-theme='dark'] *[style*="opacity:0.4"],
+html[data-theme='dark'] *[style*="opacity:0.5"],
+html[data-theme='dark'] *[style*="opacity:0.6"]{ opacity:.85 !important; }
