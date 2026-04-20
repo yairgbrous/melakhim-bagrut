@@ -445,6 +445,107 @@ html[data-theme='light'] .study-card .sc-tag{ background:rgba(139,111,31,.18); c
 }
 html[data-theme='light'] .study-empty{ color:#7D6742; }
 
+/* Inline expand accordion (replaces drawer) */
+.expanded-panel{
+  display:block;
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .3s ease, padding .2s ease, margin .2s ease;
+}
+.expanded-panel.open{
+  max-height:4000px;
+  margin-top:8px;
+}
+.expanded-panel-inner{
+  padding:14px 16px;
+  background:linear-gradient(180deg,rgba(22,40,74,.7) 0%,rgba(10,22,40,.7) 100%);
+  border:1px solid rgba(212,165,116,.35);
+  border-radius:14px;
+  font-family:'Frank Ruhl Libre','Noto Serif Hebrew',serif;
+  line-height:1.85;
+  color:#F5E6C8;
+  font-size:14.5px;
+}
+html[data-theme='light'] .expanded-panel-inner{
+  background:linear-gradient(180deg,#FBF6EB 0%,#F0E4C4 100%);
+  color:#1A1611;
+  border-color:#C89B3C;
+}
+.expanded-panel-inner .sect{
+  margin-top:10px; padding-top:8px;
+  border-top:1px dashed rgba(212,165,116,.35);
+}
+.expanded-panel-inner .sect:first-child{ margin-top:0; padding-top:0; border-top:0; }
+.expanded-panel-inner .sect-h{
+  font-weight:800; font-size:13px; color:#F5D670;
+  margin-bottom:4px; letter-spacing:.02em;
+}
+html[data-theme='light'] .expanded-panel-inner .sect-h{ color:#8B6F1F; }
+.expanded-panel-inner ul{ padding-inline-start:1.2em; margin:6px 0; }
+.expanded-panel-inner li{ margin-bottom:4px; }
+.expanded-panel-inner a{ color:#F5D670; text-decoration:underline; }
+html[data-theme='light'] .expanded-panel-inner a{ color:#8B6F1F; }
+.chip-row{
+  display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;
+}
+
+/* Chip when expanded — subtle "active" styling */
+.entity-chip.open{
+  background:rgba(212,165,116,.3) !important;
+  color:#FFF1B8 !important;
+  border-bottom-style:solid !important;
+}
+html[data-theme='light'] .entity-chip.open{
+  background:rgba(200,155,60,.3) !important;
+  color:#1A1611 !important;
+}
+
+/* Inline verse link row inside panel */
+.verse-links-inline{
+  display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;
+}
+.verse-links-inline a{
+  display:inline-flex; align-items:center; gap:4px;
+  padding:6px 10px; border-radius:10px;
+  background:linear-gradient(135deg,#D4A574 0%,#8B6F47 100%);
+  color:#1A1611 !important;
+  font-weight:800; font-size:12px; text-decoration:none !important;
+}
+
+/* Study card wrap (accordion container) */
+.study-card-wrap{
+  grid-column: span 1;
+}
+.study-card-wrap.expanded{
+  grid-column: 1 / -1;
+}
+.study-card{
+  width:100%;
+  text-align:right; padding:14px; border-radius:16px;
+  background:linear-gradient(135deg,rgba(22,40,74,.85),rgba(15,31,58,.85));
+  border:1px solid rgba(212,165,116,.35);
+  color:#F5E6C8; cursor:pointer;
+  transition:transform .15s ease, border-color .15s ease;
+  display:flex; flex-direction:column; gap:6px;
+  min-height:120px;
+}
+.study-card.open{
+  border-color:#F5D670;
+  box-shadow:0 0 0 2px rgba(245,214,112,.25);
+}
+.study-card:hover{ border-color:#F5D670; transform:translateY(-1px); }
+html[data-theme='light'] .study-card{
+  background:linear-gradient(135deg,#FBF6EB,#F0E4C4);
+  color:#1A1611; border-color:#C89B3C;
+}
+
+/* Unit card specifics */
+.unit-card .study-card{ min-height:160px; }
+.unit-card .study-card .unit-head{
+  display:flex; align-items:center; gap:10px; margin-bottom:4px;
+}
+.unit-card .study-card .unit-head .ic{ font-size:36px; line-height:1; }
+
 @media (prefers-reduced-motion: reduce){
   .ent-drawer,.ent-drawer-ovl,.study-card{ animation:none; transition:none; }
 }
@@ -1302,20 +1403,33 @@ function parseTokens(text){
 }
 
 function EntityChip({type, id, label}){
+  const [open, setOpen] = useState(false);
   const idx = (typeof window!=='undefined' && window.__ENTITY_INDEX__) || {};
   const resolvedType = ENTITY_TYPE_ALIAS[type] || type;
   const bucket = idx[resolvedType];
   const missing = !bucket || !bucket[id];
+  const title = ENTITY_TYPE_LABELS[type] ? ENTITY_TYPE_LABELS[type]+' · '+label : label;
+  const toggle = () => setOpen(o=>!o);
+  // Panel rendered ONLY when open → avoids breaking inline prose flow when chip is mid-sentence.
   return (
-    <span className="entity-chip"
-      data-type={type} data-id={id}
-      data-missing={missing?"true":undefined}
-      role="button" tabIndex={0}
-      onClick={()=>window.openEntityDrawer(type, id, label)}
-      onKeyDown={e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); window.openEntityDrawer(type,id,label); } }}
-      title={ENTITY_TYPE_LABELS[type] ? ENTITY_TYPE_LABELS[type]+' · '+label : label}>
-      {label}
-    </span>
+    <>
+      <span className={`entity-chip ${open?'open':''}`}
+        data-type={type} data-id={id}
+        data-missing={missing?"true":undefined}
+        role="button" tabIndex={0}
+        onClick={toggle}
+        onKeyDown={e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); } }}
+        title={title}>
+        {label}{open?' ▴':''}
+      </span>
+      {open && (
+        <span className="expanded-panel open" style={{display:'block'}}>
+          <span className="expanded-panel-inner" style={{display:'block'}}>
+            <EntityDetail type={type} id={id} label={label}/>
+          </span>
+        </span>
+      )}
+    </>
   );
 }
 
@@ -1325,121 +1439,150 @@ function EntityText({text, as="span", className}){
   return <Tag className={className}>{parseTokens(text)}</Tag>;
 }
 
-function EntityDrawer({entity, onClose}){
-  useEffect(()=>{
-    if(!entity) return;
-    const onKey = e => { if(e.key==='Escape') onClose(); };
-    document.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return ()=>{ document.removeEventListener('keydown', onKey); document.body.style.overflow = prev; };
-  },[entity, onClose]);
-  if(!entity) return null;
-  if(entity.type === 'verse') return <VerseDrawerInline entity={entity} onClose={onClose}/>;
-  const idx = window.__ENTITY_INDEX__ || {};
-  const resolvedType = ENTITY_TYPE_ALIAS[entity.type] || entity.type;
-  const data = (idx[resolvedType] || {})[entity.id];
-  const heading = (data && data.heading) || entity.label || entity.id;
-  const body = (data && data.summary) || '';
-  const typeLabel = ENTITY_TYPE_LABELS[entity.type] || entity.type;
+// Renders inline the entity's full content. Nested EntityChips handle further expansion.
+function EntityDetail({type, id, label}){
+  if(type === 'verse') return <VersePanel id={id} label={label}/>;
+  const idx = (typeof window!=='undefined' && window.__ENTITY_INDEX__) || {};
+  const resolvedType = ENTITY_TYPE_ALIAS[type] || type;
+  const data = (idx[resolvedType] || {})[id];
+  if(!data){
+    return (
+      <div className="sect">
+        <div className="sect-h">מידע לא נמצא</div>
+        <div>לא נטענו נתונים עבור <code>{type}:{id}</code>. ייתכן שהמודול לא נטען או שהמזהה חסר.</div>
+      </div>
+    );
+  }
+  const body = data.summary || '';
   return (
     <>
-      <div className="ent-drawer-ovl" onClick={onClose} aria-hidden="true"/>
-      <aside className="ent-drawer" role="dialog" aria-modal="true" aria-labelledby="ent-title" tabIndex={-1}>
-        <div className="ent-drawer-hdr">
-          <div>
-            <span className="ent-drawer-type">{typeLabel}</span>
-            <h2 id="ent-title" className="ent-drawer-title">{heading}</h2>
-          </div>
-          <button className="ent-drawer-close" onClick={onClose} aria-label="סגור">✕</button>
+      {body && <div className="sect"><div>{parseTokens(body)}</div></div>}
+      {data.role && (
+        <div className="sect">
+          <div className="sect-h">תפקיד</div>
+          <div>{data.role}{data.era?` · ${data.era}`:''}{data.kingdom?` · ${data.kingdom}`:''}</div>
         </div>
-        <div className="ent-drawer-body">
-          {!data && (
-            <div className="sect">
-              <div className="sect-h">מידע לא נמצא</div>
-              <div>לא הצלחנו לטעון את הנתונים עבור <code>{entity.type}:{entity.id}</code>. ייתכן שהמודול לא נטען או שהמזהה שגוי.</div>
-            </div>
-          )}
-          {body && <div>{parseTokens(body)}</div>}
-          {data && data.all_occurrences && Array.isArray(data.all_occurrences) && data.all_occurrences.length>0 && (
-            <div className="sect">
-              <div className="sect-h">מופעים במקרא</div>
-              <ul>
-                {data.all_occurrences.map((o,i)=>(
-                  <li key={i}><strong>{o.verse_ref}</strong> — {o.context_short}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {data && data.theological_significance_hebrew && (
-            <div className="sect">
-              <div className="sect-h">משמעות תיאולוגית</div>
-              <div>{data.theological_significance_hebrew}</div>
-            </div>
-          )}
-          {data && data.what_it_proves && (
-            <div className="sect">
-              <div className="sect-h">מה זה מוכיח</div>
-              <div>{data.what_it_proves}</div>
-            </div>
-          )}
-          {data && data.related_biblical_events && data.related_biblical_events.length>0 && (
-            <div className="sect">
-              <div className="sect-h">אירועים קשורים</div>
-              <ul>{data.related_biblical_events.map((e,i)=><li key={i}>{e}</li>)}</ul>
-            </div>
-          )}
-          {data && data.reference && (
-            <div className="sect">
-              <div className="sect-h">מקור</div>
-              <div><strong>{data.reference}</strong></div>
-            </div>
-          )}
-          {data && data.themes && Array.isArray(data.themes) && data.themes.length>0 && (
-            <div className="sect">
-              <div className="sect-h">נושאים</div>
-              <div>{data.themes.map((t,i)=><span key={i} className="sc-tag">{t}</span>)}</div>
-            </div>
-          )}
-          {data && data.keyVerses && Array.isArray(data.keyVerses) && (
-            <div className="sect">
-              <div className="sect-h">פסוקי מפתח</div>
-              <ul>{data.keyVerses.map((v,i)=><li key={i} className="hebrew">{v}</li>)}</ul>
-            </div>
-          )}
-          {data && data.role && (
-            <div className="sect">
-              <div className="sect-h">תפקיד</div>
-              <div>{data.role}{data.era?` · ${data.era}`:''}</div>
-            </div>
-          )}
-          {data && data.gregorian_approx && (
-            <div className="sect">
-              <div className="sect-h">תאריך לועזי</div>
-              <div>{data.gregorian_approx}</div>
-            </div>
-          )}
-          {data && data.sources && (
-            <div className="sect">
-              <div className="sect-h">מקורות</div>
-              {Array.isArray(data.sources)
-                ? <ul>{data.sources.map((s,i)=><li key={i}>{s}</li>)}</ul>
-                : <ul>{Object.entries(data.sources).map(([k,v],i)=>(
-                    <li key={i}>{typeof v==='string'&&v.startsWith('http')
-                      ? <a href={v} target="_blank" rel="noopener noreferrer">{k}</a>
-                      : `${k}: ${v}`}</li>
-                  ))}</ul>}
-            </div>
-          )}
+      )}
+      {data.all_occurrences && Array.isArray(data.all_occurrences) && data.all_occurrences.length>0 && (
+        <div className="sect">
+          <div className="sect-h">מופעים במקרא</div>
+          <ul>
+            {data.all_occurrences.map((o,i)=>(
+              <li key={i}><strong>{o.verse_ref}</strong> — {parseTokens(o.context_short||'')}</li>
+            ))}
+          </ul>
         </div>
-      </aside>
+      )}
+      {data.theological_significance_hebrew && (
+        <div className="sect">
+          <div className="sect-h">משמעות תיאולוגית</div>
+          <div>{parseTokens(data.theological_significance_hebrew)}</div>
+        </div>
+      )}
+      {data.what_it_proves && (
+        <div className="sect">
+          <div className="sect-h">מה זה מוכיח</div>
+          <div>{parseTokens(data.what_it_proves)}</div>
+        </div>
+      )}
+      {data.period_bce && (
+        <div className="sect">
+          <div className="sect-h">תקופה</div>
+          <div>{data.period_bce}{data.discovered_year?` · התגלה ${data.discovered_year}`:''}{data.location_hebrew?` · ${data.location_hebrew}`:''}</div>
+        </div>
+      )}
+      {data.related_biblical_events && Array.isArray(data.related_biblical_events) && data.related_biblical_events.length>0 && (
+        <div className="sect">
+          <div className="sect-h">אירועים קשורים</div>
+          <ul>{data.related_biblical_events.map((e,i)=><li key={i}>{parseTokens(e)}</li>)}</ul>
+        </div>
+      )}
+      {data.related_kings && Array.isArray(data.related_kings) && data.related_kings.length>0 && (
+        <div className="sect">
+          <div className="sect-h">מלכים קשורים</div>
+          <div>{data.related_kings.join(' · ')}</div>
+        </div>
+      )}
+      {data.reference && (
+        <div className="sect">
+          <div className="sect-h">מקור</div>
+          <div><strong>{data.reference}</strong></div>
+        </div>
+      )}
+      {data.themes && Array.isArray(data.themes) && data.themes.length>0 && (
+        <div className="sect">
+          <div className="sect-h">נושאים</div>
+          <div className="chip-row">{data.themes.map((t,i)=><span key={i} className="sc-tag">{t}</span>)}</div>
+        </div>
+      )}
+      {data.keyVerses && Array.isArray(data.keyVerses) && data.keyVerses.length>0 && (
+        <div className="sect">
+          <div className="sect-h">פסוקי מפתח</div>
+          <ul>{data.keyVerses.map((v,i)=><li key={i} className="hebrew">{parseTokens(v)}</li>)}</ul>
+        </div>
+      )}
+      {data.event_short && (
+        <div className="sect">
+          <div className="sect-h">האירוע</div>
+          <div>{parseTokens(data.event_short)}</div>
+          {data.significance && <div className="mt-1">{parseTokens(data.significance)}</div>}
+          {data.modern_commemoration && <div className="mt-1"><strong>ציון בימינו:</strong> {data.modern_commemoration}</div>}
+        </div>
+      )}
+      {data.gregorian_approx && (
+        <div className="sect">
+          <div className="sect-h">תאריך לועזי</div>
+          <div>{data.gregorian_approx}</div>
+        </div>
+      )}
+      {data.front && data.back && (
+        <div className="sect">
+          <div className="sect-h">תשובה</div>
+          <div className="hebrew">{parseTokens(data.back)}</div>
+        </div>
+      )}
+      {data.shortDef && (
+        <div className="sect">
+          <div className="sect-h">הגדרה קצרה</div>
+          <div>{parseTokens(data.shortDef)}</div>
+        </div>
+      )}
+      {data.expanded && data.expanded !== data.summary && (
+        <div className="sect">
+          <div className="sect-h">הרחבה</div>
+          <div>{parseTokens(data.expanded)}</div>
+        </div>
+      )}
+      {data.references && Array.isArray(data.references) && data.references.length>0 && (
+        <div className="sect">
+          <div className="sect-h">הפניות</div>
+          <ul>{data.references.map((r,i)=><li key={i}>{r}</li>)}</ul>
+        </div>
+      )}
+      {data.tags && Array.isArray(data.tags) && data.tags.length>0 && (
+        <div className="sect">
+          <div className="sect-h">תגיות</div>
+          <div className="chip-row">{data.tags.map((t,i)=><span key={i} className="sc-tag">{t}</span>)}</div>
+        </div>
+      )}
+      {data.sources && (
+        <div className="sect">
+          <div className="sect-h">מקורות</div>
+          {Array.isArray(data.sources)
+            ? <ul>{data.sources.map((s,i)=><li key={i}>{s}</li>)}</ul>
+            : <ul>{Object.entries(data.sources).map(([k,v],i)=>(
+                <li key={i}>{typeof v==='string'&&v.startsWith('http')
+                  ? <a href={v} target="_blank" rel="noopener noreferrer">{k}</a>
+                  : `${k}: ${v}`}</li>
+              ))}</ul>}
+        </div>
+      )}
     </>
   );
 }
 
-function VerseDrawerInline({entity, onClose}){
-  // Parse id like "1K-3-9" or "2K-17-4" into book+ch+verse.
-  const m = /^([12])K-(\d+)-(\d+)(?:-(\d+))?$/.exec(entity.id||"");
+function VersePanel({id, label}){
+  const m = /^([12])K-(\d+)-(\d+)(?:-(\d+))?$/.exec(id||"");
   const bookIdx = m ? m[1] : '1';
   const chapter = m ? parseInt(m[2],10) : null;
   const verseStart = m ? parseInt(m[3],10) : null;
@@ -1454,47 +1597,185 @@ function VerseDrawerInline({entity, onClose}){
   const mamreUrl = `https://mechon-mamre.org/i/t/t${mamreCode}${ch2}.htm`;
   const refText = chapter && verseStart
     ? (verseEnd && verseEnd!==verseStart ? `${book} ${chapter}:${verseStart}-${verseEnd}` : `${book} ${chapter}:${verseStart}`)
-    : (entity.label || entity.id);
+    : (label || id);
   return (
     <>
-      <div className="ent-drawer-ovl" onClick={onClose} aria-hidden="true"/>
-      <aside className="ent-drawer" role="dialog" aria-modal="true" aria-labelledby="verse-title" tabIndex={-1}>
-        <div className="ent-drawer-hdr">
-          <div>
-            <span className="ent-drawer-type">📖 פסוק</span>
-            <h2 id="verse-title" className="ent-drawer-title">{refText}</h2>
-          </div>
-          <button className="ent-drawer-close" onClick={onClose} aria-label="סגור">✕</button>
+      <div className="sect">
+        <div className="sect-h">📖 {refText}</div>
+        <div>{label || refText}</div>
+      </div>
+      <div className="sect">
+        <div className="sect-h">קרא במקורות</div>
+        <div className="verse-links-inline">
+          <a href={sefariaUrl} target="_blank" rel="noopener noreferrer">📜 ספריא</a>
+          <a href={mamreUrl} target="_blank" rel="noopener noreferrer">🕯 מכון ממרא</a>
+          <a href={`https://www.chabad.org/library/bible_cdo/aid/${bookIdx==='2'?15786:15785}/jewish/Chapter-${chapter||1}.htm`} target="_blank" rel="noopener noreferrer">🔯 חב״ד</a>
         </div>
-        <div className="ent-drawer-body">
-          <div className="sect">
-            <div className="sect-h">קרא במקורות</div>
-            <div className="verse-links">
-              <a href={sefariaUrl} target="_blank" rel="noopener noreferrer">
-                <span className="big">📜</span><span>ספריא</span>
-              </a>
-              <a href={mamreUrl} target="_blank" rel="noopener noreferrer">
-                <span className="big">🕯</span><span>מכון ממרא</span>
-              </a>
-              <a href={`https://www.chabad.org/library/bible_cdo/aid/${bookIdx==='2'?15786:15785}/jewish/Chapter-${chapter||1}.htm`} target="_blank" rel="noopener noreferrer">
-                <span className="big">🔯</span><span>חב״ד</span>
-              </a>
-            </div>
-          </div>
-          <div className="sect">
-            <div className="sect-h">הקשר</div>
-            <div>{entity.label || refText}</div>
-          </div>
-        </div>
-      </aside>
+      </div>
     </>
   );
 }
 
-// ============ STUDY HUB ============
+// (EntityDrawer / VerseDrawerInline removed — v2 uses inline-expand via
+// EntityChip + EntityDetail + VersePanel above. No modal overlay.)
+
+// ============ STUDY HUB (v2 — inline expand, units first tab) ============
+
+// Keyword mapping for unit cross-linking — filters entities whose summary/heading/id contains these.
+const UNIT_KEYWORDS = {
+  1: ['שלמה','שְׁלֹמֹה','shlomo','גבעון','מקדש','מלכת שבא','דוד','בת שבע','חכמה','חירם','לב שומע','מלכות שלמה','solomon','temple'],
+  2: ['ירבעם','רחבעם','פילוג','פילג','אחיה','שכם','עגלי','דן','בית אל','בעשא','זמרי','עמרי','split','jeroboam','rehoboam','אבים','אסא','נדב','אלה'],
+  3: ['אליהו','אלישע','אחאב','איזבל','כרמל','נבות','חורב','בעל','בצורת','צרפית','אליהו התשבי','elijah','elisha','ahab','jezebel'],
+  4: ['יהוא','אחאב','איזבל','יורם','יזרעאל','בית עמרי','ירבעם השני','יונה','jehu','jeroboam ii'],
+  5: ['חזקיה','חזקיהו','סנחריב','ישעיהו','רבשקה','שילוח','אחז','מנשה','אשור','hezekiah','sennacherib','ahaz','manasseh'],
+  6: ['יאשיה','יאשיהו','חורבן','נבוכדנצר','חולדה','צדקיהו','יהויכין','ירמיה','בבל','מצרים','פרעה','ספר תורה','josiah','destruction','babylon','zedekiah','jehoiachin']
+};
+
+function matchesUnit(entity, unitId){
+  const kws = UNIT_KEYWORDS[unitId] || [];
+  const hay = [entity.summary||'', entity.heading||'', entity.id||'', JSON.stringify(entity.tags||[]), JSON.stringify(entity.themes||[])].join(' ').toLowerCase();
+  return kws.some(k => hay.includes(String(k).toLowerCase()));
+}
+
+function UnitStudyCard({unit}){
+  const [open, setOpen] = useState(false);
+  const idx = (typeof window!=='undefined' && window.__ENTITY_INDEX__) || {};
+  const chars = Object.values(idx.character||{}).filter(e => matchesUnit(e, unit.id));
+  const stories = Object.values(idx.story||{}).filter(e => matchesUnit(e, unit.id));
+  const motifs = Object.values(idx.motif||{}).filter(e => matchesUnit(e, unit.id));
+  const archs = Object.values(idx.archaeology||{}).filter(e => matchesUnit(e, unit.id));
+  const dates = Object.values(idx.date||{}).filter(e => matchesUnit(e, unit.id));
+  const concepts = Object.values(idx.keyConcept||{}).filter(e => matchesUnit(e, unit.id));
+  const qCount = (typeof QUESTIONS !== 'undefined') ? QUESTIONS.filter(q => q.u === unit.id).length : 0;
+  const quotes = (unit.quotes || []).slice(0, 6);
+  return (
+    <div className={`study-card-wrap unit-card ${open?'expanded':''}`}>
+      <button className={`study-card ${open?'open':''}`} onClick={()=>setOpen(o=>!o)} aria-expanded={open}>
+        <div className="unit-head">
+          <span className="ic" aria-hidden="true">{unit.icon}</span>
+          <div>
+            <div className="sc-title">יחידה {unit.num}: {unit.title}</div>
+            <div className="sc-sub">{unit.subtitle}</div>
+          </div>
+        </div>
+        <div className="sc-sub" style={{fontFamily:'monospace', fontSize:11}}>{unit.range}</div>
+        <div className="sc-body">{parseTokens((unit.summary||'').slice(0, 180))}{(unit.summary||'').length>180?'…':''}</div>
+        <div className="chip-row">
+          <span className="sc-tag">❓ {qCount} שאלות</span>
+          {chars.length>0 && <span className="sc-tag">👥 {chars.length}</span>}
+          {stories.length>0 && <span className="sc-tag">📖 {stories.length}</span>}
+          {motifs.length>0 && <span className="sc-tag">🔮 {motifs.length}</span>}
+          {archs.length>0 && <span className="sc-tag">🏺 {archs.length}</span>}
+        </div>
+      </button>
+      <div className={`expanded-panel ${open?'open':''}`}>
+        {open && (
+          <div className="expanded-panel-inner">
+            <div className="sect">
+              <div className="sect-h">תקציר מלא</div>
+              <div>{parseTokens(unit.summary||'')}</div>
+            </div>
+            {chars.length>0 && (
+              <div className="sect">
+                <div className="sect-h">דמויות מפתח ({chars.length})</div>
+                <div className="chip-row">{chars.map(c => <EntityChip key={c.id} type="character" id={c.id} label={c.heading}/>)}</div>
+              </div>
+            )}
+            {stories.length>0 && (
+              <div className="sect">
+                <div className="sect-h">סיפורים ({stories.length})</div>
+                <div className="chip-row">{stories.map(s => <EntityChip key={s.id} type="story" id={s.id} label={s.heading}/>)}</div>
+              </div>
+            )}
+            {motifs.length>0 && (
+              <div className="sect">
+                <div className="sect-h">מוטיבים ({motifs.length})</div>
+                <div className="chip-row">{motifs.map(m => <EntityChip key={m.id} type="motif" id={m.id} label={m.heading}/>)}</div>
+              </div>
+            )}
+            {archs.length>0 && (
+              <div className="sect">
+                <div className="sect-h">ממצאים ארכיאולוגיים ({archs.length})</div>
+                <div className="chip-row">{archs.map(a => <EntityChip key={a.id} type="archaeology" id={a.id} label={a.heading}/>)}</div>
+              </div>
+            )}
+            {dates.length>0 && (
+              <div className="sect">
+                <div className="sect-h">תאריכים ({dates.length})</div>
+                <div className="chip-row">{dates.map(d => <EntityChip key={d.id} type="date" id={d.id} label={d.heading}/>)}</div>
+              </div>
+            )}
+            {concepts.length>0 && (
+              <div className="sect">
+                <div className="sect-h">מושגי יסוד ({concepts.length})</div>
+                <div className="chip-row">{concepts.map(c => <EntityChip key={c.id} type="keyConcept" id={c.id} label={c.heading}/>)}</div>
+              </div>
+            )}
+            {unit.keyEvents && unit.keyEvents.length>0 && (
+              <div className="sect">
+                <div className="sect-h">אירועי מפתח</div>
+                <ul>
+                  {unit.keyEvents.slice(0,8).map((ev,i)=>(
+                    <li key={i}><strong>{ev.ch}</strong> — {parseTokens(ev.event)}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {quotes.length>0 && (
+              <div className="sect">
+                <div className="sect-h">ציטוטי מפתח ({unit.quotes.length})</div>
+                <ul>
+                  {quotes.map((q,i)=>(
+                    <li key={i} className="hebrew">״{q.text}״ — <em>{q.who}</em> · <span style={{opacity:.85}}>{q.context}</span></li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div className="sect">
+              <div className="sect-h">תרגול</div>
+              <div className="chip-row">
+                <span className="sc-tag">{qCount} שאלות בבנק</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StudyCard({item, type}){
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={`study-card-wrap ${open?'expanded':''}`}>
+      <button className={`study-card ${open?'open':''}`} onClick={()=>setOpen(o=>!o)} aria-expanded={open}>
+        <div className="sc-title">{item.heading}</div>
+        {item.role && <div className="sc-sub">{item.role}{item.era?' · '+item.era:''}</div>}
+        {item.reference && <div className="sc-sub">{item.reference}</div>}
+        {item.period_bce && <div className="sc-sub">{item.period_bce}</div>}
+        {item.gregorian_approx && <div className="sc-sub">{item.gregorian_approx}</div>}
+        {item.domain && <div className="sc-sub">{item.domain}</div>}
+        {item.category && <div className="sc-sub">{item.category}</div>}
+        <div className="sc-body">{parseTokens((item.summary||'').slice(0, 160))}{(item.summary||'').length>160?'…':''}</div>
+        <div className="chip-row">
+          {Array.isArray(item.tags) && item.tags.slice(0,3).map((t,j)=><span key={j} className="sc-tag">{t}</span>)}
+          {Array.isArray(item.themes) && item.themes.slice(0,3).map((t,j)=><span key={'t'+j} className="sc-tag">{t}</span>)}
+        </div>
+      </button>
+      <div className={`expanded-panel ${open?'open':''}`}>
+        {open && (
+          <div className="expanded-panel-inner">
+            <EntityDetail type={type} id={item.id} label={item.heading}/>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function StudyHub(){
   const [ready, setReady] = useState(!!window.__ENTITY_INDEX_READY__);
-  const [tab, setTab] = useState('character');
+  const [tab, setTab] = useState('unit');
   useEffect(()=>{
     if(ready) return;
     const onReady = ()=>setReady(true);
@@ -1502,61 +1783,79 @@ function StudyHub(){
     const id = setInterval(()=>{ if(window.__ENTITY_INDEX_READY__){ setReady(true); } },250);
     return ()=>{ window.removeEventListener('entity-index-ready', onReady); clearInterval(id); };
   },[ready]);
-  const idx = (window.__ENTITY_INDEX__) || {};
+  const idx = (typeof window!=='undefined' && window.__ENTITY_INDEX__) || {};
+  const unitCount = (typeof MELAKHIM_DATA !== 'undefined' && MELAKHIM_DATA.units) ? MELAKHIM_DATA.units.length : 0;
   const tabs = [
-    {k:'character', l:'דמויות', i:'👥'},
-    {k:'story', l:'סיפורים', i:'📖'},
-    {k:'motif', l:'מוטיבים', i:'🔮'},
-    {k:'archaeology', l:'ארכיאולוגיה', i:'🏺'},
-    {k:'date', l:'תאריכים', i:'📅'},
-    {k:'keyConcept', l:'מושגי יסוד', i:'🗝'},
-    {k:'flashcard', l:'כרטיסיות', i:'🃏'}
+    {k:'unit', l:'יחידות', i:'📚', count: unitCount},
+    {k:'character', l:'דמויות', i:'👥', count: Object.keys(idx.character||{}).length},
+    {k:'story', l:'סיפורים', i:'📖', count: Object.keys(idx.story||{}).length},
+    {k:'motif', l:'מוטיבים', i:'🔮', count: Object.keys(idx.motif||{}).length},
+    {k:'archaeology', l:'ארכיאולוגיה', i:'🏺', count: Object.keys(idx.archaeology||{}).length},
+    {k:'date', l:'תאריכים', i:'📅', count: Object.keys(idx.date||{}).length},
+    {k:'keyConcept', l:'מושגי יסוד', i:'🗝', count: Object.keys(idx.keyConcept||{}).length},
+    {k:'flashcard', l:'כרטיסיות', i:'🃏', count: Object.keys(idx.flashcard||{}).length}
   ];
-  const items = Object.values(idx[tab] || {});
+  const units = (typeof MELAKHIM_DATA !== 'undefined' && MELAKHIM_DATA.units) ? MELAKHIM_DATA.units : [];
   return (
     <div className="space-y-4">
       <div>
         <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300">📚 מוקד הלמידה</h1>
-        <p className="text-amber-100/70 text-sm mt-1">חקור דמויות, סיפורים, מוטיבים, ארכיאולוגיה ועוד — לחץ לפרטים.</p>
+        <p className="text-amber-100/70 text-sm mt-1">לחץ על כרטיס או תגית להרחבה במקום — בלי חלונות קופצים.</p>
       </div>
       <div className="study-tabs">
         {tabs.map(t => (
           <button key={t.k} onClick={()=>setTab(t.k)} className={`study-tab ${tab===t.k?"active":""}`}>
             <span className="ml-1" aria-hidden="true">{t.i}</span>{t.l}
-            {idx[t.k] && <span className="mr-1 text-[10px] opacity-80">({Object.keys(idx[t.k]).length})</span>}
+            <span className="mr-1 text-[10px] opacity-80">({t.count})</span>
           </button>
         ))}
       </div>
-      {!ready && (
+      {tab === 'unit' ? (
+        <div className="study-grid">
+          {units.map(u => <UnitStudyCard key={u.id} unit={u}/>)}
+        </div>
+      ) : !ready ? (
         <div className="study-empty">
           <div className="skel" style={{height:20, width:'60%', margin:'0 auto 12px'}}/>
           <div>טוען תוכן...</div>
         </div>
-      )}
-      {ready && items.length===0 && (
-        <div className="study-empty">
-          <div className="text-4xl mb-2">📭</div>
-          <div>אין תוכן בקטגוריה זו עדיין.</div>
+      ) : (() => {
+        const items = Object.values(idx[tab] || {});
+        if(items.length === 0) return (
+          <div className="study-empty">
+            <div className="text-4xl mb-2">📭</div>
+            <div>אין תוכן בקטגוריה זו עדיין.</div>
+          </div>
+        );
+        return (
+          <div className="study-grid">
+            {items.map((it, i) => <StudyCard key={it.id||i} item={it} type={tab}/>)}
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+// ============ ME TAB (merged profile + class + grade leaderboards) ============
+function MeTab({S, update, setRoute}){
+  return (
+    <div className="space-y-6">
+      <Profile S={S} update={update} setRoute={setRoute}/>
+      <section className="space-y-3">
+        <h2 className="font-display text-xl md:text-2xl font-bold text-amber-300 flex items-center gap-2">
+          <span aria-hidden="true">🏆</span><span>דירוג הכיתה</span>
+        </h2>
+        <ClassBoard S={S} update={update} setRoute={setRoute}/>
+      </section>
+      <section className="space-y-3">
+        <h2 className="font-display text-xl md:text-2xl font-bold text-amber-300 flex items-center gap-2">
+          <span aria-hidden="true">🎓</span><span>דירוג השכבה</span>
+        </h2>
+        <div className="card rounded-xl p-4 text-center text-amber-100/80">
+          דירוג ברמת שכבה יתווסף בעדכון הבא. כעת מוצג דירוג הכיתה בלבד.
         </div>
-      )}
-      {ready && items.length>0 && (
-        <div className="study-grid">
-          {items.map((it, i) => (
-            <button key={it.id||i} className="study-card" onClick={()=>window.openEntityDrawer(tab, it.id, it.heading)}>
-              <div className="sc-title">{it.heading}</div>
-              {it.role && <div className="sc-sub">{it.role}{it.era?' · '+it.era:''}</div>}
-              {it.reference && <div className="sc-sub">{it.reference}</div>}
-              {it.period_bce && <div className="sc-sub">{it.period_bce}</div>}
-              {it.gregorian_approx && <div className="sc-sub">{it.gregorian_approx}</div>}
-              {it.domain && <div className="sc-sub">{it.domain}</div>}
-              {it.category && <div className="sc-sub">{it.category}</div>}
-              <div className="sc-body">{(it.summary||'').slice(0, 140)}{(it.summary||'').length>140?'…':''}</div>
-              {Array.isArray(it.tags) && it.tags.slice(0,3).map((t,j)=><span key={j} className="sc-tag">{t}</span>)}
-              {Array.isArray(it.themes) && it.themes.slice(0,3).map((t,j)=><span key={j} className="sc-tag">{t}</span>)}
-            </button>
-          ))}
-        </div>
-      )}
+      </section>
     </div>
   );
 }
@@ -1630,20 +1929,11 @@ function App(){
   ];
   const bottomNavs = [
     {p:"home",l:"בית",i:"🏠"},
-    {p:"quiz",l:"חידון",i:"⚡"},
+    {p:"quiz",l:"אזור בחינה",i:"✍️"},
     {p:"study",l:"למידה",i:"📚"},
-    {p:"class",l:"דירוג",i:"🏆"},
-    {p:"profile",l:"אני",i:"👤"}
+    {p:"profile",l:"אישי",i:"👤"}
   ];
   const go = p => { setRoute({page:p}); setDrawerOpen(false); };
-
-  // Entity drawer state (driven by window.openEntityDrawer dispatch)
-  const [entity, setEntity] = useState(null);
-  useEffect(()=>{
-    const onOpen = e => setEntity(e.detail);
-    window.addEventListener('mb-open-entity', onOpen);
-    return ()=>window.removeEventListener('mb-open-entity', onOpen);
-  },[]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -1716,12 +2006,10 @@ function App(){
         {route.page==="maps" && <MapsPage S={S} update={update} awardXP={awardXP}/>}
         {route.page==="exam" && <ExamSim S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/>}
         {route.page==="class" && <ClassBoard S={S} update={update} setRoute={setRoute}/>}
-        {route.page==="profile" && <Profile S={S} update={update} setRoute={setRoute}/>}
+        {route.page==="profile" && <MeTab S={S} update={update} setRoute={setRoute}/>}
         {route.page==="study" && <StudyHub/>}
         </>}
       </main>
-
-      <EntityDrawer entity={entity} onClose={()=>setEntity(null)}/>
 
       {!isTeacher && (
         <nav className="bottom-nav" role="navigation" aria-label="ניווט תחתון">
