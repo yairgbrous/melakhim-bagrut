@@ -293,3 +293,101 @@
   .quote-card__text { font-size: 1.05rem; }
   .quote-card__marks { font-size: 3rem; }
 }
+
+/* =========================================================================
+   Auto-apply scroll/parchment styling to existing .parchment containers
+   that wrap a .hebrew text node — these ARE the in-app quote cards.
+   No React/JSX changes needed.
+   ========================================================================= */
+
+/* Parchment texture as faint SVG noise + diagonal lines */
+.parchment{
+  position:relative;
+  background-image:
+    /* very subtle diagonal scroll-grain */
+    repeating-linear-gradient(135deg, rgba(139,111,31,.045) 0 2px, transparent 2px 8px),
+    /* warm parchment vertical wash */
+    linear-gradient(180deg, #FBF6EB 0%, #F0E4C4 100%);
+  background-blend-mode: multiply, normal;
+  background-color: #FBF6EB;
+  border: 1px solid #C89B3C !important;
+  box-shadow:
+    inset 0 0 60px rgba(139,111,31,.08),
+    0 8px 24px -8px rgba(26,22,17,.35) !important;
+}
+
+/* Gold ornate frame accent — only when .parchment wraps a .hebrew quote */
+.parchment:has(> .hebrew),
+.parchment:has(.hebrew){
+  background-image:
+    /* subtle deckle-edge feel */
+    radial-gradient(ellipse at top left, rgba(200,155,60,.10), transparent 40%),
+    radial-gradient(ellipse at bottom right, rgba(200,155,60,.10), transparent 40%),
+    repeating-linear-gradient(135deg, rgba(139,111,31,.05) 0 2px, transparent 2px 9px),
+    linear-gradient(180deg, #FBF6EB 0%, #F0E4C4 100%);
+}
+
+/* Gold corner flourishes — four ornate L-shape corners on quote cards */
+.parchment:has(.hebrew)::before,
+.parchment:has(.hebrew)::after{
+  content:"";
+  position:absolute;
+  width:28px; height:28px;
+  pointer-events:none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%238B6F1F' stroke-width='1.5' stroke-linecap='round'><path d='M2 14 Q2 2 14 2'/><path d='M2 9 Q2 6 6 6 Q9 6 9 2' opacity='.55'/><circle cx='5' cy='5' r='1.4' fill='%23C89B3C' stroke='none'/></svg>");
+  background-size:contain;
+  background-repeat:no-repeat;
+}
+.parchment:has(.hebrew)::before{ top:8px; inset-inline-end:8px; transform:scaleX(-1); }
+.parchment:has(.hebrew)::after{ bottom:8px; inset-inline-start:8px; transform:scaleY(-1); }
+
+/* Hebrew quote text inside parchment: serif, drop-cap-friendly, more readable */
+.parchment .hebrew{
+  font-family:'Frank Ruhl Libre','Noto Serif Hebrew',Georgia,serif !important;
+  line-height:1.85 !important;
+  color:#1A1611 !important;
+  letter-spacing:.005em;
+  position:relative;
+  padding-inline:.25em;
+}
+
+/* Quotation marks rendered as larger gold ornament in inline quotes */
+.parchment .hebrew::first-letter{
+  font-weight:900;
+  color:#8B6F1F;
+}
+
+/* Source attribution under hebrew block */
+.parchment .hebrew + .src,
+.parchment .hebrew + .source-box{
+  display:inline-block;
+  margin-top:.5rem;
+  padding:.15rem .5rem;
+  border-radius:999px;
+  background:rgba(200,155,60,.15);
+  color:#5A4517;
+  font-size:.78rem;
+  font-weight:700;
+}
+
+/* Decorative top divider for any quote card */
+.parchment:has(.hebrew) > :first-child{
+  position:relative;
+}
+
+/* Print: keep parchment readable but drop ornaments */
+@media print{
+  .parchment:has(.hebrew)::before,
+  .parchment:has(.hebrew)::after{ display:none; }
+  .parchment{ background:#fff !important; border:1px solid #888 !important; box-shadow:none !important; }
+}
+
+/* Reduced motion: no hover lift */
+@media (prefers-reduced-motion: reduce){
+  .parchment{ transition:none !important; transform:none !important; }
+}
+
+/* Fallback for browsers without :has() — apply lighter version to all .parchment */
+@supports not selector(:has(*)){
+  .parchment{ border-color:#C89B3C !important; }
+}
