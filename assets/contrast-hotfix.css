@@ -160,3 +160,430 @@ html[data-theme='light'] *[style*="opacity:0.6"],
 html[data-theme='dark'] *[style*="opacity:0.4"],
 html[data-theme='dark'] *[style*="opacity:0.5"],
 html[data-theme='dark'] *[style*="opacity:0.6"]{ opacity:.85 !important; }
+
+/* =========================================================================
+   D) Small UI fixes (CSS-only, no JSX touch)
+   ========================================================================= */
+
+/* Bottom nav active item: gold gradient + glow shadow (filled state) */
+.bottom-nav .bn-item.active,
+.bottom-nav .bn-item[aria-current="page"]{
+  background: linear-gradient(180deg, rgba(245,214,112,.28) 0%, rgba(200,155,60,.18) 100%) !important;
+  box-shadow: 0 -2px 12px rgba(200,155,60,.5), inset 0 1px 0 rgba(245,214,112,.55) !important;
+  color: #F5D670 !important;
+  font-weight: 800 !important;
+}
+.bottom-nav .bn-item.active .bn-ico,
+.bottom-nav .bn-item[aria-current="page"] .bn-ico{
+  filter: drop-shadow(0 0 8px rgba(244,213,141,.95)) drop-shadow(0 0 3px #F5D670) !important;
+  text-shadow: 0 0 22px rgba(244,213,141,1), 0 0 10px #FFD77A !important;
+  transform: scale(1.12) !important;
+}
+html[data-theme='light'] .bottom-nav .bn-item.active{
+  background: linear-gradient(180deg, rgba(245,214,112,.55) 0%, rgba(200,155,60,.32) 100%) !important;
+  color: #5A4517 !important;
+}
+
+/* Locked achievements: enforce opacity .35 + grayscale .7 + lock overlay */
+.ach-locked,
+.achievement.locked,
+[data-locked="true"]{
+  opacity: .35 !important;
+  filter: grayscale(.7) !important;
+  position: relative !important;
+}
+.ach-locked::after,
+.achievement.locked::after,
+[data-locked="true"]::after{
+  content: "🔒";
+  position: absolute;
+  top: 4px;
+  inset-inline-end: 6px;
+  font-size: 16px;
+  filter: grayscale(0) !important;
+  opacity: 1 !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.5);
+}
+
+/* Mini rank chip enhancements (clickable, gold) */
+.rank-chip,
+.mini-rank,
+[data-rank-chip]{
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  background: linear-gradient(135deg, #F5D670 0%, #C89B3C 100%) !important;
+  color: #1A1611 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 6px rgba(200,155,60,.4), inset 0 1px 0 rgba(255,245,200,.6);
+  border: 1px solid #F4D58D !important;
+}
+.rank-chip:hover,
+.mini-rank:hover,
+[data-rank-chip]:hover{
+  transform: translateY(-1px) scale(1.04);
+  box-shadow: 0 4px 12px rgba(200,155,60,.6), inset 0 1px 0 rgba(255,245,200,.6);
+  filter: brightness(1.08);
+}
+.rank-chip:active,
+.mini-rank:active{ transform: translateY(0) scale(.98); }
+
+/* Rank progression animation: when .num inside .rank-chip changes,
+   give a brief gold pulse via attribute-change-friendly @keyframes.
+   Components can add data-rank-changed for one tick to trigger it. */
+@keyframes rank-pulse{
+  0%{ transform: scale(1); color: #1A1611; }
+  35%{ transform: scale(1.18); color: #fff; text-shadow: 0 0 12px #F5D670; }
+  100%{ transform: scale(1); color: #1A1611; text-shadow: none; }
+}
+.rank-chip .num,
+.mini-rank .num{
+  display: inline-block;
+  transition: transform .25s ease;
+}
+.rank-chip[data-rank-changed] .num,
+.mini-rank[data-rank-changed] .num{
+  animation: rank-pulse .6s ease-out;
+}
+
+/* Animated counter visual fallback: gold sheen sweep when number text updates */
+@keyframes count-sheen{
+  0%{ background-position: 200% 0; }
+  100%{ background-position: -200% 0; }
+}
+.rank-chip[data-counting] .num,
+.mini-rank[data-counting] .num{
+  background: linear-gradient(90deg, #1A1611 0%, #C89B3C 50%, #1A1611 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: count-sheen .6s ease;
+}
+
+/* Compact mini-rank chip styling (for header use)
+   Components can apply: <span class="mini-rank">#3 בכיתה</span> */
+.mini-rank{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.mini-rank::before{
+  content: "🏆";
+  font-size: 12px;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.3));
+}
+
+/* About-page card grid (4 cards layout) — CSS scaffolding for when
+   Tab A wires in the new About markup */
+.about-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  padding: 12px 0;
+}
+.about-card{
+  background: linear-gradient(135deg, rgba(22,40,74,.85), rgba(15,31,58,.85));
+  border: 1px solid rgba(212,165,116,.4);
+  border-radius: 18px;
+  padding: 18px;
+  text-align: center;
+  transition: transform .2s ease, border-color .2s ease;
+}
+.about-card:hover{
+  transform: translateY(-3px);
+  border-color: #F5D670;
+}
+.about-card svg,
+.about-card .about-icon{
+  width: 48px; height: 48px;
+  margin: 0 auto 10px;
+  color: #F5D670;
+  filter: drop-shadow(0 4px 12px rgba(244,213,141,.4));
+}
+.about-card h3{
+  font-family: 'Frank Ruhl Libre', serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: #F5E6C8;
+  margin: 0 0 6px;
+}
+.about-card p{
+  font-size: 13px;
+  color: #C8B98A;
+  line-height: 1.5;
+  margin: 0;
+}
+html[data-theme='light'] .about-card{
+  background: linear-gradient(135deg, #FBF6EB, #F0E4C4);
+  border-color: #C89B3C;
+}
+html[data-theme='light'] .about-card h3{ color: #1A1611; }
+html[data-theme='light'] .about-card p{ color: #4A3D2C; }
+html[data-theme='light'] .about-card .about-icon,
+html[data-theme='light'] .about-card svg{ color: #8B6F1F; }
+
+/* =========================================================================
+   AGGRESSIVE READABILITY PASS — both modes
+   User reports: "טקסט לא ממש קריא" in BOTH light & dark.
+   Every selector below forces minimum 4.5:1 contrast on target.
+   ========================================================================= */
+
+/* (1) Top-bar stat chips: numbers + emoji must POP */
+.mini-stats, .mini-stats *{ opacity:1 !important; }
+.mini-stats .ms{ font-weight:800 !important; }
+.mini-stats .ms .num{ font-weight:900 !important; }
+html[data-theme='light'] .mini-stats,
+html[data-theme='light'] .mini-stats .ms,
+html[data-theme='light'] .mini-stats .num{
+  color:#1A1611 !important;
+}
+html[data-theme='dark'] .mini-stats,
+html[data-theme='dark'] .mini-stats .ms,
+html[data-theme='dark'] .mini-stats .num,
+html:not([data-theme]) .mini-stats,
+html:not([data-theme]) .mini-stats .ms,
+html:not([data-theme]) .mini-stats .num{
+  color:#F5E6C8 !important;
+}
+
+/* (2) Hero countdown chip "נותרו 10 ימים · 30.4.2026" — dominant numerals */
+.parchment .bg-red-700,
+section .bg-red-700,
+.bg-red-700{
+  background:#A8324F !important;     /* deeper red ensures 4.5:1 with white text */
+  color:#FFF7E8 !important;
+  border:1px solid #6B1F30 !important;
+  font-weight:800 !important;
+}
+html[data-theme='light'] .parchment .bg-red-700{
+  background:#7A1F2A !important;
+  color:#FFF7E8 !important;
+}
+/* If the countdown chip uses a gold class instead, force deep brown in light, gold in dark */
+.parchment .text-amber-900,
+.parchment .text-amber-800,
+.parchment .text-amber-700{
+  color:#3D2E18 !important;
+  opacity:1 !important;
+}
+html[data-theme='dark'] .parchment .text-amber-900,
+html[data-theme='dark'] .parchment .text-amber-800,
+html[data-theme='dark'] .parchment .text-amber-700,
+html:not([data-theme]) .parchment .text-amber-900,
+html:not([data-theme]) .parchment .text-amber-800,
+html:not([data-theme]) .parchment .text-amber-700{
+  color:#3D2E18 !important;   /* parchment is light yellow even in dark mode → keep deep brown */
+}
+
+/* (3) Card body text — "המשך מסלול / 0/6 יחידות / 0%" type strings */
+.card .text-amber-100,
+.card .text-amber-100\/40,
+.card .text-amber-100\/50,
+.card .text-amber-100\/60,
+.card .text-amber-100\/70,
+.card .text-amber-200,
+.card .text-amber-200\/60,
+.card .text-amber-200\/70,
+.card .text-amber-200\/80,
+.card .text-amber-200\/90{
+  opacity:1 !important;
+}
+html[data-theme='dark'] .card .text-amber-100,
+html[data-theme='dark'] .card .text-amber-200,
+html:not([data-theme]) .card .text-amber-100,
+html:not([data-theme]) .card .text-amber-200{ color:#F5E6C8 !important; }
+html[data-theme='dark'] .card .text-amber-100\/60,
+html[data-theme='dark'] .card .text-amber-100\/70,
+html[data-theme='dark'] .card .text-amber-200\/60,
+html[data-theme='dark'] .card .text-amber-200\/70,
+html:not([data-theme]) .card .text-amber-100\/60,
+html:not([data-theme]) .card .text-amber-100\/70,
+html:not([data-theme]) .card .text-amber-200\/60,
+html:not([data-theme]) .card .text-amber-200\/70{ color:#E0CDA0 !important; }
+html[data-theme='light'] .card .text-amber-100,
+html[data-theme='light'] .card .text-amber-200,
+html[data-theme='light'] .card .text-amber-100\/60,
+html[data-theme='light'] .card .text-amber-100\/70,
+html[data-theme='light'] .card .text-amber-200\/60,
+html[data-theme='light'] .card .text-amber-200\/70{ color:#1A1611 !important; }
+
+/* (4) Time-remaining chip backgrounds → guaranteed AA */
+[class*="rounded-full"][class*="bg-amber"]{
+  color:#1A1611 !important;
+  background:rgba(245,214,112,.85) !important;
+}
+[class*="rounded-full"][class*="bg-red"]{
+  color:#FFF7E8 !important;
+}
+
+/* (5) Quote verse numbers like "(י״ב, טו)" / "(ג', ט)" in dim text-amber-700/800
+       — these get force-bumped to bold gold-deep */
+.text-amber-700, .text-amber-800,
+[class*="text-amber-700"], [class*="text-amber-800"]{
+  font-weight:700 !important;
+}
+html[data-theme='light'] .text-amber-700,
+html[data-theme='light'] .text-amber-800,
+html[data-theme='light'] [class*="text-amber-700"],
+html[data-theme='light'] [class*="text-amber-800"]{
+  color:#8B6F1F !important;
+  opacity:1 !important;
+}
+html[data-theme='dark'] .text-amber-700,
+html[data-theme='dark'] .text-amber-800,
+html[data-theme='dark'] [class*="text-amber-700"],
+html[data-theme='dark'] [class*="text-amber-800"],
+html:not([data-theme]) .text-amber-700,
+html:not([data-theme]) .text-amber-800{
+  color:#E6C46E !important;
+  opacity:1 !important;
+}
+
+/* (6) Bottom nav INACTIVE labels — never below 0.7 opacity */
+.bottom-nav .bn-item:not(.active):not([aria-current="page"]){
+  opacity:1 !important;
+}
+html[data-theme='light'] .bottom-nav .bn-item:not(.active):not([aria-current="page"]){
+  color:#7D6742 !important;
+}
+html[data-theme='dark'] .bottom-nav .bn-item:not(.active):not([aria-current="page"]),
+html:not([data-theme]) .bottom-nav .bn-item:not(.active):not([aria-current="page"]){
+  color:#A89070 !important;     /* ~5:1 on #0A1628 */
+}
+.bottom-nav .bn-item .bn-ico{ filter:none !important; }
+.bottom-nav .bn-item:not(.active) .bn-ico{ opacity:.85 !important; }
+
+/* (7) Quiz explanation text — solid, never muted */
+.parchment .text-amber-950,
+.parchment .text-amber-900,
+.parchment .text-emerald-700,
+.parchment .text-red-700{
+  opacity:1 !important;
+  font-weight:600;
+}
+.parchment .text-amber-950{ color:#1A1611 !important; }
+.parchment .text-emerald-700{ color:#1F5C4A !important; }
+.parchment .text-red-700{ color:#7A1F2A !important; }
+/* Same in dark — explanations are inside .parchment which is always cream */
+
+/* Generic explanation panels outside parchment */
+[class*="bg-emerald-600"]{ color:#0F2A22 !important; }
+[class*="bg-red-600"]{ color:#FFF7E8 !important; }
+
+/* (8) "(אתה)" / me chip is already gold via .me-chip — reinforce: */
+.me-chip{
+  background: linear-gradient(135deg,#F5D670,#C89B3C) !important;
+  color:#1A1611 !important;
+  border:1px solid #8B6F1F !important;
+  text-shadow:0 1px 0 rgba(255,245,200,.5);
+  font-weight:900 !important;
+}
+
+/* (9) Progress-bar labels — flip color when over filled portion.
+   Pure CSS approach: ensure any .num inside a progress bar uses
+   mix-blend-mode difference for auto-contrast. */
+[role="progressbar"] .num,
+.h-2 .num, .h-2\.5 .num, .h-1\.5 .num,
+.progress-label{
+  mix-blend-mode: difference;
+  color: #fff !important;
+  font-weight:800 !important;
+}
+
+/* (10) Footer credit — readable in both modes */
+footer{ opacity:1 !important; }
+html[data-theme='light'] footer{ color:#4A3D2C !important; }
+html[data-theme='dark'] footer,
+html:not([data-theme]) footer{ color:#C8B98A !important; }
+footer .text-amber-300,
+footer .font-bold{
+  color:#8B6F1F !important;
+  font-weight:800 !important;
+}
+html[data-theme='dark'] footer .text-amber-300,
+html[data-theme='dark'] footer .font-bold,
+html:not([data-theme]) footer .text-amber-300,
+html:not([data-theme]) footer .font-bold{
+  color:#F5D670 !important;
+}
+
+/* (11) Period chips, sync indicator — solid */
+.period-chip:not(.active){ opacity:1 !important; }
+html[data-theme='light'] .period-chip:not(.active){ color:#1A1611 !important; background:rgba(139,111,31,.12) !important; }
+html[data-theme='dark'] .period-chip:not(.active),
+html:not([data-theme]) .period-chip:not(.active){ color:#F5D670 !important; }
+.period-chip.active{ color:#1A1611 !important; }
+
+/* (12) Drawer link inactive state */
+html[data-theme='dark'] .drawer-link:not(.active),
+html:not([data-theme]) .drawer-link:not(.active){ color:#F5E6C8 !important; }
+html[data-theme='light'] .drawer-link:not(.active){ color:#1A1611 !important; }
+
+/* (13) Theme toggle button readable */
+.theme-tog{ opacity:1 !important; font-weight:700 !important; }
+
+/* (14) Skeleton placeholders should not be mistaken for unreadable text */
+.skel{ opacity:1 !important; }
+
+/* (15) Buttons inside cards — force readable label */
+.card button:not(.gold-btn):not(.diff-easy):not(.diff-medium):not(.diff-hard){
+  color: inherit !important;
+}
+html[data-theme='light'] .card button:not(.gold-btn):not(.diff-easy):not(.diff-medium):not(.diff-hard){
+  color:#1A1611 !important;
+}
+html[data-theme='dark'] .card button:not(.gold-btn):not(.diff-easy):not(.diff-medium):not(.diff-hard),
+html:not([data-theme]) .card button:not(.gold-btn):not(.diff-easy):not(.diff-medium):not(.diff-hard){
+  color:#F5E6C8 !important;
+}
+
+/* (16) Difficulty pills must keep dark text on lighter gold (medium) */
+.diff-medium{ color:#1A1611 !important; }
+.diff-easy, .diff-hard{ color:#FFF7E8 !important; }
+
+/* (17) Faint horizontal scroll-card subtitle/range text */
+.hrow .text-amber-100\/60,
+.hrow .text-amber-100\/40{ opacity:1 !important; color:#E0CDA0 !important; }
+html[data-theme='light'] .hrow .text-amber-100\/60,
+html[data-theme='light'] .hrow .text-amber-100\/40{ color:#4A3D2C !important; }
+
+/* (18) Hero greeting "שלום [name]" — never tinted by .text-amber-700 in dark */
+.parchment h1.font-display,
+.parchment h1{ color:#1A1611 !important; opacity:1 !important; }
+.parchment h1 span{ color:#3D2E18 !important; }
+
+/* (19) Emoji + adjacent text: emoji keeps native color, text MUST respect theme.
+   Strategy: any element containing an emoji span aria-hidden gets its
+   text descendants forced to theme color via a generic rule. */
+html[data-theme='light'] *:not(.gold-btn):not(.diff-easy):not(.diff-hard):not(.bg-red-700):not(.me-chip):not(.rank-chip) > span:not([aria-hidden]):not(.al):not([class*="text-amber-"]){
+  /* fallback inheritance, intentional no-op - keeps explicit cascading */
+}
+/* Any span placed next to an emoji (aria-hidden) inherits parent color reliably */
+[aria-hidden="true"] + span,
+[aria-hidden="true"] + *,
+.bn-item span:not(.bn-ico),
+.drawer-link span:not(.dico),
+.mini-stats .ms{
+  color:inherit;
+}
+html[data-theme='light'] .bn-item span:not(.bn-ico){ color:#1A1611 !important; }
+html[data-theme='dark'] .bn-item.active span:not(.bn-ico),
+html:not([data-theme]) .bn-item.active span:not(.bn-ico){ color:#F5D670 !important; }
+
+/* (20) Onboarding parchment: ensure body text is dark on cream regardless of theme */
+.parchment .text-amber-950\/80,
+.parchment label,
+.parchment p{
+  color:#1A1611 !important;
+  opacity:1 !important;
+}
+.parchment .text-amber-800\/80,
+.parchment .text-amber-800\/60{
+  color:#4A3D2C !important;
+  opacity:1 !important;
+}
