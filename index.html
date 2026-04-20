@@ -2,8 +2,19 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=5">
 <title>ספר מלכים · בגרות 2551 · י״א 5 יח״ל</title>
+<meta name="description" content="הכנה לבגרות בתנ״ך ספר מלכים — שאלון 2551. 6 יחידות, 39 מלכים, 150+ שאלות, סימולציות ומפות."/>
+<meta name="theme-color" content="#0A1628"/>
+<meta property="og:title" content="ספר מלכים · בגרות 2551"/>
+<meta property="og:description" content="הכנה אינטראקטיבית לבגרות בתנ״ך — חידונים, סימולציה, מפות ולוח כיתה חי."/>
+<meta property="og:image" content="https://yairgbrous.github.io/melakhim-bagrut/og.png"/>
+<meta property="og:type" content="website"/>
+<meta property="og:locale" content="he_IL"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E📖%3C/text%3E%3C/svg%3E"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E📖%3C/text%3E%3C/svg%3E"/>
+<link rel="manifest" href="manifest.json"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
@@ -56,6 +67,34 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .diff-hard{background:linear-gradient(135deg,#A83240,#7a1f2a);color:#fff}
 details summary{cursor:pointer;list-style:none}
 details summary::-webkit-details-marker{display:none}
+/* ---- 20-fix batch additions ---- */
+.al{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#F5D670,#8B6F1F);color:#1A1611;font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:18px;border:2px solid #C89B3C;box-shadow:inset 0 0 8px rgba(255,255,255,.35),0 2px 6px rgba(0,0,0,.25);flex-shrink:0;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.next-btn{position:sticky;bottom:16px;z-index:30}
+.toast{position:fixed;inset-inline-start:50%;transform:translateX(-50%);bottom:24px;z-index:80;background:linear-gradient(135deg,#D4A574,#8B6F47);color:#1A1611;padding:.7rem 1.1rem;border-radius:999px;border:1px solid #F4D58D;font-weight:800;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);animation:toastIn .35s ease-out}
+@keyframes toastIn{from{transform:translate(-50%,12px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+.skel{background:linear-gradient(90deg,rgba(212,165,116,.08) 0%,rgba(212,165,116,.22) 50%,rgba(212,165,116,.08) 100%);background-size:200% 100%;animation:skel 1.2s ease-in-out infinite;border-radius:12px}
+@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* podium gradients */
+.podium-row{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:.5rem;align-items:end;margin-bottom:.75rem}
+.podium-row .pad{border-radius:14px;padding:.75rem;text-align:center;border:1px solid rgba(244,213,141,.55);position:relative}
+.podium-row .p1{background:linear-gradient(180deg,#FFE680 0%,#C89B3C 100%);color:#1A1611;min-height:160px}
+.podium-row .p2{background:linear-gradient(180deg,#E8E8EC 0%,#9AA0A6 100%);color:#1A1611;min-height:135px}
+.podium-row .p3{background:linear-gradient(180deg,#F0B98A 0%,#A8631F 100%);color:#1A1611;min-height:115px}
+.podium-row .pad .crown{font-size:26px}
+.podium-row .pad .nm{font-weight:900;font-family:'Frank Ruhl Libre',serif;margin-top:.25rem;font-size:14px;line-height:1.1}
+.podium-row .pad .av{font-size:34px;line-height:1}
+.podium-row .pad .meta{font-size:11px;opacity:.85;margin-top:.25rem}
+.podium-row .rank-bubble{position:absolute;inset-inline-end:8px;top:6px;background:rgba(0,0,0,.18);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px}
+/* light mode override */
+html[data-theme='light'] body{background:#F7F1E1;color:#1A1611}
+html[data-theme='light'] body::before{background:radial-gradient(circle at 15% 20%,rgba(212,165,116,.18),transparent 50%),radial-gradient(circle at 85% 75%,rgba(107,91,149,.10),transparent 55%)}
+html[data-theme='light'] header{background:rgba(247,241,225,.9)!important;border-color:rgba(139,111,71,.4)!important}
+html[data-theme='light'] .card{background:linear-gradient(135deg,rgba(255,253,242,.95) 0%,rgba(238,226,196,.95) 100%);color:#1A1611;border-color:rgba(139,111,71,.35)}
+html[data-theme='light'] .card .text-amber-100,html[data-theme='light'] .card .text-amber-200,html[data-theme='light'] .card .text-amber-300{color:#1A1611!important}
+html[data-theme='light'] .text-amber-100\/60,html[data-theme='light'] .text-amber-100\/70{color:rgba(26,22,17,.7)!important}
+html[data-theme='light'] input,html[data-theme='light'] textarea{background:#fff!important;color:#1A1611!important}
+.theme-tog{padding:.35rem .55rem;border-radius:999px;background:rgba(212,165,116,.18);border:1px solid rgba(212,165,116,.45);color:#F4D58D;font-size:14px}
+html[data-theme='light'] .theme-tog{color:#1A1611;background:rgba(139,111,71,.15)}
 </style>
 </head>
 <body>
@@ -878,13 +917,16 @@ function App(){
   const [S, setS] = useState(load);
   const [route, setRoute] = useState({page:"home"});
   const [firstTime, setFirstTime] = useState(!S.name);
+  const [theme, setTheme] = useState(()=>document.documentElement.getAttribute('data-theme')||'dark');
+  const toggleTheme = ()=>{ const t=theme==='dark'?'light':'dark'; setTheme(t); document.documentElement.setAttribute('data-theme',t); try{localStorage.setItem('mb_theme',t);}catch{} };
 
   useEffect(() => {
-    const today = new Date().toDateString();
+    const ilDay = (t=Date.now())=>new Date(t).toLocaleDateString('en-CA',{timeZone:'Asia/Jerusalem'});
+    const today = ilDay();
     let n = {...S};
     let changed = false;
     if (S.lastActive !== today) {
-      const yest = new Date(Date.now()-86400000).toDateString();
+      const yest = ilDay(Date.now()-86400000);
       const ns = S.lastActive === yest ? S.streak + 1 : 1;
       n = {...n, lastActive:today, streak:ns};
       if (ns >= 7 && !n.achievements.includes("elijah")) n.achievements = [...n.achievements,"elijah"];
@@ -946,6 +988,9 @@ function App(){
             </div>
           </button>
           <div className="flex items-center gap-1">
+            <button onClick={toggleTheme} className="theme-tog" aria-label="החלף מצב כהה/בהיר" title="החלף מצב כהה/בהיר">
+              {theme==='light'?'🌙':'☀️'}
+            </button>
             <Pill i={level.icon} v={level.title} c="amber"/>
             <Pill i="🔥" v={S.streak} c="crimson"/>
             <Pill i="⭐" v={S.xp} c="purple"/>
@@ -1066,13 +1111,23 @@ function Home({S, setRoute, level, nextLv}){
   const lvPct = nextLv ? (xpInLv / xpForNext) * 100 : 100;
   const dMock = daysTo(MOCK_DATE);
   const dExam = daysTo(EXAM_DATE);
+  const [tick, setTick] = useState(0);
+  useEffect(()=>{ const id=setInterval(()=>setTick(t=>t+1),1000); return ()=>clearInterval(id); },[]);
+  const cd = useMemo(()=>{
+    const ms = EXAM_DATE.getTime() - Date.now();
+    if (ms<=0) return null;
+    const s = Math.floor(ms/1000);
+    return { d: Math.floor(s/86400), h: Math.floor((s%86400)/3600), m: Math.floor((s%3600)/60), s: s%60 };
+  },[tick]);
+  const heDays = d => d===0?'היום':d===1?'יום':d===2?'יומיים':`${d} ימים`;
+  const heMock = d => d===0?'היום':d===1?'מחר':d===2?'מחרתיים':`בעוד ${d} ימים`;
 
   return (
     <div className="space-y-5">
       <section className="relative overflow-hidden rounded-3xl parchment p-5 md:p-8">
         <div className="absolute top-0 left-0 text-[160px] opacity-[.06] select-none pointer-events-none leading-none">📜</div>
         <div className="relative">
-          <div className="inline-block px-3 py-1 rounded-full bg-red-700 text-red-50 text-xs font-bold mb-3">⏰ בגרות י״ג אייר תשפ״ו · 30.4.2026 · {dExam} ימים{dMock>0?` · מתכונת בעוד ${dMock} ימים`:""}</div>
+          <div className="inline-block px-3 py-1 rounded-full bg-red-700 text-red-50 text-xs font-bold mb-3">⏰ בגרות י״ג אייר תשפ״ו · 30.4.2026 · {cd ? <><span dir="ltr" className="num">{cd.d}</span> {heDays(cd.d)} · <span dir="ltr" className="num">{String(cd.h).padStart(2,'0')}:{String(cd.m).padStart(2,'0')}:{String(cd.s).padStart(2,'0')}</span></> : "התחיל!"}{dMock>0?` · מתכונת ${heMock(dMock)}`:""}</div>
           <h1 className="font-display text-2xl md:text-4xl font-black text-amber-900 leading-tight">
             שלום {S.name}! {S.avatar}<br/>
             <span className="text-amber-700 text-xl md:text-3xl">נצליח בבגרות 2551 יחד</span>
@@ -1530,12 +1585,18 @@ function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity}){
     if (unit) pool = pool.filter(q => q.u === unit);
     if (diff && diff !== "all") pool = pool.filter(q => q.d === diff);
     const count = mode === "battle" ? 20 : 10;
-    return [...pool].sort(() => Math.random()-0.5).slice(0, count);
+    const fy = (arr)=>{ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+    return fy(pool).slice(0, count).map(q=>{
+      const ix = fy([0,1,2,3]);
+      return {...q, a: ix.map(i=>q.a[i]), c: ix.indexOf(q.c), _origC: q.c};
+    });
   }, [mode,unit,diff]);
 
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState(null);
   const [correct, setCorrect] = useState(0);
+  const [missed, setMissed] = useState([]);
+  const [expanded, setExpanded] = useState(false);
   const [time, setTime] = useState(mode==="battle"?180:0);
   const [waitingNext, setWaitingNext] = useState(false);
   const timed = mode === "battle";
@@ -1563,6 +1624,7 @@ function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity}){
     const right = i === q.c;
     if (right) {
       setCorrect(x => x+1);
+      setExpanded(false);
       if (q.d === "hard") update(p => {
         const nhc = (p.hardCorrect||0) + 1;
         let ach = p.achievements;
@@ -1571,14 +1633,15 @@ function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity}){
       });
     } else {
       update(p => ({...p, hearts:Math.max(0, p.hearts-1)}));
+      setMissed(m => [...m, {...q, picked:i}]);
+      setExpanded(true);
     }
     setWaitingNext(true);
   };
 
   const nextQ = () => {
-    const finalCorrect = correct + (picked === q.c ? 0 : 0); // already counted
     if (idx+1 >= questions.length) finish(correct);
-    else { setIdx(idx+1); setPicked(null); setWaitingNext(false); }
+    else { setIdx(idx+1); setPicked(null); setWaitingNext(false); setExpanded(false); }
   };
 
   const finish = async (finalCorrect) => {
@@ -1598,7 +1661,7 @@ function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity}){
       return {...p, quizScores:scores, achievements:ach, totalQuizzes:(p.totalQuizzes||0)+1, perfectQuizzes:pq};
     });
     publishActivity && publishActivity("quiz", {score:pct, total:questions.length, mode, unit, diff});
-    setRoute({page:"quizResult", pct, correct:finalCorrect, total:questions.length, earned, mode, unit, diff});
+    setRoute({page:"quizResult", pct, correct:finalCorrect, total:questions.length, earned, mode, unit, diff, missed});
   };
 
   const progress = (idx / questions.length) * 100;
@@ -1637,8 +1700,8 @@ function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity}){
           else if (i===picked) cls += "wrong-ans border-red-500 text-white shake";
           else cls += "border-slate-800 opacity-40 text-amber-100/60";
           return (
-            <button key={i} disabled={picked!==null} onClick={()=>pick(i)} className={cls}>
-              <span className="inline-block w-7 h-7 rounded-full bg-amber-500/20 text-amber-300 text-sm text-center leading-7 ml-2 font-bold">{["א","ב","ג","ד"][i]}</span>
+            <button key={i} disabled={picked!==null} onClick={()=>pick(i)} className={cls} aria-label={`תשובה ${["א׳","ב׳","ג׳","ד׳"][i]}`}>
+              <span className="al ml-2" aria-hidden="true">{["א","ב","ג","ד"][i]}</span>
               {a}
             </button>
           );
@@ -1647,10 +1710,17 @@ function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity}){
 
       {picked !== null && (
         <>
-          <ExpandSources q={q} picked={picked}/>
-          <button onClick={nextQ} className="gold-btn w-full py-3 rounded-xl text-base">
-            {idx+1 >= questions.length ? "🏁 סיום ותוצאה" : "שאלה הבאה ←"}
-          </button>
+          {picked!==q.c && (
+            <button onClick={()=>setExpanded(e=>!e)} className="text-xs text-amber-300 underline" aria-expanded={expanded}>
+              {expanded?"הסתר הסבר":"הצג הסבר"}
+            </button>
+          )}
+          {(expanded || picked===q.c) && <ExpandSources q={q} picked={picked}/>}
+          <div className="next-btn">
+            <button onClick={nextQ} className="gold-btn w-full py-3 rounded-xl text-base" aria-label={idx+1 >= questions.length ? "סיים את החידון" : "שאלה הבאה"}>
+              {idx+1 >= questions.length ? "🏁 סיום ותוצאה" : "שאלה הבאה ←"}
+            </button>
+          </div>
         </>
       )}
     </div>
@@ -1658,9 +1728,34 @@ function QuizPlay({mode,unit,diff,setRoute,S,awardXP,update,publishActivity}){
 }
 
 // ============ QUIZ RESULT ============
-function QuizResult({pct,correct,total,earned,mode,S,setRoute}){
+function QuizResult({pct,correct,total,earned,mode,S,setRoute,missed=[]}){
   const shareCode = encodeShare(S.name, S.avatar, pct, total);
   const copyCode = () => { navigator.clipboard.writeText(shareCode).then(()=>alert("הקוד הועתק! שלח לחברים בוואטסאפ.")).catch(()=>{}); };
+  const [showReview, setShowReview] = useState(false);
+  if (showReview) {
+    if (!missed.length) return (
+      <div className="max-w-xl mx-auto py-8 text-center">
+        <div className="text-6xl mb-3">🎉</div>
+        <h2 className="font-display text-2xl font-bold text-amber-300">אין טעויות לסקור</h2>
+        <button onClick={()=>setShowReview(false)} className="mt-4 gold-btn px-4 py-2 rounded-lg" aria-label="חזרה לתוצאה">חזרה</button>
+      </div>
+    );
+    return (
+      <div className="max-w-2xl mx-auto space-y-3 py-4">
+        <h1 className="font-display text-2xl font-bold text-amber-300">📝 סקירת טעויות (<span dir="ltr" className="num">{missed.length}</span>)</h1>
+        {missed.map((q,i)=>(
+          <div key={i} className="parchment rounded-xl p-4">
+            <div className="text-xs text-amber-700 mb-1">{q.s}</div>
+            <div className="font-display text-base font-bold text-amber-950 mb-3">{q.q}</div>
+            <div className="text-sm text-red-700 mb-1 flex items-center gap-2"><span className="al" style={{width:24,height:24,fontSize:14}}>✗</span><span>בחרת: {q.a[q.picked]}</span></div>
+            <div className="text-sm text-emerald-700 font-bold mb-3 flex items-center gap-2"><span className="al" style={{width:24,height:24,fontSize:14}}>✓</span><span>נכון: {q.a[q.c]}</span></div>
+            <ExpandSources q={q} picked={q.picked}/>
+          </div>
+        ))}
+        <button onClick={()=>setShowReview(false)} className="gold-btn w-full py-3 rounded-xl" aria-label="חזרה לתוצאה">חזרה לתוצאה</button>
+      </div>
+    );
+  }
   return (
     <div className="max-w-xl mx-auto space-y-5 py-4">
       <div className="text-center">
@@ -1668,19 +1763,22 @@ function QuizResult({pct,correct,total,earned,mode,S,setRoute}){
         <h1 className="font-display text-3xl md:text-4xl font-black text-amber-300">{pct>=80?"מצוין!":pct>=60?"כל הכבוד":"המשך לתרגל"}</h1>
       </div>
       <div className="parchment rounded-2xl p-6 text-center">
-        <div className="font-display text-6xl font-black text-amber-900">{pct}%</div>
-        <div className="text-lg text-amber-950 mt-2">{correct} / {total} נכונות</div>
-        <div className="mt-3 text-amber-700 font-bold">⭐ +{earned} XP</div>
+        <div className="font-display text-6xl font-black text-amber-900"><span dir="ltr" className="num">{pct}%</span></div>
+        <div className="text-lg text-amber-950 mt-2"><span dir="ltr" className="num">{correct}</span> / <span dir="ltr" className="num">{total}</span> נכונות</div>
+        <div className="mt-3 text-amber-700 font-bold">⭐ +<span dir="ltr" className="num">{earned}</span> XP</div>
       </div>
+      <button disabled={!missed.length} onClick={()=>setShowReview(true)} className={`w-full py-3 rounded-xl font-bold ${missed.length?'gold-btn':'card opacity-50 text-amber-200/60'}`} aria-label="סקירת טעויות">
+        🔍 סקור <span dir="ltr" className="num">{missed.length}</span> טעויות
+      </button>
       <div className="card rounded-xl p-4">
         <h3 className="font-bold text-amber-200 mb-2">📢 שתף עם הכיתה</h3>
         <p className="text-xs text-amber-100/60 mb-2">העתק והדבק בוואטסאפ. חברים יראו את הציון שלך.</p>
         <div className="bg-slate-800/80 rounded-lg p-2 font-mono text-[10px] text-amber-300 break-all select-all max-h-20 overflow-y-auto">{shareCode}</div>
-        <button onClick={copyCode} className="mt-2 gold-btn w-full py-2 rounded-lg text-sm">📋 העתק קוד</button>
+        <button onClick={copyCode} className="mt-2 gold-btn w-full py-2 rounded-lg text-sm" aria-label="העתק קוד שיתוף">📋 העתק קוד</button>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <button onClick={()=>setRoute({page:"home"})} className="card py-3 rounded-xl text-amber-200 font-bold">🏠 בית</button>
-        <button onClick={()=>setRoute({page:"quiz"})} className="gold-btn py-3 rounded-xl font-bold">🔁 חידון נוסף</button>
+        <button onClick={()=>setRoute({page:"home"})} className="card py-3 rounded-xl text-amber-200 font-bold" aria-label="חזרה לבית">🏠 בית</button>
+        <button onClick={()=>setRoute({page:"quiz"})} className="gold-btn py-3 rounded-xl font-bold" aria-label="חידון נוסף">🔁 חידון נוסף</button>
       </div>
     </div>
   );
@@ -2151,7 +2249,10 @@ function ClassBoard({S,update}){
   const [loading, setLoading] = useState(true);
   const [code, setCode] = useState("");
   const [err, setErr] = useState("");
+  const [toast, setToast] = useState("");
+  const prevRankRef = useRef(null);
   const hasFB = !!getFB();
+  useEffect(()=>{ if(!toast) return; const id=setTimeout(()=>setToast(""), 3500); return ()=>clearTimeout(id); },[toast]);
 
   const loadClass = useCallback(async () => {
     setLoading(true);
@@ -2159,7 +2260,7 @@ function ClassBoard({S,update}){
       const members = await fbGet(`classes/${S.classCode}/members`);
       const act = await fbGet(`classes/${S.classCode}/activity`);
       setClassData(members || {});
-      setActivity(act ? Object.values(act).sort((a,b)=>b.ts-a.ts).slice(0,20) : []);
+      setActivity(act ? Object.values(act).sort((a,b)=>b.ts-a.ts).slice(0,150) : []);
     }
     setLoading(false);
   }, [S.classCode, hasFB]);
@@ -2181,6 +2282,21 @@ function ClassBoard({S,update}){
   };
 
   const liveMembers = classData ? Object.values(classData).sort((a,b)=>(b.xp||0)-(a.xp||0)) : [];
+  useEffect(()=>{
+    if(!liveMembers.length || !S.name) return;
+    const myIdx = liveMembers.findIndex(m=>m.name===S.name);
+    if(myIdx<0) return;
+    const myRank = myIdx+1;
+    const prev = prevRankRef.current;
+    if(prev!=null && myRank < prev){
+      const overtaken = liveMembers[myIdx+1];
+      if(overtaken) setToast(`🎉 עקפת את ${overtaken.name}!`);
+    }
+    prevRankRef.current = myRank;
+  // eslint-disable-next-line
+  },[liveMembers.map(m=>m.name+':'+m.xp).join('|'), S.name]);
+  const podium = liveMembers.slice(0,3);
+  const rest = liveMembers.slice(3);
   const localFriends = Object.entries(S.friends||{}).map(([name,f])=>({...f, name})).sort((a,b)=>b.bestScore-a.bestScore);
   const myBest = Math.max(0, ...Object.values(S.quizScores||{}));
 
@@ -2208,26 +2324,64 @@ function ClassBoard({S,update}){
         <>
           <section>
             <h2 className="font-display text-lg font-bold text-amber-200 mb-2">📊 דירוג הכיתה · חי</h2>
-            {loading ? <div className="text-amber-100/60 text-center py-4">טוען...</div> :
-            liveMembers.length === 0 ? <div className="card rounded-xl p-4 text-center text-amber-100/60">עדיין אין חברים. שתף את קוד הכיתה: <strong>{S.classCode}</strong></div> : (
-              <div className="space-y-2">
-                {liveMembers.map((m,i) => (
-                  <div key={i} className={`flex items-center gap-3 p-3 rounded-xl ${i<3?"parchment":"card"} ${m.name===S.name?"ring-2 ring-amber-500":""}`}>
-                    <div className={`w-9 h-9 rounded-full font-bold flex items-center justify-center font-display shrink-0 ${i===0?"bg-amber-400 text-slate-900":i===1?"bg-gray-300 text-slate-900":i===2?"bg-orange-400 text-slate-900":"bg-slate-800 text-amber-200"}`}>{i===0?"👑":i+1}</div>
-                    <div className="text-3xl">{m.avatar}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className={`font-bold truncate ${i<3?"text-amber-950":"text-amber-100"}`}>{m.name}{m.name===S.name?" (אני)":""}</div>
-                      <div className={`text-[10px] ${i<3?"text-amber-800":"text-amber-100/60"}`}>🔥 {m.streak||0} · ⭐ {m.xp||0}</div>
-                    </div>
+            {loading ? (
+              <div className="space-y-2" aria-busy="true" aria-label="טוען דירוג">
+                {[0,1,2,3,4].map(i=>(
+                  <div key={i} className="flex items-center gap-3 p-3">
+                    <div className="skel" style={{width:36,height:36,borderRadius:'50%'}}/>
+                    <div className="skel" style={{width:42,height:42,borderRadius:'50%'}}/>
+                    <div className="flex-1"><div className="skel" style={{height:12,width:'60%',marginBottom:6}}/><div className="skel" style={{height:8,width:'40%'}}/></div>
                   </div>
                 ))}
               </div>
+            ) :
+            liveMembers.length === 0 ? <div className="card rounded-xl p-4 text-center text-amber-100/60">📭 עדיין אין חברים. שתף את קוד הכיתה: <strong>{S.classCode}</strong></div> : (
+              <div>
+                {podium.length>0 && (
+                  <div className="podium-row">
+                    {/* layout: #2 (left), #1 (center), #3 (right) — RTL flips visually */}
+                    {(() => {
+                      const order = [podium[1], podium[0], podium[2]].map((m,k)=>({m, place: k===0?2:k===1?1:3}));
+                      return order.map((o,idx)=>{
+                        if(!o.m) return <div key={idx}/>;
+                        const cls = o.place===1?'pad p1':o.place===2?'pad p2':'pad p3';
+                        const crown = o.place===1?'👑':o.place===2?'🥈':'🥉';
+                        return (
+                          <div key={idx} className={cls + (o.m.name===S.name?' ring-2 ring-amber-500':'')}>
+                            <div className="rank-bubble"><span dir="ltr" className="num">{o.place}</span></div>
+                            <div className="crown">{crown}</div>
+                            <div className="av">{o.m.avatar}</div>
+                            <div className="nm">{o.m.name}{o.m.name===S.name?' (אני)':''}</div>
+                            <div className="meta">🔥 <span dir="ltr" className="num">{o.m.streak||0}</span> · ⭐ <span dir="ltr" className="num">{o.m.xp||0}</span></div>
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                )}
+                <div className="space-y-2">
+                  {rest.map((m,i) => {
+                    const place = i+4;
+                    return (
+                      <div key={place} className={`flex items-center gap-3 p-3 rounded-xl card ${m.name===S.name?"ring-2 ring-amber-500":""}`}>
+                        <div className="w-9 h-9 rounded-full font-bold flex items-center justify-center font-display shrink-0 bg-slate-800 text-amber-200" aria-label={`מקום ${place}`}><span dir="ltr" className="num">{place}</span></div>
+                        <div className="text-3xl">{m.avatar}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold truncate text-amber-100">{m.name}{m.name===S.name?" (אני)":""}</div>
+                          <div className="text-[10px] text-amber-100/60">🔥 <span dir="ltr" className="num">{m.streak||0}</span> · ⭐ <span dir="ltr" className="num">{m.xp||0}</span></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             )}
+            {toast && <div className="toast" role="status">{toast}</div>}
           </section>
           <section>
             <h3 className="font-display text-lg font-bold text-amber-200 mb-2">📰 פעילות אחרונה</h3>
             <div className="space-y-1 max-h-60 overflow-y-auto fancy-scroll">
-              {activity.slice(0,10).map((a,i) => (
+              {activity.map((a,i) => (
                 <div key={i} className="card rounded-lg p-2 text-xs flex items-center gap-2">
                   <span className="text-lg">{a.avatar}</span>
                   <span className="font-bold text-amber-200">{a.name}</span>
@@ -2349,7 +2503,32 @@ function Profile({S,update,setRoute}){
 }
 
 // ============ RENDER ============
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+class EB extends React.Component {
+  constructor(p){ super(p); this.state={err:null}; }
+  static getDerivedStateFromError(err){ return {err}; }
+  componentDidCatch(err,info){ try{console.error('EB',err,info);}catch{} }
+  render(){
+    if(this.state.err) return (
+      <div style={{maxWidth:540,margin:'48px auto',padding:24,borderRadius:16,background:'rgba(168,50,64,.18)',border:'1px solid #A83240',color:'#F7F1E1',fontFamily:'Heebo,sans-serif',textAlign:'center'}}>
+        <div style={{fontSize:48,marginBottom:8}}>😕</div>
+        <div style={{fontSize:20,fontWeight:800,marginBottom:8}}>משהו השתבש</div>
+        <div style={{fontSize:13,opacity:.75,marginBottom:14}}>{String(this.state.err.message||this.state.err)}</div>
+        <button onClick={()=>location.reload()} style={{padding:'8px 18px',borderRadius:10,background:'linear-gradient(135deg,#D4A574,#8B6F47)',color:'#1A1611',fontWeight:800,border:0,cursor:'pointer'}} aria-label="רענן את הדף">רענן</button>
+      </div>
+    );
+    return this.props.children;
+  }
+}
+// init theme from prefers-color-scheme + saved
+(function(){
+  try{
+    const saved = localStorage.getItem('mb_theme');
+    const prefDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const t = saved || (prefDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', t);
+  }catch{ document.documentElement.setAttribute('data-theme','dark'); }
+})();
+ReactDOM.createRoot(document.getElementById("root")).render(<EB><App/></EB>);
 </script>
 </body>
 </html>
