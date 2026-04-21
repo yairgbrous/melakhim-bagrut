@@ -124,6 +124,7 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=400"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -3072,45 +3073,10 @@ function QuotePractice({quotes,onBack,awardXP,update}){
 
 // ============ TIMELINE ============
 function Timeline(){
-  const [filter, setFilter] = useState("all");
-  const list = MELAKHIM_DATA.timeline.filter(k =>
-    filter==="all" || (filter==="good" && k.good) || (filter==="bad" && !k.good) ||
-    (filter==="yehuda" && k.dynasty==="יהודה") || (filter==="israel" && k.dynasty==="ישראל")
-  );
-  return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300">📜 ציר {MELAKHIM_DATA.timeline.length} המלכים</h1>
-        <p className="text-amber-100/70 text-sm mt-1">כרונולוגי · סנן לפי מלכות וצדקות</p>
-      </div>
-      <div className="flex flex-wrap gap-1.5">
-        {[{v:"all",l:"הכל"},{v:"yehuda",l:"👑 יהודה"},{v:"israel",l:"✂️ ישראל"},{v:"good",l:"✅ ישר"},{v:"bad",l:"❌ רע"}].map(f => (
-          <button key={f.v} onClick={()=>setFilter(f.v)} className={`px-3 py-1.5 rounded-lg text-xs font-bold ${filter===f.v?"tab-active":"card"}`}>{f.l}</button>
-        ))}
-      </div>
-      <div className="relative">
-        <div className="absolute right-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-amber-500 via-amber-700 to-slate-800"/>
-        <div className="space-y-2">
-          {list.map((k,i) => (
-            <div key={i} className="flex items-start gap-3 relative pr-10">
-              <div className={`absolute right-2.5 top-3 w-4 h-4 rounded-full border-2 ${k.good?"bg-emerald-500 border-emerald-300":"bg-red-600 border-red-400"}`}/>
-              <div className={`flex-1 card rounded-xl p-3 border-r-4 ${k.dynasty==="יהודה"?"border-r-amber-500":"border-r-purple-500"}`}>
-                <div className="flex items-center justify-between flex-wrap gap-1">
-                  <h3 className="font-display font-bold text-amber-100 text-base">{k.name}</h3>
-                  <div className="flex gap-1 text-[10px]">
-                    <span className="px-1.5 py-0.5 rounded bg-slate-800 text-amber-200">{k.dynasty}</span>
-                    <span className="px-1.5 py-0.5 rounded bg-slate-800 text-amber-200">{k.years}</span>
-                  </div>
-                </div>
-                <div className="text-[10px] text-amber-300">{k.period}</div>
-                <p className="text-xs text-amber-100/70 mt-1">{k.notes}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  const KingsTableImpl = typeof window !== 'undefined' ? window.KingsTableComponent : null;
+  return KingsTableImpl
+    ? <KingsTableImpl/>
+    : <div className="text-amber-300">טוען טבלת מלכים...</div>;
 }
 
 // ============ MAPS ============
