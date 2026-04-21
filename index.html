@@ -556,6 +556,8 @@ html[data-theme='light'] .study-card{
 </head>
 <body>
 <div id="root"></div>
+<!-- Tab D: authentic quiz / exam-sim / flashcards components (attach to window before main render) -->
+<script type="text/babel" data-presets="react" src="./components/FlashcardDrill.js"></script>
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
@@ -2116,6 +2118,7 @@ function App(){
         {route.page==="unit" && <UnitDetail unitId={route.unitId} S={S} setRoute={setRoute} awardXP={awardXP} update={update}/>}
         {route.page==="lesson" && <Lesson unitId={route.unitId} mode={route.mode} setRoute={setRoute} S={S} awardXP={awardXP} update={update}/>}
         {route.page==="quiz" && <QuizLobby S={S} setRoute={setRoute}/>}
+        {route.page==="flashcards" && (()=>{ const X=window.FlashcardDrillComponent; return X ? <X S={S} update={update} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען כרטיסיות...</div>; })()}
         {route.page==="quizPlay" && <QuizRun params={route} S={S} setRoute={setRoute} awardXP={awardXP} update={update} publishActivity={publishActivity} soundOn={soundOn}/>}
         {route.page==="quizResult" && <QuizResult {...route} S={S} setRoute={setRoute}/>}
         {route.page==="themes" && <Themes S={S} update={update}/>}
@@ -2667,6 +2670,7 @@ function QuizLobby({S,setRoute}){
         <Mode t="מהיר · כל הספר" d="10 שאלות אקראיות מכל הרמות" i="⚡" color="#D4A574" onClick={()=>setRoute({page:"quizPlay",mode:"quick"})}/>
         <Mode t="לפי יחידה" d="בחר יחידה ורמת קושי" i="🎯" color="#6B5B95" onClick={()=>setRoute({page:"quizPlay",mode:"selectUnit"})}/>
         <Mode t="קרב גדול · טיימר" d="20 שאלות · 3 דקות · לחץ" i="🏆" color="#A83240" onClick={()=>setRoute({page:"quizPlay",mode:"battle"})}/>
+        <Mode t="כרטיסיות זיכרון" d="מיקוד משרד החינוך — פסוקים, מושגים, דמויות" i="🃏" color="#3E8E7E" onClick={()=>setRoute({page:"flashcards"})}/>
       </div>
 
       <div>
