@@ -1,0 +1,66 @@
+/* =========================================================================
+   layout-fix.css — black-area rendering bug fix.
+
+   Bug: on "למידה" tab, expanding a unit card and scrolling mid-transition
+   caused a large dark band to flash / persist across the page.
+
+   Root causes addressed:
+     - sticky header with backdrop-filter bleeding into transparent children
+       during scroll (background-clip: padding-box)
+     - expanded-panel max-height transition interacting with grid-column:1/-1
+       reflow (transparent outer panel, isolated stacking context)
+     - fixed radial-gradient body::before leaving GPU snapshot artifacts
+       (will-change + transform:translateZ(0) + contain)
+     - min-height:100vh inheritance on study cards that jump column-span
+   ========================================================================= */
+
+/* Sticky header — prevent blurred backdrop from bleeding past the border box
+   on Chrome mobile during overscroll. */
+header.sticky,
+header[class*="sticky"] {
+  background-clip: padding-box !important;
+  isolation: isolate;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Fixed radial overlay — nail it to the compositor. */
+body::before {
+  will-change: opacity;
+  transform: translateZ(0);
+  contain: strict;
+}
+
+/* Inline accordion: keep the outer panel transparent so it never contributes
+   a dark band during max-height animation; confine painting to the inner. */
+.expanded-panel {
+  background: transparent !important;
+  min-height: initial !important;
+  isolation: isolate;
+}
+.expanded-panel.open {
+  contain: layout paint;
+}
+.expanded-panel-inner {
+  min-height: initial !important;
+  background-clip: padding-box !important;
+}
+
+/* Study grid cards — prevent stray min-height inheritance when the wrap jumps
+   to grid-column:1/-1 on expand. */
+.study-card-wrap,
+.study-card-wrap.expanded,
+.study-card,
+.unit-card {
+  min-height: initial !important;
+}
+.study-card-wrap.expanded {
+  align-self: start;
+}
+
+/* Generic disclosure widgets — keep transparent so they don't introduce
+   their own dark band during animation. */
+details > .content,
+.inline-expand {
+  background: transparent !important;
+}
