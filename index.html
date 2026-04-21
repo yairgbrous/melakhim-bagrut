@@ -18,8 +18,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;700;800;900&family=Noto+Serif+Hebrew:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/quote-cards.css">
-<link rel="stylesheet" href="assets/contrast-hotfix.css">
+<link rel="stylesheet" href="assets/quote-cards.css?v=400">
+<link rel="stylesheet" href="assets/contrast-hotfix.css?v=400">
+<link rel="stylesheet" href="assets/layout-fix.css?v=400">
 <script>
 /* =========================================================================
    Entity index bootstrap — loads data modules into window.__ENTITY_INDEX__
@@ -123,6 +124,8 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=400"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=400"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -1837,11 +1840,10 @@ function StudyHub(){
   );
 }
 
-// ============ ME TAB (merged profile + class + grade leaderboards) ============
+// ============ ME TAB — leaderboard FIRST, then achievements, then profile ============
 function MeTab({S, update, setRoute}){
   return (
     <div className="space-y-6">
-      <Profile S={S} update={update} setRoute={setRoute}/>
       <section className="space-y-3">
         <h2 className="font-display text-xl md:text-2xl font-bold text-amber-300 flex items-center gap-2">
           <span aria-hidden="true">🏆</span><span>דירוג הכיתה</span>
@@ -1852,10 +1854,126 @@ function MeTab({S, update, setRoute}){
         <h2 className="font-display text-xl md:text-2xl font-bold text-amber-300 flex items-center gap-2">
           <span aria-hidden="true">🎓</span><span>דירוג השכבה</span>
         </h2>
-        <div className="card rounded-xl p-4 text-center text-amber-100/80">
-          דירוג ברמת שכבה יתווסף בעדכון הבא. כעת מוצג דירוג הכיתה בלבד.
-        </div>
+        <GradeLeaderboard S={S}/>
       </section>
+      <section className="space-y-3">
+        <h2 className="font-display text-xl md:text-2xl font-bold text-amber-300 flex items-center gap-2">
+          <span aria-hidden="true">🏅</span><span>הישגים</span>
+        </h2>
+        <ProfileAchievements S={S}/>
+      </section>
+      <section className="space-y-3">
+        <h2 className="font-display text-xl md:text-2xl font-bold text-amber-300 flex items-center gap-2">
+          <span aria-hidden="true">👤</span><span>פרופיל</span>
+        </h2>
+        <Profile S={S} update={update} setRoute={setRoute}/>
+      </section>
+    </div>
+  );
+}
+
+function GradeLeaderboard({S}){
+  const [rows, setRows] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const hasFB = !!getFB();
+  useEffect(()=>{
+    let alive = true;
+    if (!hasFB) { setRows([]); return; }
+    setLoading(true);
+    (async () => {
+      try {
+        const classes = await fbGet('classes');
+        if (!alive) return;
+        const all = [];
+        if (classes && typeof classes === 'object') {
+          Object.entries(classes).forEach(([code, cl]) => {
+            const members = cl && cl.members ? cl.members : null;
+            if (members) {
+              Object.values(members).forEach(m => {
+                if (m && m.name) all.push({name:m.name, avatar:m.avatar||'👤', xp:m.xp||0, classCode:code});
+              });
+            }
+          });
+        }
+        all.sort((a,b)=>b.xp-a.xp);
+        setRows(all.slice(0, 50));
+      } catch(e) {
+        setRows([]);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return ()=>{ alive = false; };
+  }, [hasFB]);
+
+  if (!hasFB) {
+    return (
+      <div className="card rounded-xl p-4 text-center text-amber-100/80 text-sm">
+        דירוג ברמת שכבה יופעל כאשר תחובר לפיירבייס הכיתתי. כעת מוצג דירוג הכיתה בלבד.
+      </div>
+    );
+  }
+  if (loading || rows === null) {
+    return (
+      <div className="card rounded-xl p-4 space-y-2" aria-busy="true">
+        {[0,1,2,3].map(i => (
+          <div key={i} className="flex items-center gap-3">
+            <div className="skel" style={{width:28,height:28,borderRadius:'50%'}}/>
+            <div className="skel" style={{flex:1,height:14,borderRadius:6}}/>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (rows.length === 0) {
+    return (
+      <div className="card rounded-xl p-4 text-center text-amber-100/80 text-sm">
+        אין עדיין תלמידים אחרים בשכבה. שתפו את הקישור לחברים בכיתות אחרות.
+      </div>
+    );
+  }
+  return (
+    <div className="card rounded-xl p-3 space-y-1">
+      {rows.map((r, i) => {
+        const isMe = r.name === S.name;
+        return (
+          <div key={i} className={`flex items-center gap-3 p-2 rounded-lg ${isMe?'bg-amber-500/20 border border-amber-400/50':''}`}>
+            <div className="w-7 text-center font-bold text-amber-300">{i+1}</div>
+            <div className="text-2xl">{r.avatar}</div>
+            <div className="flex-1 min-w-0">
+              <div className="font-display text-sm font-bold text-amber-100 truncate">{r.name}{isMe && <span className="me-chip">אני</span>}</div>
+              <div className="text-[10px] text-amber-200/60">כיתה {r.classCode}</div>
+            </div>
+            <div className="text-amber-300 text-sm font-bold">⭐ <span dir="ltr" className="num">{r.xp}</span></div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ProfileAchievements({S}){
+  const earned = ACHIEVEMENTS.filter(a => (S.achievements||[]).includes(a.id));
+  const locked = ACHIEVEMENTS.filter(a => !(S.achievements||[]).includes(a.id));
+  return (
+    <div className="space-y-2">
+      <div className="text-xs text-amber-200/70">{earned.length} מתוך {ACHIEVEMENTS.length} הישגים</div>
+      <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+        {earned.map(a => (
+          <div key={a.id} className="parchment rounded-xl p-3 text-center">
+            <div className="text-3xl">{a.icon}</div>
+            <div className="font-display font-bold text-amber-900 text-xs mt-1">{a.name}</div>
+            <div className="text-[10px] text-amber-800 mt-0.5">{a.desc}</div>
+          </div>
+        ))}
+        {locked.map(a => (
+          <div key={a.id} className="card rounded-xl p-3 text-center ach-locked" aria-label={`הישג נעול: ${a.name}`}>
+            <div className="text-3xl">{a.icon}</div>
+            <div className="font-display font-bold text-amber-200 text-xs mt-1">{a.name}</div>
+            <div className="text-[10px] text-amber-100/60 mt-0.5">{a.desc}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -3071,49 +3189,20 @@ function QuotePractice({quotes,onBack,awardXP,update}){
 
 // ============ TIMELINE ============
 function Timeline(){
-  const [filter, setFilter] = useState("all");
-  const list = MELAKHIM_DATA.timeline.filter(k =>
-    filter==="all" || (filter==="good" && k.good) || (filter==="bad" && !k.good) ||
-    (filter==="yehuda" && k.dynasty==="יהודה") || (filter==="israel" && k.dynasty==="ישראל")
-  );
-  return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300">📜 ציר {MELAKHIM_DATA.timeline.length} המלכים</h1>
-        <p className="text-amber-100/70 text-sm mt-1">כרונולוגי · סנן לפי מלכות וצדקות</p>
-      </div>
-      <div className="flex flex-wrap gap-1.5">
-        {[{v:"all",l:"הכל"},{v:"yehuda",l:"👑 יהודה"},{v:"israel",l:"✂️ ישראל"},{v:"good",l:"✅ ישר"},{v:"bad",l:"❌ רע"}].map(f => (
-          <button key={f.v} onClick={()=>setFilter(f.v)} className={`px-3 py-1.5 rounded-lg text-xs font-bold ${filter===f.v?"tab-active":"card"}`}>{f.l}</button>
-        ))}
-      </div>
-      <div className="relative">
-        <div className="absolute right-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-amber-500 via-amber-700 to-slate-800"/>
-        <div className="space-y-2">
-          {list.map((k,i) => (
-            <div key={i} className="flex items-start gap-3 relative pr-10">
-              <div className={`absolute right-2.5 top-3 w-4 h-4 rounded-full border-2 ${k.good?"bg-emerald-500 border-emerald-300":"bg-red-600 border-red-400"}`}/>
-              <div className={`flex-1 card rounded-xl p-3 border-r-4 ${k.dynasty==="יהודה"?"border-r-amber-500":"border-r-purple-500"}`}>
-                <div className="flex items-center justify-between flex-wrap gap-1">
-                  <h3 className="font-display font-bold text-amber-100 text-base">{k.name}</h3>
-                  <div className="flex gap-1 text-[10px]">
-                    <span className="px-1.5 py-0.5 rounded bg-slate-800 text-amber-200">{k.dynasty}</span>
-                    <span className="px-1.5 py-0.5 rounded bg-slate-800 text-amber-200">{k.years}</span>
-                  </div>
-                </div>
-                <div className="text-[10px] text-amber-300">{k.period}</div>
-                <p className="text-xs text-amber-100/70 mt-1">{k.notes}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  const KingsTableImpl = typeof window !== 'undefined' ? window.KingsTableComponent : null;
+  return KingsTableImpl
+    ? <KingsTableImpl/>
+    : <div className="text-amber-300">טוען טבלת מלכים...</div>;
 }
 
 // ============ MAPS ============
-function MapsPage({S, update, awardXP}){
+function MapsPage(props){
+  const MapsImpl = typeof window !== 'undefined' ? window.MapsPageComponent : null;
+  if (MapsImpl) return <MapsImpl {...props}/>;
+  return <MapsPageLegacy {...props}/>;
+}
+
+function MapsPageLegacy({S, update, awardXP}){
   const [practiceMap, setPracticeMap] = useState(null);
   if (practiceMap !== null) return <MapPractice map={BAGRUT_MAPS[practiceMap]} onBack={()=>setPracticeMap(null)} awardXP={awardXP} update={update}/>;
   return (
@@ -3579,8 +3668,6 @@ function Profile({S,update,setRoute}){
   const [avatar, setAvatar] = useState(S.avatar);
   const [classCode, setClassCode] = useState(S.classCode||"");
   const [fbUrl, setFbUrl] = useState(getFB());
-  const earned = ACHIEVEMENTS.filter(a => S.achievements.includes(a.id));
-  const locked = ACHIEVEMENTS.filter(a => !S.achievements.includes(a.id));
   const level = getLevel(S.xp);
   const saveFbUrl = () => {
     if (fbUrl.trim()) localStorage.setItem('melakhim_fbUrl', fbUrl.trim());
@@ -3615,25 +3702,6 @@ function Profile({S,update,setRoute}){
         <Stat i="⚔️" v={S.totalQuizzes||0} l="חידונים" c="purple"/>
         <Stat i="💯" v={S.perfectQuizzes||0} l="מושלמים" c="emerald"/>
       </div>
-      <section>
-        <h2 className="font-display text-lg font-bold text-amber-300 mb-2">🏅 הישגים ({earned.length}/{ACHIEVEMENTS.length})</h2>
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
-          {earned.map(a => (
-            <div key={a.id} className="parchment rounded-xl p-3 text-center">
-              <div className="text-3xl">{a.icon}</div>
-              <div className="font-display font-bold text-amber-900 text-xs mt-1">{a.name}</div>
-              <div className="text-[10px] text-amber-800 mt-0.5">{a.desc}</div>
-            </div>
-          ))}
-          {locked.map(a => (
-            <div key={a.id} className="card rounded-xl p-3 text-center ach-locked" aria-label={`הישג נעול: ${a.name}`}>
-              <div className="text-3xl">{a.icon}</div>
-              <div className="font-display font-bold text-amber-200 text-xs mt-1">{a.name}</div>
-              <div className="text-[10px] text-amber-100/60 mt-0.5">{a.desc}</div>
-            </div>
-          ))}
-        </div>
-      </section>
       <details className="card rounded-xl p-3">
         <summary className="text-amber-300 text-sm font-bold cursor-pointer">🔧 הגדרות מתקדמות (Firebase לחבר׳ה)</summary>
         <div className="mt-3 space-y-2">
