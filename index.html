@@ -125,6 +125,7 @@
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=400"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=400"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -3080,7 +3081,13 @@ function Timeline(){
 }
 
 // ============ MAPS ============
-function MapsPage({S, update, awardXP}){
+function MapsPage(props){
+  const MapsImpl = typeof window !== 'undefined' ? window.MapsPageComponent : null;
+  if (MapsImpl) return <MapsImpl {...props}/>;
+  return <MapsPageLegacy {...props}/>;
+}
+
+function MapsPageLegacy({S, update, awardXP}){
   const [practiceMap, setPracticeMap] = useState(null);
   if (practiceMap !== null) return <MapPractice map={BAGRUT_MAPS[practiceMap]} onBack={()=>setPracticeMap(null)} awardXP={awardXP} update={update}/>;
   return (
