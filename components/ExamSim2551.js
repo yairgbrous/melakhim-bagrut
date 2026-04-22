@@ -294,6 +294,7 @@
     }
 
     if (phase === "select") {
+      const ready = selectedA.length === MAX_A && selectedBC.length === MAX_BC;
       return (
         <div className="max-w-2xl mx-auto space-y-4">
           <div className="card rounded-xl p-3 flex items-center justify-between text-sm">
@@ -304,15 +305,97 @@
           </div>
           <PartASelect selected={selectedA} onToggle={toggleA}/>
           <PartBCSelect selected={selectedBC} onToggle={toggleBC}/>
+          <button onClick={()=>setPhase("running")} disabled={!ready}
+            className={`w-full py-4 rounded-2xl text-lg font-bold ${ready?"gold-btn glow":"bg-slate-700 text-slate-400 cursor-not-allowed"}`}>
+            {ready ? `🏁 התחל מבחן · ${fmtHMS(examCfg&&examCfg.durationSec||DURATION_STANDARD)}` : `בחר ${MAX_A-selectedA.length} בפרק א ו-${MAX_BC-selectedBC.length} בפרקים ב+ג`}
+          </button>
         </div>
       );
+    }
+
+    if (phase === "running") {
+      return <ExamRunning
+        selectedA={selectedA} selectedBC={selectedBC}
+        durationSec={(examCfg&&examCfg.durationSec)||DURATION_STANDARD}
+        onFinish={()=>setPhase("grade")}
+        onExit={()=>setPhase("intro")}
+      />;
     }
 
     return (
       <div className="max-w-xl mx-auto text-center py-12 space-y-3">
         <div className="text-5xl">🏗</div>
-        <p className="text-amber-200">שלב הבחינה בפיתוח.</p>
+        <p className="text-amber-200">שלב הדירוג בפיתוח — הקומיט הבא.</p>
         <button onClick={()=>setPhase("intro")} className="gold-btn px-4 py-2 rounded-lg">חזרה</button>
+      </div>
+    );
+  }
+
+  function ExamRunning({ selectedA, selectedBC, durationSec, onFinish, onExit }){
+    const [timeLeft, setTimeLeft] = useState(durationSec);
+    const [answers, setAnswers] = useState({});
+    useEffect(() => {
+      if (timeLeft <= 0) { onFinish(); return; }
+      const t = setTimeout(() => setTimeLeft(x => x-1), 1000);
+      return () => clearTimeout(t);
+    }, [timeLeft, onFinish]);
+
+    const partAQs = PART_A_POOL.filter(q => selectedA.includes(q.id));
+    const partBCQs = PART_BC_POOL.filter(q => selectedBC.includes(q.id));
+    const mins = Math.floor(timeLeft/60), secs = timeLeft%60;
+
+    const setAns = (id, v) => setAnswers(a => ({...a, [id]: v}));
+
+    return (
+      <div className="max-w-3xl mx-auto space-y-4">
+        <div className="sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between">
+          <div className="text-sm text-amber-200">
+            נענו: <span dir="ltr" className="font-bold">{Object.keys(answers).filter(k=>answers[k]&&answers[k].trim()).length}/{partAQs.length+partBCQs.length}</span>
+          </div>
+          <div className={`font-mono font-bold text-lg ${timeLeft<300?"text-red-400":"text-amber-200"}`}>
+            ⏱ <span dir="ltr">{String(Math.floor(mins/60)).padStart(1,"0")}:{String(mins%60).padStart(2,"0")}:{String(secs).padStart(2,"0")}</span>
+          </div>
+          <button onClick={onFinish} className="px-3 py-1.5 rounded-lg bg-red-700 text-white text-xs font-bold">הגשה</button>
+        </div>
+
+        <section className="space-y-2">
+          <h2 className="font-display text-lg font-bold text-amber-300">פרק א — בקיאות</h2>
+          {partAQs.map(q => (
+            <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
+              <div className="flex items-center gap-2 text-xs">
+                <span className="px-2 py-0.5 rounded-full bg-amber-700 text-white font-bold">שאלה {q.n}</span>
+                <span className="text-amber-800">{q.points} נק׳</span>
+                <span className="text-amber-900 font-bold mr-auto">{q.title}</span>
+              </div>
+              <div className="hebrew text-amber-950 leading-relaxed">{q.prompt}</div>
+              <textarea value={answers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)}
+                rows={4} placeholder="כתוב את תשובתך כאן..."
+                className="w-full px-3 py-2 rounded-lg bg-white/80 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"/>
+            </div>
+          ))}
+        </section>
+
+        <section className="space-y-2">
+          <h2 className="font-display text-lg font-bold text-purple-300">פרק ב + ג — ידע ורוחב</h2>
+          {partBCQs.map(q => (
+            <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
+              <div className="flex items-center gap-2 text-xs">
+                <span className="px-2 py-0.5 rounded-full bg-purple-700 text-white font-bold">סעיף {q.n}</span>
+                <span className="text-amber-800">{q.points} נק׳</span>
+                <span className="text-amber-900 font-bold mr-auto">פרק {q.part} · {q.title}</span>
+              </div>
+              <div className="hebrew text-amber-950 leading-relaxed">{q.prompt}</div>
+              <textarea value={answers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)}
+                rows={4} placeholder="כתוב את תשובתך כאן..."
+                className="w-full px-3 py-2 rounded-lg bg-white/80 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"/>
+            </div>
+          ))}
+        </section>
+
+        <div className="grid grid-cols-2 gap-2">
+          <button onClick={onExit} className="card py-3 rounded-xl text-amber-200">← יציאה</button>
+          <button onClick={onFinish} className="gold-btn py-3 rounded-xl font-bold">📤 הגש לבדיקה</button>
+        </div>
       </div>
     );
   }
