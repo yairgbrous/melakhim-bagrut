@@ -283,6 +283,47 @@
       notes:["מפה רקע להבנת גיאוגרפיית הארץ"],
       book_page:213
     },
+    {
+      id:"shvatim_12",
+      number:16, unit:1,
+      title:"נחלות שנים עשר השבטים",
+      era_label:"רקע — יהושע י״ג-י״ט",
+      caption:"רקע גאוגרפי לספר מלכים: תפרוסת השבטים שממנה פורשת ממלכת ישראל (10 שבטים) וממנה נשארת יהודה.",
+      pins:[
+        {n:1, place:"דן (צפון)", placeId:"dan", x:55, y:12},
+        {n:2, place:"נפתלי", placeId:"naftali", x:52, y:22},
+        {n:3, place:"אשר", placeId:"asher", x:38, y:24},
+        {n:4, place:"זבולון", placeId:"zvulun", x:45, y:30},
+        {n:5, place:"יששכר", placeId:"yissachar", x:50, y:36},
+        {n:6, place:"מנשה", placeId:"menashe", x:46, y:44},
+        {n:7, place:"אפרים", placeId:"efraim", x:44, y:52},
+        {n:8, place:"בנימין", placeId:"binyamin", x:42, y:64},
+        {n:9, place:"יהודה", placeId:"yehuda", x:38, y:78},
+        {n:10, place:"שמעון", placeId:"shimon", x:28, y:88},
+        {n:11, place:"ראובן-גד-חצי מנשה (עבר הירדן)", placeId:"ever_hayarden", x:72, y:55}
+      ],
+      notes:["10 שבטים לישראל; יהודה ובנימין לממלכת יהודה; לוי מפוזר"],
+      book_page:213
+    },
+    {
+      id:"masai_eliyahu",
+      number:17, unit:3,
+      title:"מסעי אליהו הנביא",
+      era_label:"אליהו התשבי, ימי אחאב",
+      caption:"נחל כרית → צרפת (אלמנה) → הר הכרמל (נביאי הבעל) → חורב (״קול דממה דקה״) → עליה בסערה מן הירדן.",
+      pins:[
+        {n:1, place:"גלעד (תשבי)", placeId:"tishbi", x:70, y:50},
+        {n:2, place:"נחל כרית", placeId:"kerit", x:68, y:55},
+        {n:3, place:"צרפת (צידון)", placeId:"tzarfat", x:36, y:18},
+        {n:4, place:"הר הכרמל", placeId:"karmel", x:38, y:36},
+        {n:5, place:"יזרעאל", placeId:"yizrael", x:47, y:35},
+        {n:6, place:"באר שבע", placeId:"beer_sheva", x:32, y:87},
+        {n:7, place:"הר חורב", placeId:"chorev", x:46, y:100},
+        {n:8, place:"ירדן (עליה לשמים)", placeId:"yarden", x:65, y:58}
+      ],
+      notes:["אליהו מחולל נסים בגבולות הממלכה ומחוצה לה"],
+      book_page:213
+    },
     // maps inserted incrementally below
   ];
 
