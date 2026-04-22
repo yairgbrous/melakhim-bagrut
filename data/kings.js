@@ -14,6 +14,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 40,
     era: 1,
+    reign_start_bce: 970,
+    reign_end_bce: 931,
     assessment: "מעורב",
     assessment_quote:
       "וַיְהִי לְעֵת זִקְנַת שְׁלֹמֹה נָשָׁיו הִטּוּ אֶת־לְבָבוֹ אַחֲרֵי אֱלֹהִים אֲחֵרִים וְלֹא־הָיָה לְבָבוֹ שָׁלֵם עִם־יְהוָה אֱלֹהָיו כִּלְבַב דָּוִיד אָבִיו (מל״א יא׳ ד)",
@@ -42,6 +44,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 17,
     era: 2,
+    reign_start_bce: 931,
+    reign_end_bce: 913,
     assessment: "רשע",
     assessment_quote:
       "וַיַּעַשׂ יְהוּדָה הָרַע בְּעֵינֵי יְהוָה וַיְקַנְאוּ אֹתוֹ מִכֹּל אֲשֶׁר עָשׂוּ אֲבֹתָם (מל״א יד׳ כב)",
@@ -68,6 +72,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 3,
     era: 2,
+    reign_start_bce: 913,
+    reign_end_bce: 911,
     assessment: "רשע",
     assessment_quote:
       "וַיֵּלֶךְ בְּכָל־חַטֹּאות אָבִיו אֲשֶׁר עָשָׂה לְפָנָיו וְלֹא־הָיָה לְבָבוֹ שָׁלֵם עִם־יְהוָה אֱלֹהָיו כִּלְבַב דָּוִד אָבִיו (מל״א טו׳ ג)",
@@ -88,6 +94,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 41,
     era: 2,
+    reign_start_bce: 911,
+    reign_end_bce: 870,
     assessment: "צדיק",
     assessment_quote:
       "וַיַּעַשׂ אָסָא הַיָּשָׁר בְּעֵינֵי יְהוָה כְּדָוִד אָבִיו (מל״א טו׳ יא)",
@@ -108,6 +116,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 25,
     era: 3,
+    reign_start_bce: 870,
+    reign_end_bce: 848,
     assessment: "צדיק",
     assessment_quote:
       "וַיֵּלֶךְ בְּכָל־דֶּרֶךְ אָסָא אָבִיו לֹא־סָר מִמֶּנָּה לַעֲשׂוֹת הַיָּשָׁר בְּעֵינֵי יְהוָה (מל״א כב׳ מג)",
@@ -133,6 +143,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 8,
     era: 4,
+    reign_start_bce: 848,
+    reign_end_bce: 841,
     assessment: "רשע",
     assessment_quote:
       "וַיֵּלֶךְ בְּדֶרֶךְ מַלְכֵי יִשְׂרָאֵל כַּאֲשֶׁר עָשׂוּ בֵּית אַחְאָב כִּי בַּת־אַחְאָב הָיְתָה־לּוֹ לְאִשָּׁה וַיַּעַשׂ הָרַע בְּעֵינֵי יְהוָה (מל״ב ח׳ יח)",
@@ -153,6 +165,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 1,
     era: 4,
+    reign_start_bce: 841,
+    reign_end_bce: 841,
     assessment: "רשע",
     assessment_quote:
       "וַיֵּלֶךְ בְּדֶרֶךְ בֵּית אַחְאָב וַיַּעַשׂ הָרַע בְּעֵינֵי יְהוָה כְּבֵית אַחְאָב כִּי חֲתַן בֵּית אַחְאָב הוּא (מל״ב ח׳ כז)",
@@ -173,6 +187,8 @@ export const kings = [
     dynasty: null,
     reign_years: 6,
     era: 4,
+    reign_start_bce: 841,
+    reign_end_bce: 835,
     assessment: "רשע",
     assessment_quote:
       "וַתָּקָם וַתְּאַבֵּד אֵת כָּל־זֶרַע הַמַּמְלָכָה (מל״ב יא׳ א)",
@@ -193,6 +209,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 40,
     era: 4,
+    reign_start_bce: 835,
+    reign_end_bce: 796,
     assessment: "צדיק",
     assessment_quote:
       "וַיַּעַשׂ יְהוֹאָשׁ הַיָּשָׁר בְּעֵינֵי יְהוָה כָּל־יָמָיו אֲשֶׁר הוֹרָהוּ יְהוֹיָדָע הַכֹּהֵן (מל״ב יב׳ ג)",
@@ -219,6 +237,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 29,
     era: 5,
+    reign_start_bce: 796,
+    reign_end_bce: 767,
     assessment: "צדיק",
     assessment_quote:
       "וַיַּעַשׂ הַיָּשָׁר בְּעֵינֵי יְהוָה רַק לֹא כְּדָוִד אָבִיו כְּכֹל אֲשֶׁר־עָשָׂה יוֹאָשׁ אָבִיו עָשָׂה (מל״ב יד׳ ג)",
