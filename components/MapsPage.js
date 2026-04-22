@@ -1,11 +1,13 @@
 /* =========================================================================
-   MapsPage — 19-maps list grouped by unit with full-screen map view.
-   Book reference: חוברת_מלכים.pdf pp. 213-214 (רשימת 19 המפות למיקוד תשפ״ו).
+   MapsPage — 19 named maps (book pp. 213-214) with numbered pin overlays.
+   Each map: title, era_label, caption, inline-SVG geography, numbered pins,
+   and a legend (pin # → named place). Pin click navigates to /place/:id.
 
    Data sources (in order of preference):
-     1. window.BAGRUT_MAPS_19   (from data/maps.js — Tab A delivers)
-     2. window.__ENTITY_INDEX__.map
-     3. BAGRUT_MAPS (6 legacy entries from index.html — graceful fallback)
+     1. MAPS_19 hardcoded fallback (this file, below)  ← authoritative for v2
+     2. window.BAGRUT_MAPS_19  (data/maps.js — Tab A)
+     3. window.__ENTITY_INDEX__.map
+     4. legacy BAGRUT_MAPS from index.html
 
    Exposes: window.MapsPageComponent
    ========================================================================= */
@@ -25,9 +27,21 @@
     6: "יחידה ו · חורבן יהודה"
   };
 
+  // -------------------------------------------------------------------------
+  // MAPS_19 — 19 authoritative maps. Populated incrementally (3 at a time).
+  // Coord system: x,y in 0..100 (percentage of canvas).
+  // -------------------------------------------------------------------------
+  const MAPS_19 = [
+    // maps inserted incrementally below
+  ];
+
   function normalizeMap(m, idx){
-    // Accept either rich maps (data/maps.js) or legacy BAGRUT_MAPS entries.
-    const required_places = m.required_places || (m.locs || []).map(l => ({
+    const required_places = m.required_places || (m.pins || []).map(p => ({
+      id: p.placeId || p.place,
+      name: p.place || p.name || '',
+      description: p.description || '',
+      required_for_exam: true
+    })) || (m.locs || []).map(l => ({
       name: l.n || l.name || '',
       description: l.d || l.description || '',
       required_for_exam: (l.required_for_exam !== false)
@@ -38,6 +52,9 @@
       unit: m.unit || 1,
       title: m.title || m.name || 'מפה',
       subtitle: m.subtitle || m.content_description || '',
+      era_label: m.era_label || m.era || '',
+      caption: m.caption || '',
+      pins: Array.isArray(m.pins) ? m.pins : null,
       required_places,
       notes: [].concat(m.notes || m.bagrut_notes || []).filter(Boolean),
       book_page: m.book_page || m.page || null,
@@ -46,6 +63,9 @@
   }
 
   function pickMapsData(){
+    if (Array.isArray(MAPS_19) && MAPS_19.length > 0){
+      return MAPS_19.map(normalizeMap);
+    }
     if (typeof window.BAGRUT_MAPS_19 !== 'undefined' && Array.isArray(window.BAGRUT_MAPS_19) && window.BAGRUT_MAPS_19.length > 0){
       return window.BAGRUT_MAPS_19.map(normalizeMap);
     }
@@ -57,12 +77,14 @@
     return legacy.map(normalizeMap);
   }
 
-  function goToStudyPlace(placeId){
-    try{ window.dispatchEvent(new CustomEvent('navigate-study', {detail:{tab:'place', focusId:placeId}})); }catch(e){}
-    try{ window.location.hash = '#study-place-' + encodeURIComponent(placeId || ''); }catch(e){}
+  function goToPlace(placeIdOrName){
+    const setRoute = window.__setRoute;
+    if (setRoute && placeIdOrName){ setRoute({page:'place', id:placeIdOrName}); return; }
+    try{ window.dispatchEvent(new CustomEvent('navigate-study', {detail:{tab:'place', focusId:placeIdOrName}})); }catch(e){}
+    try{ window.location.hash = '#study-place-' + encodeURIComponent(placeIdOrName || ''); }catch(e){}
   }
 
-  // Deterministic pseudo-random positions for pins based on place name.
+  // Pseudo-random fallback positions (only used when a map has no explicit pins)
   function hashString(s){
     let h = 5381;
     for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) & 0xffffffff;
@@ -71,13 +93,12 @@
   function pinPos(name, i){
     const h1 = hashString(name + ':x:' + i);
     const h2 = hashString(name + ':y:' + i);
-    const x = 10 + (h1 % 80); // 10..90 %
-    const y = 15 + (h2 % 70); // 15..85 %
-    return {x, y};
+    return { x: 10 + (h1 % 80), y: 15 + (h2 % 70) };
   }
 
   function MapFullView({map, onBack}){
     const color = UNIT_COLOR[map.unit] || "#D4A574";
+    const hasPins = Array.isArray(map.pins) && map.pins.length > 0;
     return (
       <div className="mp-full">
         <div className="mp-full-head" style={{background:color}}>
@@ -85,7 +106,8 @@
           <div className="mp-full-title-wrap">
             <div className="mp-full-num">מפה {map.number}</div>
             <h2 className="font-display mp-full-title">{map.title}</h2>
-            {map.subtitle && <p className="mp-full-sub">{map.subtitle}</p>}
+            {map.era_label && <div className="mp-full-era" style={{fontSize:12,opacity:.9,marginTop:2}}>{map.era_label}</div>}
+            {(map.caption || map.subtitle) && <p className="mp-full-sub">{map.caption || map.subtitle}</p>}
           </div>
         </div>
         <div className="mp-canvas-wrap">
@@ -101,18 +123,32 @@
             </defs>
             <rect x="0" y="0" width="100" height="100" fill={'url(#mpGrad-' + map.id + ')'}/>
             <rect x="0" y="0" width="100" height="100" fill={'url(#mpGrid-' + map.id + ')'}/>
+            {/* Mediterranean coastline (west) */}
             <path d="M 20 0 Q 30 30 22 60 T 35 100"
                   stroke={color} strokeOpacity="0.55" strokeWidth="0.6" fill="none" strokeDasharray="1.2 1.2"/>
-            <path d="M 0 72 Q 40 65 100 78"
+            {/* Jordan river (east of center) */}
+            <path d="M 72 8 Q 70 35 75 60 T 78 95"
                   stroke={color} strokeOpacity="0.55" strokeWidth="0.6" fill="none" strokeDasharray="1.2 1.2"/>
+            <text x="6" y="96" fontSize="3" fill={color} fillOpacity="0.7">ים התיכון</text>
+            <text x="80" y="50" fontSize="3" fill={color} fillOpacity="0.7">ירדן</text>
           </svg>
-          {map.required_places.map((p, i) => {
+          {hasPins ? map.pins.map((pin, i) => (
+            <button key={i}
+              className="mp-pin mp-pin-numbered"
+              style={{left: pin.x + '%', top: pin.y + '%', borderColor: color}}
+              onClick={()=>goToPlace(pin.placeId || pin.place)}
+              title={pin.place}
+            >
+              <span className="mp-pin-dot" style={{background: color, color:'#fff', fontWeight:900, fontSize:11, width:22, height:22, display:'inline-flex', alignItems:'center', justifyContent:'center', borderRadius:'50%'}}>{pin.n}</span>
+              <span className="mp-pin-label">{pin.place}</span>
+            </button>
+          )) : map.required_places.map((p, i) => {
             const pos = pinPos(p.name || p.id || ('p' + i), i);
             return (
               <button key={i}
                 className="mp-pin"
                 style={{left: pos.x + '%', top: pos.y + '%', borderColor: color}}
-                onClick={()=>goToStudyPlace(p.id || p.name)}
+                onClick={()=>goToPlace(p.id || p.name)}
                 title={p.description || p.name}
               >
                 <span className="mp-pin-dot" style={{background: color}}/>
@@ -122,10 +158,16 @@
           })}
         </div>
         <div className="mp-full-list">
-          <h3 className="mp-full-list-h">מקומות לבגרות</h3>
+          <h3 className="mp-full-list-h">{hasPins ? 'מקרא המפה' : 'מקומות לבגרות'}</h3>
           <div className="mp-full-list-grid">
-            {map.required_places.map((p, i) => (
-              <button key={i} onClick={()=>goToStudyPlace(p.id || p.name)}
+            {hasPins ? map.pins.map((pin, i) => (
+              <button key={i} onClick={()=>goToPlace(pin.placeId || pin.place)}
+                className="mp-place-pill" style={{borderColor: color, display:'flex', alignItems:'center', gap:8}}>
+                <span style={{background:color, color:'#fff', fontWeight:900, width:24, height:24, display:'inline-flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', flexShrink:0}}>{pin.n}</span>
+                <span className="mp-place-name">{pin.place}</span>
+              </button>
+            )) : map.required_places.map((p, i) => (
+              <button key={i} onClick={()=>goToPlace(p.id || p.name)}
                 className="mp-place-pill" style={{borderColor: color}}>
                 <span className="mp-place-name">📍 {p.name}</span>
                 {p.description && <span className="mp-place-desc">{p.description}</span>}
@@ -149,6 +191,8 @@
 
   function MapCard({map, onOpen}){
     const color = UNIT_COLOR[map.unit] || "#D4A574";
+    const hasPins = Array.isArray(map.pins) && map.pins.length > 0;
+    const chips = hasPins ? map.pins.map(p=>p.place) : map.required_places.map(p=>p.name);
     return (
       <button onClick={onOpen} className="mp-card" style={{borderColor: color}}>
         <div className="mp-card-band" style={{background: color}}>
@@ -157,13 +201,14 @@
         </div>
         <div className="mp-card-body">
           <h3 className="font-display mp-card-title">{map.title}</h3>
-          {map.subtitle && <p className="mp-card-sub">{map.subtitle}</p>}
+          {map.era_label && <div style={{fontSize:11,opacity:.7,marginTop:2}}>{map.era_label}</div>}
+          {(map.caption || map.subtitle) && <p className="mp-card-sub">{map.caption || map.subtitle}</p>}
           <div className="mp-card-places">
-            {map.required_places.slice(0, 6).map((p, i) =>
-              <span key={i} className="mp-place-chip">📍 {p.name}</span>
+            {chips.slice(0, 6).map((name, i) =>
+              <span key={i} className="mp-place-chip">📍 {name}</span>
             )}
-            {map.required_places.length > 6 &&
-              <span className="mp-place-chip mp-place-more">+{map.required_places.length - 6}</span>
+            {chips.length > 6 &&
+              <span className="mp-place-chip mp-place-more">+{chips.length - 6}</span>
             }
           </div>
           {map.notes.length > 0 && (
@@ -191,7 +236,7 @@
       };
     }, [ready]);
 
-    const [unitFilter, setUnitFilter] = useState(0); // 0 = all
+    const [unitFilter, setUnitFilter] = useState(0);
     const [examOnly, setExamOnly]     = useState(false);
     const [openMap, setOpenMap]       = useState(null);
 
@@ -217,14 +262,13 @@
     return (
       <div className="mp-wrap">
         <div className="mp-header">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300">🗺️ מפות הבגרות</h1>
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300">🗺️ 19 מפות הבגרות</h1>
           <p className="text-amber-100/70 text-sm mt-1">
-            רשימת המפות למיקוד תשפ״ו — מאורגנת לפי היחידות. לחץ על מפה לתצוגת מלאה עם סיכות.
+            המפות שבבגרות (לפי הספר עמ׳ 213-214). לחץ על מפה לתצוגה מלאה עם סיכות ממוספרות.
           </p>
           <div className="parchment rounded-2xl p-4 mp-tip">
             <p className="text-amber-900 text-sm">
-              💡 <strong>טיפ לבגרות:</strong> בבחינה לוקחים תנ״ך שלם ללא פירושים.
-              סמן את המקומות החשובים במפות שבסוף התנ״ך.
+              💡 <strong>טיפ לבגרות:</strong> בבחינה לוקחים תנ״ך שלם ללא פירושים. סמן את המקומות במפות שבסוף התנ״ך.
             </p>
           </div>
         </div>
