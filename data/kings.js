@@ -555,6 +555,8 @@ export const kings = [
     dynasty: "ירבעם",
     reign_years: 22,
     era: 2,
+    reign_start_bce: 931,
+    reign_end_bce: 910,
     assessment: "רשע",
     assessment_quote:
       "וְהַדָּבָר הַזֶּה הָיָה לְחַטָּאת בֵּית יָרָבְעָם וּלְהַכְחִיד וּלְהַשְׁמִיד מֵעַל פְּנֵי הָאֲדָמָה (מל״א יג׳ לד)",
@@ -582,6 +584,8 @@ export const kings = [
     dynasty: "ירבעם",
     reign_years: 2,
     era: 2,
+    reign_start_bce: 910,
+    reign_end_bce: 909,
     assessment: "רשע",
     assessment_quote:
       "וַיַּעַשׂ הָרַע בְּעֵינֵי יְהוָה וַיֵּלֶךְ בְּדֶרֶךְ אָבִיו וּבְחַטָּאתוֹ אֲשֶׁר הֶחֱטִיא אֶת־יִשְׂרָאֵל (מל״א טו׳ כו)",
@@ -602,6 +606,8 @@ export const kings = [
     dynasty: "בעשא",
     reign_years: 24,
     era: 2,
+    reign_start_bce: 909,
+    reign_end_bce: 886,
     assessment: "רשע",
     assessment_quote:
       "וַיַּעַשׂ הָרַע בְּעֵינֵי יְהוָה וַיֵּלֶךְ בְּדֶרֶךְ יָרָבְעָם וּבְחַטָּאתוֹ אֲשֶׁר הֶחֱטִיא אֶת־יִשְׂרָאֵל (מל״א טו׳ לד)",
@@ -626,6 +632,8 @@ export const kings = [
     dynasty: "בעשא",
     reign_years: 2,
     era: 2,
+    reign_start_bce: 886,
+    reign_end_bce: 885,
     assessment: "רשע",
     assessment_quote:
       "עַל כָּל־חַטֹּאות בַּעְשָׁא וְחַטֹּאות אֵלָה בְנוֹ אֲשֶׁר חָטְאוּ וַאֲשֶׁר הֶחֱטִיאוּ אֶת־יִשְׂרָאֵל לְהַכְעִיס אֶת־יְהוָה אֱלֹהֵי יִשְׂרָאֵל בְּהַבְלֵיהֶם (מל״א טז׳ יג)",
@@ -646,6 +654,8 @@ export const kings = [
     dynasty: null,
     reign_years: 0.02,
     era: 2,
+    reign_start_bce: 885,
+    reign_end_bce: 885,
     assessment: "רשע",
     assessment_quote:
       "עַל חַטֹּאתָיו אֲשֶׁר חָטָא לַעֲשׂוֹת הָרַע בְּעֵינֵי יְהוָה לָלֶכֶת בְּדֶרֶךְ יָרָבְעָם (מל״א טז׳ יט)",
@@ -666,6 +676,8 @@ export const kings = [
     dynasty: "עמרי",
     reign_years: 12,
     era: 3,
+    reign_start_bce: 885,
+    reign_end_bce: 874,
     assessment: "רשע",
     assessment_quote:
       "וַיַּעֲשֶׂה עָמְרִי הָרַע בְּעֵינֵי יְהוָה וַיָּרַע מִכֹּל אֲשֶׁר לְפָנָיו (מל״א טז׳ כה)",
@@ -690,6 +702,8 @@ export const kings = [
     dynasty: "עמרי",
     reign_years: 22,
     era: 3,
+    reign_start_bce: 874,
+    reign_end_bce: 853,
     assessment: "רשע",
     assessment_quote:
       "רַק לֹא־הָיָה כְאַחְאָב אֲשֶׁר הִתְמַכֵּר לַעֲשׂוֹת הָרַע בְּעֵינֵי יְהוָה אֲשֶׁר־הֵסַתָּה אֹתוֹ אִיזֶבֶל אִשְׁתּוֹ (מל״א כא׳ כה)",
@@ -726,6 +740,8 @@ export const kings = [
     dynasty: "עמרי",
     reign_years: 2,
     era: 3,
+    reign_start_bce: 853,
+    reign_end_bce: 852,
     assessment: "רשע",
     assessment_quote:
       "וַיַּעֲבֹד אֶת־הַבַּעַל וַיִּשְׁתַּחֲוֶה לוֹ וַיַּכְעִיס אֶת־יְהוָה אֱלֹהֵי יִשְׂרָאֵל כְּכֹל אֲשֶׁר־עָשָׂה אָבִיו (מל״א כב׳ נד)",
@@ -751,6 +767,8 @@ export const kings = [
     dynasty: "עמרי",
     reign_years: 12,
     era: 4,
+    reign_start_bce: 852,
+    reign_end_bce: 841,
     assessment: "רשע",
     assessment_quote:
       "רַק לֹא כְּאָבִיו וּכְאִמּוֹ וַיָּסַר אֶת־מַצְּבַת הַבַּעַל אֲשֶׁר עָשָׂה אָבִיו. רַק בְּחַטֹּאות יָרָבְעָם בֶּן־נְבָט אֲשֶׁר הֶחֱטִיא אֶת־יִשְׂרָאֵל דָּבֵק לֹא־סָר מִמֶּנָּה (מל״ב ג׳ ב–ג)",
@@ -777,6 +795,8 @@ export const kings = [
     dynasty: "יהוא",
     reign_years: 28,
     era: 4,
+    reign_start_bce: 841,
+    reign_end_bce: 814,
     assessment: "רשע",
     assessment_quote:
       "רַק מֵחַטֹּאות יָרָבְעָם בֶּן־נְבָט אֲשֶׁר הֶחֱטִיא אֶת־יִשְׂרָאֵל לֹא־סָר יֵהוּא מֵאַחֲרֵיהֶם עֶגְלֵי הַזָּהָב אֲשֶׁר בֵּית־אֵל וַאֲשֶׁר בְּדָן (מל״ב י׳ כט)",
