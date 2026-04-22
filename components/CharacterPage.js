@@ -263,6 +263,18 @@
             </Section>
           )}
 
+          {keyQuotes.length>0 && (
+            <Section title="💬 ציטוטים מרכזיים (מי אמר למי)">
+              <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                {keyQuotes.map((q,i)=>(
+                  <blockquote key={i} className="hebrew" style={{margin:0,padding:'10px 14px',borderInlineStart:'3px solid #8B6F1F',background:'rgba(212,165,116,.15)',borderRadius:6,fontFamily:"'Frank Ruhl Libre', serif",fontSize:15,lineHeight:1.75,color:'#3a2a0d'}}>
+                    {typeof q === 'string' ? q : (q.text || q.ref || '')}
+                  </blockquote>
+                ))}
+              </div>
+            </Section>
+          )}
+
           {quotesBy.length>0 && (
             <Section title="💬 ציטוטים שאמר/ה">
               <div style={{display:'flex',flexDirection:'column',gap:6}}>
