@@ -82,6 +82,60 @@
       notes:["נקודת המפנה מאשור לבבל; מות יאשיהו סוגר את עידן הצדק"],
       book_page:214
     },
+    {
+      id:"shlomo_memlacha",
+      number:1, unit:1,
+      title:"ממלכת שלמה וקשרי החוץ",
+      era_label:"שלמה בן דוד, שיא הממלכה המאוחדת",
+      caption:"ממלכה נרחבת ״מלבוא חמת עד נחל מצרים״; בניין המקדש בירושלים, קשרים עם חירם מלך צור, ועם מלכת שבא.",
+      pins:[
+        {n:1, place:"ירושלים", placeId:"yerushalayim", x:40, y:70},
+        {n:2, place:"גבעון", placeId:"givon", x:41, y:66},
+        {n:3, place:"צור", placeId:"tzor", x:38, y:22},
+        {n:4, place:"מגידו", placeId:"megido", x:42, y:38},
+        {n:5, place:"חצור", placeId:"chatzor", x:52, y:26},
+        {n:6, place:"עציון גבר", placeId:"etzion_gever", x:46, y:97},
+        {n:7, place:"תפסח (נחל פרת)", placeId:"tifsach", x:88, y:14},
+        {n:8, place:"מצרים", placeId:"mitzrayim", x:8, y:94}
+      ],
+      notes:["קשרי המסחר: צור בצפון, עציון גבר בדרום; גבול מזרחי עד תפסח"],
+      book_page:213
+    },
+    {
+      id:"asa_baasha_gvul",
+      number:3, unit:2,
+      title:"אסא ובעשא — מלחמת הגבול בבנימין",
+      era_label:"אסא מלך יהודה ובעשא מלך ישראל",
+      caption:"בעשא בונה את הרמה לחסום את יציאת יהודה צפונה. אסא שוכר את בן־הדד הארמי, ובעקבות זאת בונה את גבע ואת מצפה.",
+      pins:[
+        {n:1, place:"ירושלים", placeId:"yerushalayim", x:40, y:70},
+        {n:2, place:"הרמה", placeId:"harama", x:41, y:64},
+        {n:3, place:"גבע בנימין", placeId:"geva_binyamin", x:43, y:65},
+        {n:4, place:"מצפה", placeId:"mitzpe", x:40, y:62},
+        {n:5, place:"דמשק (ארם)", placeId:"damesek", x:76, y:18},
+        {n:6, place:"עיון", placeId:"iyon", x:58, y:18},
+        {n:7, place:"דן", placeId:"dan", x:55, y:12}
+      ],
+      notes:["אסא מוריד אוצרות בית ה׳ לשלוחם לבן־הדד"],
+      book_page:213
+    },
+    {
+      id:"ahab_aram",
+      number:4, unit:3,
+      title:"מלחמות אחאב בארם — אפק ורמות גלעד",
+      era_label:"אחאב מלך ישראל, בן־הדד מלך ארם",
+      caption:"ניצחונות ישראל בשומרון ובאפק; בברית אחאב־יהושפט העלייה לרמות גלעד נגמרת בנפילת אחאב.",
+      pins:[
+        {n:1, place:"שומרון", placeId:"shomron", x:42, y:42},
+        {n:2, place:"אפק", placeId:"afek", x:64, y:38},
+        {n:3, place:"רמות גלעד", placeId:"ramot_gilad", x:72, y:45},
+        {n:4, place:"יזרעאל", placeId:"yizrael", x:47, y:35},
+        {n:5, place:"דמשק (ארם)", placeId:"damesek", x:76, y:18},
+        {n:6, place:"ירושלים (יהושפט)", placeId:"yerushalayim", x:40, y:70}
+      ],
+      notes:["באפק: נצחון ישראל ונבואה על חייו של בן־הדד; ברמות גלעד: חץ ״לתומו״"],
+      book_page:213
+    },
     // maps inserted incrementally below
   ];
 
