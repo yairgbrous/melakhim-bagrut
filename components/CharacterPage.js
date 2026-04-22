@@ -50,12 +50,16 @@
   }
 
   function resolveCharacter(id){
+    // Primary source: window.CHARACTERS_DATA (data/characters.js v2)
+    const cd = Array.isArray(window.CHARACTERS_DATA) ? window.CHARACTERS_DATA : [];
+    const fromData = cd.find(x => x && x.id === id);
+    if (fromData) return fromData;
     const KU = window.KingsUtils;
     if (KU && KU.getCharacter){
       const c = KU.getCharacter(id);
       if (c) return c;
     }
-    // try kings index / timeline by id
+    // fallback: kings timeline by id
     const k = allKings().find(k => k.id === id);
     if (k) return { id:k.id, name:k.name, role:'מלך', kingdom:k.dynasty, era:k.years ? (k.years+' שנות מלוכה') : '', bio:'', _king:k };
     return null;
@@ -66,6 +70,22 @@
     const col = (KU && KU.assessmentColor) ? KU.assessmentColor(k) : {cls:'assess-mixed',hex:'#8b6d2d'};
     const lbl = col.cls==='assess-tzadik'?'צדיק':col.cls==='assess-rasha'?'רשע':'מעורב';
     return <span className={"kt-assess-pill " + col.cls} style={{marginInlineStart:8}}>{lbl}</span>;
+  }
+
+  const ROLE_LABEL = {
+    'נביא':'נביא', 'prophet':'נביא', 'queen':'מלכה', 'אשה':'אשה',
+    'king':'מלך', 'מלך':'מלך', 'פקיד':'פקיד', 'עם':'זר/עם',
+  };
+  function RoleBadge({role}){
+    if (!role) return null;
+    const label = ROLE_LABEL[role] || role;
+    return <span className="kt-assess-pill assess-mixed" style={{marginInlineStart:8,background:'rgba(139,111,31,.18)',color:'#3a2a0d'}}>{label}</span>;
+  }
+  function EraBadge({era}){
+    if (era == null || era === '') return null;
+    const n = typeof era === 'number' ? era : parseInt(era,10);
+    const label = Number.isFinite(n) ? ('יחידה ' + n) : ('יחידה ' + era);
+    return <span className="kt-assess-pill assess-mixed" style={{marginInlineStart:6,background:'rgba(200,155,60,.22)',color:'#5a3d0d'}}>{label}</span>;
   }
 
   function Chip({label, onClick, tone}){
@@ -130,6 +150,16 @@
     const prophetChips = toChips(c.related_prophets || [], 'character');
     const placeChips   = toChips(c.related_places   || c.places || [], 'archaeology');
     const eventChips   = toChips(c.related_events   || c.events || [], 'story');
+    const labelForKing = (kid) => {
+      const row = kings.find(x => x.id === kid);
+      return row ? (row.name_niqqud || row.name || kid) : kid;
+    };
+    const kingChips = (c.related_kings || []).map(v =>
+      (v && typeof v==='object') ? {id:v.id||v.label, label:v.label||v.name||v.id} : {id:v, label:labelForKing(v)}
+    );
+    const keyQuotes = c.key_quotes || [];
+    const bookRefs  = c.book_refs  || [];
+    const significance = c.significance || '';
     const breadth  = c.breadth_topics || c.breadth || [];
     const units    = c.units || (c.unit ? [c.unit] : []);
 
@@ -150,11 +180,11 @@
               <h1 className="font-display text-2xl md:text-3xl font-black text-amber-900 hebrew">
                 {c.name_niqqud || c.name || c.heading || c.id}
                 {isKing && k && <KingAssess k={k}/>}
+                {!isKing && <RoleBadge role={c.role}/>}
+                <EraBadge era={c.era}/>
               </h1>
               <div className="text-amber-800 text-sm mt-1">
-                {c.role && <span>{c.role}</span>}
-                {c.kingdom && <span> · {c.kingdom}</span>}
-                {c.era && <span> · יחידה {c.era}</span>}
+                {c.kingdom && <span>{c.kingdom}</span>}
                 {reignYears != null && <span> · {reignYears} שנות מלוכה</span>}
                 {dyn && dyn.name && <span> · {dyn.name}</span>}
                 {succession && <span> · {succession}</span>}
@@ -233,6 +263,18 @@
             </Section>
           )}
 
+          {keyQuotes.length>0 && (
+            <Section title="💬 ציטוטים מרכזיים (מי אמר למי)">
+              <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                {keyQuotes.map((q,i)=>(
+                  <blockquote key={i} className="hebrew" style={{margin:0,padding:'10px 14px',borderInlineStart:'3px solid #8B6F1F',background:'rgba(212,165,116,.15)',borderRadius:6,fontFamily:"'Frank Ruhl Libre', serif",fontSize:15,lineHeight:1.75,color:'#3a2a0d'}}>
+                    {typeof q === 'string' ? q : (q.text || q.ref || '')}
+                  </blockquote>
+                ))}
+              </div>
+            </Section>
+          )}
+
           {quotesBy.length>0 && (
             <Section title="💬 ציטוטים שאמר/ה">
               <div style={{display:'flex',flexDirection:'column',gap:6}}>
@@ -265,6 +307,12 @@
             </Section>
           )}
 
+          {kingChips.length>0 && (
+            <Section title="👑 מלכים קשורים">
+              <div className="kt-chips">{kingChips.map(p=><Chip key={p.id} tone="prophet" label={p.label} onClick={()=>goChar(p.id)}/>)}</div>
+            </Section>
+          )}
+
           {placeChips.length>0 && (
             <Section title="📍 מקומות">
               <div className="kt-chips">{placeChips.map(p=><Chip key={p.id} tone="place" label={p.label} onClick={()=>goPlace(p.id)}/>)}</div>
@@ -277,6 +325,14 @@
             </Section>
           )}
 
+          {bookRefs.length>0 && (
+            <Section title="📚 מקורות בספר מלכים">
+              <ul className="kt-actions" style={{columnCount:2,columnGap:18}}>
+                {bookRefs.map((r,i)=><li key={i} style={{breakInside:'avoid'}}>{r}</li>)}
+              </ul>
+            </Section>
+          )}
+
           {breadth.length>0 && (
             <Section title="🌐 נושאי רוחב">
               <div className="kt-chips">{breadth.map((p,i)=><Chip key={i} label={p.label||p.name||p}/>)}</div>
@@ -286,6 +342,12 @@
           {c.tags && c.tags.length>0 && (
             <Section title="🏷 תגיות">
               <div className="kt-chips">{c.tags.map((t,i)=><Chip key={i} label={t}/>)}</div>
+            </Section>
+          )}
+
+          {significance && (
+            <Section title="✨ משמעות לספר מלכים">
+              <p className="kt-bio hebrew" style={{fontStyle:'italic',color:'#4a3612'}}>{renderText(significance)}</p>
             </Section>
           )}
         </div>
