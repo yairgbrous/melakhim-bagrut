@@ -18,9 +18,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;700;800;900&family=Noto+Serif+Hebrew:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/quote-cards.css?v=400">
-<link rel="stylesheet" href="assets/contrast-hotfix.css?v=400">
-<link rel="stylesheet" href="assets/layout-fix.css?v=400">
+<link rel="stylesheet" href="assets/quote-cards.css?v=500">
+<link rel="stylesheet" href="assets/contrast-hotfix.css?v=500">
+<link rel="stylesheet" href="assets/layout-fix.css?v=500">
 <script>
 /* =========================================================================
    Entity index bootstrap — loads data modules into window.__ENTITY_INDEX__
@@ -124,8 +124,8 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=400"></script>
-<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=400"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=500"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=500"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -1778,7 +1778,7 @@ function StudyCard({item, type}){
   );
 }
 
-function StudyHub(){
+function StudyHub({setRoute}){
   const [ready, setReady] = useState(!!window.__ENTITY_INDEX_READY__);
   const [tab, setTab] = useState('unit');
   useEffect(()=>{
@@ -1790,15 +1790,15 @@ function StudyHub(){
   },[ready]);
   const idx = (typeof window!=='undefined' && window.__ENTITY_INDEX__) || {};
   const unitCount = (typeof MELAKHIM_DATA !== 'undefined' && MELAKHIM_DATA.units) ? MELAKHIM_DATA.units.length : 0;
+  const quoteIdx = idx.quote || idx.verse || {};
   const tabs = [
     {k:'unit', l:'יחידות', i:'📚', count: unitCount},
+    {k:'event', l:'אירועים', i:'📅', count: Object.keys(idx.event||{}).length},
     {k:'character', l:'דמויות', i:'👥', count: Object.keys(idx.character||{}).length},
-    {k:'story', l:'סיפורים', i:'📖', count: Object.keys(idx.story||{}).length},
-    {k:'motif', l:'מוטיבים', i:'🔮', count: Object.keys(idx.motif||{}).length},
-    {k:'archaeology', l:'ארכיאולוגיה', i:'🏺', count: Object.keys(idx.archaeology||{}).length},
-    {k:'date', l:'תאריכים', i:'📅', count: Object.keys(idx.date||{}).length},
-    {k:'keyConcept', l:'מושגי יסוד', i:'🗝', count: Object.keys(idx.keyConcept||{}).length},
-    {k:'flashcard', l:'כרטיסיות', i:'🃏', count: Object.keys(idx.flashcard||{}).length}
+    {k:'place', l:'מקומות', i:'🗺️', count: Object.keys(idx.place||{}).length},
+    {k:'quote', l:'ציטוטים', i:'💬', count: Object.keys(quoteIdx).length},
+    {k:'kingsTable', l:'טבלת מלכים', i:'📜', nav:true},
+    {k:'theme', l:'נושאי רוחב', i:'🧭', count: Object.keys(idx.theme||{}).length}
   ];
   const units = (typeof MELAKHIM_DATA !== 'undefined' && MELAKHIM_DATA.units) ? MELAKHIM_DATA.units : [];
   return (
@@ -1809,9 +1809,9 @@ function StudyHub(){
       </div>
       <div className="study-tabs">
         {tabs.map(t => (
-          <button key={t.k} onClick={()=>setTab(t.k)} className={`study-tab ${tab===t.k?"active":""}`}>
+          <button key={t.k} onClick={()=> t.nav ? (setRoute && setRoute({page:"timeline"})) : setTab(t.k)} className={`study-tab ${!t.nav && tab===t.k?"active":""}`}>
             <span className="ml-1" aria-hidden="true">{t.i}</span>{t.l}
-            <span className="mr-1 text-[10px] opacity-80">({t.count})</span>
+            {!t.nav && <span className="mr-1 text-[10px] opacity-80">({t.count})</span>}
           </button>
         ))}
       </div>
@@ -1825,7 +1825,16 @@ function StudyHub(){
           <div>טוען תוכן...</div>
         </div>
       ) : (() => {
-        const items = Object.values(idx[tab] || {});
+        const source = tab === 'quote' ? (idx.quote || idx.verse || {}) : (idx[tab] || {});
+        const items = Object.values(source);
+        const placeholderTabs = ['event','character','place','quote','theme'];
+        if(items.length === 0 && placeholderTabs.includes(tab)) return (
+          <div className="card rounded-xl p-6 text-center">
+            <div className="text-4xl mb-2" aria-hidden="true">⌛</div>
+            <div className="font-display text-amber-200 font-bold">יוצג ברגע שהנתונים יטענו</div>
+            <div className="text-xs text-amber-100/60 mt-2">(<span dir="ltr" className="num">{items.length}</span> פריטים)</div>
+          </div>
+        );
         if(items.length === 0) return (
           <div className="study-empty">
             <div className="text-4xl mb-2">📭</div>
@@ -2128,7 +2137,7 @@ function App(){
         {route.page==="exam" && <ExamSim S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/>}
         {route.page==="class" && <ClassBoard S={S} update={update} setRoute={setRoute}/>}
         {route.page==="profile" && <MeTab S={S} update={update} setRoute={setRoute}/>}
-        {route.page==="study" && <StudyHub/>}
+        {route.page==="study" && <StudyHub setRoute={setRoute}/>}
         </>}
       </main>
 
