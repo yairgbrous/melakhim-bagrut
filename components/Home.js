@@ -206,6 +206,49 @@
     );
   }
 
+  // ---- STATS STRIP -------------------------------------------------------
+  function readStats(S){
+    const streakDays = (S && typeof S.streak === 'number') ? S.streak : 0;
+    let total = 0, correct = 0;
+    if (S && typeof S.quizTotal === 'number') total = S.quizTotal;
+    if (S && typeof S.quizCorrect === 'number') correct = S.quizCorrect;
+
+    if (!total){
+      try {
+        if (typeof localStorage !== 'undefined'){
+          const t = parseInt(localStorage.getItem('jarvis.quiz.total'), 10) || 0;
+          const c = parseInt(localStorage.getItem('jarvis.quiz.correct'), 10) || 0;
+          total = t; correct = c;
+        }
+      } catch(e){}
+    }
+    const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+    return { streakDays, total, accuracy };
+  }
+
+  function StatCell({icon, value, label, accent}){
+    return (
+      <div className={'stats-cell ' + (accent || '')}>
+        <div className="stats-icon" aria-hidden="true">{icon}</div>
+        <div className="stats-value">{value}</div>
+        <div className="stats-label">{label}</div>
+      </div>
+    );
+  }
+
+  function StatsStrip({S}){
+    const { streakDays, total, accuracy } = readStats(S);
+    return (
+      <section className="stats-strip-wrap">
+        <div className="stats-strip-grid">
+          <StatCell icon="🔥" value={streakDays} label="ימים ברצף" accent="stats-streak"/>
+          <StatCell icon="📊" value={total} label="שאלות שנענו" accent="stats-total"/>
+          <StatCell icon="🎯" value={accuracy + '%'} label="דיוק ממוצע" accent="stats-accuracy"/>
+        </div>
+      </section>
+    );
+  }
+
   // ---- MAIN ---------------------------------------------------------------
   function Home({S, setRoute, level, nextLv}){
     const [tick, setTick] = useState(0);
@@ -221,6 +264,7 @@
         <ProgressStrip units={units} S={S} setRoute={setRoute} currentUnit={currentUnit}/>
         <QuickActions setRoute={setRoute}/>
         <TodayFocus setRoute={setRoute}/>
+        <StatsStrip S={S}/>
         {/* QUICK ACTIONS — added in commit 3 */}
         {/* TODAY'S FOCUS — added in commit 4 */}
         {/* STATS STRIP — added in commit 5 */}
