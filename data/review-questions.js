@@ -1121,7 +1121,227 @@
       related_entities:["char:yarovam_2","place:damesek","place:chamat","event:shivat_gvulot"]
     },
     // === יחידה ו — חורבן יהודה ===
-    // questions inserted incrementally (3 at a time)
+    {
+      id:"rq-u6-001", unit:6, type:"character_details", difficulty:"קל",
+      prompt_niqqud:"מִי הָיָה חִזְקִיָּהוּ מֶלֶךְ יְהוּדָה וּמָה יִחֵד אוֹתוֹ?",
+      answer_points:[
+        "בן אחז; מלך 29 שנה",
+        "״עשה הישר בעיני ה׳ ככל אשר עשה דוד אביו״",
+        "הסיר את הבמות, שיבר את המצבות, כתת את נחש הנחושת",
+        "״בה׳ אלהי ישראל בטח, ואחריו לא היה כמהו בכל מלכי יהודה״"
+      ],
+      related_entities:["char:chizkiyahu","char:achaz","event:hasarat_bamot","event:nechushtan"]
+    },
+    {
+      id:"rq-u6-002", unit:6, type:"mi_amar_lemi", difficulty:"בינוני",
+      prompt_niqqud:"״הָאֵל אֲשֶׁר הָיָה שָׁם — יַצִּיל אֶתְכֶם מִיָּדִי?״ — מִי אָמַר?",
+      answer_points:[
+        "רבשקה, שר צבא סנחריב, בשדה כובס מחוץ לירושלים",
+        "תבוסה על עמי הסביבה שנפלו לאשור",
+        "״אל יבטח אתכם חזקיהו״ — מנסה להפיל את רוח העם",
+        "דובר בעברית כדי שיבינו אנשי העיר"
+      ],
+      related_entities:["char:rabshake","char:chizkiyahu","event:neum_rabshake","place:yerushalayim"]
+    },
+    {
+      id:"rq-u6-003", unit:6, type:"short_answer", difficulty:"בינוני",
+      prompt_niqqud:"תָאֵר אֶת נֵס הֲצָלַת יְרוּשָׁלִַם מִסַּנְחֵרִיב.",
+      answer_points:[
+        "חזקיה פרש את מכתב סנחריב לפני ה׳ במקדש",
+        "ישעיהו התנבא שסנחריב ישוב לארצו",
+        "מלאך ה׳ הכה 185,000 איש במחנה אשור בלילה אחד",
+        "סנחריב שב לנינוה ונרצח בידי בניו אדרמלך ושראצר"
+      ],
+      related_entities:["char:chizkiyahu","char:yeshayahu","char:sancheriv","event:nes_yerushalayim"]
+    },
+    {
+      id:"rq-u6-004", unit:6, type:"place_events", difficulty:"בינוני",
+      prompt_niqqud:"מָה הָיְתָה מַחֲלַת חִזְקִיָּהוּ וּמָה יַחַס ה׳?",
+      answer_points:[
+        "חלה ״עד למות״ — ישעיהו בא אליו: ״צו לביתך כי מת אתה״",
+        "חזקיהו התפלל בבכי והזכיר ״זכר נא... דרכי בטח״",
+        "ה׳ הוסיף לו 15 שנות חיים",
+        "אות: השמש שבה 10 מעלות לאחור ב״מעלות אחז״"
+      ],
+      related_entities:["char:chizkiyahu","char:yeshayahu","event:refuat_chizkiyahu"]
+    },
+    {
+      id:"rq-u6-005", unit:6, type:"al_mi_neemar", difficulty:"קשה",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״וַיַּעֲבֵר אֶת בְּנוֹ בָּאֵשׁ וְעוֹנֵן וְנִחֵשׁ״?",
+      answer_points:[
+        "על מנשה בן חזקיהו",
+        "התיז את כל תיקוני אביו",
+        "הביא פסל אשרה לבית ה׳",
+        "שפך דם נקי הרבה במיוחד — ״עד כי מלא את ירושלים פה לפה״"
+      ],
+      related_entities:["char:menashe","event:chatat_menashe"]
+    },
+    {
+      id:"rq-u6-006", unit:6, type:"be_eize_hekhsher", difficulty:"בינוני",
+      prompt_niqqud:"״נָטִיתִי עַל יְרוּשָׁלִַם אֵת קָו שֹׁמְרוֹן וְאֶת מִשְׁקֹלֶת בֵּית אַחְאָב״ — בְּאֵיזֶה הֶקְשֵׁר?",
+      answer_points:[
+        "גזירה אלוקית על ירושלים בימי מנשה",
+        "אותה אמת מידה שהופעלה על שומרון — תופעל גם על ירושלים",
+        "גזר הדין נחתם בגלל חטאי מנשה",
+        "גם תשובת יאשיהו לא תוכל לבטל"
+      ],
+      related_entities:["char:menashe","event:gzirat_churban"]
+    },
+    {
+      id:"rq-u6-007", unit:6, type:"character_details", difficulty:"קל",
+      prompt_niqqud:"מִי הָיָה יֹאשִׁיָּהוּ מֶלֶךְ יְהוּדָה וּמָה יִחֵד אוֹתוֹ?",
+      answer_points:[
+        "בן אמון; מלך מגיל 8; 31 שנה",
+        "״עשה הישר בעיני ה׳ וילך בכל דרך דוד אביו״",
+        "״כמהו לא היה לפניו מלך אשר שב אל ה׳ בכל לבבו... ואחריו לא קם כמהו״",
+        "הוביל את תשובת יהודה המלאה בעקבות מציאת ספר התורה"
+      ],
+      related_entities:["char:yoshiyahu","event:tshuvat_yoshiyahu","event:sefer_hatorah"]
+    },
+    {
+      id:"rq-u6-008", unit:6, type:"short_answer", difficulty:"בינוני",
+      prompt_niqqud:"תָאֵר אֶת מְצִיאַת סֵפֶר הַתּוֹרָה בִּימֵי יֹאשִׁיָּהוּ.",
+      answer_points:[
+        "חלקיה הכהן הגדול מצא ספר תורה במהלך בדק הבית",
+        "שפן הסופר קרא אותו לפני יאשיהו",
+        "יאשיהו קרע את בגדיו",
+        "שלח לחולדה הנביאה לדרוש בשם ה׳"
+      ],
+      related_entities:["char:yoshiyahu","char:chilkiya","char:shafan","char:chulda","event:metziat_sefer","event:bedek_habayit"]
+    },
+    {
+      id:"rq-u6-009", unit:6, type:"mi_amar_lemi", difficulty:"בינוני",
+      prompt_niqqud:"״גְּדוֹלָה חֲמַת ה׳ אֲשֶׁר הִצְתָה בָּנוּ״ — מִי אָמַר לְמִי?",
+      answer_points:[
+        "חולדה הנביאה ליאשיהו (דרך שליחיו)",
+        "בתגובה לקריאה בספר התורה",
+        "הרעה שאמרנו — תבוא; אך לא בימי יאשיהו",
+        "בגלל ״שפלת לבך ונכנעת... אני אספך אל אבתיך״"
+      ],
+      related_entities:["char:chulda","char:yoshiyahu","event:metziat_sefer"]
+    },
+    {
+      id:"rq-u6-010", unit:6, type:"place_events", difficulty:"בינוני",
+      prompt_niqqud:"מָה עָשָׂה יֹאשִׁיָּהוּ בְּבֵית אֵל — וּמָה הַקֶּשֶׁר לַנְּבוּאָה הַיְשָׁנָה?",
+      answer_points:[
+        "שרף את עצמות הכהנים בבמה; פיזר את האפר",
+        "הוציא עצם אחד — נביא ״איש אלוהים ביהודה״",
+        "קיים את נבואת אותו איש אלהים (מל״א י״ג)",
+        "שנבא 300 שנה קודם על מזבח ירבעם בבית אל"
+      ],
+      related_entities:["char:yoshiyahu","place:beit_el","event:tihur_bamot"]
+    },
+    {
+      id:"rq-u6-011", unit:6, type:"short_answer", difficulty:"קשה",
+      prompt_niqqud:"תָאֵר אֶת חַג הַפֶּסַח בִּימֵי יֹאשִׁיָּהוּ.",
+      answer_points:[
+        "צווה על כל העם ״עשו פסח לה׳ אלהיכם״",
+        "״כי לא נעשה כפסח הזה מימי השפטים... וכל ימי מלכי ישראל ומלכי יהודה״",
+        "חג פסח מרכזי לפי ספר התורה",
+        "אירוע דתי־לאומי לאיחוד מחודש של העם סביב המקדש"
+      ],
+      related_entities:["char:yoshiyahu","event:chag_hapesach"]
+    },
+    {
+      id:"rq-u6-012", unit:6, type:"al_mi_neemar", difficulty:"בינוני",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״וַיֶּהְרוּג פַּרְעֹה נְכֹה שָׁם בְּמִגִדּוֹ״?",
+      answer_points:[
+        "על יאשיהו מלך יהודה",
+        "יצא לקראת פרעה נכה שעלה לכרכמיש לעזרת אשור",
+        "נהרג — גופתו הובאה לירושלים, נקבר בקברי המלכים",
+        "ירמיהו וכל השרים ספדו עליו; ״קינות״ נכתב בימיו"
+      ],
+      related_entities:["char:yoshiyahu","char:paro_necho","place:megido","event:moto_bemgido"]
+    },
+    {
+      id:"rq-u6-013", unit:6, type:"character_details", difficulty:"בינוני",
+      prompt_niqqud:"מִי הָיָה יְהוֹיָקִים וְאֵיךְ הִסְתַּיְּמוּ יָמָיו?",
+      answer_points:[
+        "אחד מבני יאשיהו; הומלך בידי פרעה נכה",
+        "שמו המקורי — אליקים; נכה החליפו ליהויקים",
+        "״עשה הרע בעיני ה׳״; העלה מס לפרעה מן העם",
+        "בגד בנבוכדנצר; נפטר במצור; הומלך יהויכין בנו"
+      ],
+      related_entities:["char:yehoyakim","char:paro_necho","char:nebuchadnezzar","char:yehoyachin"]
+    },
+    {
+      id:"rq-u6-014", unit:6, type:"place_events", difficulty:"קל",
+      prompt_niqqud:"תָאֵר אֶת גָּלוּת יְהוֹיָכִין (597 לפנה״ס).",
+      answer_points:[
+        "נבוכדנצר עלה על ירושלים",
+        "יהויכין הוציא עצמו אל המלך — לא נלחם",
+        "גלה עם אמו, נשיו, סריסיו, שריו — ועשרת אלפים אנשי חיל",
+        "״החרש והמסגר... לא נשאר זולת דלת עם הארץ״"
+      ],
+      related_entities:["char:yehoyachin","char:nebuchadnezzar","event:galut_yehoyachin"]
+    },
+    {
+      id:"rq-u6-015", unit:6, type:"short_answer", difficulty:"בינוני",
+      prompt_niqqud:"מָה הָיְתָה מְרִידַת צִדְקִיָּהוּ וּמָה הַתּוֹצָאָה?",
+      answer_points:[
+        "נבוכדנצר המליך את צדקיהו (מתניה בן יאשיהו)",
+        "צדקיהו מרד בבבל — הסתמך על מצרים",
+        "נבוכדנצר צר על ירושלים שנתיים וחצי",
+        "העיר נפלה; צדקיהו נתפס בערבות יריחו, עיוורו עיניו, הובא בבלה"
+      ],
+      related_entities:["char:tzidkiyahu","char:nebuchadnezzar","event:churban_yerushalayim"]
+    },
+    {
+      id:"rq-u6-016", unit:6, type:"place_events", difficulty:"בינוני",
+      prompt_niqqud:"מָה עָשָׂה נְבוּזַרְאֲדָן בִּירוּשָׁלִַם?",
+      answer_points:[
+        "שרף את בית ה׳, בית המלך וכל בתי ירושלים",
+        "נתץ את חומות ירושלים",
+        "הגלה את ״יתר העם״ לבבל",
+        "לקח את כלי הנחושת; שבר את עמודי יכין ובועז"
+      ],
+      related_entities:["char:nevuzaradan","event:churban_yerushalayim","place:mikdash","place:yerushalayim"]
+    },
+    {
+      id:"rq-u6-017", unit:6, type:"character_details", difficulty:"קל",
+      prompt_niqqud:"מִי הָיָה גְּדַלְיָה בֶּן אֲחִיקָם?",
+      answer_points:[
+        "הופקד על ידי נבוכדנצר על הנשארים ביהודה",
+        "ישב במצפה — מרכז הממשל החדש",
+        "קרא ליהודים השבים משטחי סביב להתיישב בארץ",
+        "נרצח בידי ישמעאל בן נתניה (מזרע המלוכה) — הפליטה נסה למצרים"
+      ],
+      related_entities:["char:gdalya","char:yishmael","char:nebuchadnezzar","place:mitzpe"]
+    },
+    {
+      id:"rq-u6-018", unit:6, type:"mi_amar_lemi", difficulty:"בינוני",
+      prompt_niqqud:"״הָרֹעֶה בַּאֲשֵׁרוֹת... מַלְכֵי יְהוּדָה״ — בְּהֶקְשֵׁר?",
+      answer_points:[
+        "יאשיהו שרף את כלי הבעל, האשרה וכל צבא השמיים שהושמו במקדש",
+        "פיזר את עפרם על קברי בני העם",
+        "גם הוציא את האשרה מבית ה׳ שרפה בנחל קדרון",
+        "ביצע תיקון מקיף חסר תקדים"
+      ],
+      related_entities:["char:yoshiyahu","event:tihur_mikdash"]
+    },
+    {
+      id:"rq-u6-019", unit:6, type:"be_eize_hekhsher", difficulty:"קשה",
+      prompt_niqqud:"״וַיִּשָּׂא אֶת רֹאשׁ יְהוֹיָכִין... בִּשְׁנַת עֶשְׂרִים וָשֶׁבַע״ — בְּאֵיזֶה הֶקְשֵׁר?",
+      answer_points:[
+        "אויל מרודך מלך בבל, שנה ראשונה למלכותו",
+        "הוציא את יהויכין מבית הכלא",
+        "״דבר אתו טבות... וישנה את בגדי כלאו״",
+        "סוף הספר — נקודת תקווה אחרי החורבן"
+      ],
+      related_entities:["char:yehoyachin","char:evil_merodach","event:nisa_rosh_yehoyachin"]
+    },
+    {
+      id:"rq-u6-020", unit:6, type:"al_mi_neemar", difficulty:"קשה",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״לֹא סָר ה׳ מֵחֲרוֹן אַפּוֹ הַגָּדוֹל... בְּכָל הַכְּעָסִים אֲשֶׁר הִכְעִיסוֹ מְנַשֶּׁה״?",
+      answer_points:[
+        "על יאשיהו — למרות תשובתו המלאה",
+        "הגזירה על יהודה לא בוטלה בגלל חטאי מנשה",
+        "בעיקר שפיכת דם נקי שמילא את ירושלים",
+        "מלמד: חטאים מצטברים בהיסטוריה — אין תיקון אחורה מלא"
+      ],
+      related_entities:["char:yoshiyahu","char:menashe","event:gzirat_churban"]
+    }
+    // --- end of 120 questions (20 per unit × 6) ---
   ];
   if (typeof window !== 'undefined'){
     window.REVIEW_QUESTIONS = QUESTIONS;
