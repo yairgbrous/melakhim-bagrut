@@ -54,11 +54,12 @@
     evalFile('./data/archaeology.js', ['archaeologyFinds']),
     evalFile('./data/hebrew-dates.js', [])
   ]);
-  const [chars, stories, flashcards, keyConcepts] = await Promise.all([
+  const [chars, stories, flashcards, keyConcepts, kingsMod] = await Promise.all([
     importModule('./data/characters.js'),
     importModule('./data/stories.js'),
     importModule('./data/flashcards.js'),
-    importModule('./data/key-concepts.js')
+    importModule('./data/key-concepts.js'),
+    importModule('./data/kings.js')
   ]);
   const idx = window.__ENTITY_INDEX__;
   (window.motifs||[]).forEach(m => {
@@ -107,6 +108,17 @@
       heading: k.title || k.id
     });
   });
+  const kingsArr = (kingsMod && (kingsMod.default || kingsMod.kings)) || [];
+  idx.king = idx.king || {};
+  kingsArr.forEach(kk => {
+    idx.king[kk.id] = Object.assign({}, kk, {
+      summary: kk.short_summary || '',
+      heading: kk.name_niqqud || kk.id,
+      name: kk.name_niqqud || kk.id
+    });
+  });
+  // Raw array — consumed by KingsTable/KingsUtils/CharacterPage for real data.
+  window.KINGS_DATA = kingsArr;
   window.__ENTITY_INDEX_READY__ = true;
   try{ window.dispatchEvent(new CustomEvent('entity-index-ready', {detail:idx})); }catch(e){}
   console.log('[entity-boot] ready', {
@@ -116,7 +128,8 @@
     character: Object.keys(idx.character).length,
     story: Object.keys(idx.story).length,
     flashcard: Object.keys(idx.flashcard).length,
-    keyConcept: Object.keys(idx.keyConcept).length
+    keyConcept: Object.keys(idx.keyConcept).length,
+    king: Object.keys(idx.king).length
   });
 })();
 </script>
@@ -124,9 +137,9 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="./components/KingsUtils.js?v=700"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=700"></script>
-<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=700"></script>
+<script src="./components/KingsUtils.js?v=800"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=800"></script>
+<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=800"></script>
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=700"></script>
 <script src="./components/BreadthPage.js?v=700"></script>
 <style>
