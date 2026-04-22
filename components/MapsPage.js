@@ -136,6 +136,53 @@
       notes:["באפק: נצחון ישראל ונבואה על חייו של בן־הדד; ברמות גלעד: חץ ״לתומו״"],
       book_page:213
     },
+    {
+      id:"misha_moav",
+      number:5, unit:4,
+      title:"מסע מישע מלך מואב",
+      era_label:"יהורם בן אחאב, יהושפט ומלך אדום",
+      caption:"יהורם, יהושפט ומלך אדום יוצאים דרך מדבר אדום נגד מואב. אלישע מורה לכרות בורות; ניצחון מוגבל.",
+      pins:[
+        {n:1, place:"שומרון", placeId:"shomron", x:42, y:42},
+        {n:2, place:"ירושלים", placeId:"yerushalayim", x:40, y:70},
+        {n:3, place:"קיר חרשת", placeId:"kir_hareshet", x:64, y:85},
+        {n:4, place:"דיבון", placeId:"divon", x:62, y:78},
+        {n:5, place:"מדבר אדום", placeId:"edom", x:52, y:95}
+      ],
+      notes:["״אבן מישע״ הארכיאולוגית — העדות החוץ־מקראית"],
+      book_page:213
+    },
+    {
+      id:"yehu_yizrael",
+      number:6, unit:4,
+      title:"מרד יהוא — יזרעאל ושומרון",
+      era_label:"יהוא בן נמשי מחסל את בית אחאב",
+      caption:"אלישע שולח נער למשוח את יהוא ברמות גלעד. יהוא עולה ליזרעאל, הורג את יורם ואיזבל; לאחר מכן משמיד את עובדי הבעל בשומרון.",
+      pins:[
+        {n:1, place:"רמות גלעד", placeId:"ramot_gilad", x:72, y:45},
+        {n:2, place:"יזרעאל", placeId:"yizrael", x:47, y:35},
+        {n:3, place:"שומרון", placeId:"shomron", x:42, y:42},
+        {n:4, place:"בית עקד הרעים", placeId:"beit_eked", x:45, y:44},
+        {n:5, place:"מגידו", placeId:"megido", x:42, y:38}
+      ],
+      notes:["אחזיה מלך יהודה נמלט דרך גור־אבלעם ומת במגידו"],
+      book_page:213
+    },
+    {
+      id:"yehoash_chazael",
+      number:7, unit:4,
+      title:"חזאל ארם מאיים על יהודה — גת",
+      era_label:"יהואש מלך יהודה, חזאל מלך ארם",
+      caption:"חזאל עולה מארם, כובש את גת, ופונה לירושלים. יהואש מסיר אוצרות בית ה׳ ובית המלך ושולחם אליו כדי לסור.",
+      pins:[
+        {n:1, place:"דמשק (ארם)", placeId:"damesek", x:76, y:18},
+        {n:2, place:"גת", placeId:"gat", x:25, y:75},
+        {n:3, place:"ירושלים", placeId:"yerushalayim", x:40, y:70},
+        {n:4, place:"לוד", placeId:"lod", x:28, y:65}
+      ],
+      notes:["יהואש נרצח ע״י עבדיו לאחר הכניעה לחזאל"],
+      book_page:213
+    },
     // maps inserted incrementally below
   ];
 
