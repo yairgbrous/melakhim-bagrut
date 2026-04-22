@@ -458,6 +458,227 @@
       related_entities:["char:yarovam","place:shchem","place:pnuel","place:beit_el","place:dan"]
     },
     // === יחידה ג — אליהו ואחאב ===
+    {
+      id:"rq-u3-001", unit:3, type:"mi_amar_lemi", difficulty:"קל",
+      prompt_niqqud:"״חַי ה׳ אֱלֹהֵי יִשְׂרָאֵל אֲשֶׁר עָמַדְתִּי לְפָנָיו, אִם יִהְיֶה הַשָּׁנִים הָאֵלֶּה טַל וּמָטָר כִּי אִם לְפִי דְּבָרִי״ — מִי לְמִי?",
+      answer_points:[
+        "אליהו התשבי לאחאב מלך ישראל",
+        "מכריז בצורת בעונש על עבודת הבעל",
+        "פתיחת הסיפור של אליהו במל״א י״ז",
+        "מטרת הבצורת: להוכיח שלא הבעל ממטיר — אלא ה׳"
+      ],
+      related_entities:["char:eliyahu","char:achav","event:batzoret"]
+    },
+    {
+      id:"rq-u3-002", unit:3, type:"character_details", difficulty:"קל",
+      prompt_niqqud:"מִי הָיְתָה אִיזֶבֶל וּמָה הִשְׁפִּיעָה עַל אַחְאָב?",
+      answer_points:[
+        "בת אתבעל מלך צידון",
+        "נישאה לאחאב — חלק מקשרי חוץ של בית עמרי",
+        "הכניסה את עבודת הבעל למלכות ישראל",
+        "רדפה אחר נביאי ה׳ והעמידה 450 נביאי הבעל ו־400 נביאי האשרה בחצר"
+      ],
+      related_entities:["char:izevel","char:achav","event:avodat_habaal"]
+    },
+    {
+      id:"rq-u3-003", unit:3, type:"place_events", difficulty:"בינוני",
+      prompt_niqqud:"מָה הִתְרַחֵשׁ בְּנַחַל כְּרִית וּבְצָרְפַת בִּימֵי אֵלִיָּהוּ?",
+      answer_points:[
+        "בנחל כרית: אליהו מתחבא בתקופת הבצורת",
+        "עורבים מביאים לו לחם ובשר בוקר וערב",
+        "בצרפת: אלמנה מכלכלת אותו; נס צפחת השמן וכד הקמח",
+        "אליהו גם מחיה את בנה המת — נס תחיית המתים הראשון בספר"
+      ],
+      related_entities:["char:eliyahu","place:nachal_krit","place:tzarfat","event:tzfachat_hashemen"]
+    },
+    {
+      id:"rq-u3-004", unit:3, type:"short_answer", difficulty:"בינוני",
+      prompt_niqqud:"תָאֵר אֶת הָעִמּוּת בְּהַר הַכַּרְמֶל — עִקָּרִים וּתוֹצָאוֹת.",
+      answer_points:[
+        "אליהו מכנס את העם, 450 נביאי הבעל ו־400 נביאי האשרה",
+        "שואל: ״עד מתי אתם פוסחים על שתי הסעיפים״",
+        "מבחן: אשר יענה באש הוא האלהים. הבעל לא ענה; ה׳ שלח אש ״ותאכל העולה״",
+        "העם קורא ״ה׳ הוא האלהים״; אליהו שוחט את נביאי הבעל בנחל קישון"
+      ],
+      related_entities:["char:eliyahu","place:karmel","event:imut_karmel","event:shchitat_neviei_habaal"]
+    },
+    {
+      id:"rq-u3-005", unit:3, type:"be_eize_hekhsher", difficulty:"בינוני",
+      prompt_niqqud:"״וַיִּגַּשׁ אֵלִיָּהוּ אֶל כָּל הָעָם וַיֹּאמֶר עַד מָתַי אַתֶּם פֹּסְחִים עַל שְׁתֵּי הַסְּעִפִּים״ — הֶסְבֵּר.",
+      answer_points:[
+        "פתיחת המבחן בהר הכרמל",
+        "״פוסחים״ = מהססים בין שני אלים",
+        "אם ה׳ — לכו אחריו; אם הבעל — אחריו",
+        "קוראה לעם לבחירה ברורה, ללא דו־דתיות"
+      ],
+      related_entities:["char:eliyahu","place:karmel","event:imut_karmel"]
+    },
+    {
+      id:"rq-u3-006", unit:3, type:"al_mi_neemar", difficulty:"קל",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״וְהוּא הָלַךְ אֶל בְּאֵר שֶׁבַע... וַיֵּשֶׁב תַּחַת רֹתֶם אֶחָד״?",
+      answer_points:[
+        "על אליהו הנביא",
+        "לאחר איום איזבל להרגו בעקבות שחיטת נביאי הבעל",
+        "בורח לאר שבע (שבמלכות יהודה — מחוץ לתחום איזבל)",
+        "משם ממשיך 40 יום ו־40 לילה לחורב"
+      ],
+      related_entities:["char:eliyahu","char:izevel","place:beer_sheva","event:ma_lecha_po"]
+    },
+    {
+      id:"rq-u3-007", unit:3, type:"short_answer", difficulty:"קשה",
+      prompt_niqqud:"מָה אֵרַע לְאֵלִיָּהוּ בְּחוֹרֵב? מָה מַשְׁמָעוּת הַהִתְגַּלּוּת?",
+      answer_points:[
+        "ה׳ מעביר לפניו: רוח, רעש, אש — ואינו בהם",
+        "ואחר כך ״קול דממה דקה״ — שם מתגלה ה׳",
+        "מסר: דרך ה׳ אינה בכוחניות אלא בסבלנות ובפעולה שקטה",
+        "ה׳ מטיל עליו 3 משימות: למשוח חזאל, יהוא ואלישע"
+      ],
+      related_entities:["char:eliyahu","place:chorev","event:kol_dmama_daka"]
+    },
+    {
+      id:"rq-u3-008", unit:3, type:"character_details", difficulty:"בינוני",
+      prompt_niqqud:"מִי הָיָה נָבוֹת הַיִּזְרְעֵאלִי וּמָה הָיָה גּוֹרָלוֹ?",
+      answer_points:[
+        "בעל כרם בצד ארמון אחאב ביזרעאל",
+        "אחאב ביקש לקנות/להחליף את הכרם — סרב (״חלילה לי מה׳ מתתי נחלת אבתי״)",
+        "איזבל סידרה עדי שקר; נבות נסקל",
+        "אחאב יורד לרשת; אליהו בא — ״הרצחת וגם ירשת?״"
+      ],
+      related_entities:["char:navot","char:achav","char:izevel","event:kerem_navot"]
+    },
+    {
+      id:"rq-u3-009", unit:3, type:"mi_amar_lemi", difficulty:"בינוני",
+      prompt_niqqud:"״הֲרָצַחְתָּ וְגַם יָרָשְׁתָּ״ — מִי לְמִי?",
+      answer_points:[
+        "אליהו הנביא לאחאב מלך ישראל",
+        "בכרם נבות, לאחר שירד לרשתו",
+        "מכאן — נבואת הכיליון על בית אחאב",
+        '"במקום אשר לקקו הכלבים את דם נבות ילקו הכלבים את דמך"'
+      ],
+      related_entities:["char:eliyahu","char:achav","event:kerem_navot"]
+    },
+    {
+      id:"rq-u3-010", unit:3, type:"short_answer", difficulty:"קשה",
+      prompt_niqqud:"מָה הַכֶּשֶׁר בֵּין נְבוּאַת הָאֱוִיל בִּנְפִילַת אַחְאָב בְּרָמוֹת גִּלְעָד וְעֶקְרוֹן הַסִּבָּתִיּוּת הַכְּפוּלָה?",
+      answer_points:[
+        "הנבואה: ״במקום אשר לקקו הכלבים את דם נבות ילקו הכלבים את דמך״",
+        "אחאב הלך לרמות גלעד בניגוד לדברי מיכיהו",
+        "התחפש — אך ״איש משך בקשת לתמו״",
+        "פגע בדיוק באחאב. הסיבה הגלויה — מקרה; הנסתרת — דבר ה׳"
+      ],
+      related_entities:["char:achav","char:michayahu","event:milchemet_ramot_gilad"]
+    },
+    {
+      id:"rq-u3-011", unit:3, type:"character_details", difficulty:"בינוני",
+      prompt_niqqud:"מִי הָיָה מִיכָיְהוּ בֶּן יִמְלָה?",
+      answer_points:[
+        "נביא אמת בחצר אחאב — מבודד מול 400 נביאי שקר",
+        "לפני מלחמת רמות גלעד, יהושפט ביקש ״עוד נביא לה׳״",
+        "בשם ה׳ נבא: ״ראיתי את כל ישראל נפצים על ההרים״",
+        "אחאב כועס — שולח אותו לכלא עד שובו בשלום. לא שב"
+      ],
+      related_entities:["char:michayahu","char:achav","char:yehoshafat","event:milchemet_ramot_gilad"]
+    },
+    {
+      id:"rq-u3-012", unit:3, type:"be_eize_hekhsher", difficulty:"בינוני",
+      prompt_niqqud:"״אֲשִׁיבֵם אִישׁ בְּשָׁלוֹם אֶל בֵּיתוֹ״ — בְּאֵיזֶה הֶקְשֵׁר?",
+      answer_points:[
+        "אחאב שואל את 400 הנביאים לפני מלחמת רמות גלעד",
+        "כולם מנבאים טוב — כל אחד בשם ה׳ (או בשם אחר)",
+        "אחאב מבקש מיכיהו וזה מנבא רעה",
+        "הצגה של נבואות השקר שליוו את חצר המלך"
+      ],
+      related_entities:["char:achav","char:michayahu","event:milchemet_ramot_gilad"]
+    },
+    {
+      id:"rq-u3-013", unit:3, type:"place_events", difficulty:"בינוני",
+      prompt_niqqud:"מָה הִתְרַחֵשׁ בְּאָפֵק בִּמְלֶחֶת בֶּן־הֲדַד הַשְּׁנִיָּה?",
+      answer_points:[
+        "הארמים אמרו ״אלהי הרים הוא״ וערכו מערכה בעמק",
+        "ישראל כ״שני חשפי עזים״, ארם מילאה את הארץ",
+        "ה׳ נתן נצחון מוחלט — 100,000 איש וקיר אפק נפל",
+        "בן־הדד נכנע; אחאב חמל עליו — כעס הנביא על הפטור"
+      ],
+      related_entities:["char:achav","char:ben_hadad","place:afek"]
+    },
+    {
+      id:"rq-u3-014", unit:3, type:"al_mi_neemar", difficulty:"קשה",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״רַק לֹא הָיָה כְאַחְאָב אֲשֶׁר הִתְמַכֵּר לַעֲשׂוֹת הָרַע״?",
+      answer_points:[
+        "על אחאב בן עמרי",
+        "הדגש החזק ביותר על רוע מלכותי בספר",
+        "״התמכר״ = מכר את עצמו; ״אשר הסתה אתו איזבל אשתו״",
+        "הביטוי הזה מוצג בסיכום אישיותו לאחר כרם נבות"
+      ],
+      related_entities:["char:achav","char:izevel","event:kerem_navot"]
+    },
+    {
+      id:"rq-u3-015", unit:3, type:"mi_amar_lemi", difficulty:"קשה",
+      prompt_niqqud:"״הֲמָצָאתַנִי אֹיְבִי״ — מִי אָמַר לְמִי?",
+      answer_points:[
+        "אחאב לאליהו הנביא",
+        "בכרם נבות לאחר שאליהו הגיע בנבואת הכיליון",
+        "מגלה את היחס העוין בין שני הצדדים",
+        "אליהו עונה: ״מצאתי יען התמכרך לעשות הרע בעיני ה׳״"
+      ],
+      related_entities:["char:achav","char:eliyahu","event:kerem_navot"]
+    },
+    {
+      id:"rq-u3-016", unit:3, type:"short_answer", difficulty:"בינוני",
+      prompt_niqqud:"מָה הָיְתָה חֲשִׁיבוּת הָעוֹרְבִים בְּנַחַל כְּרִית?",
+      answer_points:[
+        "ה׳ צווה עליהם לכלכל את אליהו",
+        "עורבים טמאים — אך משרתים בדבר ה׳",
+        "לחם ובשר בוקר וערב — כפל של אוכל",
+        "מוטיב ההשגחה: ה׳ מפרנס עבדו בצרה"
+      ],
+      related_entities:["char:eliyahu","place:nachal_krit"]
+    },
+    {
+      id:"rq-u3-017", unit:3, type:"be_eize_hekhsher", difficulty:"קשה",
+      prompt_niqqud:"״וַיִּתְכַּסֶּה בְּשַׂק וַיָּלֶן בַּשָּׂק״ — בְּאֵיזֶה הֶקְשֵׁר?",
+      answer_points:[
+        "אחאב לאחר נבואת הכיליון של אליהו (כרם נבות)",
+        "נכנע, קרע בגדיו, לבש שק וצם",
+        "ה׳ מגיב: בגלל ההכנעה — אני ידחה רעה לבנו",
+        "דוגמה מעניינת למלך רשע שמכיר בחטא בעת משבר"
+      ],
+      related_entities:["char:achav","char:eliyahu","event:kerem_navot"]
+    },
+    {
+      id:"rq-u3-018", unit:3, type:"character_details", difficulty:"בינוני",
+      prompt_niqqud:"מִי הָיָה עוֹבַדְיָהוּ בֶּן בֵּית אַחְאָב?",
+      answer_points:[
+        "אשר על הבית של אחאב — ״ירא את ה׳ מאד״",
+        "בימי בצורת ורדיפות איזבל הסתיר 100 נביאים במערות",
+        "פרנס אותם בלחם ומים",
+        "נפגש עם אליהו לפני מעמד הכרמל — אליהו שלחו להודיע לאחאב"
+      ],
+      related_entities:["char:ovadyahu","char:eliyahu","char:achav","char:izevel"]
+    },
+    {
+      id:"rq-u3-019", unit:3, type:"place_events", difficulty:"בינוני",
+      prompt_niqqud:"מָה הָיוּ 3 הַמְּשִׂימוֹת שֶׁהֵטִיל ה׳ עַל אֵלִיָּהוּ בַּחוֹרֵב?",
+      answer_points:[
+        "למשוח את חזאל למלך על ארם",
+        "למשוח את יהוא בן נמשי למלך על ישראל",
+        "למשוח את אלישע בן שפט לנביא תחתיו",
+        "הבטחה: מי שימלט מחרב חזאל ימית יהוא; ומחרב יהוא — אלישע"
+      ],
+      related_entities:["char:eliyahu","char:chazael","char:yehu","char:elisha","place:chorev"]
+    },
+    {
+      id:"rq-u3-020", unit:3, type:"al_mi_neemar", difficulty:"קשה",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״וַיַּעַל אֵלִיָּהוּ בַּסְעָרָה הַשָּׁמָיִם״?",
+      answer_points:[
+        "על אליהו — במסעו האחרון מגלגל־ברית אל עבר הירדן",
+        "אלישע רואה; ״רכב ישראל ופרשיו״ — רכב אש וסוסי אש",
+        "קורע את בגדיו; מרים אדרת אליהו; שב וחוצה את הירדן",
+        "אליהו לא מת — דוגמה מיוחדת בתנך. ״הנני שולח לכם את אליה הנביא״ (מלאכי)"
+      ],
+      related_entities:["char:eliyahu","char:elisha","place:yarden","event:aliyat_eliyahu"]
+    },
+    // === יחידה ד — מהפכות ותמורות ===
     // questions inserted incrementally (3 at a time)
   ];
   if (typeof window !== 'undefined'){
