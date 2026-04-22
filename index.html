@@ -183,6 +183,7 @@
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=900"></script>
 <script src="./components/BreadthPage.js?v=900"></script>
 <script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=900"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=910"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -662,6 +663,193 @@ html[data-theme='light'] .study-card{
 
 @media (prefers-reduced-motion: reduce){
   .ent-drawer,.ent-drawer-ovl,.study-card{ animation:none; transition:none; }
+}
+
+/* =========================================================================
+   CONTRAST TOKENS — WCAG AA enforcement on parchment backgrounds.
+   Primary ink #1A1611, secondary #4A3829, accent #8B6F1F, muted meta #6B5639.
+   ========================================================================= */
+.text-on-parchment{ color:#1A1611 !important; }
+.text-on-parchment-muted{ color:#4A3829 !important; font-weight:500; }
+.text-on-parchment-meta{ color:#6B5639 !important; }
+.text-on-parchment-accent{ color:#8B6F1F !important; font-weight:600; }
+/* Force dark ink anywhere inside .parchment to prevent cream-on-cream failures. */
+.parchment h1, .parchment h2, .parchment h3, .parchment h4{ color:#1A1611; }
+.parchment p, .parchment li, .parchment label{ color:#4A3829; }
+.parchment small, .parchment .meta{ color:#6B5639; }
+/* Disabled gold btn: visible at all times. */
+.gold-btn:disabled, .gold-btn[aria-disabled="true"]{
+  background:linear-gradient(135deg,#C9B88A,#A08C5E) !important;
+  color:#3E2F1A !important; opacity:.92; cursor:not-allowed;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+/* =========================================================================
+   HOME HERO
+   ========================================================================= */
+.hero-parchment{ border:1px solid rgba(139,111,31,.35); }
+.hero-countdown{
+  background:#7B1A1A; color:#FFF7ED;
+  box-shadow:0 2px 6px rgba(123,26,26,.35);
+  letter-spacing:.02em;
+}
+
+/* =========================================================================
+   HOME PROGRESS STRIP
+   ========================================================================= */
+.progress-strip-wrap{ padding:4px 2px; }
+.progress-strip-rail{
+  display:grid; grid-template-columns:repeat(6,1fr); gap:8px;
+}
+@media (max-width:768px){ .progress-strip-rail{ grid-template-columns:repeat(3,1fr); } }
+@media (max-width:420px){ .progress-strip-rail{ grid-template-columns:repeat(2,1fr); } }
+.progress-strip-node{
+  position:relative; overflow:hidden;
+  padding:12px 10px 14px; border-radius:16px;
+  background:linear-gradient(180deg,#FBF6EB 0%,#F0E4C4 100%);
+  border:1.5px solid rgba(139,111,31,.35);
+  color:#1A1611; text-align:right; cursor:pointer;
+  transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  display:flex; flex-direction:column; gap:2px;
+  min-height:92px;
+}
+.progress-strip-node:hover{
+  transform:translateY(-2px);
+  border-color:#8B6F1F;
+  box-shadow:0 6px 18px rgba(139,111,31,.22);
+}
+.progress-strip-node.current{
+  border-color:#8B6F1F; border-width:2px;
+  box-shadow:0 0 0 3px rgba(212,165,116,.25), 0 4px 12px rgba(139,111,31,.2);
+}
+.progress-strip-node.done{
+  border-color:#3E8E7E;
+  background:linear-gradient(180deg,#E8F5EE 0%,#C9E4D3 100%);
+}
+.progress-strip-fill{
+  position:absolute; right:0; bottom:0; height:3px;
+  background:linear-gradient(90deg,#8B6F1F,#D4A574);
+  transition:width .35s ease;
+}
+.progress-strip-node.done .progress-strip-fill{
+  background:linear-gradient(90deg,#3E8E7E,#5AB091);
+}
+.progress-strip-num{
+  font-family:'Frank Ruhl Libre','Noto Serif Hebrew',serif;
+  font-size:22px; font-weight:900; color:#1A1611;
+}
+.progress-strip-title{ font-size:13px; font-weight:600; color:#4A3829; line-height:1.25; }
+.progress-strip-pct{
+  position:absolute; left:10px; top:10px;
+  font-size:11px; font-weight:700; color:#8B6F1F;
+  padding:2px 6px; border-radius:999px;
+  background:rgba(212,165,116,.18);
+}
+.progress-strip-node.done .progress-strip-pct{
+  color:#1A5F3F; background:rgba(62,142,126,.18);
+}
+
+/* =========================================================================
+   HOME QUICK ACTIONS
+   ========================================================================= */
+.quick-actions-wrap{ padding:2px; }
+.quick-actions-grid{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
+}
+@media (max-width:768px){ .quick-actions-grid{ grid-template-columns:repeat(2,1fr); } }
+.quick-action-card{
+  padding:16px 14px; border-radius:18px; text-align:right; cursor:pointer;
+  background:linear-gradient(180deg,#FBF6EB 0%,#F0E4C4 100%);
+  border:1.5px solid rgba(139,111,31,.35);
+  color:#1A1611;
+  transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  display:flex; flex-direction:column; gap:6px;
+  min-height:120px;
+  position:relative; overflow:hidden;
+}
+.quick-action-card:hover{
+  transform:translateY(-3px);
+  border-color:#8B6F1F;
+  box-shadow:0 8px 22px rgba(139,111,31,.22);
+}
+.quick-action-icon{ font-size:30px; line-height:1; }
+.quick-action-title{
+  font-family:'Frank Ruhl Libre','Noto Serif Hebrew',serif;
+  font-size:16px; font-weight:900; color:#1A1611;
+}
+.quick-action-sub{ font-size:12px; font-weight:500; color:#4A3829; line-height:1.4; }
+.quick-action-card.qa-gold{ border-top:4px solid #C89B3C; }
+.quick-action-card.qa-crimson{ border-top:4px solid #A83240; }
+.quick-action-card.qa-purple{ border-top:4px solid #6B5B95; }
+.quick-action-card.qa-emerald{ border-top:4px solid #3E8E7E; }
+
+/* =========================================================================
+   HOME TODAY'S FOCUS
+   ========================================================================= */
+.today-focus-wrap{ padding:2px; }
+.today-focus-list{ display:flex; flex-direction:column; gap:8px; }
+.today-focus-card{
+  display:flex; align-items:center; gap:12px;
+  padding:14px 14px; border-radius:16px; text-align:right; cursor:pointer;
+  background:linear-gradient(90deg,#FBF6EB 0%,#F3E7C8 100%);
+  border:1.5px solid rgba(139,111,31,.3);
+  color:#1A1611;
+  transition:transform .12s ease, border-color .15s ease, box-shadow .15s ease;
+  width:100%;
+}
+.today-focus-card:hover{
+  transform:translateY(-2px);
+  border-color:#8B6F1F;
+  box-shadow:0 6px 18px rgba(139,111,31,.2);
+}
+.today-focus-rank{
+  flex-shrink:0; width:34px; height:34px; border-radius:50%;
+  background:linear-gradient(135deg,#C89B3C,#8B6F1F); color:#FFF7ED;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Frank Ruhl Libre',serif; font-weight:900; font-size:17px;
+}
+.today-focus-body{ flex:1; display:flex; flex-direction:column; gap:2px; min-width:0; }
+.today-focus-title{
+  font-family:'Frank Ruhl Libre','Noto Serif Hebrew',serif;
+  font-size:15px; font-weight:800; color:#1A1611;
+  text-overflow:ellipsis; overflow:hidden; white-space:nowrap;
+}
+.today-focus-sub{ font-size:12px; color:#4A3829; font-weight:500; }
+.today-focus-arrow{ flex-shrink:0; font-size:20px; color:#8B6F1F; font-weight:900; }
+
+/* =========================================================================
+   HOME STATS STRIP
+   ========================================================================= */
+.stats-strip-wrap{ padding:2px; }
+.stats-strip-grid{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+}
+.stats-cell{
+  padding:14px 10px; border-radius:16px; text-align:center;
+  background:linear-gradient(180deg,#FBF6EB 0%,#F0E4C4 100%);
+  border:1.5px solid rgba(139,111,31,.3);
+  color:#1A1611;
+  transition:transform .12s ease;
+  display:flex; flex-direction:column; gap:2px; align-items:center;
+}
+.stats-cell:hover{ transform:translateY(-1px); }
+.stats-icon{ font-size:22px; line-height:1; }
+.stats-value{
+  font-family:'Frank Ruhl Libre','Noto Serif Hebrew',serif;
+  font-size:26px; font-weight:900; color:#1A1611; line-height:1.1;
+}
+.stats-label{ font-size:11px; font-weight:600; color:#4A3829; }
+.stats-cell.stats-streak{ border-top:3px solid #D4A574; }
+.stats-cell.stats-total{ border-top:3px solid #6B5B95; }
+.stats-cell.stats-accuracy{ border-top:3px solid #3E8E7E; }
+
+/* Dark theme adjustments for home sections. */
+html[data-theme='dark'] .progress-strip-node,
+html[data-theme='dark'] .quick-action-card,
+html[data-theme='dark'] .today-focus-card,
+html[data-theme='dark'] .stats-cell{
+  background:linear-gradient(180deg,#FBF6EB 0%,#F0E4C4 100%);
+  color:#1A1611;
 }
 </style>
 </head>
@@ -2260,7 +2448,9 @@ function App(){
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-3 md:px-5 py-4 md:py-6 fade-up">
         {isTeacher ? <TeacherView S={S}/> : <>
-        {route.page==="home" && <Home S={S} setRoute={setRoute} level={level} nextLv={nextLv}/>}
+        {route.page==="home" && (window.HomeComponent
+          ? React.createElement(window.HomeComponent, {S, setRoute, level, nextLv})
+          : <div className="text-amber-200 text-center py-8">טוען דף בית...</div>)}
         {route.page==="path" && <UnitsPath S={S} setRoute={setRoute}/>}
         {route.page==="unit" && <UnitDetail unitId={route.unitId} S={S} setRoute={setRoute} awardXP={awardXP} update={update}/>}
         {route.page==="lesson" && <Lesson unitId={route.unitId} mode={route.mode} setRoute={setRoute} S={S} awardXP={awardXP} update={update}/>}
@@ -2433,92 +2623,7 @@ function Onboarding({onDone}){
 }
 
 // ============ HOME ============
-function Home({S, setRoute, level, nextLv}){
-  const dailyQ = useMemo(() => {
-    const seed = new Date().toDateString().split('').reduce((a,c)=>a+c.charCodeAt(0),0);
-    return QUESTIONS[seed % QUESTIONS.length];
-  }, []);
-  const dExam = daysTo(EXAM_DATE);
-  const [tick, setTick] = useState(0);
-  useEffect(()=>{ const id=setInterval(()=>setTick(t=>t+1),60000); return ()=>clearInterval(id); },[]);
-  const heDays = d => d===0?'היום':d===1?'יום אחד':d===2?'יומיים':`${d} ימים`;
-
-  // current unit = first unit without a quiz score, fallback to unit 1
-  const currentUnit = MELAKHIM_DATA.units.find(u => !(S.quizScores||{})[u.id]) || MELAKHIM_DATA.units[0];
-  const doneCount = MELAKHIM_DATA.units.filter(u => (S.quizScores||{})[u.id]).length;
-  const pathPct = Math.round((doneCount / MELAKHIM_DATA.units.length) * 100);
-
-  return (
-    <div className="space-y-5">
-      {/* Hero: countdown + single CTA */}
-      <section className="relative overflow-hidden rounded-3xl parchment p-5 md:p-7">
-        <div className="absolute top-0 left-0 text-[140px] opacity-[.06] select-none pointer-events-none leading-none">📜</div>
-        <div className="relative text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-red-700 text-red-50 text-xs font-bold mb-3">⏰ נותרו {heDays(dExam)} · 30.4.2026</div>
-          <h1 className="font-display text-2xl md:text-4xl font-black text-amber-900 leading-tight">
-            שלום {S.name} {S.avatar}
-          </h1>
-          <p className="text-amber-800/80 text-sm mt-1">בגרות 2551 · ספר מלכים · י״א 5 יח״ל</p>
-          <button onClick={()=>setRoute({page:"quizPlay",mode:"quick"})} className="gold-btn w-full md:w-auto md:px-10 py-4 rounded-2xl text-lg md:text-xl mt-4 glow">
-            ⚡ חידון מהיר · 10 שאלות
-          </button>
-        </div>
-      </section>
-
-      {/* 3-card horizontal scroll */}
-      <section>
-        <h2 className="font-display text-sm font-bold text-amber-200/90 mb-2 px-1">בחר את הדרך שלך היום</h2>
-        <div className="hrow fancy-scroll">
-          <button onClick={()=>setRoute({page:"unit",unitId:currentUnit.id})} className="card rounded-2xl p-4 text-right relative overflow-hidden">
-            <div className="absolute -top-4 -left-4 w-20 h-20 rounded-full opacity-25 blur-2xl bg-amber-400"/>
-            <div className="relative">
-              <div className="text-3xl">🗺</div>
-              <h3 className="font-display text-base font-bold text-amber-100 mt-1">המשך מסלול</h3>
-              <p className="text-xs text-amber-200/70 mt-0.5 line-clamp-1">יחידה {currentUnit.num}: {currentUnit.title}</p>
-              <div className="mt-2 h-1.5 rounded-full bg-slate-800 overflow-hidden">
-                <div className="h-full bg-gradient-to-l from-amber-300 to-amber-600 transition-all" style={{width:pathPct+"%"}}/>
-              </div>
-              <div className="text-[10px] text-amber-100/60 mt-1"><span dir="ltr" className="num">{doneCount}/6</span> יחידות · {pathPct}%</div>
-            </div>
-          </button>
-          <button onClick={()=>setRoute({page:"quizPlay",mode:"daily"})} className="card rounded-2xl p-4 text-right relative overflow-hidden">
-            <div className="absolute -top-4 -left-4 w-20 h-20 rounded-full opacity-25 blur-2xl bg-purple-400"/>
-            <div className="relative">
-              <div className="text-3xl">☀️</div>
-              <h3 className="font-display text-base font-bold text-amber-100 mt-1">אתגר היום</h3>
-              <p className="text-xs text-amber-200/70 mt-0.5 line-clamp-2 hebrew">{dailyQ.q.length>70?dailyQ.q.slice(0,70)+'…':dailyQ.q}</p>
-              <div className="mt-2 flex items-center gap-1 text-[10px]"><DiffBadge d={dailyQ.d}/><span className="text-amber-100/60">{new Date().toLocaleDateString('he-IL')}</span></div>
-            </div>
-          </button>
-          <button onClick={()=>setRoute({page:"exam"})} className="card rounded-2xl p-4 text-right relative overflow-hidden">
-            <div className="absolute -top-4 -left-4 w-20 h-20 rounded-full opacity-25 blur-2xl bg-red-400"/>
-            <div className="relative">
-              <div className="text-3xl">📝</div>
-              <h3 className="font-display text-base font-bold text-amber-100 mt-1">סימולציה מלאה</h3>
-              <p className="text-xs text-amber-200/70 mt-0.5">שעתיים · 100 נקודות · מבנה אמיתי</p>
-              <div className="mt-2 text-[10px] text-amber-300 font-bold">לחץ להתחלה ←</div>
-            </div>
-          </button>
-        </div>
-      </section>
-
-      {/* Collapsed units */}
-      <details className="card rounded-2xl overflow-hidden">
-        <summary className="px-4 py-3 cursor-pointer flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">📚</span>
-            <span className="font-display font-bold text-amber-200">יחידות לימוד</span>
-            <span className="text-[10px] text-amber-100/60">({MELAKHIM_DATA.units.length})</span>
-          </div>
-          <span className="text-amber-300 text-sm">▾</span>
-        </summary>
-        <div className="p-4 pt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {MELAKHIM_DATA.units.map(u => <UnitCard key={u.id} u={u} S={S} onClick={()=>setRoute({page:"unit",unitId:u.id})}/>)}
-        </div>
-      </details>
-    </div>
-  );
-}
+// Home moved to components/Home.js — mounts as window.HomeComponent.
 
 function Stat({i,v,l,c}){
   const cs = {gold:"border-amber-500/40",crimson:"border-red-600/40",emerald:"border-emerald-500/40",purple:"border-purple-500/40"}[c]||"";
