@@ -238,7 +238,7 @@
               <div style={{display:'flex',flexDirection:'column',gap:6}}>
                 {quotesBy.map((q,i)=>(
                   <div key={i} className="kt-quote-cite">
-                    <div>„{stripTokens(q.text || q)}"</div>
+                    <div>„{renderText(q.text || q)}"</div>
                     {q.ref && <div style={{fontSize:11,opacity:.7,marginTop:3}}>{q.ref}</div>}
                   </div>
                 ))}
@@ -251,7 +251,7 @@
               <div style={{display:'flex',flexDirection:'column',gap:6}}>
                 {quotesTo.map((q,i)=>(
                   <div key={i} className="kt-quote-cite">
-                    <div>„{stripTokens(q.text || q)}"</div>
+                    <div>„{renderText(q.text || q)}"</div>
                     {q.ref && <div style={{fontSize:11,opacity:.7,marginTop:3}}>{q.ref}</div>}
                   </div>
                 ))}
