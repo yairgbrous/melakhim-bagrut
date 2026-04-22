@@ -10,7 +10,44 @@
    Exposes: window.KingsTableComponent
    ========================================================================= */
 (function(){
-  const { useState, useEffect, useMemo } = React;
+  const { useState, useEffect, useMemo, useRef } = React;
+
+  // ---------- Inject assess-* palette + extra KT styles (idempotent) --------
+  (function injectStyles(){
+    if (typeof document === 'undefined') return;
+    if (document.getElementById('kt-assess-styles')) return;
+    const s = document.createElement('style');
+    s.id = 'kt-assess-styles';
+    s.textContent = `
+      .kt-king.assess-tzadik{background:linear-gradient(135deg,#d4f5d4,#a8e6a1);border-color:#2d7a2d;color:#1a4d1a}
+      .kt-king.assess-rasha {background:linear-gradient(135deg,#fad4d4,#e6a1a1);border-color:#8b2d2d;color:#4d1a1a}
+      .kt-king.assess-mixed {background:linear-gradient(135deg,#f5e8b8,#e6d184);border-color:#8b6d2d;color:#4d3e1a}
+      .kt-king.assess-tzadik .kt-king-name,.kt-king.assess-rasha .kt-king-name,.kt-king.assess-mixed .kt-king-name{color:inherit}
+      .kt-king-dyn{font-size:11px;font-weight:700;opacity:.85;line-height:1.1;margin-top:-2px}
+      .kt-assess-pill{display:inline-block;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.02em}
+      .kt-assess-pill.assess-tzadik{background:#2d7a2d;color:#d4f5d4}
+      .kt-assess-pill.assess-rasha {background:#8b2d2d;color:#fad4d4}
+      .kt-assess-pill.assess-mixed {background:#8b6d2d;color:#f5e8b8}
+      .kt-th-prophets{width:160px}
+      .kt-td-prophets{text-align:center;font-size:12px;padding:6px;border-inline-start:1px solid rgba(212,165,116,.15);border-inline-end:1px solid rgba(212,165,116,.15)}
+      .kt-td-prophets .kt-chip{display:inline-block;margin:2px 2px}
+      .kt-foreign-chip{display:inline-block;margin:2px 0;padding:3px 8px;border-radius:999px;background:rgba(168,50,64,.25);color:#F1B5BE;border:1px solid rgba(168,50,64,.5);font-size:11px;font-weight:700;cursor:default}
+      .kt-foreign-chip + .kt-foreign-chip{margin-top:3px}
+      html[data-theme='light'] .kt-td-prophets{color:#3a2a0d}
+      .kt-kill-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;background:rgba(139,45,45,.25);color:#ffd6d6;border:1px solid rgba(139,45,45,.55);font-size:11px;font-weight:700;cursor:pointer}
+      .kt-kill-chip:hover{background:rgba(139,45,45,.4)}
+      .kt-kill-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 2px}
+      .kt-kill-row-label{font-size:12px;font-weight:800;color:#C89B3C}
+      .kt-full-link{display:inline-block;margin-inline-start:8px;padding:8px 14px;border-radius:12px;background:rgba(107,91,149,.25);color:#C9B8E0;border:1px solid #6B5B95;font-weight:800;text-decoration:none;cursor:pointer}
+      .kt-full-link:hover{background:rgba(107,91,149,.45)}
+      .kt-chain-toggle{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(139,45,45,.2);border:1px solid rgba(139,45,45,.6);color:#ffd6d6;font-size:12px;font-weight:800;cursor:pointer}
+      .kt-chain-toggle.on{background:rgba(139,45,45,.6);color:#fff}
+      .kt-chain-svg{position:absolute;inset:0;pointer-events:none;z-index:4}
+      .kt-table-rel{position:relative}
+      .kt-quote-cite{font-family:'Frank Ruhl Libre',serif;font-size:13.5px;line-height:1.55;padding:6px 10px;border-inline-start:3px solid #C89B3C;background:rgba(212,165,116,.08);border-radius:6px;color:inherit}
+    `;
+    document.head.appendChild(s);
+  })();
 
   // Unit → theme color + empire label for מעצמות column
   const UNIT_META = {
@@ -47,12 +84,17 @@
   ];
   const JUDAH_DYN = {name:"בית דוד", color:"#8B6F1F"};
 
-  // Good/bad assessment icon
-  const assessmentIcon = (k) => {
+  // Assessment → class + hex color (NO EMOJIS). Delegates to KingsUtils when
+  // present so the same rule applies across table + character pages.
+  const assessmentClass = (k) => {
+    const KU = (typeof window!=='undefined') && window.KingsUtils;
+    if (KU && KU.assessmentColor) return KU.assessmentColor(k);
     const v = (k.assessment || '').toLowerCase();
-    if (k.good === true || v === 'righteous' || v === 'good')  return "👑";
-    if (k.good === false || v === 'wicked' || v === 'bad')     return "⚠";
-    return "➖";
+    if (k.good === true  || v === 'righteous' || v === 'good')
+      return { hex:'#2d7a2d', cls:'assess-tzadik' };
+    if (k.good === false || v === 'wicked'    || v === 'bad')
+      return { hex:'#8b2d2d', cls:'assess-rasha' };
+    return { hex:'#8b6d2d', cls:'assess-mixed' };
   };
 
   const dynastyOf = (dyn, name) => {
@@ -116,16 +158,28 @@
   }
 
   // Interleave Judah + Israel kings into rows, grouping by unit.
-  // Strategy: walk the chronologically-ordered list and emit one row per king.
-  // Rows get rowspan on the יחידה column when consecutive same-unit rows.
+  // Strategy: walk the chronologically-ordered list. If two adjacent kings are
+  // from opposite dynasties AND share the same unit+period, pair them on one
+  // row (e.g. רחבעם+ירבעם). The second king's row is marked _skip.
   function buildRows(kings){
     const rows = kings.map((k, i) => ({...k, _row: i}));
-    // Pre-compute rowspans for the יחידה column
+    for (let i = 0; i < rows.length - 1; i++){
+      const a = rows[i], b = rows[i+1];
+      if (a._skip || b._skip) continue;
+      if (a.dynasty && b.dynasty && a.dynasty !== b.dynasty
+          && a.unitId === b.unitId
+          && (a.period||'') === (b.period||'')){
+        a._pair = b;
+        b._skip = true;
+      }
+    }
+    // Pre-compute rowspans for the יחידה column — only over visible rows.
+    const visibleIdx = rows.map((r,i)=>r._skip?-1:i).filter(i=>i>=0);
     const unitSpans = {};
     let runStart = 0;
-    for (let i = 1; i <= rows.length; i++){
-      if (i === rows.length || rows[i].unitId !== rows[runStart].unitId){
-        unitSpans[runStart] = i - runStart;
+    for (let i = 1; i <= visibleIdx.length; i++){
+      if (i === visibleIdx.length || rows[visibleIdx[i]].unitId !== rows[visibleIdx[runStart]].unitId){
+        unitSpans[visibleIdx[runStart]] = i - runStart;
         runStart = i;
       }
     }
@@ -147,22 +201,37 @@
   }
 
   function KingCell({k, side}){
-    const dyn = dynastyOf(k.dynasty, k.name);
-    const icon = assessmentIcon(k);
-    const borderSide = side === 'judah' ? {borderRightWidth:'4px'} : {borderLeftWidth:'4px'};
+    const KU = (typeof window!=='undefined') && window.KingsUtils;
+    const dyn = (KU && KU.dynastyBadge) ? KU.dynastyBadge(k) : dynastyOf(k.dynasty, k.name);
+    const col = assessmentClass(k);
+    const borderSide = side === 'judah' ? {borderRightWidth:'5px'} : {borderLeftWidth:'5px'};
+    const kindLabel = col.cls==='assess-tzadik' ? 'צדיק' : col.cls==='assess-rasha' ? 'רשע' : 'מעורב';
     return (
-      <div className="kt-king" style={{...borderSide, borderColor: dyn.color}} title={dyn.name}>
+      <div
+        className={"kt-king " + col.cls}
+        data-kid={k.id}
+        style={{...borderSide, borderColor: dyn.color}}
+        title={dyn.name + ' · ' + kindLabel}
+        aria-label={k.name + ' · ' + kindLabel}
+      >
         <div className="kt-king-name hebrew">{k.name}</div>
+        <div className="kt-king-dyn" style={{color:dyn.color}}>{dyn.name}</div>
         <div className="kt-king-meta">
           <span className="kt-badge" title="שנות מלכות">{k.years}</span>
-          <span className="kt-assess" aria-label={icon==='👑'?'צדיק':icon==='⚠'?'רשע':'בינוני'}>{icon}</span>
+          <span className={"kt-assess-pill " + col.cls}>{kindLabel}</span>
         </div>
         {k.notes && <div className="kt-king-note">{k.notes}</div>}
       </div>
     );
   }
 
-  function ExpandedRow({k, onPractice}){
+  function ExpandedRow({k, onPractice, allKings}){
+    const KU = window.KingsUtils;
+    const killedBy = useMemo(()=> (KU && allKings) ? KU.killed_by(allKings, k.id) : [], [k.id, allKings]);
+    const killedOf = useMemo(()=> (KU && allKings) ? KU.killed(allKings, k.id)    : [], [k.id, allKings]);
+    const foreign  = useMemo(()=> (KU ? KU.foreign_event_for(k) : null), [k.id]);
+    const openFull = () => { if (KU) KU.navigateToCharacter(k.id); };
+    const goKing = (id) => { if (id && KU) KU.navigateToCharacter(id); };
     const rel = useMemo(() => gatherRelated(k), [k.id, k.name]);
     const chipsProphets = (k.related_prophets.length ? k.related_prophets.map(p => ({id:p, label:p})) : rel.prophets.map(c => ({id:c.id, label:c.heading||c.name}))).slice(0, 12);
     const chipsPlaces   = (k.related_places.length ? k.related_places.map(p => ({id:p, label:p})) : rel.places.map(c => ({id:c.id, label:c.heading||c.name_hebrew||c.id}))).slice(0, 12);
@@ -192,7 +261,7 @@
           <div className="kt-sect">
             <div className="kt-sect-h">🔮 נביאים בעת מלכותו</div>
             <div className="kt-chips">{chipsProphets.map(c =>
-              <button key={c.id} className="kt-chip kt-chip-prophet" onClick={()=>navigateToStudyTab('character', c.id)}>{c.label}</button>
+              <button key={c.id} className="kt-chip kt-chip-prophet" onClick={()=>{ const KU=window.KingsUtils; if(KU) KU.navigateToCharacter(c.id); else navigateToStudyTab('character', c.id); }}>{c.label}</button>
             )}</div>
           </div>
         )}
@@ -212,11 +281,78 @@
             )}</div>
           </div>
         )}
-        <div className="kt-actions-row">
-          <button className="gold-btn kt-practice-btn" onClick={()=>onPractice(k.id)}>
+        {(killedBy.length>0 || killedOf.length>0) && (
+          <div className="kt-sect">
+            <div className="kt-sect-h">⚔️ שרשרת רצח / ירושה בכוח</div>
+            {killedBy.length>0 && (
+              <div className="kt-kill-row">
+                <span className="kt-kill-row-label">נהרג על ידי:</span>
+                {killedBy.map((p,i)=>(
+                  <span key={i} className="kt-kill-chip" onClick={(e)=>{e.stopPropagation(); goKing(p.killer_id);}}>
+                    {p.killer_name}{p.note?` · ${p.note}`:''}
+                  </span>
+                ))}
+              </div>
+            )}
+            {killedOf.length>0 && (
+              <div className="kt-kill-row">
+                <span className="kt-kill-row-label">הרג את:</span>
+                {killedOf.map((p,i)=>(
+                  <span key={i} className="kt-kill-chip" onClick={(e)=>{e.stopPropagation(); goKing(p.victim_id);}}>
+                    {p.victim_name}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {foreign && (
+          <div className="kt-sect">
+            <div className="kt-sect-h">🌍 מעצמה זרה</div>
+            <div className="kt-foreign-chip" style={{display:'inline-block'}}>
+              <strong>{foreign.name}</strong> ({foreign.empire}) — {foreign.event}
+              {foreign.book_ref && <span style={{opacity:.7}}> · {foreign.book_ref}</span>}
+            </div>
+          </div>
+        )}
+        <div className="kt-actions-row" style={{flexWrap:'wrap',gap:10}}>
+          <button className="gold-btn kt-practice-btn" onClick={(e)=>{e.stopPropagation(); onPractice(k.id);}}>
             ⚔️ תרגל על מלך זה
           </button>
+          <button className="kt-full-link" onClick={(e)=>{e.stopPropagation(); openFull();}}>
+            📖 פתח דף מלא
+          </button>
         </div>
+      </div>
+    );
+  }
+
+  function ProphetsCell({k}){
+    const KU = window.KingsUtils;
+    if (!KU || !KU.prophets_by_reign) return <span className="kt-empty-cell">·</span>;
+    const chars = Object.values(((window.__ENTITY_INDEX__||{}).character)||{});
+    const list = KU.prophets_by_reign(chars, k);
+    if (!list.length) return <span className="kt-empty-cell" aria-hidden="true">·</span>;
+    const go = (id) => { try { KU.navigateToCharacter(id); } catch(e){} };
+    return (
+      <div onClick={e=>e.stopPropagation()}>
+        {list.slice(0,6).map(p => (
+          <button key={p.id} className="kt-chip kt-chip-prophet" onClick={()=>go(p.id)}>{p.name}</button>
+        ))}
+      </div>
+    );
+  }
+
+  function ForeignCell({k}){
+    const KU = window.KingsUtils;
+    if (!KU || !KU.foreign_event_for) return null;
+    const f = KU.foreign_event_for(k);
+    if (!f) return null;
+    return (
+      <div className="kt-foreign-chip" title={f.book_ref}>
+        <div style={{fontWeight:800}}>{f.name} <span style={{opacity:.8,fontWeight:600}}>({f.empire})</span></div>
+        <div style={{fontSize:10.5,lineHeight:1.3,marginTop:2}}>{f.event}</div>
+        {f.book_ref && <div style={{fontSize:10,opacity:.7,marginTop:2}}>{f.book_ref}</div>}
       </div>
     );
   }
@@ -238,6 +374,9 @@
     const [filter, setFilter]   = useState('all');
     const [onlyGood, setOnly]   = useState(false);
     const [expanded, setExpand] = useState(null);
+    const [showChain, setShowChain] = useState(false);
+    const [chainLines, setChainLines] = useState([]);
+    const tableWrapRef = useRef(null);
 
     const all = useMemo(() => pickKingsData(), [ready]);
 
@@ -252,6 +391,43 @@
     }, [all, filter, onlyGood]);
 
     const rows = useMemo(() => buildRows(filtered), [filtered]);
+
+    useEffect(() => {
+      if (!showChain) { setChainLines([]); return; }
+      const KU = window.KingsUtils;
+      if (!KU) return;
+      const recompute = () => {
+        const wrap = tableWrapRef.current;
+        if (!wrap) return;
+        const wbox = wrap.getBoundingClientRect();
+        const byId = {};
+        wrap.querySelectorAll('[data-kid]').forEach(el => { byId[el.getAttribute('data-kid')] = el; });
+        const chain = KU.succession_chain(all).filter(p => p.killer_id && p.killer_id !== p.victim_id);
+        const lines = chain.map(p => {
+          const v = byId[p.victim_id], k = byId[p.killer_id];
+          if (!v || !k) return null;
+          const vb = v.getBoundingClientRect(), kb = k.getBoundingClientRect();
+          return {
+            id: p.victim_id+'>'+p.killer_id,
+            x1: vb.left + vb.width/2 - wbox.left,
+            y1: vb.top  + vb.height/2 - wbox.top,
+            x2: kb.left + kb.width/2 - wbox.left,
+            y2: kb.top  + kb.height/2 - wbox.top,
+            label: p.killer_name + ' ← ' + p.victim_name
+          };
+        }).filter(Boolean);
+        setChainLines(lines);
+      };
+      recompute();
+      const onR = () => recompute();
+      window.addEventListener('resize', onR);
+      const wrap = tableWrapRef.current;
+      wrap && wrap.addEventListener('scroll', onR, {passive:true});
+      return () => {
+        window.removeEventListener('resize', onR);
+        wrap && wrap.removeEventListener('scroll', onR);
+      };
+    }, [showChain, rows, expanded, all]);
 
     if (rows.length === 0){
       return (
@@ -288,29 +464,66 @@
             <input type="checkbox" checked={onlyGood} onChange={e=>setOnly(e.target.checked)}/>
             <span>הצג רק צדיקים</span>
           </label>
+          <button
+            onClick={()=>setShowChain(v=>!v)}
+            className={"kt-chain-toggle " + (showChain?'on':'')}
+            aria-pressed={showChain}
+            title="הצג קווי רצח בין מלכים"
+          >
+            {showChain ? '✕ הסתר שרשרת רצח' : '⚔️ הצג שרשרת הרצח'}
+          </button>
         </div>
 
-        <div className="kt-scroll">
+        <div className="kt-scroll kt-table-rel" ref={tableWrapRef}>
+          {showChain && chainLines.length > 0 && (
+            <svg className="kt-chain-svg" width="100%" height="100%" style={{position:'absolute',inset:0,overflow:'visible'}}>
+              <defs>
+                <marker id="kt-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#d94444"/>
+                </marker>
+              </defs>
+              {chainLines.map(L => (
+                <g key={L.id}>
+                  <line x1={L.x1} y1={L.y1} x2={L.x2} y2={L.y2}
+                        stroke="#d94444" strokeWidth="2.5" strokeDasharray="6 4"
+                        markerEnd="url(#kt-arrow)" opacity="0.9">
+                    <title>{L.label}</title>
+                  </line>
+                </g>
+              ))}
+            </svg>
+          )}
           <table className="kt-table">
             <thead>
               <tr>
                 <th className="kt-th kt-th-unit">יחידה</th>
-                <th className="kt-th kt-th-judah">👑 מלכי יהודה</th>
-                <th className="kt-th kt-th-israel">✂️ מלכי ישראל</th>
-                <th className="kt-th kt-th-empire">🌍 מעצמות האזור</th>
+                <th className="kt-th kt-th-judah">מלכי יהודה</th>
+                <th className="kt-th kt-th-prophets">נביאים</th>
+                <th className="kt-th kt-th-israel">מלכי ישראל</th>
+                <th className="kt-th kt-th-empire">מעצמות האזור</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((k, i) => {
+                if (k._skip) return null;
                 const unitMeta = UNIT_META[k.unitId] || UNIT_META[1];
-                const prevUnit = i>0 ? rows[i-1].unitId : null;
+                // previous visible row's unit:
+                let prevUnit = null;
+                for (let j=i-1; j>=0; j--){ if (!rows[j]._skip){ prevUnit = rows[j].unitId; break; } }
                 const showUnitCell = k.unitId !== prevUnit;
-                const isExpanded = expanded === k.id;
+                const pair = k._pair || null;
+                const judahKing  = k.dynasty === 'יהודה' ? k : (pair && pair.dynasty === 'יהודה' ? pair : null);
+                const israelKing = k.dynasty === 'ישראל' ? k : (pair && pair.dynasty === 'ישראל' ? pair : null);
+                const kids = [k.id, pair && pair.id].filter(Boolean);
+                const expandedKing = (expanded === k.id) ? k : (pair && expanded === pair.id ? pair : null);
+                const rowHasExpand = !!expandedKing;
+                const toggle = (cand) => setExpand(expanded === cand.id ? null : cand.id);
+                const anyCell = pair ? null : k;
                 return (
                   <React.Fragment key={k.id}>
                     <tr
-                      className={'kt-row ' + (isExpanded?'kt-row-expanded':'')}
-                      onClick={()=>setExpand(isExpanded ? null : k.id)}
+                      className={'kt-row ' + (rowHasExpand?'kt-row-expanded':'')}
+                      onClick={()=>{ if(anyCell) toggle(anyCell); }}
                     >
                       {showUnitCell && (
                         <td rowSpan={k._unitSpan || 1} className="kt-td kt-td-unit"
@@ -320,23 +533,26 @@
                           <div className="kt-unit-name">{unitMeta.name}</div>
                         </td>
                       )}
-                      <td className="kt-td kt-td-judah">
-                        {k.dynasty === 'יהודה' ? <KingCell k={k} side="judah"/> : <span className="kt-empty-cell">·</span>}
+                      <td className="kt-td kt-td-judah" onClick={(e)=>{ if(judahKing){ e.stopPropagation(); toggle(judahKing); } }}>
+                        {judahKing ? <KingCell k={judahKing} side="judah"/> : <span className="kt-empty-cell">·</span>}
                       </td>
-                      <td className="kt-td kt-td-israel">
-                        {k.dynasty === 'ישראל' ? <KingCell k={k} side="israel"/> : <span className="kt-empty-cell">·</span>}
+                      <td className="kt-td kt-td-prophets">
+                        <ProphetsCell k={k}/>
+                        {pair && <ProphetsCell k={pair}/>}
                       </td>
-                      {showUnitCell && (
-                        <td rowSpan={k._unitSpan || 1} className="kt-td kt-td-empire"
-                            style={{background:unitMeta.color + '18'}}>
-                          <div className="kt-empire">{unitMeta.empire}</div>
-                        </td>
-                      )}
+                      <td className="kt-td kt-td-israel" onClick={(e)=>{ if(israelKing){ e.stopPropagation(); toggle(israelKing); } }}>
+                        {israelKing ? <KingCell k={israelKing} side="israel"/> : <span className="kt-empty-cell">·</span>}
+                      </td>
+                      <td className="kt-td kt-td-empire" style={{background:unitMeta.color + '18'}}>
+                        {showUnitCell && <div className="kt-empire" style={{marginBottom:4,fontWeight:800}}>{unitMeta.empire}</div>}
+                        <ForeignCell k={k}/>
+                        {pair && <ForeignCell k={pair}/>}
+                      </td>
                     </tr>
-                    {isExpanded && (
+                    {rowHasExpand && (
                       <tr className="kt-row-detail">
-                        <td colSpan={4} className="kt-td-detail">
-                          <ExpandedRow k={k} onPractice={firePractice}/>
+                        <td colSpan={5} className="kt-td-detail">
+                          <ExpandedRow k={expandedKing} onPractice={firePractice} allKings={all}/>
                         </td>
                       </tr>
                     )}
@@ -348,10 +564,12 @@
         </div>
 
         <div className="kt-legend">
+          <span><span className="kt-leg-dot" style={{background:"#2d7a2d"}}/> צדיק</span>
+          <span><span className="kt-leg-dot" style={{background:"#8b2d2d"}}/> רשע</span>
+          <span><span className="kt-leg-dot" style={{background:"#8b6d2d"}}/> מעורב / מעשיו דו־משמעיים</span>
           <span><span className="kt-leg-dot" style={{background:JUDAH_DYN.color}}/> בית דוד</span>
           <span><span className="kt-leg-dot" style={{background:"#1E4D7A"}}/> בית עמרי</span>
           <span><span className="kt-leg-dot" style={{background:"#4E6B2E"}}/> בית יהוא</span>
-          <span>👑 צדיק · ⚠ רשע · ➖ בינוני</span>
         </div>
       </div>
     );
