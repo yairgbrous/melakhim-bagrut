@@ -195,6 +195,37 @@
     );
   }
 
+  function PartBCSelect({ selected, onToggle }){
+    const count = selected.length;
+    const full = count >= MAX_BC;
+    const partB = PART_BC_POOL.filter(q => q.part === "B");
+    const partC = PART_BC_POOL.filter(q => q.part === "C");
+    return (
+      <section className="space-y-2">
+        <div className="flex items-center justify-between sticky top-[108px] z-10 bg-slate-900/90 backdrop-blur-sm rounded-xl p-3 border border-purple-500/30">
+          <div className="font-display text-base font-bold text-purple-200">פרק ב + ג — ידע ורוחב</div>
+          <div className={`text-sm font-bold ${full?"text-emerald-400":"text-purple-300"}`}>
+            נבחרו <span dir="ltr">{count}/{MAX_BC}</span>
+          </div>
+        </div>
+        <div className="text-[10px] text-amber-200/60 mt-2">פרק ב — ידע (4 סעיפים)</div>
+        <div className="space-y-2">
+          {partB.map(q => (
+            <SelectionCard key={q.id} q={q} selected={selected.includes(q.id)}
+              onToggle={()=>onToggle(q.id)} disabled={full}/>
+          ))}
+        </div>
+        <div className="text-[10px] text-amber-200/60 mt-3">פרק ג — ידע ונושאי רוחב (10 סעיפים)</div>
+        <div className="space-y-2">
+          {partC.map(q => (
+            <SelectionCard key={q.id} q={q} selected={selected.includes(q.id)}
+              onToggle={()=>onToggle(q.id)} disabled={full}/>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   function ExamIntro({ onStart, setRoute }){
     const [shabbat, setShabbat] = useState(() => isInShabbat());
     const [accommodation, setAccommodation] = useState(() => loadAccommodation());
@@ -252,6 +283,12 @@
       return [...prev, id];
     });
 
+    const toggleBC = (id) => setSelectedBC(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
+      if (prev.length >= MAX_BC) return prev;
+      return [...prev, id];
+    });
+
     if (phase === "intro") {
       return <ExamIntro setRoute={setRoute} onStart={startExam}/>;
     }
@@ -266,9 +303,7 @@
             </div>
           </div>
           <PartASelect selected={selectedA} onToggle={toggleA}/>
-          <div className="text-center text-xs text-amber-200/60 py-4">
-            פרקים ב + ג יתווספו בקומיט הבא.
-          </div>
+          <PartBCSelect selected={selectedBC} onToggle={toggleBC}/>
         </div>
       );
     }
