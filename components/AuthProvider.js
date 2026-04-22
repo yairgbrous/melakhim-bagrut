@@ -268,7 +268,7 @@
         onClick={onClick}
         disabled={disabled}
         title={s.error || label}
-        className={`text-xs px-2 py-1 rounded-lg border transition ${disabled?"bg-slate-800 border-slate-700 text-amber-100/50 cursor-not-allowed":"bg-amber-900/40 border-amber-500/40 text-amber-200 hover:bg-amber-800/60"}`}
+        className={`text-xs px-2 py-1 rounded-lg border transition ${disabled?"bg-slate-800 border-slate-700 text-on-parchment-meta cursor-not-allowed":"bg-amber-900/40 border-amber-500/40 text-on-parchment hover:bg-amber-800/60"}`}
       >
         {label}
       </button>

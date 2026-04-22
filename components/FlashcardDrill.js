@@ -46,9 +46,9 @@
     }, [deck, progress]);
     return (
       <div className="grid grid-cols-3 gap-2 text-center text-xs">
-        <div className="card rounded-lg p-2"><div className="text-amber-200/70">חדש</div><div className="font-bold text-amber-100 text-lg" dir="ltr">{counts.new}</div></div>
-        <div className="card rounded-lg p-2"><div className="text-amber-200/70">בלימוד</div><div className="font-bold text-amber-300 text-lg" dir="ltr">{counts.learning}</div></div>
-        <div className="card rounded-lg p-2"><div className="text-amber-200/70">יודע</div><div className="font-bold text-emerald-400 text-lg" dir="ltr">{counts.mastered}</div></div>
+        <div className="card rounded-lg p-2"><div className="text-on-parchment">חדש</div><div className="font-bold text-on-parchment-muted text-lg" dir="ltr">{counts.new}</div></div>
+        <div className="card rounded-lg p-2"><div className="text-on-parchment">בלימוד</div><div className="font-bold text-on-parchment-accent text-lg" dir="ltr">{counts.learning}</div></div>
+        <div className="card rounded-lg p-2"><div className="text-on-parchment">יודע</div><div className="font-bold text-emerald-400 text-lg" dir="ltr">{counts.mastered}</div></div>
       </div>
     );
   }
@@ -105,9 +105,9 @@
       return (
         <div className="max-w-xl mx-auto py-8 text-center space-y-3">
           <div className="text-6xl">🃏</div>
-          <p className="text-amber-200">אין כרטיסיות זמינות בסינון הזה.</p>
+          <p className="text-on-parchment">אין כרטיסיות זמינות בסינון הזה.</p>
           <button onClick={()=>setFilter("all")} className="gold-btn px-4 py-2 rounded-lg">הצג הכל</button>
-          {setRoute && <button onClick={()=>setRoute({page:"quiz"})} className="card px-4 py-2 rounded-lg text-amber-200 mr-2">חזרה</button>}
+          {setRoute && <button onClick={()=>setRoute({page:"quiz"})} className="card px-4 py-2 rounded-lg text-on-parchment mr-2">חזרה</button>}
         </div>
       );
     }
@@ -118,8 +118,8 @@
     return (
       <div className="max-w-2xl mx-auto space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300">🃏 כרטיסיות זיכרון</h1>
-          {setRoute && <button onClick={()=>setRoute({page:"quiz"})} className="text-amber-300 text-sm">→ חזרה</button>}
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">🃏 כרטיסיות זיכרון</h1>
+          {setRoute && <button onClick={()=>setRoute({page:"quiz"})} className="text-on-parchment-accent text-sm">→ חזרה</button>}
         </div>
 
         <Stats deck={deck} progress={progress}/>
@@ -127,14 +127,14 @@
         <div className="flex gap-2 flex-wrap">
           {["all","new","learning"].map(f => (
             <button key={f} onClick={()=>{setFilter(f); setIdx(0); setFlipped(false);}}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold border ${filter===f?"bg-amber-500/30 border-amber-400 text-amber-100":"border-amber-500/30 text-amber-200/80"}`}>
+              className={`px-3 py-1.5 rounded-full text-xs font-bold border ${filter===f?"bg-amber-500/30 border-amber-400 text-on-parchment-muted":"border-amber-500/30 text-on-parchment"}`}>
               {f==="all"?"הכל":f==="new"?"חדש":"בלימוד"}
             </button>
           ))}
-          <button onClick={reshuffle} className="px-3 py-1.5 rounded-full text-xs font-bold border border-amber-500/30 text-amber-200/80 mr-auto">🔀 ערבב</button>
+          <button onClick={reshuffle} className="px-3 py-1.5 rounded-full text-xs font-bold border border-amber-500/30 text-on-parchment mr-auto">🔀 ערבב</button>
         </div>
 
-        <div className="text-center text-xs text-amber-200/60">
+        <div className="text-center text-xs text-on-parchment-meta">
           <span dir="ltr">{(idx%visible.length)+1}/{visible.length}</span> · {bucketLabel}
         </div>
 
@@ -164,13 +164,13 @@
 
         {flipped ? (
           <div className="grid grid-cols-2 gap-2">
-            <button onClick={()=>setBucket("learning")} className="card border-amber-500/40 rounded-xl py-3 font-bold text-amber-200 hover:bg-amber-500/10">⚠ חזרה שוב</button>
+            <button onClick={()=>setBucket("learning")} className="card border-amber-500/40 rounded-xl py-3 font-bold text-on-parchment hover:bg-amber-500/10">⚠ חזרה שוב</button>
             <button onClick={()=>setBucket("mastered")} className="gold-btn rounded-xl py-3 font-bold">✅ אני יודע</button>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-2">
-            <button onClick={prev} className="card rounded-xl py-3 text-amber-200">→ הקודמת</button>
-            <button onClick={next} className="card rounded-xl py-3 text-amber-200">הבאה ←</button>
+            <button onClick={prev} className="card rounded-xl py-3 text-on-parchment">→ הקודמת</button>
+            <button onClick={next} className="card rounded-xl py-3 text-on-parchment">הבאה ←</button>
           </div>
         )}
       </div>
