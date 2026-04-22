@@ -264,6 +264,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 52,
     era: 5,
+    reign_start_bce: 767,
+    reign_end_bce: 740,
     assessment: "צדיק",
     assessment_quote:
       "וַיַּעַשׂ הַיָּשָׁר בְּעֵינֵי יְהוָה כְּכֹל אֲשֶׁר־עָשָׂה אֲמַצְיָהוּ אָבִיו (מל״ב טו׳ ג)",
@@ -284,6 +286,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 16,
     era: 5,
+    reign_start_bce: 740,
+    reign_end_bce: 732,
     assessment: "צדיק",
     assessment_quote:
       "וַיַּעַשׂ הַיָּשָׁר בְּעֵינֵי יְהוָה כְּכֹל אֲשֶׁר־עָשָׂה עֻזִּיָּהוּ אָבִיו עָשָׂה (מל״ב טו׳ לד)",
@@ -304,6 +308,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 16,
     era: 5,
+    reign_start_bce: 732,
+    reign_end_bce: 716,
     assessment: "רשע",
     assessment_quote:
       "וְלֹא־עָשָׂה הַיָּשָׁר בְּעֵינֵי יְהוָה אֱלֹהָיו כְּדָוִד אָבִיו וַיֵּלֶךְ בְּדֶרֶךְ מַלְכֵי יִשְׂרָאֵל וְגַם אֶת־בְּנוֹ הֶעֱבִיר בָּאֵשׁ (מל״ב טז׳ ב–ג)",
@@ -329,6 +335,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 29,
     era: 6,
+    reign_start_bce: 716,
+    reign_end_bce: 687,
     assessment: "צדיק",
     assessment_quote:
       "בַּיהוָה אֱלֹהֵי־יִשְׂרָאֵל בָּטָח וְאַחֲרָיו לֹא־הָיָה כָמֹהוּ בְּכֹל מַלְכֵי יְהוּדָה וַאֲשֶׁר הָיוּ לְפָנָיו (מל״ב יח׳ ה)",
@@ -363,6 +371,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 55,
     era: 6,
+    reign_start_bce: 687,
+    reign_end_bce: 642,
     assessment: "רשע",
     assessment_quote:
       "וַיֵּטְעוּם מְנַשֶּׁה לַעֲשׂוֹת אֶת־הָרַע מִן־הַגּוֹיִם אֲשֶׁר הִשְׁמִיד יְהוָה מִפְּנֵי בְּנֵי יִשְׂרָאֵל (מל״ב כא׳ ט)",
@@ -388,6 +398,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 2,
     era: 6,
+    reign_start_bce: 642,
+    reign_end_bce: 640,
     assessment: "רשע",
     assessment_quote:
       "וַיַּעַשׂ הָרַע בְּעֵינֵי יְהוָה כַּאֲשֶׁר עָשָׂה מְנַשֶּׁה אָבִיו (מל״ב כא׳ כ)",
@@ -408,6 +420,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 31,
     era: 6,
+    reign_start_bce: 640,
+    reign_end_bce: 609,
     assessment: "צדיק",
     assessment_quote:
       "וְכָמֹהוּ לֹא־הָיָה לְפָנָיו מֶלֶךְ אֲשֶׁר־שָׁב אֶל־יְהוָה בְּכָל־לְבָבוֹ וּבְכָל־נַפְשׁוֹ וּבְכָל־מְאֹדוֹ כְּכֹל תּוֹרַת מֹשֶׁה וְאַחֲרָיו לֹא־קָם כָּמֹהוּ (מל״ב כג׳ כה)",
@@ -437,6 +451,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 0.25,
     era: 6,
+    reign_start_bce: 609,
+    reign_end_bce: 609,
     assessment: "רשע",
     assessment_quote:
       "וַיַּעַשׂ הָרַע בְּעֵינֵי יְהוָה כְּכֹל אֲשֶׁר־עָשׂוּ אֲבֹתָיו (מל״ב כג׳ לב)",
@@ -457,6 +473,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 11,
     era: 6,
+    reign_start_bce: 609,
+    reign_end_bce: 598,
     assessment: "רשע",
     assessment_quote:
       "וַיַּעַשׂ הָרַע בְּעֵינֵי יְהוָה כְּכֹל אֲשֶׁר־עָשׂוּ אֲבֹתָיו (מל״ב כג׳ לז)",
@@ -482,6 +500,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 0.25,
     era: 6,
+    reign_start_bce: 598,
+    reign_end_bce: 597,
     assessment: "רשע",
     assessment_quote:
       "וַיַּעַשׂ הָרַע בְּעֵינֵי יְהוָה כְּכֹל אֲשֶׁר־עָשָׂה אָבִיו (מל״ב כד׳ ט)",
@@ -506,6 +526,8 @@ export const kings = [
     dynasty: "בית דוד",
     reign_years: 11,
     era: 6,
+    reign_start_bce: 597,
+    reign_end_bce: 586,
     assessment: "רשע",
     assessment_quote:
       "וַיַּעַשׂ הָרַע בְּעֵינֵי יְהוָה כְּכֹל אֲשֶׁר־עָשָׂה יְהוֹיָקִים (מל״ב כד׳ יט)",
