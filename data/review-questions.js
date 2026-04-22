@@ -237,6 +237,227 @@
       related_entities:["char:shlomo","event:hitgalut_givon","event:mishpat_shlomo"]
     },
     // === יחידה ב — פילוג הממלכה ===
+    {
+      id:"rq-u2-001", unit:2, type:"short_answer", difficulty:"קל",
+      prompt_niqqud:"מָה הָיְתָה בַּקָּשַׁת הָעָם מֵרְחַבְעָם בִּשְׁכֶם וּמָה הָיְתָה תְּשׁוּבָתוֹ?",
+      answer_points:[
+        "העם ביקש להקל מעול העבודה הכבד ששם אביו שלמה",
+        "רחבעם התייעץ עם הזקנים והם יעצו להקל",
+        "התייעץ גם עם הילדים שגדלו איתו — יעצו לענות בקשיחות",
+        "תשובתו: ״קטני עבה ממתני אבי... אבי ייסר אתכם בשוטים ואני ייסר אתכם בעקרבים״"
+      ],
+      related_entities:["char:rechavam","event:kinus_shchem","place:shchem"]
+    },
+    {
+      id:"rq-u2-002", unit:2, type:"mi_amar_lemi", difficulty:"בינוני",
+      prompt_niqqud:"״מַה לָּנוּ חֵלֶק בְּדָוִד וְלֹא נַחֲלָה בְּבֶן יִשַׁי, לְאֹהָלֶיךָ יִשְׂרָאֵל״ — מִי אָמַר לְמִי?",
+      answer_points:[
+        "עשרת השבטים, באמצעות ירבעם או מנהיגיהם, אמרו לרחבעם",
+        "בשכם, מיד לאחר תשובתו הקשה של רחבעם",
+        "ביטוי להפרדה מוחלטת מבית דוד",
+        "נקודת הפילוג הסופית בין יהודה לישראל"
+      ],
+      related_entities:["char:rechavam","char:yarovam","event:pilug","place:shchem"]
+    },
+    {
+      id:"rq-u2-003", unit:2, type:"place_events", difficulty:"קל",
+      prompt_niqqud:"מָה עָשָׂה יָרָבְעָם בְּבֵית אֵל וּבְדָן לְאַחַר שֶׁהוּמְלַךְ?",
+      answer_points:[
+        "הקים עגלי זהב כדי למנוע עלייה של העם לירושלים",
+        'אמר: "הנה אלהיך ישראל אשר העלוך מארץ מצרים"',
+        "חידש כהונה — כהני במות שאינם מבני לוי",
+        "קבע חג בחודש השמיני ״מלבו״ במקום חג הסוכות"
+      ],
+      related_entities:["char:yarovam","place:beit_el","place:dan","event:eglei_zahav"]
+    },
+    {
+      id:"rq-u2-004", unit:2, type:"be_eize_hekhsher", difficulty:"בינוני",
+      prompt_niqqud:"״כִּי הָיְתָה סִבָּה מֵעִם ה׳ לְמַעַן הָקִים אֶת דְּבָרוֹ״ — בְּאֵיזֶה הֶקְשֵׁר?",
+      answer_points:[
+        "לאחר שרחבעם דחה את בקשת העם בשכם",
+        "הכתוב מסביר שזו היתה ״סיבה״ אלוקית",
+        "למען קיום דבר ה׳ ביד אחיה השילוני — הקריעה",
+        "דוגמה מרכזית לעקרון הסיבתיות הכפולה"
+      ],
+      related_entities:["char:rechavam","event:pilug","char:achiya_hashiloni"]
+    },
+    {
+      id:"rq-u2-005", unit:2, type:"character_details", difficulty:"בינוני",
+      prompt_niqqud:"מִי הָיָה שְׁמַעְיָה אִישׁ הָאֱלֹהִים וּמָה הָיָה תַּפְקִידוֹ?",
+      answer_points:[
+        "איש אלהים (נביא) בימי רחבעם",
+        "ביקש מרחבעם לא להילחם נגד ישראל לאחר הפילוג",
+        "אמר: ״לא תעלו ולא תלחמו כי מאתי נהיה הדבר הזה״",
+        "רחבעם שמע בקולו — מנע מלחמת אחים מיידית"
+      ],
+      related_entities:["char:shmaya","char:rechavam","event:pilug"]
+    },
+    {
+      id:"rq-u2-006", unit:2, type:"al_mi_neemar", difficulty:"בינוני",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״וַיֵּעֶזְבוּ אֶת כָּל מִצְוַת ה׳ אֱלֹהֵיהֶם, וַיַּעֲשׂוּ לָהֶם מַסֵּכָה שְׁנֵי עֲגָלִים״?",
+      answer_points:[
+        "על ממלכת ישראל — דור אחר דור שהלכו בחטאי ירבעם",
+        "מתייחס לשני עגלי הזהב של ירבעם",
+        "עם ציון גם של חטאים נוספים: אשרה, עבודת הבעל",
+        "הדברים נאמרים במעין סיכום לפני נפילת שומרון (מל״ב י״ז)"
+      ],
+      related_entities:["char:yarovam","event:eglei_zahav","event:nefilat_shomron"]
+    },
+    {
+      id:"rq-u2-007", unit:2, type:"short_answer", difficulty:"קל",
+      prompt_niqqud:"מָה הָיָה מַסַּע שִׁישַׁק מֶלֶךְ מִצְרַיִם וּמָה הַשְׁפָּעָתוֹ?",
+      answer_points:[
+        "בשנה החמישית למלכות רחבעם",
+        "עלה על ירושלים וכבש אותה",
+        "לקח את אוצרות בית ה׳ ואת אוצרות בית המלך",
+        "לקח את מגני הזהב — רחבעם החליפם במגני נחושת"
+      ],
+      related_entities:["char:shishak","char:rechavam","event:masa_shishak","place:yerushalayim"]
+    },
+    {
+      id:"rq-u2-008", unit:2, type:"mi_amar_lemi", difficulty:"קשה",
+      prompt_niqqud:"״בָּא זֶה הַפּוֹטֵר... הוּא יִתֵּן לְךָ בֵּן״ — מִי אָמַר לְמִי?",
+      answer_points:[
+        "אחיה השילוני לאשת ירבעם (שבאה מחופשת)",
+        "התנבא על מות בנה אביה בעת שובה לביתה",
+        "חלק מנבואת הכיליון על בית ירבעם",
+        "בגלל חטאי העגלים והבמות"
+      ],
+      related_entities:["char:achiya_hashiloni","char:yarovam"]
+    },
+    {
+      id:"rq-u2-009", unit:2, type:"character_details", difficulty:"בינוני",
+      prompt_niqqud:"מִי הָיָה אָסָא מֶלֶךְ יְהוּדָה וּמָה עָשָׂה בְּרֵאשִׁית מַלְכוּתוֹ?",
+      answer_points:[
+        "בן אבים, נכד רחבעם",
+        "״עשה הישר בעיני ה׳״ — הסיר את הקדשים מן הארץ",
+        "גם מעכה אמו (הגבירה) הוריד מלהיות גבירה",
+        "שרף את מפלצתה בנחל קדרון"
+      ],
+      related_entities:["char:asa","char:maacha","event:srefat_mifletzet"]
+    },
+    {
+      id:"rq-u2-010", unit:2, type:"be_eize_hekhsher", difficulty:"בינוני",
+      prompt_niqqud:"״וַיִּקַּח אָסָא אֶת כָּל הַכֶּסֶף וְהַזָּהָב הַנּוֹתָרִים בְּאוֹצְרוֹת בֵּית ה׳״ — בְּאֵיזֶה הֶקְשֵׁר?",
+      answer_points:[
+        "בעשא מלך ישראל בנה את הרמה כדי לסגור את יהודה",
+        "אסא שלח את האוצרות לבן־הדד מלך ארם",
+        "כדי להפר את בריתו עם בעשא ולתקוף את ישראל",
+        "בן־הדד הפציץ ערים בצפון ישראל — בעשא חזר מהרמה"
+      ],
+      related_entities:["char:asa","char:baasha","char:ben_hadad","place:rama"]
+    },
+    {
+      id:"rq-u2-011", unit:2, type:"place_events", difficulty:"קשה",
+      prompt_niqqud:"מָה הָיוּ הָעָרִים שֶׁבָּנָה אָסָא לְאַחַר שֶׁבַּעְשָׁא נֶאֱלַץ לַעֲזֹב אֶת הָרָמָה?",
+      answer_points:[
+        "גבע בנימין ומצפה",
+        "לקח את אבני הרמה שבנה בעשא",
+        "חיזק את גבול בנימין מצפון לירושלים",
+        "רקע גאוגרפי חשוב: גבול יהודה־ישראל"
+      ],
+      related_entities:["char:asa","place:geva","place:mitzpe","place:rama"]
+    },
+    {
+      id:"rq-u2-012", unit:2, type:"character_details", difficulty:"בינוני",
+      prompt_niqqud:"מִי הָיָה זִמְרִי וּמָה הָיְתָה תְּקוּפַת מַלְכוּתוֹ?",
+      answer_points:[
+        "שר חצי הרכב של אלה בן בעשא",
+        "מרד והרג את אלה בבית ארצא (אחד משריו)",
+        "מלך רק 7 ימים בתרצה",
+        "כאשר עמרי שר הצבא עלה — התאבד בשריפת ארמון המלך"
+      ],
+      related_entities:["char:zimri","char:ela","char:omri","place:tirtza"]
+    },
+    {
+      id:"rq-u2-013", unit:2, type:"al_mi_neemar", difficulty:"בינוני",
+      prompt_niqqud:"עַל מִי נֶאֱמַר ״וַיַּרְבֶּה עָמְרִי לַעֲשׂוֹת הָרַע בְּעֵינֵי ה׳ מִכֹּל אֲשֶׁר לְפָנָיו״?",
+      answer_points:[
+        "על עמרי מלך ישראל (אבי אחאב)",
+        "יסד שושלת חזקה: עמרי ואחאב",
+        "בנה את שומרון, בירת הממלכה",
+        "מבחינה מדינית: חזק; מבחינה דתית: נחשב לרשע מאוד"
+      ],
+      related_entities:["char:omri","event:bnianat_shomron","place:shomron"]
+    },
+    {
+      id:"rq-u2-014", unit:2, type:"short_answer", difficulty:"קל",
+      prompt_niqqud:"לָמָּה קָנָה עָמְרִי אֶת הַר שֹׁמְרוֹן?",
+      answer_points:[
+        "קנה מ״שמר״ בעלי ההר ב־2 כיכר כסף",
+        "מיקום אסטרטגי — הר גבוה בלב הממלכה",
+        "נקראה על שם שמר — ״שומרון״",
+        "הפכה לבירת ישראל עד חורבנה"
+      ],
+      related_entities:["char:omri","place:shomron","event:bnianat_shomron"]
+    },
+    {
+      id:"rq-u2-015", unit:2, type:"mi_amar_lemi", difficulty:"בינוני",
+      prompt_niqqud:"״קָרֹעַ אֶקְרַע אֶת הַמַּמְלָכָה מֵעָלֶיךָ וּנְתַתִּיהָ לְעֶבֶד״ — מִי לְמִי?",
+      answer_points:[
+        "ה׳ לשלמה (דבר הנבואה)",
+        "בנבואת הכיליון לאחר חטאיו",
+        "ה״עבד״ הוא ירבעם בן נבט",
+        "מקדים את נבואת אחיה השילוני"
+      ],
+      related_entities:["char:shlomo","char:yarovam","event:gzirat_pilug"]
+    },
+    {
+      id:"rq-u2-016", unit:2, type:"be_eize_hekhsher", difficulty:"קשה",
+      prompt_niqqud:"״וַיִּבֶן עָמְרִי אֶת שֹׁמְרוֹן״ — בְּאֵיזֶה הֶקְשֵׁר וּמָה חֲשִׁיבוּת הָאִירוּעַ?",
+      answer_points:[
+        "לאחר מלחמת שש שנים עם תבני בן גינת על המלוכה",
+        "עמרי יוסד שושלת חזקה במיוחד בשושלות ישראל",
+        "שומרון הפכה לסמל גאווה וכוח של מלכי ישראל",
+        "״אבן מישע״ מזכירה את עמרי — עדות חוץ־מקראית"
+      ],
+      related_entities:["char:omri","event:bnianat_shomron","place:shomron"]
+    },
+    {
+      id:"rq-u2-017", unit:2, type:"character_details", difficulty:"בינוני",
+      prompt_niqqud:"מִי הָיָה יְהוֹשָׁפָט מֶלֶךְ יְהוּדָה וְאֵיךְ מַעֲרִיךְ אוֹתוֹ הַסֵּפֶר?",
+      answer_points:[
+        "בן אסא; מלך 25 שנה (״עשה הישר בעיני ה׳״)",
+        "כרת ברית עם אחאב מלך ישראל — נישואי בנו יהורם לעתליה",
+        "הצטרף לאחאב במלחמת רמות גלעד — כמעט נהרג",
+        "כישרון מדיני: שלום עם ישראל אך הערכה אמבילנטית על הברית"
+      ],
+      related_entities:["char:yehoshafat","char:achav","event:milchemet_ramot_gilad"]
+    },
+    {
+      id:"rq-u2-018", unit:2, type:"short_answer", difficulty:"בינוני",
+      prompt_niqqud:"מָה הָיְתָה דֶרֶךְ הַעֲרָכָה שֶׁל הַכָּתוּב לְמַלְכֵי יְהוּדָה וְיִשְׂרָאֵל בְּיוֹסֵף הַפִּלּוּג?",
+      answer_points:[
+        "מלכי יהודה מוערכים לפי ״עשה הישר/הרע בעיני ה׳״",
+        "מלכי ישראל כמעט כולם ״עשה הרע״ — הלכו בחטאת ירבעם",
+        "ביהודה מעט מלכים צדיקים (אסא, יהושפט)",
+        "נקודת המוצא — דוד המלך כמודל אידאלי"
+      ],
+      related_entities:["event:pilug","char:david"]
+    },
+    {
+      id:"rq-u2-019", unit:2, type:"al_mi_neemar", difficulty:"קל",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״אֲשֶׁר הֶחֱטִיא אֶת יִשְׂרָאֵל״?",
+      answer_points:[
+        "על ירבעם בן נבט — ביטוי חוזר בכל הערכת מלכי ישראל",
+        "הכוונה לחטאי העגלים בבית אל ובדן",
+        "כל מלך שלא הסיר אותם נחשב ממשיכו",
+        "גם יהוא — שהשמיד את הבעל — לא הסיר את עגלי ירבעם"
+      ],
+      related_entities:["char:yarovam","event:eglei_zahav"]
+    },
+    {
+      id:"rq-u2-020", unit:2, type:"place_events", difficulty:"קשה",
+      prompt_niqqud:"מָה הָיוּ שָׁלֹשׁ עָרִים שֶׁבָּנָה יָרָבְעָם וְלָמָּה הָיוּ חֲשׁוּבוֹת?",
+      answer_points:[
+        "שכם (בירה ראשונה)",
+        "פנואל בעבר הירדן (בירה חלופית)",
+        "קבע גם את בית אל ודן כערי פולחן",
+        "יצר בסיס גאוגרפי ודתי להפרדה מיהודה"
+      ],
+      related_entities:["char:yarovam","place:shchem","place:pnuel","place:beit_el","place:dan"]
+    },
+    // === יחידה ג — אליהו ואחאב ===
     // questions inserted incrementally (3 at a time)
   ];
   if (typeof window !== 'undefined'){
