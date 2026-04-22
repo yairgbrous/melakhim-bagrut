@@ -170,11 +170,11 @@
               <h1 className="font-display text-2xl md:text-3xl font-black text-amber-900 hebrew">
                 {c.name_niqqud || c.name || c.heading || c.id}
                 {isKing && k && <KingAssess k={k}/>}
+                {!isKing && <RoleBadge role={c.role}/>}
+                <EraBadge era={c.era}/>
               </h1>
               <div className="text-amber-800 text-sm mt-1">
-                {c.role && <span>{c.role}</span>}
-                {c.kingdom && <span> · {c.kingdom}</span>}
-                {c.era && <span> · יחידה {c.era}</span>}
+                {c.kingdom && <span>{c.kingdom}</span>}
                 {reignYears != null && <span> · {reignYears} שנות מלוכה</span>}
                 {dyn && dyn.name && <span> · {dyn.name}</span>}
                 {succession && <span> · {succession}</span>}
