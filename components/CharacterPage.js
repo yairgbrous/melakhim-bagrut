@@ -325,6 +325,14 @@
             </Section>
           )}
 
+          {bookRefs.length>0 && (
+            <Section title="📚 מקורות בספר מלכים">
+              <ul className="kt-actions" style={{columnCount:2,columnGap:18}}>
+                {bookRefs.map((r,i)=><li key={i} style={{breakInside:'avoid'}}>{r}</li>)}
+              </ul>
+            </Section>
+          )}
+
           {breadth.length>0 && (
             <Section title="🌐 נושאי רוחב">
               <div className="kt-chips">{breadth.map((p,i)=><Chip key={i} label={p.label||p.name||p}/>)}</div>
