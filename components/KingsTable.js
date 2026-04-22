@@ -10,7 +10,44 @@
    Exposes: window.KingsTableComponent
    ========================================================================= */
 (function(){
-  const { useState, useEffect, useMemo } = React;
+  const { useState, useEffect, useMemo, useRef } = React;
+
+  // ---------- Inject assess-* palette + extra KT styles (idempotent) --------
+  (function injectStyles(){
+    if (typeof document === 'undefined') return;
+    if (document.getElementById('kt-assess-styles')) return;
+    const s = document.createElement('style');
+    s.id = 'kt-assess-styles';
+    s.textContent = `
+      .kt-king.assess-tzadik{background:linear-gradient(135deg,#d4f5d4,#a8e6a1);border-color:#2d7a2d;color:#1a4d1a}
+      .kt-king.assess-rasha {background:linear-gradient(135deg,#fad4d4,#e6a1a1);border-color:#8b2d2d;color:#4d1a1a}
+      .kt-king.assess-mixed {background:linear-gradient(135deg,#f5e8b8,#e6d184);border-color:#8b6d2d;color:#4d3e1a}
+      .kt-king.assess-tzadik .kt-king-name,.kt-king.assess-rasha .kt-king-name,.kt-king.assess-mixed .kt-king-name{color:inherit}
+      .kt-king-dyn{font-size:11px;font-weight:700;opacity:.85;line-height:1.1;margin-top:-2px}
+      .kt-assess-pill{display:inline-block;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.02em}
+      .kt-assess-pill.assess-tzadik{background:#2d7a2d;color:#d4f5d4}
+      .kt-assess-pill.assess-rasha {background:#8b2d2d;color:#fad4d4}
+      .kt-assess-pill.assess-mixed {background:#8b6d2d;color:#f5e8b8}
+      .kt-th-prophets{width:160px}
+      .kt-td-prophets{text-align:center;font-size:12px;padding:6px;border-inline-start:1px solid rgba(212,165,116,.15);border-inline-end:1px solid rgba(212,165,116,.15)}
+      .kt-td-prophets .kt-chip{display:inline-block;margin:2px 2px}
+      .kt-foreign-chip{display:inline-block;margin:2px 0;padding:3px 8px;border-radius:999px;background:rgba(168,50,64,.25);color:#F1B5BE;border:1px solid rgba(168,50,64,.5);font-size:11px;font-weight:700;cursor:default}
+      .kt-foreign-chip + .kt-foreign-chip{margin-top:3px}
+      html[data-theme='light'] .kt-td-prophets{color:#3a2a0d}
+      .kt-kill-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;background:rgba(139,45,45,.25);color:#ffd6d6;border:1px solid rgba(139,45,45,.55);font-size:11px;font-weight:700;cursor:pointer}
+      .kt-kill-chip:hover{background:rgba(139,45,45,.4)}
+      .kt-kill-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 2px}
+      .kt-kill-row-label{font-size:12px;font-weight:800;color:#C89B3C}
+      .kt-full-link{display:inline-block;margin-inline-start:8px;padding:8px 14px;border-radius:12px;background:rgba(107,91,149,.25);color:#C9B8E0;border:1px solid #6B5B95;font-weight:800;text-decoration:none;cursor:pointer}
+      .kt-full-link:hover{background:rgba(107,91,149,.45)}
+      .kt-chain-toggle{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(139,45,45,.2);border:1px solid rgba(139,45,45,.6);color:#ffd6d6;font-size:12px;font-weight:800;cursor:pointer}
+      .kt-chain-toggle.on{background:rgba(139,45,45,.6);color:#fff}
+      .kt-chain-svg{position:absolute;inset:0;pointer-events:none;z-index:4}
+      .kt-table-rel{position:relative}
+      .kt-quote-cite{font-family:'Frank Ruhl Libre',serif;font-size:13.5px;line-height:1.55;padding:6px 10px;border-inline-start:3px solid #C89B3C;background:rgba(212,165,116,.08);border-radius:6px;color:inherit}
+    `;
+    document.head.appendChild(s);
+  })();
 
   // Unit → theme color + empire label for מעצמות column
   const UNIT_META = {
@@ -47,12 +84,17 @@
   ];
   const JUDAH_DYN = {name:"בית דוד", color:"#8B6F1F"};
 
-  // Good/bad assessment icon
-  const assessmentIcon = (k) => {
+  // Assessment → class + hex color (NO EMOJIS). Delegates to KingsUtils when
+  // present so the same rule applies across table + character pages.
+  const assessmentClass = (k) => {
+    const KU = (typeof window!=='undefined') && window.KingsUtils;
+    if (KU && KU.assessmentColor) return KU.assessmentColor(k);
     const v = (k.assessment || '').toLowerCase();
-    if (k.good === true || v === 'righteous' || v === 'good')  return "👑";
-    if (k.good === false || v === 'wicked' || v === 'bad')     return "⚠";
-    return "➖";
+    if (k.good === true  || v === 'righteous' || v === 'good')
+      return { hex:'#2d7a2d', cls:'assess-tzadik' };
+    if (k.good === false || v === 'wicked'    || v === 'bad')
+      return { hex:'#8b2d2d', cls:'assess-rasha' };
+    return { hex:'#8b6d2d', cls:'assess-mixed' };
   };
 
   const dynastyOf = (dyn, name) => {
@@ -147,15 +189,23 @@
   }
 
   function KingCell({k, side}){
-    const dyn = dynastyOf(k.dynasty, k.name);
-    const icon = assessmentIcon(k);
-    const borderSide = side === 'judah' ? {borderRightWidth:'4px'} : {borderLeftWidth:'4px'};
+    const KU = (typeof window!=='undefined') && window.KingsUtils;
+    const dyn = (KU && KU.dynastyBadge) ? KU.dynastyBadge(k) : dynastyOf(k.dynasty, k.name);
+    const col = assessmentClass(k);
+    const borderSide = side === 'judah' ? {borderRightWidth:'5px'} : {borderLeftWidth:'5px'};
+    const kindLabel = col.cls==='assess-tzadik' ? 'צדיק' : col.cls==='assess-rasha' ? 'רשע' : 'מעורב';
     return (
-      <div className="kt-king" style={{...borderSide, borderColor: dyn.color}} title={dyn.name}>
+      <div
+        className={"kt-king " + col.cls}
+        style={{...borderSide, borderColor: dyn.color}}
+        title={dyn.name + ' · ' + kindLabel}
+        aria-label={k.name + ' · ' + kindLabel}
+      >
         <div className="kt-king-name hebrew">{k.name}</div>
+        <div className="kt-king-dyn" style={{color:dyn.color}}>{dyn.name}</div>
         <div className="kt-king-meta">
           <span className="kt-badge" title="שנות מלכות">{k.years}</span>
-          <span className="kt-assess" aria-label={icon==='👑'?'צדיק':icon==='⚠'?'רשע':'בינוני'}>{icon}</span>
+          <span className={"kt-assess-pill " + col.cls}>{kindLabel}</span>
         </div>
         {k.notes && <div className="kt-king-note">{k.notes}</div>}
       </div>
@@ -348,10 +398,12 @@
         </div>
 
         <div className="kt-legend">
+          <span><span className="kt-leg-dot" style={{background:"#2d7a2d"}}/> צדיק</span>
+          <span><span className="kt-leg-dot" style={{background:"#8b2d2d"}}/> רשע</span>
+          <span><span className="kt-leg-dot" style={{background:"#8b6d2d"}}/> מעורב / מעשיו דו־משמעיים</span>
           <span><span className="kt-leg-dot" style={{background:JUDAH_DYN.color}}/> בית דוד</span>
           <span><span className="kt-leg-dot" style={{background:"#1E4D7A"}}/> בית עמרי</span>
           <span><span className="kt-leg-dot" style={{background:"#4E6B2E"}}/> בית יהוא</span>
-          <span>👑 צדיק · ⚠ רשע · ➖ בינוני</span>
         </div>
       </div>
     );
