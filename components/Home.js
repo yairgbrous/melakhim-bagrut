@@ -44,6 +44,46 @@
     );
   }
 
+  // ---- PROGRESS STRIP ----------------------------------------------------
+  function ProgressStrip({units, S, setRoute, currentUnit}){
+    if (!units || !units.length) return null;
+    const pctFor = (u) => {
+      const score = (S.quizScores||{})[u.id];
+      if (typeof score === 'number') return Math.max(5, Math.min(100, score));
+      return (u.id === (currentUnit && currentUnit.id)) ? 45 : 0;
+    };
+    const overallDone = units.filter(u => (S.quizScores||{})[u.id]).length;
+    const overallPct = Math.round((overallDone / units.length) * 100);
+    return (
+      <section className="progress-strip-wrap">
+        <div className="flex items-center justify-between mb-2 px-1">
+          <h2 className="font-display text-base md:text-lg font-bold text-on-parchment">🧭 התקדמות במסלול</h2>
+          <span className="text-xs md:text-sm text-on-parchment-muted font-semibold">
+            יחידה {currentUnit ? currentUnit.num : 'א'} · {overallPct}% סה״כ
+          </span>
+        </div>
+        <div className="progress-strip-rail">
+          {units.map(u => {
+            const p = pctFor(u);
+            const isCurrent = currentUnit && u.id === currentUnit.id;
+            const done = p >= 100;
+            return (
+              <button key={u.id}
+                onClick={()=>setRoute({page:'unit', unitId:u.id})}
+                className={'progress-strip-node ' + (isCurrent?'current ':'') + (done?'done':'')}
+                aria-label={'יחידה ' + u.num + ' · ' + u.title}>
+                <span className="progress-strip-fill" style={{width: p+'%'}} aria-hidden="true"/>
+                <span className="progress-strip-num">{u.num}</span>
+                <span className="progress-strip-title">{u.title}</span>
+                <span className="progress-strip-pct">{p}%</span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    );
+  }
+
   // ---- MAIN ---------------------------------------------------------------
   function Home({S, setRoute, level, nextLv}){
     const [tick, setTick] = useState(0);
@@ -56,7 +96,7 @@
     return (
       <div className="space-y-5">
         <Hero S={S} setRoute={setRoute} dExam={dExam} currentUnit={currentUnit}/>
-        {/* PROGRESS STRIP — added in commit 2 */}
+        <ProgressStrip units={units} S={S} setRoute={setRoute} currentUnit={currentUnit}/>
         {/* QUICK ACTIONS — added in commit 3 */}
         {/* TODAY'S FOCUS — added in commit 4 */}
         {/* STATS STRIP — added in commit 5 */}
