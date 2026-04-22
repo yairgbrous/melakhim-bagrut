@@ -340,29 +340,29 @@
   function TopicCard({t, isOpen, onToggle, gotoUnit}){
     return React.createElement('div', {className:'card rounded-2xl p-4 text-right'},
       React.createElement('button', {type:'button', onClick:onToggle, className:'w-full text-right block'},
-        React.createElement('h3', {className:'font-display text-lg font-bold text-amber-200'}, t.title),
-        t.intro && React.createElement('p', {className:'text-amber-100/80 text-sm mt-1.5 leading-relaxed'}, t.intro),
+        React.createElement('h3', {className:'font-display text-lg font-bold text-on-parchment'}, t.title),
+        t.intro && React.createElement('p', {className:'text-on-parchment-muted text-sm mt-1.5 leading-relaxed'}, t.intro),
         t.unit_coverage && React.createElement('div', {className:'flex flex-wrap gap-1 mt-2'},
           t.unit_coverage.map(uId => {
             const u = UNITS.find(x=>x.id===uId);
-            return u ? React.createElement('span', {key:uId, className:'text-[10px] px-2 py-0.5 rounded-full bg-amber-700/30 text-amber-200'}, "יח' "+u.num) : null;
+            return u ? React.createElement('span', {key:uId, className:'text-[10px] px-2 py-0.5 rounded-full bg-amber-700/30 text-on-parchment'}, "יח' "+u.num) : null;
           })
         )
       ),
       isOpen && React.createElement('div', {className:'mt-3 pt-3 border-t border-amber-700/30 space-y-3'},
         t.key_instances && t.key_instances.length>0 && React.createElement('div', null,
-          React.createElement('div', {className:'text-xs font-bold text-amber-300 mb-1'}, '📌 דוגמאות מהספר'),
+          React.createElement('div', {className:'text-xs font-bold text-on-parchment-accent mb-1'}, '📌 דוגמאות מהספר'),
           React.createElement('ul', {className:'space-y-1.5 text-sm'},
             t.key_instances.map((ki,i)=>React.createElement('li', {key:i},
-              React.createElement('button', {type:'button', onClick:()=>gotoUnit(ki.unitId), className:'text-amber-200 hover:underline text-right'},
+              React.createElement('button', {type:'button', onClick:()=>gotoUnit(ki.unitId), className:'text-on-parchment hover:underline text-right'},
                 '• ' + ki.label + (ki.unit?' (יחידה '+ki.unit+')':'')
               )
             ))
           )
         ),
         t.questions && t.questions.length>0 && React.createElement('div', null,
-          React.createElement('div', {className:'text-xs font-bold text-amber-300 mb-1'}, '💭 שאלות לדיון'),
-          React.createElement('ol', {className:'list-decimal pr-5 space-y-1 text-sm text-amber-100/90'},
+          React.createElement('div', {className:'text-xs font-bold text-on-parchment-accent mb-1'}, '💭 שאלות לדיון'),
+          React.createElement('ol', {className:'list-decimal pr-5 space-y-1 text-sm text-on-parchment-muted'},
             t.questions.map((q,i)=>React.createElement('li', {key:i}, q))
           )
         )
@@ -375,20 +375,20 @@
     return React.createElement('div', {className:'card rounded-2xl p-4 text-right'},
       React.createElement('button', {type:'button', onClick:onToggle, className:'w-full text-right block'},
         React.createElement('div', {className:'flex items-center justify-between gap-2'},
-          React.createElement('h3', {className:'font-display text-base font-bold text-amber-200 hebrew'}, it.name_niqqud || it.name),
-          count>0 && React.createElement('span', {className:'text-[10px] px-2 py-0.5 rounded-full bg-amber-700/30 text-amber-200 shrink-0'}, count+' הופעות')
+          React.createElement('h3', {className:'font-display text-base font-bold text-on-parchment hebrew'}, it.name_niqqud || it.name),
+          count>0 && React.createElement('span', {className:'text-[10px] px-2 py-0.5 rounded-full bg-amber-700/30 text-on-parchment shrink-0'}, count+' הופעות')
         )
       ),
       isOpen && React.createElement('div', {className:'mt-3 pt-3 border-t border-amber-700/30 space-y-2'},
         it.instances && it.instances.length>0 && React.createElement('ul', {className:'space-y-1.5 text-sm'},
           it.instances.map((ins,i)=>React.createElement('li', {key:i},
-            React.createElement('button', {type:'button', onClick:()=>gotoUnit(ins.unitId), className:'text-amber-200 hover:underline text-right'},
+            React.createElement('button', {type:'button', onClick:()=>gotoUnit(ins.unitId), className:'text-on-parchment hover:underline text-right'},
               '• יחידה '+(ins.unit||'')+' — '+ins.context
             )
           ))
         ),
-        it.significance && React.createElement('p', {className:'text-xs text-amber-100/80 leading-relaxed pt-1 border-t border-amber-700/20 mt-2'},
-          React.createElement('strong', {className:'text-amber-300'}, 'משמעות: '),
+        it.significance && React.createElement('p', {className:'text-xs text-on-parchment-muted leading-relaxed pt-1 border-t border-amber-700/20 mt-2'},
+          React.createElement('strong', {className:'text-on-parchment-accent'}, 'משמעות: '),
           it.significance
         )
       )
@@ -410,14 +410,14 @@
 
     return React.createElement('div', {className:'space-y-6 p-2'},
       React.createElement('div', null,
-        React.createElement('h1', {className:'font-display text-2xl md:text-3xl font-bold text-amber-300'}, '🌐 נושאי רוחב במיקוד'),
-        React.createElement('p', {className:'text-amber-100/70 text-sm mt-1'}, '7 נושאי רוחב + חפצים וביטויים חוזרים לאורך ספר מלכים')
+        React.createElement('h1', {className:'font-display text-2xl md:text-3xl font-bold text-on-parchment-accent'}, '🌐 נושאי רוחב במיקוד'),
+        React.createElement('p', {className:'text-on-parchment-muted text-sm mt-1'}, '7 נושאי רוחב + חפצים וביטויים חוזרים לאורך ספר מלכים')
       ),
       React.createElement(FilterChips, {filter, setFilter}),
       React.createElement('section', {className:'space-y-3'},
-        React.createElement('h2', {className:'font-display text-xl font-bold text-amber-200'}, '📖 שבעת נושאי הרוחב'),
+        React.createElement('h2', {className:'font-display text-xl font-bold text-on-parchment'}, '📖 שבעת נושאי הרוחב'),
         filteredTopics.length === 0
-          ? React.createElement('div', {className:'card rounded-xl p-6 text-center text-amber-100/70'}, 'אין נושא רוחב מתאים לסינון זה')
+          ? React.createElement('div', {className:'card rounded-xl p-6 text-center text-on-parchment-muted'}, 'אין נושא רוחב מתאים לסינון זה')
           : React.createElement('div', {className:'grid grid-cols-1 md:grid-cols-2 gap-3'},
               filteredTopics.map(t => React.createElement(TopicCard, {
                 key:t.id, t:t, isOpen:openTopic===t.id,
@@ -426,9 +426,9 @@
             )
       ),
       React.createElement('section', {className:'space-y-3'},
-        React.createElement('h2', {className:'font-display text-xl font-bold text-amber-200'}, '📿 חפצים וביטויים חוזרים'),
+        React.createElement('h2', {className:'font-display text-xl font-bold text-on-parchment'}, '📿 חפצים וביטויים חוזרים'),
         filteredItems.length === 0
-          ? React.createElement('div', {className:'card rounded-xl p-6 text-center text-amber-100/70'}, 'יוצג ברגע שהנתונים ייטענו')
+          ? React.createElement('div', {className:'card rounded-xl p-6 text-center text-on-parchment-muted'}, 'יוצג ברגע שהנתונים ייטענו')
           : React.createElement('div', {className:'grid grid-cols-1 md:grid-cols-2 gap-3'},
               filteredItems.map(it => React.createElement(ItemCard, {
                 key:it.id, it:it, isOpen:openItem===it.id,
