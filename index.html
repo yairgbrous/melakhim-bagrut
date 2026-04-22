@@ -2175,7 +2175,7 @@ function App(){
         {route.page==="flashcards" && (()=>{ const X=window.FlashcardDrillComponent; return X ? <X S={S} update={update} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען כרטיסיות...</div>; })()}
         {route.page==="quizPlay" && <QuizRun params={route} S={S} setRoute={setRoute} awardXP={awardXP} update={update} publishActivity={publishActivity} soundOn={soundOn}/>}
         {route.page==="quizResult" && <QuizResult {...route} S={S} setRoute={setRoute}/>}
-        {route.page==="themes" && (window.BreadthPage ? React.createElement(window.BreadthPage) : <Themes S={S} update={update}/>)}
+        {route.page==="themes" && (window.BreadthPage ? React.createElement(window.BreadthPage, {setRoute}) : <Themes S={S} update={update}/>)}
         {route.page==="quotes" && <QuotesBrowser S={S} update={update} awardXP={awardXP}/>}
         {route.page==="timeline" && <Timeline/>}
         {route.page==="maps" && <MapsPage S={S} update={update} awardXP={awardXP}/>}
