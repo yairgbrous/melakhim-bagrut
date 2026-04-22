@@ -14,6 +14,18 @@
     return t.replace(/\{\{[a-zA-Zא-ת_]+:[^|}]+\|([^}]+)\}\}/g, '$1');
   };
 
+  // If index.html has exposed window.parseTokens (bridged from its Babel app
+  // block), use it so {{type:id|Display}} tokens in bios render as clickable
+  // EntityChips. Otherwise fall back to plain unwrapped text.
+  const renderText = (t) => {
+    if (typeof t !== 'string' || !t) return t || '';
+    if (t.indexOf('{{') < 0) return t;
+    if (typeof window.parseTokens === 'function') {
+      try { return window.parseTokens(t); } catch(e) {}
+    }
+    return stripTokens(t);
+  };
+
   function findKingByName(name){
     try{
       const tl = (typeof MELAKHIM_DATA !== 'undefined') ? (MELAKHIM_DATA.timeline||[]) : [];
@@ -121,9 +133,9 @@
     const breadth  = c.breadth_topics || c.breadth || [];
     const units    = c.units || (c.unit ? [c.unit] : []);
 
-    const goChar = (cid) => setRoute({page:'character', id:cid});
-    const openArch = (id) => { try{ window.openEntityDrawer && window.openEntityDrawer('place', id); }catch(e){} };
-    const openStory = (id) => { try{ window.openEntityDrawer && window.openEntityDrawer('event', id); }catch(e){} };
+    const goChar  = (cid) => setRoute({page:'character', id:cid});
+    const goPlace = (pid) => setRoute({page:'place',     id:pid});
+    const goEvent = (eid) => setRoute({page:'event',     id:eid});
     const firePractice = () => {
       try{ window.dispatchEvent(new CustomEvent('practice-entity', {detail:{type:(isKing?'king':'character'), id:c.id}})); }catch(e){}
     };
@@ -173,12 +185,16 @@
         </div>
 
         <div className="kt-expanded rounded-2xl" style={{border:'1px solid rgba(212,165,116,.25)'}}>
-          {bio && <Section title="📖 ביוגרפיה"><p className="kt-bio">{bio}</p></Section>}
-          {k && k.notes && !bio && <Section title="📖 תקציר"><p className="kt-bio">{stripTokens(k.notes)}</p></Section>}
+          {bioRaw && (
+            <Section title="📖 ביוגרפיה">
+              <p className="kt-bio hebrew">{renderText(bioRaw)}</p>
+            </Section>
+          )}
+          {k && k.notes && !bioRaw && <Section title="📖 תקציר"><p className="kt-bio hebrew">{renderText(k.notes)}</p></Section>}
 
           {c.key_actions && c.key_actions.length>0 && (
             <Section title="⚡ מעשים מרכזיים">
-              <ul className="kt-actions">{c.key_actions.map((a,i)=><li key={i}>{stripTokens(a)}</li>)}</ul>
+              <ul className="kt-actions">{c.key_actions.map((a,i)=><li key={i}>{renderText(a)}</li>)}</ul>
             </Section>
           )}
 
@@ -222,7 +238,7 @@
               <div style={{display:'flex',flexDirection:'column',gap:6}}>
                 {quotesBy.map((q,i)=>(
                   <div key={i} className="kt-quote-cite">
-                    <div>„{stripTokens(q.text || q)}"</div>
+                    <div>„{renderText(q.text || q)}"</div>
                     {q.ref && <div style={{fontSize:11,opacity:.7,marginTop:3}}>{q.ref}</div>}
                   </div>
                 ))}
@@ -235,7 +251,7 @@
               <div style={{display:'flex',flexDirection:'column',gap:6}}>
                 {quotesTo.map((q,i)=>(
                   <div key={i} className="kt-quote-cite">
-                    <div>„{stripTokens(q.text || q)}"</div>
+                    <div>„{renderText(q.text || q)}"</div>
                     {q.ref && <div style={{fontSize:11,opacity:.7,marginTop:3}}>{q.ref}</div>}
                   </div>
                 ))}
@@ -251,13 +267,13 @@
 
           {placeChips.length>0 && (
             <Section title="📍 מקומות">
-              <div className="kt-chips">{placeChips.map(p=><Chip key={p.id} tone="place" label={p.label} onClick={()=>openArch(p.id)}/>)}</div>
+              <div className="kt-chips">{placeChips.map(p=><Chip key={p.id} tone="place" label={p.label} onClick={()=>goPlace(p.id)}/>)}</div>
             </Section>
           )}
 
           {eventChips.length>0 && (
             <Section title="📜 אירועים">
-              <div className="kt-chips">{eventChips.map(p=><Chip key={p.id} tone="event" label={p.label} onClick={()=>openStory(p.id)}/>)}</div>
+              <div className="kt-chips">{eventChips.map(p=><Chip key={p.id} tone="event" label={p.label} onClick={()=>goEvent(p.id)}/>)}</div>
             </Section>
           )}
 

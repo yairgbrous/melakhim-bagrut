@@ -338,8 +338,34 @@
   function getCharacter(id){
     if (!id) return null;
     const idx = (typeof window !== 'undefined' && window.__ENTITY_INDEX__) || {};
-    // Prefer real king entry from kings.js if id matches.
     const king = (idx.king || {})[id];
+    const chr  = (idx.character || {})[id];
+    // If both sources carry this id (e.g. shlomo), merge: character wins on
+    // bio/tags (it has tokenized narrative), king wins on era/reign/assessment.
+    if (king && chr) {
+      return Object.assign({}, king, chr, {
+        _kingsData: true,
+        _charData:  true,
+        name: chr.name || king.name_niqqud || king.id,
+        name_niqqud: chr.name || king.name_niqqud,
+        role: chr.role || (king.kingdom === 'ישראל' ? 'מלך ישראל' : (king.kingdom === 'יהודה' ? 'מלך יהודה' : 'מלך')),
+        kingdom: chr.kingdom || king.kingdom,
+        era: king.era,
+        bio: chr.bio || king.short_summary || '',
+        short_summary: chr.bio || king.short_summary || '',
+        summary: chr.bio || king.short_summary || '',
+        assessment: king.assessment,
+        assessment_quote: king.assessment_quote,
+        related_prophets: king.related_prophets || chr.related_prophets || [],
+        related_places:   king.related_places   || chr.related_places   || [],
+        related_events:   king.related_events   || chr.related_events   || [],
+        killed: king.killed || [],
+        killed_by: king.killed_by || null,
+        reign_years: king.reign_years,
+        succession_type: king.succession_type
+      });
+    }
+    // Prefer real king entry from kings.js if id matches.
     if (king) {
       return Object.assign({}, king, {
         name: king.name_niqqud || king.name || king.id,
