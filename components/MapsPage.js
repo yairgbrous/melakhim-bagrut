@@ -234,6 +234,55 @@
       notes:["סוף ממלכת ישראל; מיקום הגלות לחלח וחבור"],
       book_page:214
     },
+    {
+      id:"galut_yehoyachin",
+      number:13, unit:6,
+      title:"גלות יהויכין — 597 לפנה״ס",
+      era_label:"יהויכין מלך יהודה, נבוכדנאצר מלך בבל",
+      caption:"הגלות הראשונה לבבל: עשרת אלפים שרים, החרש והמסגר; ״לא נשאר זולת דלת עם הארץ״.",
+      pins:[
+        {n:1, place:"ירושלים", placeId:"yerushalayim", x:40, y:70},
+        {n:2, place:"בבל", placeId:"bavel", x:92, y:22},
+        {n:3, place:"ריבלה", placeId:"rivla", x:72, y:10},
+        {n:4, place:"נהר פרת", placeId:"prat", x:88, y:20}
+      ],
+      notes:["יחזקאל ודניאל גלו בגלות זו"],
+      book_page:214
+    },
+    {
+      id:"churban_yerushalayim",
+      number:14, unit:6,
+      title:"חורבן ירושלים — 586 לפנה״ס",
+      era_label:"צדקיהו מלך יהודה, נבוזראדן רב טבחים",
+      caption:"מרד צדקיהו; מצור שנתיים וחצי. נבוזראדן שורף את המקדש ובית המלך; צדקיהו נתפס במדבר יריחו.",
+      pins:[
+        {n:1, place:"ירושלים", placeId:"yerushalayim", x:40, y:70},
+        {n:2, place:"ערבות יריחו", placeId:"arvot_yericho", x:55, y:72},
+        {n:3, place:"ריבלה", placeId:"rivla", x:72, y:10},
+        {n:4, place:"בבל", placeId:"bavel", x:92, y:22},
+        {n:5, place:"מצפה (גדליה)", placeId:"mitzpe", x:40, y:62},
+        {n:6, place:"מצרים (פליטי יהודה)", placeId:"mitzrayim", x:8, y:94}
+      ],
+      notes:["גדליה בן אחיקם נרצח במצפה; הפליטה גולה למצרים"],
+      book_page:214
+    },
+    {
+      id:"arei_miklat",
+      number:15, unit:1,
+      title:"שש ערי המקלט",
+      era_label:"נחלות השבטים — במדבר ל״ה, יהושע כ׳",
+      caption:"שלוש בעבר הירדן המזרחי ושלוש בארץ כנען, מפוזרות לצפון/מרכז/דרום — ״נכון הדרך״.",
+      pins:[
+        {n:1, place:"קדש (גליל)", placeId:"kadesh", x:54, y:22},
+        {n:2, place:"שכם (אפרים)", placeId:"shchem", x:44, y:48},
+        {n:3, place:"חברון (יהודה)", placeId:"chevron", x:38, y:80},
+        {n:4, place:"בצר (ראובן)", placeId:"betzer", x:68, y:74},
+        {n:5, place:"רמות גלעד (גד)", placeId:"ramot_gilad", x:72, y:45},
+        {n:6, place:"גולן (מנשה)", placeId:"golan", x:62, y:30}
+      ],
+      notes:["מפה רקע להבנת גיאוגרפיית הארץ"],
+      book_page:213
+    },
     // maps inserted incrementally below
   ];
 
