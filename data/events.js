@@ -290,6 +290,21 @@ export const events = [
     related_recurring_items: ["lying_spirit", "arrow_by_chance", "prophecy_fulfilled"],
     chapter_ref: "מל״א כ״ב",
   },
+  {
+    id: "eliyahu_achaziah_baal_zevuv",
+    title_niqqud: "אֵלִיָּהוּ וַאֲחַזְיָה — בַּעַל זְבוּב",
+    unit: 3,
+    date_bce: 852,
+    participants: ["achaziah_yisrael", "eliyahu"],
+    places: ["shomron", "ekron"],
+    summary:
+      "{{king:achaziah_yisrael|אחזיה בן אחאב}} נפל דרך השבכה בעלייתו בשומרון וחלה. הוא שלח מלאכים: ״לכו דרשו בבעל זבוב אלהי עקרון אם אחיה מחולי זה״. מלאך ה׳ אמר ל{{prophet:eliyahu|אליהו}} לצאת לקראתם: ״המבלי אין אלהים בישראל אתם הולכים לדרוש בבעל זבוב אלהי עקרון? לכן... מטה אשר עלית שם לא תרד ממנה כי מות תמות״. המלאכים חזרו אל המלך שתמה למה שבו; תיארו לו את האיש: בעל שיער ואזור עור במותניו. המלך אמר ״איש תשבי הוא״ ושלח שר חמישים עם חמישיו ללכדו. השר עלה אל ההר ואמר ״איש האלהים המלך דיבר רד!״ — ״ותרד אש מן השמים ותאכל אותו ואת חמישיו״. שלח שני, שלישי — בפעם השלישית השר התחנן על נפשו, ומלאך ה׳ שלח את אליהו לרדת אליו. אליהו הגיע אל המלך וחזר על הנבואה. אחזיה מת ״כדבר ה׳ אשר דיבר אליהו״.",
+    significance:
+      "המופע האחרון של אליהו לפני הסתלקותו. הסיפור מעצים את נושא הבלעדיות — ״המבלי אין אלהים בישראל״. האש מן השמים מזכירה את הר הכרמל. הזיקה לבעל נמשכה בבית אחאב למרות תבוסת אליהו, אך {{motif:fire_from_heaven|אש ה׳}} גוברת בסוף.",
+    related_breadth: ["idolatry_vs_monotheism", "prophet_and_king"],
+    related_recurring_items: ["fire_from_heaven", "foreign_god", "fifty_men"],
+    chapter_ref: "מל״ב א׳",
+  },
 ];
 
 export default events;
