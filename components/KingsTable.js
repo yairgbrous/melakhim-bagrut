@@ -271,6 +271,36 @@
     );
   }
 
+  function ProphetsCell({k}){
+    const KU = window.KingsUtils;
+    if (!KU || !KU.prophets_by_reign) return <span className="kt-empty-cell">·</span>;
+    const chars = Object.values(((window.__ENTITY_INDEX__||{}).character)||{});
+    const list = KU.prophets_by_reign(chars, k);
+    if (!list.length) return <span className="kt-empty-cell" aria-hidden="true">·</span>;
+    const go = (id) => { try { KU.navigateToCharacter(id); } catch(e){} };
+    return (
+      <div onClick={e=>e.stopPropagation()}>
+        {list.slice(0,6).map(p => (
+          <button key={p.id} className="kt-chip kt-chip-prophet" onClick={()=>go(p.id)}>{p.name}</button>
+        ))}
+      </div>
+    );
+  }
+
+  function ForeignCell({k}){
+    const KU = window.KingsUtils;
+    if (!KU || !KU.foreign_event_for) return null;
+    const f = KU.foreign_event_for(k);
+    if (!f) return null;
+    return (
+      <div className="kt-foreign-chip" title={f.book_ref}>
+        <div style={{fontWeight:800}}>{f.name} <span style={{opacity:.8,fontWeight:600}}>({f.empire})</span></div>
+        <div style={{fontSize:10.5,lineHeight:1.3,marginTop:2}}>{f.event}</div>
+        {f.book_ref && <div style={{fontSize:10,opacity:.7,marginTop:2}}>{f.book_ref}</div>}
+      </div>
+    );
+  }
+
   function KingsTable(){
     const [ready, setReady] = useState(!!window.__ENTITY_INDEX_READY__);
     useEffect(()=>{
@@ -345,9 +375,10 @@
             <thead>
               <tr>
                 <th className="kt-th kt-th-unit">יחידה</th>
-                <th className="kt-th kt-th-judah">👑 מלכי יהודה</th>
-                <th className="kt-th kt-th-israel">✂️ מלכי ישראל</th>
-                <th className="kt-th kt-th-empire">🌍 מעצמות האזור</th>
+                <th className="kt-th kt-th-judah">מלכי יהודה</th>
+                <th className="kt-th kt-th-prophets">נביאים</th>
+                <th className="kt-th kt-th-israel">מלכי ישראל</th>
+                <th className="kt-th kt-th-empire">מעצמות האזור</th>
               </tr>
             </thead>
             <tbody>
@@ -373,19 +404,20 @@
                       <td className="kt-td kt-td-judah">
                         {k.dynasty === 'יהודה' ? <KingCell k={k} side="judah"/> : <span className="kt-empty-cell">·</span>}
                       </td>
+                      <td className="kt-td kt-td-prophets">
+                        <ProphetsCell k={k}/>
+                      </td>
                       <td className="kt-td kt-td-israel">
                         {k.dynasty === 'ישראל' ? <KingCell k={k} side="israel"/> : <span className="kt-empty-cell">·</span>}
                       </td>
-                      {showUnitCell && (
-                        <td rowSpan={k._unitSpan || 1} className="kt-td kt-td-empire"
-                            style={{background:unitMeta.color + '18'}}>
-                          <div className="kt-empire">{unitMeta.empire}</div>
-                        </td>
-                      )}
+                      <td className="kt-td kt-td-empire" style={{background:unitMeta.color + '18'}}>
+                        {showUnitCell && <div className="kt-empire" style={{marginBottom:4,fontWeight:800}}>{unitMeta.empire}</div>}
+                        <ForeignCell k={k}/>
+                      </td>
                     </tr>
                     {isExpanded && (
                       <tr className="kt-row-detail">
-                        <td colSpan={4} className="kt-td-detail">
+                        <td colSpan={5} className="kt-td-detail">
                           <ExpandedRow k={k} onPractice={firePractice}/>
                         </td>
                       </tr>
