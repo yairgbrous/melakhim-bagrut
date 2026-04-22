@@ -183,6 +183,7 @@
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=900"></script>
 <script src="./components/BreadthPage.js?v=900"></script>
 <script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=900"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=910"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -2260,7 +2261,9 @@ function App(){
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-3 md:px-5 py-4 md:py-6 fade-up">
         {isTeacher ? <TeacherView S={S}/> : <>
-        {route.page==="home" && <Home S={S} setRoute={setRoute} level={level} nextLv={nextLv}/>}
+        {route.page==="home" && (window.HomeComponent
+          ? React.createElement(window.HomeComponent, {S, setRoute, level, nextLv})
+          : <div className="text-amber-200 text-center py-8">טוען דף בית...</div>)}
         {route.page==="path" && <UnitsPath S={S} setRoute={setRoute}/>}
         {route.page==="unit" && <UnitDetail unitId={route.unitId} S={S} setRoute={setRoute} awardXP={awardXP} update={update}/>}
         {route.page==="lesson" && <Lesson unitId={route.unitId} mode={route.mode} setRoute={setRoute} S={S} awardXP={awardXP} update={update}/>}
@@ -2432,92 +2435,7 @@ function Onboarding({onDone}){
 }
 
 // ============ HOME ============
-function Home({S, setRoute, level, nextLv}){
-  const dailyQ = useMemo(() => {
-    const seed = new Date().toDateString().split('').reduce((a,c)=>a+c.charCodeAt(0),0);
-    return QUESTIONS[seed % QUESTIONS.length];
-  }, []);
-  const dExam = daysTo(EXAM_DATE);
-  const [tick, setTick] = useState(0);
-  useEffect(()=>{ const id=setInterval(()=>setTick(t=>t+1),60000); return ()=>clearInterval(id); },[]);
-  const heDays = d => d===0?'היום':d===1?'יום אחד':d===2?'יומיים':`${d} ימים`;
-
-  // current unit = first unit without a quiz score, fallback to unit 1
-  const currentUnit = MELAKHIM_DATA.units.find(u => !(S.quizScores||{})[u.id]) || MELAKHIM_DATA.units[0];
-  const doneCount = MELAKHIM_DATA.units.filter(u => (S.quizScores||{})[u.id]).length;
-  const pathPct = Math.round((doneCount / MELAKHIM_DATA.units.length) * 100);
-
-  return (
-    <div className="space-y-5">
-      {/* Hero: countdown + single CTA */}
-      <section className="relative overflow-hidden rounded-3xl parchment p-5 md:p-7">
-        <div className="absolute top-0 left-0 text-[140px] opacity-[.06] select-none pointer-events-none leading-none">📜</div>
-        <div className="relative text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-red-700 text-red-50 text-xs font-bold mb-3">⏰ נותרו {heDays(dExam)} · 30.4.2026</div>
-          <h1 className="font-display text-2xl md:text-4xl font-black text-amber-900 leading-tight">
-            שלום {S.name} {S.avatar}
-          </h1>
-          <p className="text-amber-800/80 text-sm mt-1">בגרות 2551 · ספר מלכים · י״א 5 יח״ל</p>
-          <button onClick={()=>setRoute({page:"quizPlay",mode:"quick"})} className="gold-btn w-full md:w-auto md:px-10 py-4 rounded-2xl text-lg md:text-xl mt-4 glow">
-            ⚡ חידון מהיר · 10 שאלות
-          </button>
-        </div>
-      </section>
-
-      {/* 3-card horizontal scroll */}
-      <section>
-        <h2 className="font-display text-sm font-bold text-amber-200/90 mb-2 px-1">בחר את הדרך שלך היום</h2>
-        <div className="hrow fancy-scroll">
-          <button onClick={()=>setRoute({page:"unit",unitId:currentUnit.id})} className="card rounded-2xl p-4 text-right relative overflow-hidden">
-            <div className="absolute -top-4 -left-4 w-20 h-20 rounded-full opacity-25 blur-2xl bg-amber-400"/>
-            <div className="relative">
-              <div className="text-3xl">🗺</div>
-              <h3 className="font-display text-base font-bold text-amber-100 mt-1">המשך מסלול</h3>
-              <p className="text-xs text-amber-200/70 mt-0.5 line-clamp-1">יחידה {currentUnit.num}: {currentUnit.title}</p>
-              <div className="mt-2 h-1.5 rounded-full bg-slate-800 overflow-hidden">
-                <div className="h-full bg-gradient-to-l from-amber-300 to-amber-600 transition-all" style={{width:pathPct+"%"}}/>
-              </div>
-              <div className="text-[10px] text-amber-100/60 mt-1"><span dir="ltr" className="num">{doneCount}/6</span> יחידות · {pathPct}%</div>
-            </div>
-          </button>
-          <button onClick={()=>setRoute({page:"quizPlay",mode:"daily"})} className="card rounded-2xl p-4 text-right relative overflow-hidden">
-            <div className="absolute -top-4 -left-4 w-20 h-20 rounded-full opacity-25 blur-2xl bg-purple-400"/>
-            <div className="relative">
-              <div className="text-3xl">☀️</div>
-              <h3 className="font-display text-base font-bold text-amber-100 mt-1">אתגר היום</h3>
-              <p className="text-xs text-amber-200/70 mt-0.5 line-clamp-2 hebrew">{dailyQ.q.length>70?dailyQ.q.slice(0,70)+'…':dailyQ.q}</p>
-              <div className="mt-2 flex items-center gap-1 text-[10px]"><DiffBadge d={dailyQ.d}/><span className="text-amber-100/60">{new Date().toLocaleDateString('he-IL')}</span></div>
-            </div>
-          </button>
-          <button onClick={()=>setRoute({page:"exam"})} className="card rounded-2xl p-4 text-right relative overflow-hidden">
-            <div className="absolute -top-4 -left-4 w-20 h-20 rounded-full opacity-25 blur-2xl bg-red-400"/>
-            <div className="relative">
-              <div className="text-3xl">📝</div>
-              <h3 className="font-display text-base font-bold text-amber-100 mt-1">סימולציה מלאה</h3>
-              <p className="text-xs text-amber-200/70 mt-0.5">שעתיים · 100 נקודות · מבנה אמיתי</p>
-              <div className="mt-2 text-[10px] text-amber-300 font-bold">לחץ להתחלה ←</div>
-            </div>
-          </button>
-        </div>
-      </section>
-
-      {/* Collapsed units */}
-      <details className="card rounded-2xl overflow-hidden">
-        <summary className="px-4 py-3 cursor-pointer flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">📚</span>
-            <span className="font-display font-bold text-amber-200">יחידות לימוד</span>
-            <span className="text-[10px] text-amber-100/60">({MELAKHIM_DATA.units.length})</span>
-          </div>
-          <span className="text-amber-300 text-sm">▾</span>
-        </summary>
-        <div className="p-4 pt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {MELAKHIM_DATA.units.map(u => <UnitCard key={u.id} u={u} S={S} onClick={()=>setRoute({page:"unit",unitId:u.id})}/>)}
-        </div>
-      </details>
-    </div>
-  );
-}
+// Home moved to components/Home.js — mounts as window.HomeComponent.
 
 function Stat({i,v,l,c}){
   const cs = {gold:"border-amber-500/40",crimson:"border-red-600/40",emerald:"border-emerald-500/40",purple:"border-purple-500/40"}[c]||"";
