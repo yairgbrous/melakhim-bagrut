@@ -18,6 +18,19 @@
   const DURATION_STANDARD = 2*3600 + 15*60;
   const DURATION_EXTENDED = Math.round(DURATION_STANDARD * 1.15);
   const ACCOMMODATION_KEY = "jarvis.exam.accommodation";
+  const IN_PROGRESS_KEY  = "jarvis.exam.in_progress";
+  const ATTEMPTS_KEY     = "jarvis.exam.attempts";
+
+  function loadInProgress(){
+    try { const r = localStorage.getItem(IN_PROGRESS_KEY); return r ? JSON.parse(r) : null; }
+    catch { return null; }
+  }
+  function saveInProgress(obj){
+    try { localStorage.setItem(IN_PROGRESS_KEY, JSON.stringify(obj)); } catch {}
+  }
+  function clearInProgress(){
+    try { localStorage.removeItem(IN_PROGRESS_KEY); } catch {}
+  }
 
   // --- hardcoded מתכונת תשפ"ו question pool (fallback until data/past-exams.js extends) ---
   const PART_A_POOL = [
@@ -268,14 +281,48 @@
     );
   }
 
+  function ResumeModal({ draft, onResume, onDiscard }){
+    const when = draft && draft.savedAt ? new Date(draft.savedAt).toLocaleString("he-IL", {timeZone:"Asia/Jerusalem"}) : "";
+    const answered = draft && draft.answers ? Object.keys(draft.answers).filter(k => draft.answers[k] && draft.answers[k].trim()).length : 0;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:"rgba(0,0,0,.7)"}}>
+        <div className="parchment rounded-2xl p-6 max-w-md text-center space-y-3">
+          <div className="text-5xl">📝</div>
+          <h2 className="font-display text-xl font-bold text-amber-900">יש בחינה שלא הושלמה</h2>
+          <p className="text-amber-950 hebrew text-sm">
+            נשמרה אוטומטית ב-{when}. תשובות שנכתבו: <span dir="ltr" className="font-bold">{answered}</span>.
+          </p>
+          <p className="text-amber-950 hebrew text-sm">להמשיך מהמקום שבו עצרת?</p>
+          <div className="grid grid-cols-2 gap-2 pt-2">
+            <button onClick={onDiscard} className="rounded-lg py-2 bg-white/60 text-amber-900 font-bold">🗑 התחל מחדש</button>
+            <button onClick={onResume}  className="gold-btn rounded-lg py-2 font-bold">▶ המשך</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   function ExamSim2551(props){
     const setRoute = props && props.setRoute;
     const [phase, setPhase] = useState("intro");
     const [examCfg, setExamCfg] = useState(null);
     const [selectedA, setSelectedA] = useState([]);
     const [selectedBC, setSelectedBC] = useState([]);
+    const [draft, setDraft] = useState(() => loadInProgress());
+    const [resumeData, setResumeData] = useState(null);
 
     const startExam = (cfg) => { setExamCfg(cfg); setPhase("select"); };
+
+    const resumeDraft = () => {
+      if (!draft) return;
+      setSelectedA(draft.selectedA || []);
+      setSelectedBC(draft.selectedBC || []);
+      setExamCfg({ accommodation: !!draft.accommodation, durationSec: draft.durationSec || DURATION_STANDARD });
+      setResumeData(draft);
+      setDraft(null);
+      setPhase("running");
+    };
+    const discardDraft = () => { clearInProgress(); setDraft(null); };
 
     const toggleA = (id) => setSelectedA(prev => {
       if (prev.includes(id)) return prev.filter(x => x !== id);
@@ -290,7 +337,12 @@
     });
 
     if (phase === "intro") {
-      return <ExamIntro setRoute={setRoute} onStart={startExam}/>;
+      return (
+        <>
+          {draft && <ResumeModal draft={draft} onResume={resumeDraft} onDiscard={discardDraft}/>}
+          <ExamIntro setRoute={setRoute} onStart={startExam}/>
+        </>
+      );
     }
 
     if (phase === "select") {
@@ -317,8 +369,10 @@
       return <ExamRunning
         selectedA={selectedA} selectedBC={selectedBC}
         durationSec={(examCfg&&examCfg.durationSec)||DURATION_STANDARD}
-        onFinish={()=>setPhase("grade")}
-        onExit={()=>setPhase("intro")}
+        accommodation={!!(examCfg&&examCfg.accommodation)}
+        resume={resumeData}
+        onFinish={()=>{ setResumeData(null); setPhase("grade"); }}
+        onExit={()=>{ setResumeData(null); setPhase("intro"); }}
       />;
     }
 
@@ -331,14 +385,33 @@
     );
   }
 
-  function ExamRunning({ selectedA, selectedBC, durationSec, onFinish, onExit }){
-    const [timeLeft, setTimeLeft] = useState(durationSec);
-    const [answers, setAnswers] = useState({});
+  function ExamRunning({ selectedA, selectedBC, durationSec, accommodation, resume, onFinish, onExit }){
+    const [timeLeft, setTimeLeft] = useState(() => (resume && typeof resume.timeLeft === "number") ? resume.timeLeft : durationSec);
+    const [answers, setAnswers]   = useState(() => (resume && resume.answers) || {});
+    const [startTime]             = useState(() => (resume && resume.startTime) || Date.now());
+
     useEffect(() => {
-      if (timeLeft <= 0) { onFinish(); return; }
+      if (timeLeft <= 0) { onFinish({ answers, elapsedSec: durationSec }); return; }
       const t = setTimeout(() => setTimeLeft(x => x-1), 1000);
       return () => clearTimeout(t);
-    }, [timeLeft, onFinish]);
+    }, [timeLeft, onFinish, answers, durationSec]);
+
+    // auto-save every 30s
+    useEffect(() => {
+      const iv = setInterval(() => {
+        saveInProgress({
+          selectedA, selectedBC, answers,
+          startTime, elapsedSec: durationSec - timeLeft,
+          timeLeft, durationSec, accommodation, savedAt: Date.now()
+        });
+      }, 30*1000);
+      return () => clearInterval(iv);
+    }, [selectedA, selectedBC, answers, startTime, timeLeft, durationSec, accommodation]);
+
+    const finish = () => {
+      clearInProgress();
+      onFinish({ answers, elapsedSec: durationSec - timeLeft });
+    };
 
     const partAQs = PART_A_POOL.filter(q => selectedA.includes(q.id));
     const partBCQs = PART_BC_POOL.filter(q => selectedBC.includes(q.id));
@@ -355,7 +428,7 @@
           <div className={`font-mono font-bold text-lg ${timeLeft<300?"text-red-400":"text-amber-200"}`}>
             ⏱ <span dir="ltr">{String(Math.floor(mins/60)).padStart(1,"0")}:{String(mins%60).padStart(2,"0")}:{String(secs).padStart(2,"0")}</span>
           </div>
-          <button onClick={onFinish} className="px-3 py-1.5 rounded-lg bg-red-700 text-white text-xs font-bold">הגשה</button>
+          <button onClick={finish} className="px-3 py-1.5 rounded-lg bg-red-700 text-white text-xs font-bold">הגשה</button>
         </div>
 
         <section className="space-y-2">
@@ -394,7 +467,7 @@
 
         <div className="grid grid-cols-2 gap-2">
           <button onClick={onExit} className="card py-3 rounded-xl text-amber-200">← יציאה</button>
-          <button onClick={onFinish} className="gold-btn py-3 rounded-xl font-bold">📤 הגש לבדיקה</button>
+          <button onClick={finish} className="gold-btn py-3 rounded-xl font-bold">📤 הגש לבדיקה</button>
         </div>
       </div>
     );
