@@ -664,6 +664,193 @@ html[data-theme='light'] .study-card{
 @media (prefers-reduced-motion: reduce){
   .ent-drawer,.ent-drawer-ovl,.study-card{ animation:none; transition:none; }
 }
+
+/* =========================================================================
+   CONTRAST TOKENS — WCAG AA enforcement on parchment backgrounds.
+   Primary ink #1A1611, secondary #4A3829, accent #8B6F1F, muted meta #6B5639.
+   ========================================================================= */
+.text-on-parchment{ color:#1A1611 !important; }
+.text-on-parchment-muted{ color:#4A3829 !important; font-weight:500; }
+.text-on-parchment-meta{ color:#6B5639 !important; }
+.text-on-parchment-accent{ color:#8B6F1F !important; font-weight:600; }
+/* Force dark ink anywhere inside .parchment to prevent cream-on-cream failures. */
+.parchment h1, .parchment h2, .parchment h3, .parchment h4{ color:#1A1611; }
+.parchment p, .parchment li, .parchment label{ color:#4A3829; }
+.parchment small, .parchment .meta{ color:#6B5639; }
+/* Disabled gold btn: visible at all times. */
+.gold-btn:disabled, .gold-btn[aria-disabled="true"]{
+  background:linear-gradient(135deg,#C9B88A,#A08C5E) !important;
+  color:#3E2F1A !important; opacity:.92; cursor:not-allowed;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+/* =========================================================================
+   HOME HERO
+   ========================================================================= */
+.hero-parchment{ border:1px solid rgba(139,111,31,.35); }
+.hero-countdown{
+  background:#7B1A1A; color:#FFF7ED;
+  box-shadow:0 2px 6px rgba(123,26,26,.35);
+  letter-spacing:.02em;
+}
+
+/* =========================================================================
+   HOME PROGRESS STRIP
+   ========================================================================= */
+.progress-strip-wrap{ padding:4px 2px; }
+.progress-strip-rail{
+  display:grid; grid-template-columns:repeat(6,1fr); gap:8px;
+}
+@media (max-width:768px){ .progress-strip-rail{ grid-template-columns:repeat(3,1fr); } }
+@media (max-width:420px){ .progress-strip-rail{ grid-template-columns:repeat(2,1fr); } }
+.progress-strip-node{
+  position:relative; overflow:hidden;
+  padding:12px 10px 14px; border-radius:16px;
+  background:linear-gradient(180deg,#FBF6EB 0%,#F0E4C4 100%);
+  border:1.5px solid rgba(139,111,31,.35);
+  color:#1A1611; text-align:right; cursor:pointer;
+  transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  display:flex; flex-direction:column; gap:2px;
+  min-height:92px;
+}
+.progress-strip-node:hover{
+  transform:translateY(-2px);
+  border-color:#8B6F1F;
+  box-shadow:0 6px 18px rgba(139,111,31,.22);
+}
+.progress-strip-node.current{
+  border-color:#8B6F1F; border-width:2px;
+  box-shadow:0 0 0 3px rgba(212,165,116,.25), 0 4px 12px rgba(139,111,31,.2);
+}
+.progress-strip-node.done{
+  border-color:#3E8E7E;
+  background:linear-gradient(180deg,#E8F5EE 0%,#C9E4D3 100%);
+}
+.progress-strip-fill{
+  position:absolute; right:0; bottom:0; height:3px;
+  background:linear-gradient(90deg,#8B6F1F,#D4A574);
+  transition:width .35s ease;
+}
+.progress-strip-node.done .progress-strip-fill{
+  background:linear-gradient(90deg,#3E8E7E,#5AB091);
+}
+.progress-strip-num{
+  font-family:'Frank Ruhl Libre','Noto Serif Hebrew',serif;
+  font-size:22px; font-weight:900; color:#1A1611;
+}
+.progress-strip-title{ font-size:13px; font-weight:600; color:#4A3829; line-height:1.25; }
+.progress-strip-pct{
+  position:absolute; left:10px; top:10px;
+  font-size:11px; font-weight:700; color:#8B6F1F;
+  padding:2px 6px; border-radius:999px;
+  background:rgba(212,165,116,.18);
+}
+.progress-strip-node.done .progress-strip-pct{
+  color:#1A5F3F; background:rgba(62,142,126,.18);
+}
+
+/* =========================================================================
+   HOME QUICK ACTIONS
+   ========================================================================= */
+.quick-actions-wrap{ padding:2px; }
+.quick-actions-grid{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
+}
+@media (max-width:768px){ .quick-actions-grid{ grid-template-columns:repeat(2,1fr); } }
+.quick-action-card{
+  padding:16px 14px; border-radius:18px; text-align:right; cursor:pointer;
+  background:linear-gradient(180deg,#FBF6EB 0%,#F0E4C4 100%);
+  border:1.5px solid rgba(139,111,31,.35);
+  color:#1A1611;
+  transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  display:flex; flex-direction:column; gap:6px;
+  min-height:120px;
+  position:relative; overflow:hidden;
+}
+.quick-action-card:hover{
+  transform:translateY(-3px);
+  border-color:#8B6F1F;
+  box-shadow:0 8px 22px rgba(139,111,31,.22);
+}
+.quick-action-icon{ font-size:30px; line-height:1; }
+.quick-action-title{
+  font-family:'Frank Ruhl Libre','Noto Serif Hebrew',serif;
+  font-size:16px; font-weight:900; color:#1A1611;
+}
+.quick-action-sub{ font-size:12px; font-weight:500; color:#4A3829; line-height:1.4; }
+.quick-action-card.qa-gold{ border-top:4px solid #C89B3C; }
+.quick-action-card.qa-crimson{ border-top:4px solid #A83240; }
+.quick-action-card.qa-purple{ border-top:4px solid #6B5B95; }
+.quick-action-card.qa-emerald{ border-top:4px solid #3E8E7E; }
+
+/* =========================================================================
+   HOME TODAY'S FOCUS
+   ========================================================================= */
+.today-focus-wrap{ padding:2px; }
+.today-focus-list{ display:flex; flex-direction:column; gap:8px; }
+.today-focus-card{
+  display:flex; align-items:center; gap:12px;
+  padding:14px 14px; border-radius:16px; text-align:right; cursor:pointer;
+  background:linear-gradient(90deg,#FBF6EB 0%,#F3E7C8 100%);
+  border:1.5px solid rgba(139,111,31,.3);
+  color:#1A1611;
+  transition:transform .12s ease, border-color .15s ease, box-shadow .15s ease;
+  width:100%;
+}
+.today-focus-card:hover{
+  transform:translateY(-2px);
+  border-color:#8B6F1F;
+  box-shadow:0 6px 18px rgba(139,111,31,.2);
+}
+.today-focus-rank{
+  flex-shrink:0; width:34px; height:34px; border-radius:50%;
+  background:linear-gradient(135deg,#C89B3C,#8B6F1F); color:#FFF7ED;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Frank Ruhl Libre',serif; font-weight:900; font-size:17px;
+}
+.today-focus-body{ flex:1; display:flex; flex-direction:column; gap:2px; min-width:0; }
+.today-focus-title{
+  font-family:'Frank Ruhl Libre','Noto Serif Hebrew',serif;
+  font-size:15px; font-weight:800; color:#1A1611;
+  text-overflow:ellipsis; overflow:hidden; white-space:nowrap;
+}
+.today-focus-sub{ font-size:12px; color:#4A3829; font-weight:500; }
+.today-focus-arrow{ flex-shrink:0; font-size:20px; color:#8B6F1F; font-weight:900; }
+
+/* =========================================================================
+   HOME STATS STRIP
+   ========================================================================= */
+.stats-strip-wrap{ padding:2px; }
+.stats-strip-grid{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+}
+.stats-cell{
+  padding:14px 10px; border-radius:16px; text-align:center;
+  background:linear-gradient(180deg,#FBF6EB 0%,#F0E4C4 100%);
+  border:1.5px solid rgba(139,111,31,.3);
+  color:#1A1611;
+  transition:transform .12s ease;
+  display:flex; flex-direction:column; gap:2px; align-items:center;
+}
+.stats-cell:hover{ transform:translateY(-1px); }
+.stats-icon{ font-size:22px; line-height:1; }
+.stats-value{
+  font-family:'Frank Ruhl Libre','Noto Serif Hebrew',serif;
+  font-size:26px; font-weight:900; color:#1A1611; line-height:1.1;
+}
+.stats-label{ font-size:11px; font-weight:600; color:#4A3829; }
+.stats-cell.stats-streak{ border-top:3px solid #D4A574; }
+.stats-cell.stats-total{ border-top:3px solid #6B5B95; }
+.stats-cell.stats-accuracy{ border-top:3px solid #3E8E7E; }
+
+/* Dark theme adjustments for home sections. */
+html[data-theme='dark'] .progress-strip-node,
+html[data-theme='dark'] .quick-action-card,
+html[data-theme='dark'] .today-focus-card,
+html[data-theme='dark'] .stats-cell{
+  background:linear-gradient(180deg,#FBF6EB 0%,#F0E4C4 100%);
+  color:#1A1611;
+}
 </style>
 </head>
 <body>
