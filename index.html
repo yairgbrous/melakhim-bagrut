@@ -448,6 +448,60 @@ html[data-theme='light'] .study-card .sc-tag{ background:rgba(139,111,31,.18); c
 }
 html[data-theme='light'] .study-empty{ color:#7D6742; }
 
+/* Hub 3-card entry layout (למידה) */
+.hub-grid{
+  display:grid; gap:14px;
+  grid-template-columns:repeat(5, minmax(0,1fr));
+}
+.hub-span-1{ grid-column:span 5; }
+.hub-span-2{ grid-column:span 5; }
+@media (min-width:720px){
+  .hub-span-2{ grid-column:span 2; }
+  .hub-span-1{ grid-column:span 1; }
+}
+.hub-card{
+  --hub-accent:#D4A574;
+  position:relative; overflow:hidden;
+  text-align:right; cursor:pointer;
+  padding:22px 22px 20px; border-radius:22px;
+  background:linear-gradient(135deg,rgba(22,40,74,.92),rgba(15,31,58,.88));
+  border:1px solid rgba(212,165,116,.4);
+  color:#F5E6C8;
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+  min-height:150px;
+  display:flex; align-items:stretch;
+}
+.hub-card:hover,.hub-card:focus-visible{
+  transform:translateY(-3px);
+  border-color:var(--hub-accent);
+  box-shadow:0 14px 32px rgba(0,0,0,.35), 0 0 0 1px var(--hub-accent);
+}
+.hub-card:active{ transform:translateY(-1px); }
+.hub-glow{
+  position:absolute; inset:auto -40px -40px auto;
+  width:180px; height:180px; border-radius:50%;
+  background:var(--hub-accent); opacity:.18; filter:blur(30px);
+  pointer-events:none;
+}
+.hub-card-inner{ position:relative; width:100%; display:flex; flex-direction:column; gap:6px; }
+.hub-icon{ font-size:40px; line-height:1; margin-bottom:4px; }
+.hub-title{
+  font-family:'Frank Ruhl Libre','Noto Serif Hebrew',serif;
+  font-size:22px; font-weight:900; color:#F5D670;
+  letter-spacing:.01em;
+}
+.hub-sub{ font-size:13.5px; line-height:1.55; color:rgba(245,230,200,.85); }
+.hub-arrow{
+  margin-top:auto; font-size:18px; color:var(--hub-accent);
+  font-weight:900; align-self:flex-end; padding-top:10px;
+}
+html[data-theme='light'] .hub-card{
+  background:linear-gradient(135deg,#FBF6EB,#F0E4C4);
+  color:#1A1611; border-color:#C89B3C;
+}
+html[data-theme='light'] .hub-title{ color:#1A1611; }
+html[data-theme='light'] .hub-sub{ color:#5A4517; }
+
 /* Inline expand accordion (replaces drawer) */
 .expanded-panel{
   display:block;
@@ -1779,74 +1833,51 @@ function StudyCard({item, type}){
 }
 
 function StudyHub({setRoute}){
-  const [ready, setReady] = useState(!!window.__ENTITY_INDEX_READY__);
-  const [tab, setTab] = useState('unit');
-  useEffect(()=>{
-    if(ready) return;
-    const onReady = ()=>setReady(true);
-    window.addEventListener('entity-index-ready', onReady);
-    const id = setInterval(()=>{ if(window.__ENTITY_INDEX_READY__){ setReady(true); } },250);
-    return ()=>{ window.removeEventListener('entity-index-ready', onReady); clearInterval(id); };
-  },[ready]);
-  const idx = (typeof window!=='undefined' && window.__ENTITY_INDEX__) || {};
-  const unitCount = (typeof MELAKHIM_DATA !== 'undefined' && MELAKHIM_DATA.units) ? MELAKHIM_DATA.units.length : 0;
-  const quoteIdx = idx.quote || idx.verse || {};
-  const tabs = [
-    {k:'unit', l:'יחידות', i:'📚', count: unitCount},
-    {k:'event', l:'אירועים', i:'📅', count: Object.keys(idx.event||{}).length},
-    {k:'character', l:'דמויות', i:'👥', count: Object.keys(idx.character||{}).length},
-    {k:'place', l:'מקומות', i:'🗺️', count: Object.keys(idx.place||{}).length},
-    {k:'quote', l:'ציטוטים', i:'💬', count: Object.keys(quoteIdx).length},
-    {k:'kingsTable', l:'טבלת מלכים', i:'📜', nav:true},
-    {k:'theme', l:'נושאי רוחב', i:'🧭', count: Object.keys(idx.theme||{}).length}
+  const go = (page) => { if(setRoute) setRoute({page}); };
+  const cards = [
+    {
+      key:"path", page:"path", span:2, icon:"🎓",
+      title:"למידה לפי יחידות",
+      subtitle:"6 יחידות עם תקציר, דמויות, אירועים ומבחן",
+      accent:"#D4A574"
+    },
+    {
+      key:"themes", page:"themes", span:2, icon:"🌐",
+      title:"נושאי רוחב במיקוד",
+      subtitle:"7 נושאי רוחב + חפצים וביטויים חוזרים",
+      accent:"#6B5B95"
+    },
+    {
+      key:"timeline", page:"timeline", span:1, icon:"📜",
+      title:"ציר מלכים",
+      subtitle:"טבלת כל המלכים עם נביאים ומעצמות",
+      accent:"#A83240"
+    }
   ];
-  const units = (typeof MELAKHIM_DATA !== 'undefined' && MELAKHIM_DATA.units) ? MELAKHIM_DATA.units : [];
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div>
-        <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300">📚 מוקד הלמידה</h1>
-        <p className="text-amber-100/70 text-sm mt-1">לחץ על כרטיס או תגית להרחבה במקום — בלי חלונות קופצים.</p>
+        <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300">📚 מרכז הלמידה</h1>
+        <p className="text-amber-100/70 text-sm mt-1">בחר איך ללמוד היום — לפי יחידות, לפי נושאי רוחב, או דרך טבלת המלכים.</p>
       </div>
-      <div className="study-tabs">
-        {tabs.map(t => (
-          <button key={t.k} onClick={()=> t.nav ? (setRoute && setRoute({page:"timeline"})) : setTab(t.k)} className={`study-tab ${!t.nav && tab===t.k?"active":""}`}>
-            <span className="ml-1" aria-hidden="true">{t.i}</span>{t.l}
-            {!t.nav && <span className="mr-1 text-[10px] opacity-80">({t.count})</span>}
+      <div className="hub-grid">
+        {cards.map(c => (
+          <button
+            key={c.key}
+            onClick={()=>go(c.page)}
+            className={`hub-card hub-span-${c.span}`}
+            style={{"--hub-accent": c.accent}}
+            aria-label={c.title}>
+            <div className="hub-glow" aria-hidden="true"/>
+            <div className="hub-card-inner">
+              <div className="hub-icon" aria-hidden="true">{c.icon}</div>
+              <div className="hub-title font-display">{c.title}</div>
+              <div className="hub-sub">{c.subtitle}</div>
+              <div className="hub-arrow" aria-hidden="true">←</div>
+            </div>
           </button>
         ))}
       </div>
-      {tab === 'unit' ? (
-        <div className="study-grid">
-          {units.map(u => <UnitStudyCard key={u.id} unit={u}/>)}
-        </div>
-      ) : !ready ? (
-        <div className="study-empty">
-          <div className="skel" style={{height:20, width:'60%', margin:'0 auto 12px'}}/>
-          <div>טוען תוכן...</div>
-        </div>
-      ) : (() => {
-        const source = tab === 'quote' ? (idx.quote || idx.verse || {}) : (idx[tab] || {});
-        const items = Object.values(source);
-        const placeholderTabs = ['event','character','place','quote','theme'];
-        if(items.length === 0 && placeholderTabs.includes(tab)) return (
-          <div className="card rounded-xl p-6 text-center">
-            <div className="text-4xl mb-2" aria-hidden="true">⌛</div>
-            <div className="font-display text-amber-200 font-bold">יוצג ברגע שהנתונים יטענו</div>
-            <div className="text-xs text-amber-100/60 mt-2">(<span dir="ltr" className="num">{items.length}</span> פריטים)</div>
-          </div>
-        );
-        if(items.length === 0) return (
-          <div className="study-empty">
-            <div className="text-4xl mb-2">📭</div>
-            <div>אין תוכן בקטגוריה זו עדיין.</div>
-          </div>
-        );
-        return (
-          <div className="study-grid">
-            {items.map((it, i) => <StudyCard key={it.id||i} item={it} type={tab}/>)}
-          </div>
-        );
-      })()}
     </div>
   );
 }
