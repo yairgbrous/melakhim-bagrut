@@ -530,8 +530,8 @@
     return (
       <div className="kt-wrap">
         <div className="kt-header">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300">📜 ציר המלכים</h1>
-          <p className="text-amber-100/70 text-sm mt-1">
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">📜 ציר המלכים</h1>
+          <p className="text-on-parchment-muted text-sm mt-1">
             טבלה אותנטית בעקבות חוברת מלכים — מלכי יהודה מימין, מלכי ישראל משמאל, מעצמות האזור בקצה.
           </p>
         </div>

@@ -11,13 +11,13 @@
 (function(){
   function Chip({ label, onClick, color }){
     const styles = {
-      king:       "bg-amber-500/20 border-amber-500/40 text-amber-100",
+      king:       "bg-amber-500/20 border-amber-500/40 text-on-parchment-muted",
       character:  "bg-orange-500/20 border-orange-500/40 text-orange-100",
       place:      "bg-emerald-500/20 border-emerald-500/40 text-emerald-100",
       breadth:    "bg-purple-500/20 border-purple-500/40 text-purple-100",
       recurring:  "bg-pink-500/20 border-pink-500/40 text-pink-100"
     };
-    const cls = styles[color] || "bg-amber-500/20 border-amber-500/40 text-amber-100";
+    const cls = styles[color] || "bg-amber-500/20 border-amber-500/40 text-on-parchment-muted";
     return (
       <button onClick={onClick}
         className={`px-2.5 py-1 rounded-full text-xs font-bold border transition hover:scale-105 ${cls}`}>
@@ -42,20 +42,20 @@
 
     return (
       <div className="max-w-2xl mx-auto space-y-4 p-2">
-        <button onClick={()=>go("study")} className="text-amber-300 text-sm">→ חזרה לאזור הלימוד</button>
+        <button onClick={()=>go("study")} className="text-on-parchment-accent text-sm">→ חזרה לאזור הלימוד</button>
 
         <header className="card rounded-2xl p-5">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300">
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">
             ⚔️ {ev.title || ev.name_hebrew || id}
           </h1>
           <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
-            {ev.unit && <span className="px-2 py-0.5 rounded-full bg-amber-700 text-amber-100 font-bold">יחידה {ev.unit}</span>}
-            {ev.chapters && <span className="text-amber-200/70">{ev.chapters}</span>}
+            {ev.unit && <span className="px-2 py-0.5 rounded-full bg-amber-700 text-on-parchment-muted font-bold">יחידה {ev.unit}</span>}
+            {ev.chapters && <span className="text-on-parchment">{ev.chapters}</span>}
           </div>
         </header>
 
         {!hasData && (
-          <div className="card rounded-xl p-4 text-amber-100/70 text-sm">
+          <div className="card rounded-xl p-4 text-on-parchment-muted text-sm">
             יוצג בקרוב · נתוני האירוע טרם הוזנו ל-<code>window.EVENTS_DATA</code>.
           </div>
         )}
@@ -69,14 +69,14 @@
 
         {ev.significance && (
           <section className="card rounded-xl p-4">
-            <h2 className="font-display text-base font-bold text-amber-200 mb-2">משמעות</h2>
-            <p className="hebrew text-amber-100/90 leading-relaxed">{ev.significance}</p>
+            <h2 className="font-display text-base font-bold text-on-parchment mb-2">משמעות</h2>
+            <p className="hebrew text-on-parchment-muted leading-relaxed">{ev.significance}</p>
           </section>
         )}
 
         {Array.isArray(ev.participants) && ev.participants.length > 0 && (
           <section>
-            <h3 className="text-xs font-bold text-amber-200 mb-2">👤 דמויות באירוע</h3>
+            <h3 className="text-xs font-bold text-on-parchment mb-2">👤 דמויות באירוע</h3>
             <div className="flex flex-wrap gap-1.5">
               {ev.participants.map(p => {
                 const pid = typeof p === "string" ? p : p.id;
@@ -89,7 +89,7 @@
 
         {Array.isArray(ev.places) && ev.places.length > 0 && (
           <section>
-            <h3 className="text-xs font-bold text-amber-200 mb-2">📍 מקומות</h3>
+            <h3 className="text-xs font-bold text-on-parchment mb-2">📍 מקומות</h3>
             <div className="flex flex-wrap gap-1.5">
               {ev.places.map(p => {
                 const pid = typeof p === "string" ? p : p.id;
@@ -102,7 +102,7 @@
 
         {Array.isArray(ev.related_breadth) && ev.related_breadth.length > 0 && (
           <section>
-            <h3 className="text-xs font-bold text-amber-200 mb-2">🌐 נושאי רוחב</h3>
+            <h3 className="text-xs font-bold text-on-parchment mb-2">🌐 נושאי רוחב</h3>
             <div className="flex flex-wrap gap-1.5">
               {ev.related_breadth.map(t => {
                 const tid = typeof t === "string" ? t : t.id;
@@ -115,7 +115,7 @@
 
         {Array.isArray(ev.related_recurring_items) && ev.related_recurring_items.length > 0 && (
           <section>
-            <h3 className="text-xs font-bold text-amber-200 mb-2">🔁 פריטים חוזרים</h3>
+            <h3 className="text-xs font-bold text-on-parchment mb-2">🔁 פריטים חוזרים</h3>
             <div className="flex flex-wrap gap-1.5">
               {ev.related_recurring_items.map(t => {
                 const tid = typeof t === "string" ? t : t.id;

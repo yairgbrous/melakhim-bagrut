@@ -106,7 +106,7 @@
     if (!c){
       return (
         <div className="max-w-3xl mx-auto space-y-4">
-          <button onClick={()=>setRoute({page:'timeline'})} className="text-amber-300 text-sm">→ חזרה לציר המלכים</button>
+          <button onClick={()=>setRoute({page:'timeline'})} className="text-on-parchment-accent text-sm">→ חזרה לציר המלכים</button>
           <div className="parchment rounded-2xl p-6 text-center">
             <div style={{fontSize:42,marginBottom:6}}>📜</div>
             <div className="font-bold text-amber-900">דמות לא נמצאה</div>
@@ -172,7 +172,7 @@
 
     return (
       <div className="max-w-3xl mx-auto space-y-4">
-        <button onClick={()=>setRoute({page:'timeline'})} className="text-amber-300 text-sm">→ חזרה לציר המלכים</button>
+        <button onClick={()=>setRoute({page:'timeline'})} className="text-on-parchment-accent text-sm">→ חזרה לציר המלכים</button>
 
         <div className="parchment rounded-2xl p-5 md:p-6">
           <div className="flex items-start justify-between flex-wrap gap-2">

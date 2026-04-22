@@ -193,8 +193,8 @@
     return (
       <section className="space-y-2">
         <div className="flex items-center justify-between sticky top-[108px] z-10 bg-slate-900/90 backdrop-blur-sm rounded-xl p-3 border border-amber-500/30">
-          <div className="font-display text-base font-bold text-amber-200">פרק א — בקיאות</div>
-          <div className={`text-sm font-bold ${full?"text-emerald-400":"text-amber-300"}`}>
+          <div className="font-display text-base font-bold text-on-parchment">פרק א — בקיאות</div>
+          <div className={`text-sm font-bold ${full?"text-emerald-400":"text-on-parchment-accent"}`}>
             נבחרו <span dir="ltr">{count}/{MAX_A}</span>
           </div>
         </div>
@@ -221,14 +221,14 @@
             נבחרו <span dir="ltr">{count}/{MAX_BC}</span>
           </div>
         </div>
-        <div className="text-[10px] text-amber-200/60 mt-2">פרק ב — ידע (4 סעיפים)</div>
+        <div className="text-[10px] text-on-parchment-meta mt-2">פרק ב — ידע (4 סעיפים)</div>
         <div className="space-y-2">
           {partB.map(q => (
             <SelectionCard key={q.id} q={q} selected={selected.includes(q.id)}
               onToggle={()=>onToggle(q.id)} disabled={full}/>
           ))}
         </div>
-        <div className="text-[10px] text-amber-200/60 mt-3">פרק ג — ידע ונושאי רוחב (10 סעיפים)</div>
+        <div className="text-[10px] text-on-parchment-meta mt-3">פרק ג — ידע ונושאי רוחב (10 סעיפים)</div>
         <div className="space-y-2">
           {partC.map(q => (
             <SelectionCard key={q.id} q={q} selected={selected.includes(q.id)}
@@ -250,7 +250,7 @@
     return (
       <div className="max-w-2xl mx-auto space-y-4">
         {shabbat && <ShabbatModal onDismiss={()=>setRoute && setRoute({page:"quiz"})}/>}
-        <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300">📝 מתכונת בגרות · שאלון 2551 · תשפ"ו</h1>
+        <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">📝 מתכונת בגרות · שאלון 2551 · תשפ"ו</h1>
         <div className="parchment rounded-2xl p-5 md:p-7 space-y-3">
           <h2 className="font-display text-xl font-bold text-amber-900">ספר מלכים · מתכונת מלאה</h2>
           <div className="text-sm text-amber-950 space-y-1.5">
@@ -351,8 +351,8 @@
       return (
         <div className="max-w-2xl mx-auto space-y-4">
           <div className="card rounded-xl p-3 flex items-center justify-between text-sm">
-            <div className="font-bold text-amber-200">שלב בחירת שאלות</div>
-            <div className="text-xs text-amber-200/70">
+            <div className="font-bold text-on-parchment">שלב בחירת שאלות</div>
+            <div className="text-xs text-on-parchment">
               א: <span dir="ltr" className="font-bold">{selectedA.length}/{MAX_A}</span> · ב+ג: <span dir="ltr" className="font-bold">{selectedBC.length}/{MAX_BC}</span>
             </div>
           </div>
@@ -391,7 +391,7 @@
       return (
         <div className="max-w-xl mx-auto text-center py-12 space-y-3">
           <div className="text-6xl">🎉</div>
-          <p className="text-amber-200">הבחינה הוגשה ונשמרה בהיסטוריית הניסיונות.</p>
+          <p className="text-on-parchment">הבחינה הוגשה ונשמרה בהיסטוריית הניסיונות.</p>
           <button onClick={()=>{ setSelectedA([]); setSelectedBC([]); setExamCfg(null); setPhase("intro"); }} className="gold-btn px-4 py-2 rounded-lg">חזרה למסך הפתיחה</button>
         </div>
       );
@@ -436,17 +436,17 @@
     return (
       <div className="max-w-3xl mx-auto space-y-4">
         <div className="sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between">
-          <div className="text-sm text-amber-200">
+          <div className="text-sm text-on-parchment">
             נענו: <span dir="ltr" className="font-bold">{Object.keys(answers).filter(k=>answers[k]&&answers[k].trim()).length}/{partAQs.length+partBCQs.length}</span>
           </div>
-          <div className={`font-mono font-bold text-lg ${timeLeft<300?"text-red-400":"text-amber-200"}`}>
+          <div className={`font-mono font-bold text-lg ${timeLeft<300?"text-red-400":"text-on-parchment"}`}>
             ⏱ <span dir="ltr">{String(Math.floor(mins/60)).padStart(1,"0")}:{String(mins%60).padStart(2,"0")}:{String(secs).padStart(2,"0")}</span>
           </div>
           <button onClick={finish} className="px-3 py-1.5 rounded-lg bg-red-700 text-white text-xs font-bold">הגשה</button>
         </div>
 
         <section className="space-y-2">
-          <h2 className="font-display text-lg font-bold text-amber-300">פרק א — בקיאות</h2>
+          <h2 className="font-display text-lg font-bold text-on-parchment-accent">פרק א — בקיאות</h2>
           {partAQs.map(q => (
             <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
               <div className="flex items-center gap-2 text-xs">
@@ -480,7 +480,7 @@
         </section>
 
         <div className="grid grid-cols-2 gap-2">
-          <button onClick={onExit} className="card py-3 rounded-xl text-amber-200">← יציאה</button>
+          <button onClick={onExit} className="card py-3 rounded-xl text-on-parchment">← יציאה</button>
           <button onClick={finish} className="gold-btn py-3 rounded-xl font-bold">📤 הגש לבדיקה</button>
         </div>
       </div>
@@ -543,17 +543,17 @@
       <div className="max-w-3xl mx-auto space-y-4">
         <div className="card rounded-xl p-4 flex items-center justify-between flex-wrap gap-2">
           <div>
-            <h2 className="font-display text-xl font-bold text-amber-300">📝 דירוג עצמי מול תשובות מצופות</h2>
-            <div className="text-xs text-amber-200/70">
+            <h2 className="font-display text-xl font-bold text-on-parchment-accent">📝 דירוג עצמי מול תשובות מצופות</h2>
+            <div className="text-xs text-on-parchment">
               זמן שלקח: <span dir="ltr">{fmtHMS(elapsedSec)}</span> · מצב התאמה: {accommodation?"פעיל":"רגיל"}
             </div>
           </div>
           <div className="text-left">
-            <div className="text-xs text-amber-200/70">ציון נוכחי</div>
-            <div className="font-mono font-bold text-amber-300 text-2xl" dir="ltr">
+            <div className="text-xs text-on-parchment">ציון נוכחי</div>
+            <div className="font-mono font-bold text-on-parchment-accent text-2xl" dir="ltr">
               {Math.round(total*10)/10}/101
             </div>
-            <div className="text-[10px] text-amber-200/60">
+            <div className="text-[10px] text-on-parchment-meta">
               א: <span dir="ltr">{Math.round(partAScore*10)/10}/45</span> · ב+ג: <span dir="ltr">{Math.round(partBCScore*10)/10}/56</span>
             </div>
           </div>
@@ -613,7 +613,7 @@
             {weakTopics.length > 0 && (
               <div>
                 <div className="text-xs text-red-300 font-bold mb-1">🎯 נקודות חלשות לחזרה:</div>
-                <ul className="list-disc pr-5 text-xs text-amber-100 hebrew space-y-0.5">
+                <ul className="list-disc pr-5 text-xs text-on-parchment-muted hebrew space-y-0.5">
                   {weakTopics.map((t,i)=><li key={i}>{t}</li>)}
                 </ul>
               </div>

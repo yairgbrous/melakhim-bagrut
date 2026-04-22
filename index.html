@@ -173,17 +173,17 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=900"></script>
-<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=900"></script>
-<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=900"></script>
-<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=900"></script>
-<script src="./components/KingsUtils.js?v=900"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=900"></script>
-<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=900"></script>
-<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=900"></script>
-<script src="./components/BreadthPage.js?v=900"></script>
-<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=900"></script>
-<script type="text/babel" data-presets="react" src="./components/Home.js?v=910"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1000"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=1000"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=1000"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=1000"></script>
+<script src="./components/KingsUtils.js?v=1000"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=1000"></script>
+<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=1000"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=1000"></script>
+<script src="./components/BreadthPage.js?v=1000"></script>
+<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=1000"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=1000"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -2349,6 +2349,81 @@ function App(){
       if (window.__appSetRoute__ === setRoute) delete window.__appSetRoute__;
     };
   }, []);
+
+  // Hash router — deep-link any page via #/path/:id. Bidirectional sync:
+  // URL hash change → setRoute; setRoute → window.location.hash.
+  useEffect(() => {
+    const PAGE_FROM_SLUG = {
+      home: 'home', learn: 'study', study: 'study',
+      timeline: 'timeline', themes: 'themes', maps: 'maps',
+      quiz: 'quiz', 'exam-sim': 'exam', exam: 'exam',
+      flashcards: 'flashcards', quotes: 'quotes', profile: 'profile', class: 'class'
+    };
+    const SLUG_FROM_PAGE = {
+      home: 'home', study: 'learn', timeline: 'timeline', themes: 'themes',
+      maps: 'maps', quiz: 'quiz', exam: 'exam-sim', flashcards: 'flashcards',
+      quotes: 'quotes', profile: 'profile', class: 'class',
+      character: 'character', event: 'event', place: 'place', unit: 'unit', lesson: 'lesson'
+    };
+    const parseHash = () => {
+      const raw = (window.location.hash || '').replace(/^#\/?/, '').trim();
+      if (!raw) return null;
+      const parts = raw.split('/').filter(Boolean);
+      if (!parts.length) return null;
+      const slug = parts[0];
+      const id = parts[1] ? decodeURIComponent(parts[1]) : null;
+      if (slug === 'character' && id) return {page:'character', id};
+      if (slug === 'event' && id)     return {page:'event', id};
+      if (slug === 'place' && id)     return {page:'place', id};
+      if (slug === 'unit' && id)      return {page:'unit', unitId: isNaN(+id) ? id : +id};
+      if (slug === 'lesson' && id)    return {page:'lesson', unitId: isNaN(+id) ? id : +id, mode: parts[2] || 'summary'};
+      const page = PAGE_FROM_SLUG[slug];
+      return page ? {page} : null;
+    };
+    const buildHash = (r) => {
+      if (!r || !r.page) return '';
+      const slug = SLUG_FROM_PAGE[r.page] || r.page;
+      if (r.page === 'character' && r.id) return '#/character/' + encodeURIComponent(r.id);
+      if (r.page === 'event' && r.id)     return '#/event/' + encodeURIComponent(r.id);
+      if (r.page === 'place' && r.id)     return '#/place/' + encodeURIComponent(r.id);
+      if (r.page === 'unit' && r.unitId != null)   return '#/unit/' + encodeURIComponent(r.unitId);
+      if (r.page === 'lesson' && r.unitId != null) return '#/lesson/' + encodeURIComponent(r.unitId) + '/' + encodeURIComponent(r.mode || 'summary');
+      return '#/' + slug;
+    };
+
+    // Initial-load: if there's a hash, apply it.
+    const initial = parseHash();
+    if (initial) setRoute(initial);
+
+    const onHashChange = () => {
+      const next = parseHash();
+      if (!next) return;
+      setRoute(prev => {
+        if (prev && prev.page === next.page && prev.id === next.id && prev.unitId === next.unitId) return prev;
+        return next;
+      });
+    };
+    window.addEventListener('hashchange', onHashChange);
+    window.__buildHash__ = buildHash;
+    return () => {
+      window.removeEventListener('hashchange', onHashChange);
+      if (window.__buildHash__ === buildHash) delete window.__buildHash__;
+    };
+  }, []);
+
+  // Keep URL hash in sync with current route (without triggering hashchange loop).
+  useEffect(() => {
+    if (typeof window.__buildHash__ !== 'function') return;
+    const want = window.__buildHash__(route);
+    if (!want) return;
+    const cur = window.location.hash || '';
+    if (cur === want) return;
+    try {
+      history.replaceState(null, '', window.location.pathname + window.location.search + want);
+    } catch (e) {
+      window.location.hash = want;
+    }
+  }, [route]);
 
   const update = u => setS(p => typeof u === 'function' ? u(p) : {...p, ...u});
   const awardXP = n => update(p => {
