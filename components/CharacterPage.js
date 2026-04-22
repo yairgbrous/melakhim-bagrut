@@ -14,6 +14,18 @@
     return t.replace(/\{\{[a-zA-Zא-ת_]+:[^|}]+\|([^}]+)\}\}/g, '$1');
   };
 
+  // If index.html has exposed window.parseTokens (bridged from its Babel app
+  // block), use it so {{type:id|Display}} tokens in bios render as clickable
+  // EntityChips. Otherwise fall back to plain unwrapped text.
+  const renderText = (t) => {
+    if (typeof t !== 'string' || !t) return t || '';
+    if (t.indexOf('{{') < 0) return t;
+    if (typeof window.parseTokens === 'function') {
+      try { return window.parseTokens(t); } catch(e) {}
+    }
+    return stripTokens(t);
+  };
+
   function findKingByName(name){
     try{
       const tl = (typeof MELAKHIM_DATA !== 'undefined') ? (MELAKHIM_DATA.timeline||[]) : [];
@@ -173,12 +185,16 @@
         </div>
 
         <div className="kt-expanded rounded-2xl" style={{border:'1px solid rgba(212,165,116,.25)'}}>
-          {bio && <Section title="📖 ביוגרפיה"><p className="kt-bio">{bio}</p></Section>}
-          {k && k.notes && !bio && <Section title="📖 תקציר"><p className="kt-bio">{stripTokens(k.notes)}</p></Section>}
+          {bioRaw && (
+            <Section title="📖 ביוגרפיה">
+              <p className="kt-bio hebrew">{renderText(bioRaw)}</p>
+            </Section>
+          )}
+          {k && k.notes && !bioRaw && <Section title="📖 תקציר"><p className="kt-bio hebrew">{renderText(k.notes)}</p></Section>}
 
           {c.key_actions && c.key_actions.length>0 && (
             <Section title="⚡ מעשים מרכזיים">
-              <ul className="kt-actions">{c.key_actions.map((a,i)=><li key={i}>{stripTokens(a)}</li>)}</ul>
+              <ul className="kt-actions">{c.key_actions.map((a,i)=><li key={i}>{renderText(a)}</li>)}</ul>
             </Section>
           )}
 
