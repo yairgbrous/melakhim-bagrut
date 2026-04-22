@@ -592,8 +592,8 @@
     return (
       <div className="mp-wrap">
         <div className="mp-header">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300">🗺️ 19 מפות הבגרות</h1>
-          <p className="text-amber-100/70 text-sm mt-1">
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">🗺️ 19 מפות הבגרות</h1>
+          <p className="text-on-parchment-muted text-sm mt-1">
             המפות שבבגרות (לפי הספר עמ׳ 213-214). לחץ על מפה לתצוגה מלאה עם סיכות ממוספרות.
           </p>
           <div className="parchment rounded-2xl p-4 mp-tip">
