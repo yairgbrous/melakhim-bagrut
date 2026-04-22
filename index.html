@@ -2027,6 +2027,17 @@ function App(){
 
   useEffect(() => save(S), [S]);
 
+  // Expose setRoute for cross-component navigation (KingsTable, CharacterPage).
+  useEffect(() => {
+    window.__appSetRoute__ = setRoute;
+    const onNav = (e) => { if (e && e.detail && e.detail.page) setRoute(e.detail); };
+    window.addEventListener('mb-navigate', onNav);
+    return () => {
+      window.removeEventListener('mb-navigate', onNav);
+      if (window.__appSetRoute__ === setRoute) delete window.__appSetRoute__;
+    };
+  }, []);
+
   const update = u => setS(p => typeof u === 'function' ? u(p) : {...p, ...u});
   const awardXP = n => update(p => {
     const xp = p.xp + n;
@@ -2140,6 +2151,7 @@ function App(){
         {route.page==="class" && <ClassBoard S={S} update={update} setRoute={setRoute}/>}
         {route.page==="profile" && <MeTab S={S} update={update} setRoute={setRoute}/>}
         {route.page==="study" && <StudyHub setRoute={setRoute}/>}
+        {route.page==="character" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף דמות...</div>; })()}
         </>}
       </main>
 
