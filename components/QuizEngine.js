@@ -179,13 +179,13 @@
     return (
       <div className="space-y-3">
         <div className="flex items-center gap-2 text-xs flex-wrap">
-          <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold">
+          <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-on-parchment-accent font-bold">
             {idx+1}/{total}
           </span>
-          <span className="px-2 py-0.5 rounded-full bg-amber-900 text-amber-100 text-[10px] font-bold">
+          <span className="px-2 py-0.5 rounded-full bg-amber-900 text-on-parchment-muted text-[10px] font-bold">
             {TYPE_LABEL[q.type] || "שאלה"}
           </span>
-          {q.points && <span className="text-amber-200/60 text-[10px]">{q.points} נק׳</span>}
+          {q.points && <span className="text-on-parchment-meta text-[10px]">{q.points} נק׳</span>}
         </div>
 
         <div className="parchment rounded-2xl p-5 md:p-6">
@@ -268,9 +268,9 @@
 
         {footerChips().length > 0 && (
           <div className="flex items-center gap-1.5 flex-wrap text-[10px]">
-            <span className="text-amber-200/60">קשור ל:</span>
+            <span className="text-on-parchment-meta">קשור ל:</span>
             {footerChips().map(c => (
-              <span key={c.key} className="px-2 py-0.5 rounded-full bg-amber-900/40 border border-amber-500/20 text-amber-200">
+              <span key={c.key} className="px-2 py-0.5 rounded-full bg-amber-900/40 border border-amber-500/20 text-on-parchment">
                 {c.label}
               </span>
             ))}
@@ -307,37 +307,37 @@
       <div className="max-w-2xl mx-auto space-y-4">
         <div className="text-center py-4">
           <div className="text-6xl mb-2">📊</div>
-          <h2 className="font-display text-2xl font-bold text-amber-300">סיכום תרגול</h2>
+          <h2 className="font-display text-2xl font-bold text-on-parchment-accent">סיכום תרגול</h2>
         </div>
 
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="card rounded-xl p-3">
             <div className="text-2xl">✅</div>
             <div className="font-bold text-emerald-400 text-xl" dir="ltr">{counts.know}</div>
-            <div className="text-xs text-amber-200/70">היה לי</div>
+            <div className="text-xs text-on-parchment">היה לי</div>
           </div>
           <div className="card rounded-xl p-3">
             <div className="text-2xl">⚠</div>
-            <div className="font-bold text-amber-300 text-xl" dir="ltr">{counts.partial}</div>
-            <div className="text-xs text-amber-200/70">חלקית</div>
+            <div className="font-bold text-on-parchment-accent text-xl" dir="ltr">{counts.partial}</div>
+            <div className="text-xs text-on-parchment">חלקית</div>
           </div>
           <div className="card rounded-xl p-3">
             <div className="text-2xl">❌</div>
             <div className="font-bold text-red-400 text-xl" dir="ltr">{counts.dont}</div>
-            <div className="text-xs text-amber-200/70">לא ידעתי</div>
+            <div className="text-xs text-on-parchment">לא ידעתי</div>
           </div>
         </div>
 
         <div className="card rounded-xl p-4">
-          <h3 className="font-bold text-amber-200 mb-2">ביצוע לפי סוג שאלה:</h3>
+          <h3 className="font-bold text-on-parchment mb-2">ביצוע לפי סוג שאלה:</h3>
           <div className="space-y-1.5 text-xs">
             {Object.entries(byType).map(([t, s])=>(
               <div key={t} className="flex items-center gap-2">
-                <span className="flex-1 text-amber-100">{TYPE_LABEL[t] || t}</span>
+                <span className="flex-1 text-on-parchment-muted">{TYPE_LABEL[t] || t}</span>
                 <span className="text-emerald-400">✓ <span dir="ltr">{s.know}</span></span>
-                <span className="text-amber-300">⚠ <span dir="ltr">{s.partial}</span></span>
+                <span className="text-on-parchment-accent">⚠ <span dir="ltr">{s.partial}</span></span>
                 <span className="text-red-400">✗ <span dir="ltr">{s.dont}</span></span>
-                <span className="text-amber-200/50 w-10 text-left" dir="ltr">/{s.total}</span>
+                <span className="text-on-parchment-meta w-10 text-left" dir="ltr">/{s.total}</span>
               </div>
             ))}
           </div>
@@ -346,7 +346,7 @@
         {weak.length > 0 && (
           <div className="card rounded-xl p-4 border border-red-600/40">
             <h3 className="font-bold text-red-300 mb-2">🎯 נקודות חלשות — חזור עליהן:</h3>
-            <ul className="text-sm text-amber-100 space-y-1.5 list-disc pr-5">
+            <ul className="text-sm text-on-parchment-muted space-y-1.5 list-disc pr-5">
               {weak.slice(0,8).map(q => (
                 <li key={q.id} className="hebrew">
                   {q.prompt || q.quote || q.phrase || q.character || q.place || q.verse}
@@ -358,7 +358,7 @@
 
         <div className="grid grid-cols-2 gap-2">
           <button onClick={onRestart} className="gold-btn py-3 rounded-xl font-bold">🔁 שוב</button>
-          <button onClick={onExit} className="card py-3 rounded-xl text-amber-200">🏠 יציאה</button>
+          <button onClick={onExit} className="card py-3 rounded-xl text-on-parchment">🏠 יציאה</button>
         </div>
       </div>
     );
@@ -432,11 +432,11 @@
       return (
         <div className="max-w-xl mx-auto py-8 text-center space-y-3">
           <div className="text-5xl">🔍</div>
-          <p className="text-amber-200">אין שאלות זמינות.</p>
+          <p className="text-on-parchment">אין שאלות זמינות.</p>
           {entityFilter && (
             <button onClick={()=>setEntityFilter(null)} className="gold-btn px-4 py-2 rounded-lg">הסר סינון</button>
           )}
-          <button onClick={exit} className="card px-4 py-2 rounded-lg text-amber-200 mr-2">חזרה</button>
+          <button onClick={exit} className="card px-4 py-2 rounded-lg text-on-parchment mr-2">חזרה</button>
         </div>
       );
     }
@@ -455,17 +455,17 @@
       <div className="max-w-2xl mx-auto space-y-4">
         <div className="sticky top-[108px] z-20 card rounded-xl p-3">
           <div className="flex items-center justify-between mb-2 text-sm">
-            <span className="font-bold text-amber-200" dir="ltr">{idx+1}/{questions.length}</span>
+            <span className="font-bold text-on-parchment" dir="ltr">{idx+1}/{questions.length}</span>
             {duration > 0 && (
-              <span className={`font-mono font-bold ${timeLeft<30?"text-red-400":"text-amber-200"}`}>
+              <span className={`font-mono font-bold ${timeLeft<30?"text-red-400":"text-on-parchment"}`}>
                 ⏱ {String(mins).padStart(2,"0")}:{String(secs).padStart(2,"0")}
               </span>
             )}
             <div className="flex items-center gap-2 text-xs">
               {entityFilter && (
-                <button onClick={()=>setEntityFilter(null)} className="text-amber-300 underline">✕ סינון</button>
+                <button onClick={()=>setEntityFilter(null)} className="text-on-parchment-accent underline">✕ סינון</button>
               )}
-              <button onClick={exit} className="text-amber-300">יציאה</button>
+              <button onClick={exit} className="text-on-parchment-accent">יציאה</button>
             </div>
           </div>
           <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
