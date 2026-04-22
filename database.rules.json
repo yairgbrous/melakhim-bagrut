@@ -1,0 +1,43 @@
+{
+  "_comment_howto": [
+    "====================================================================",
+    "RTDB security rules for the Melakhim Bagrut app.",
+    "",
+    "HOW TO DEPLOY (one time, from a machine with Firebase CLI installed):",
+    "  1. npm install -g firebase-tools",
+    "  2. firebase login",
+    "  3. firebase init database        # select the same project as the app",
+    "                                   # choose this file as the rules file",
+    "  4. firebase deploy --only database",
+    "",
+    "Alternatively, copy the 'rules' block below (without the _comment_*",
+    "keys) into the Firebase Console → Realtime Database → Rules tab, and",
+    "click Publish.",
+    "===================================================================="
+  ],
+  "_comment_structure": [
+    "Structure this app writes:",
+    "  users/{uid}/progress/<encoded-key> : string   # localStorage mirror",
+    "  users/{uid}/meta                   : object   # optional future use",
+    "  classes/{code}/members/{name}      : object   # existing leaderboard",
+    "  classes/{code}/activity/{push-id}  : object   # existing activity feed",
+    "",
+    "Security goals:",
+    "  - A signed-in user can read/write ONLY their own users/{uid}/*.",
+    "  - Anyone can still read the classes/* board (keeps current leaderboard",
+    "    behaviour). If you want to lock that down too, replace the classes",
+    "    rules below with '.read': 'auth != null' and '.write': 'auth != null'."
+  ],
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read":  "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "classes": {
+      ".read":  true,
+      ".write": true
+    }
+  }
+}
