@@ -150,6 +150,16 @@
     const prophetChips = toChips(c.related_prophets || [], 'character');
     const placeChips   = toChips(c.related_places   || c.places || [], 'archaeology');
     const eventChips   = toChips(c.related_events   || c.events || [], 'story');
+    const labelForKing = (kid) => {
+      const row = kings.find(x => x.id === kid);
+      return row ? (row.name_niqqud || row.name || kid) : kid;
+    };
+    const kingChips = (c.related_kings || []).map(v =>
+      (v && typeof v==='object') ? {id:v.id||v.label, label:v.label||v.name||v.id} : {id:v, label:labelForKing(v)}
+    );
+    const keyQuotes = c.key_quotes || [];
+    const bookRefs  = c.book_refs  || [];
+    const significance = c.significance || '';
     const breadth  = c.breadth_topics || c.breadth || [];
     const units    = c.units || (c.unit ? [c.unit] : []);
 
