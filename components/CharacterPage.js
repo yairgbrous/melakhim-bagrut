@@ -295,6 +295,12 @@
             </Section>
           )}
 
+          {kingChips.length>0 && (
+            <Section title="👑 מלכים קשורים">
+              <div className="kt-chips">{kingChips.map(p=><Chip key={p.id} tone="prophet" label={p.label} onClick={()=>goChar(p.id)}/>)}</div>
+            </Section>
+          )}
+
           {placeChips.length>0 && (
             <Section title="📍 מקומות">
               <div className="kt-chips">{placeChips.map(p=><Chip key={p.id} tone="place" label={p.label} onClick={()=>goPlace(p.id)}/>)}</div>
