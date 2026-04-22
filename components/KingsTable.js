@@ -197,6 +197,7 @@
     return (
       <div
         className={"kt-king " + col.cls}
+        data-kid={k.id}
         style={{...borderSide, borderColor: dyn.color}}
         title={dyn.name + ' · ' + kindLabel}
         aria-label={k.name + ' · ' + kindLabel}
@@ -361,6 +362,9 @@
     const [filter, setFilter]   = useState('all');
     const [onlyGood, setOnly]   = useState(false);
     const [expanded, setExpand] = useState(null);
+    const [showChain, setShowChain] = useState(false);
+    const [chainLines, setChainLines] = useState([]);
+    const tableWrapRef = useRef(null);
 
     const all = useMemo(() => pickKingsData(), [ready]);
 
@@ -375,6 +379,43 @@
     }, [all, filter, onlyGood]);
 
     const rows = useMemo(() => buildRows(filtered), [filtered]);
+
+    useEffect(() => {
+      if (!showChain) { setChainLines([]); return; }
+      const KU = window.KingsUtils;
+      if (!KU) return;
+      const recompute = () => {
+        const wrap = tableWrapRef.current;
+        if (!wrap) return;
+        const wbox = wrap.getBoundingClientRect();
+        const byId = {};
+        wrap.querySelectorAll('[data-kid]').forEach(el => { byId[el.getAttribute('data-kid')] = el; });
+        const chain = KU.succession_chain(all).filter(p => p.killer_id && p.killer_id !== p.victim_id);
+        const lines = chain.map(p => {
+          const v = byId[p.victim_id], k = byId[p.killer_id];
+          if (!v || !k) return null;
+          const vb = v.getBoundingClientRect(), kb = k.getBoundingClientRect();
+          return {
+            id: p.victim_id+'>'+p.killer_id,
+            x1: vb.left + vb.width/2 - wbox.left,
+            y1: vb.top  + vb.height/2 - wbox.top,
+            x2: kb.left + kb.width/2 - wbox.left,
+            y2: kb.top  + kb.height/2 - wbox.top,
+            label: p.killer_name + ' ← ' + p.victim_name
+          };
+        }).filter(Boolean);
+        setChainLines(lines);
+      };
+      recompute();
+      const onR = () => recompute();
+      window.addEventListener('resize', onR);
+      const wrap = tableWrapRef.current;
+      wrap && wrap.addEventListener('scroll', onR, {passive:true});
+      return () => {
+        window.removeEventListener('resize', onR);
+        wrap && wrap.removeEventListener('scroll', onR);
+      };
+    }, [showChain, rows, expanded, all]);
 
     if (rows.length === 0){
       return (
@@ -411,9 +452,35 @@
             <input type="checkbox" checked={onlyGood} onChange={e=>setOnly(e.target.checked)}/>
             <span>הצג רק צדיקים</span>
           </label>
+          <button
+            onClick={()=>setShowChain(v=>!v)}
+            className={"kt-chain-toggle " + (showChain?'on':'')}
+            aria-pressed={showChain}
+            title="הצג קווי רצח בין מלכים"
+          >
+            {showChain ? '✕ הסתר שרשרת רצח' : '⚔️ הצג שרשרת הרצח'}
+          </button>
         </div>
 
-        <div className="kt-scroll">
+        <div className="kt-scroll kt-table-rel" ref={tableWrapRef}>
+          {showChain && chainLines.length > 0 && (
+            <svg className="kt-chain-svg" width="100%" height="100%" style={{position:'absolute',inset:0,overflow:'visible'}}>
+              <defs>
+                <marker id="kt-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#d94444"/>
+                </marker>
+              </defs>
+              {chainLines.map(L => (
+                <g key={L.id}>
+                  <line x1={L.x1} y1={L.y1} x2={L.x2} y2={L.y2}
+                        stroke="#d94444" strokeWidth="2.5" strokeDasharray="6 4"
+                        markerEnd="url(#kt-arrow)" opacity="0.9">
+                    <title>{L.label}</title>
+                  </line>
+                </g>
+              ))}
+            </svg>
+          )}
           <table className="kt-table">
             <thead>
               <tr>
