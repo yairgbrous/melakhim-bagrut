@@ -2280,8 +2280,9 @@ function App(){
         {route.page==="profile" && <MeTab S={S} update={update} setRoute={setRoute}/>}
         {route.page==="study" && <StudyHub setRoute={setRoute}/>}
         {route.page==="character" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף דמות...</div>; })()}
-        {route.page==="place" && <EntityFullPage type="place" id={route.id} setRoute={setRoute}/>}
-        {route.page==="event" && <EntityFullPage type="event" id={route.id} setRoute={setRoute}/>}
+        {route.page==="exam-sim" && (()=>{ const X=window.ExamSim2551; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/> : <div className="text-amber-200 text-center py-8">טוען מתכונת...</div>; })()}
+        {route.page==="event" && (()=>{ const X=window.EventPage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אירוע...</div>; })()}
+        {route.page==="place" && (()=>{ const X=window.PlacePage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען מקום...</div>; })()}
         </>}
       </main>
 
