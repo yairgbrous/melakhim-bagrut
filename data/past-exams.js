@@ -186,3 +186,69 @@ export function getExamQuestionsByType(type) {
 }
 
 export default examQuestions;
+
+// ============================================================================
+// EXAM_2551_DATA — מתכונת בגרות תשפ"ו (ספר מלכים)
+// נוסח משוחזר לצורכי תרגול. ציטוטי מקרא מובאים מילה־במילה (נחלת הכלל).
+// שאר הניסוחים משוחזרים ומנוסחים על־ידי צוות האתר בהשראת מבנה המתכונת.
+// מבנה: פרק א׳ (בקיאות) 8 שאלות × 9 נק׳, בוחרים 5 ⇒ עד 45 נק׳.
+//         פרק ב׳ (ידע וזיכרון) 4 שאלות + פרק ג׳ (ניתוח ורוחב) 10 שאלות,
+//         בוחרים 7 מתוך 14 × 8 נק׳ ⇒ עד 56 נק׳. סה"כ 101 נק׳.
+// משך: 2:15 רגיל, 2:35 עם התאמת 15%.
+// ============================================================================
+
+const EXAM_2551_DATA = {
+  id: "exam_2551",
+  title: "מתכונת בגרות תשפ\"ו — ספר מלכים",
+  source_note: "מתכונת תשפ\"ו - נוסח משוחזר",
+  duration: {
+    standard_minutes: 135,
+    accommodation_15pct_minutes: 155,
+    label_he: "2:15 רגיל | 2:35 עם התאמת 15%",
+  },
+  rubric: {
+    total_points: 101,
+    parts: [
+      {
+        id: "A",
+        name_he: "בקיאות",
+        question_count: 8,
+        pick: 5,
+        points_per_question: 9,
+        max_points: 45,
+      },
+      {
+        id: "B",
+        name_he: "ידע וזיכרון",
+        question_count: 4,
+        points_per_question: 8,
+        groups_with: "C",
+      },
+      {
+        id: "C",
+        name_he: "ניתוח ורוחב",
+        question_count: 10,
+        points_per_question: 8,
+        groups_with: "B",
+      },
+      {
+        id: "B+C",
+        name_he: "ידע/זיכרון + ניתוח/רוחב (מאוחד)",
+        question_count: 14,
+        pick: 7,
+        points_per_question: 8,
+        max_points: 56,
+      },
+    ],
+  },
+  questions: [
+    // --- PART A (בקיאות) ---
+    // --- PART B (ידע וזיכרון) ---
+    // --- PART C (ניתוח ורוחב) ---
+  ],
+};
+
+if (typeof window !== "undefined") {
+  window.EXAM_2551_DATA = EXAM_2551_DATA;
+}
+
