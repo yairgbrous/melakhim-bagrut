@@ -84,8 +84,9 @@
       );
     }
 
-    const isKing = !!c._king || /מלך|king/i.test(c.role||'');
-    const k = c._king || (kings.find(x => x.id === c.id) || null);
+    const isKing = !!c._kingsData || !!c._king || /מלך|king/i.test(c.role||'');
+    // Real king row from kings.js — the character IS the king, so pass `c` itself.
+    const k = c._kingsData ? c : (c._king || (kings.find(x => x.id === c.id) || null));
 
     const prophets = (k && KU && KU.prophets_by_reign) ? KU.prophets_by_reign(Object.values((window.__ENTITY_INDEX__||{}).character||{}), k) : [];
     const foreign  = (k && KU && KU.foreign_event_for) ? KU.foreign_event_for(k) : null;
@@ -93,15 +94,36 @@
     const killedOf = (k && KU) ? KU.killed(kings, k.id)    : [];
 
     const dyn = (k && KU && KU.dynastyBadge) ? KU.dynastyBadge(k) : null;
-    const bio = stripTokens(c.bio || c.summary || c.description || '');
+    const bioRaw = c.short_summary || c.bio || c.summary || c.description || '';
+    const bio = stripTokens(bioRaw);
+    const assessmentQuote = c.assessment_quote || '';
+    const succession = c.succession_type || '';
+    const bookPage = c.book_page || null;
+    const reignYears = (c.reign_years != null) ? c.reign_years : null;
     const quotesBy = c.quotes_by || c.quotes || [];
     const quotesTo = c.quotes_to || [];
-    const places   = c.related_places || c.places || [];
-    const events   = c.related_events || c.events || [];
+    // related_prophets/places/events may be arrays of string IDs (kings.js)
+    // or arrays of {id,label} (legacy). Normalize to {id,label}.
+    const idx = (window.__ENTITY_INDEX__ || {});
+    const labelForId = (id, bucket) => {
+      const b = idx[bucket] || {};
+      const entry = b[id];
+      if (!entry) return id;
+      return entry.name_niqqud || entry.heading || entry.name || entry.title || id;
+    };
+    const toChips = (raw, bucket) => (raw || []).map(v => {
+      if (v && typeof v === 'object') return { id: v.id || v.label, label: v.label || v.name || v.id };
+      return { id: v, label: labelForId(v, bucket) };
+    });
+    const prophetChips = toChips(c.related_prophets || [], 'character');
+    const placeChips   = toChips(c.related_places   || c.places || [], 'archaeology');
+    const eventChips   = toChips(c.related_events   || c.events || [], 'story');
     const breadth  = c.breadth_topics || c.breadth || [];
     const units    = c.units || (c.unit ? [c.unit] : []);
 
     const goChar = (cid) => setRoute({page:'character', id:cid});
+    const openArch = (id) => { try{ window.openEntityDrawer && window.openEntityDrawer('place', id); }catch(e){} };
+    const openStory = (id) => { try{ window.openEntityDrawer && window.openEntityDrawer('event', id); }catch(e){} };
     const firePractice = () => {
       try{ window.dispatchEvent(new CustomEvent('practice-entity', {detail:{type:(isKing?'king':'character'), id:c.id}})); }catch(e){}
     };
@@ -114,20 +136,40 @@
           <div className="flex items-start justify-between flex-wrap gap-2">
             <div>
               <h1 className="font-display text-2xl md:text-3xl font-black text-amber-900 hebrew">
-                {c.name || c.heading || c.id}
+                {c.name_niqqud || c.name || c.heading || c.id}
                 {isKing && k && <KingAssess k={k}/>}
               </h1>
               <div className="text-amber-800 text-sm mt-1">
                 {c.role && <span>{c.role}</span>}
                 {c.kingdom && <span> · {c.kingdom}</span>}
-                {c.era && <span> · {c.era}</span>}
-                {k && k.years && <span> · {k.years} שנות מלוכה</span>}
-                {dyn && <span> · {dyn.name}</span>}
+                {c.era && <span> · יחידה {c.era}</span>}
+                {reignYears != null && <span> · {reignYears} שנות מלוכה</span>}
+                {dyn && dyn.name && <span> · {dyn.name}</span>}
+                {succession && <span> · {succession}</span>}
+                {bookPage != null && <span> · עמוד {bookPage}</span>}
               </div>
               {units && units.length>0 && <div className="text-xs text-amber-700 mt-1">יחידות: {units.join(', ')}</div>}
             </div>
             <button onClick={firePractice} className="gold-btn px-4 py-2 rounded-xl font-bold">⚔️ תרגל על דמות זו</button>
           </div>
+
+          {assessmentQuote && (
+            <blockquote
+              className="hebrew"
+              style={{
+                marginTop:14, marginBottom:0,
+                padding:'10px 14px',
+                borderInlineStart:'4px solid #8B6F1F',
+                background:'rgba(212,165,116,.18)',
+                borderRadius:8,
+                fontFamily:"'Frank Ruhl Libre', serif",
+                fontSize:15, lineHeight:1.7,
+                color:'#3a2a0d'
+              }}
+            >
+              {assessmentQuote}
+            </blockquote>
+          )}
         </div>
 
         <div className="kt-expanded rounded-2xl" style={{border:'1px solid rgba(212,165,116,.25)'}}>
@@ -201,15 +243,21 @@
             </Section>
           )}
 
-          {places.length>0 && (
-            <Section title="📍 מקומות">
-              <div className="kt-chips">{places.map((p,i)=><Chip key={i} tone="place" label={p.label||p.name||p}/>)}</div>
+          {prophetChips.length>0 && prophets.length===0 && (
+            <Section title="🔮 נביאים בעת מלכותו">
+              <div className="kt-chips">{prophetChips.map(p => <Chip key={p.id} tone="prophet" label={p.label} onClick={()=>goChar(p.id)}/>)}</div>
             </Section>
           )}
 
-          {events.length>0 && (
+          {placeChips.length>0 && (
+            <Section title="📍 מקומות">
+              <div className="kt-chips">{placeChips.map(p=><Chip key={p.id} tone="place" label={p.label} onClick={()=>openArch(p.id)}/>)}</div>
+            </Section>
+          )}
+
+          {eventChips.length>0 && (
             <Section title="📜 אירועים">
-              <div className="kt-chips">{events.map((p,i)=><Chip key={i} tone="event" label={p.label||p.title||p}/>)}</div>
+              <div className="kt-chips">{eventChips.map(p=><Chip key={p.id} tone="event" label={p.label} onClick={()=>openStory(p.id)}/>)}</div>
             </Section>
           )}
 

@@ -54,11 +54,12 @@
     evalFile('./data/archaeology.js', ['archaeologyFinds']),
     evalFile('./data/hebrew-dates.js', [])
   ]);
-  const [chars, stories, flashcards, keyConcepts] = await Promise.all([
+  const [chars, stories, flashcards, keyConcepts, kingsMod] = await Promise.all([
     importModule('./data/characters.js'),
     importModule('./data/stories.js'),
     importModule('./data/flashcards.js'),
-    importModule('./data/key-concepts.js')
+    importModule('./data/key-concepts.js'),
+    importModule('./data/kings.js')
   ]);
   const idx = window.__ENTITY_INDEX__;
   (window.motifs||[]).forEach(m => {
@@ -107,6 +108,17 @@
       heading: k.title || k.id
     });
   });
+  const kingsArr = (kingsMod && (kingsMod.default || kingsMod.kings)) || [];
+  idx.king = idx.king || {};
+  kingsArr.forEach(kk => {
+    idx.king[kk.id] = Object.assign({}, kk, {
+      summary: kk.short_summary || '',
+      heading: kk.name_niqqud || kk.id,
+      name: kk.name_niqqud || kk.id
+    });
+  });
+  // Raw array — consumed by KingsTable/KingsUtils/CharacterPage for real data.
+  window.KINGS_DATA = kingsArr;
   window.__ENTITY_INDEX_READY__ = true;
   try{ window.dispatchEvent(new CustomEvent('entity-index-ready', {detail:idx})); }catch(e){}
   console.log('[entity-boot] ready', {
@@ -116,7 +128,8 @@
     character: Object.keys(idx.character).length,
     story: Object.keys(idx.story).length,
     flashcard: Object.keys(idx.flashcard).length,
-    keyConcept: Object.keys(idx.keyConcept).length
+    keyConcept: Object.keys(idx.keyConcept).length,
+    king: Object.keys(idx.king).length
   });
 })();
 </script>
@@ -124,9 +137,9 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="./components/KingsUtils.js?v=700"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=700"></script>
-<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=700"></script>
+<script src="./components/KingsUtils.js?v=800"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=800"></script>
+<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=800"></script>
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=700"></script>
 <script src="./components/BreadthPage.js?v=700"></script>
 <style>
@@ -651,6 +664,7 @@ const MELAKHIM_DATA = {
       range: "מלכים א, א-י\"א",
       icon: "👑",
       color: "gold",
+      kings_note: "תקופה 1 של ספר מלכים מציגה מלך אחד בלבד — שלמה — בראש הממלכה המאוחדת. ההערכה שלו מורכבת: הוא מתואר כחכם מכל אדם ובונה המקדש, אך בסוף ימיו נשותיו הנוכריות הטו את לבבו ל-עבודה זרה והוא הקים במות. מכאן סימונו כ'מעורב' בטבלת המלכים — ירוק לא, אדום לא, אלא כתום. הנביאים המלווים את תקופתו הם נתן (שהמליכו) ואחיה השילוני (שניבא על הפילוג). כל שאר המלכים ב-ספר מלכים באים אחריו, כצאצאיו ממנהיגי בית דוד או כמתמודדים על שבטי ישראל.",
       summary: "ספר מלכים פותח בימי זקנת דוד. אדוניהו בנו מנסה למלוך במקום אביו, ודוד - בעקבות פניית נתן הנביא ובת שבע - ממליך את שלמה. שלמה זוכה להתגלות בגבעון, מבקש לב שומע לשפוט, ומתגלה כחכם מכל אדם. הוא בונה את בית המקדש, את בית המלך, מפתח קשרי חוץ (חירם מלך צור, מלכת שבא, פרעה), והמלכות מגיעה לשיאה: \"וַיֵּשֶׁב יְהוּדָה וְיִשְׂרָאֵל לָבֶטַח אִישׁ תַּחַת גַּפְנוֹ\". אך בסוף ימיו, נישואיו לנשים נוכריות מטים את לבו אחרי אלוהים אחרים, וה' גוזר על קריעת הממלכה מיד בנו.",
       keyEvents: [
         { ch: "א'", event: "המלכת שלמה בגיחון - צדוק הכהן, נתן הנביא ובניהו בן יהוידע מרכיבים אותו על פרדת המלך, מושחים אותו בשמן, תוקעים בשופר והעם קורא 'יְחִי הַמֶּלֶךְ שְׁלֹמֹה'" },
@@ -709,6 +723,7 @@ const MELAKHIM_DATA = {
       range: "מלכים א, י\"א-ט\"ז",
       icon: "💔",
       color: "crimson",
+      kings_note: "תקופה 2 היא תור המעבר: רחבעם (רשע) מאבד את עשרת השבטים בעקבות עצת הילדים, אביה ואסא ממשיכים את בית דוד ביהודה. בישראל מתחלפות במהירות שלוש שושלות קצרות — בית ירבעם (ירבעם, נדב), בית בעשא (בעשא, אלה), וזמרי ב-7 ימים בלבד. עמרי מכונן בסוף התקופה שושלת יציבה. כל מלכי ישראל כאן רשעים בגלל 'חטאת ירבעם' — עגלי הזהב בבית־אל ובדן. אסא מזהיר: לראשונה מופיע 'צדיק' בצבע ירוק בטבלה. שרשראות רצח רבות (נדב←בעשא, אלה←זמרי, זמרי←התאבד) ממחישות כי בישראל הכוח עובר בחרב, בניגוד לבית דוד.",
       summary: "מות שלמה מביא לשבר הגדול. בנו רחבעם בא לשכם להמליך את עצמו. העם (בראשות ירבעם שחזר ממצרים) מבקש להקל עול, אך רחבעם - בעצת הילדים - משיב בגאווה: 'אֲנִי אֲיַסֵּר אֶתְכֶם בָּעַקְרַבִּים'. עשרת השבטים פורשים: 'מַה לָּנוּ חֵלֶק בְּדָוִד'. ירבעם מולך על ישראל, אך מחשש שהעם יחזור לירושלים, מקים שני עגלי זהב בבית אל ובדן - חטא שילווה את ממלכת ישראל עד חורבנה. אחיה השילוני מנבא על כיליון בית ירבעם. מלכים חולפים בחיפזון: נדב, בעשא, אלה, זמרי (7 ימים!), עד שעמרי מכונן שושלת יציבה ובונה את שומרון.",
       keyEvents: [
         { ch: "י\"א", event: "ירבעם בן נבט - אפרתי, פקיד של שלמה על סבל בית יוסף. אחיה השילוני קורע בגדו ל-12 קרעים, נותן לירבעם 10. ירבעם בורח למצרים לשישק" },
@@ -764,6 +779,7 @@ const MELAKHIM_DATA = {
       id: 3,
       num: "ג",
       title: "אליהו ואחאב",
+      kings_note: "תקופה 3 היא עימות הנביא-המלך. בישראל — עמרי בונה את שומרון, ואחרי בנו אחאב מולך: הוא נושא את איזבל בת מלך צידון, מכניס פולחן בעל מאורגן, ועומד מול אליהו במעמד הר הכרמל. אחאב, אחזיה (בנו) ויורם (בנו השני) כולם מסומנים אדום — רשעים. ביהודה — יהושפט בן אסא הוא צדיק ירוק; הוא כורת ברית־חיתון עם בית אחאב ('הֲלַרָשָׁע לַעְזֹר') אך שומר על יראת ה׳. הנביאים המלווים את התקופה — אליהו, אלישע, מיכיהו בן ימלה. שרשראות רצח: יורם בן אחאב ייפול ביד יהוא בתקופה הבאה, ואיזבל תושלך מהחלון. התקופה מוכתרת ב'רכב אש וסוסי אש' שמעלה את אליהו השמיימה.",
       subtitle: "המאבק על נפש האומה",
       range: "מלכים א, ט\"ז - מלכים ב, ב'",
       icon: "🔥",
@@ -827,6 +843,7 @@ const MELAKHIM_DATA = {
       id: 4,
       num: "ד",
       title: "מהפכות ותמורות",
+      kings_note: "תקופה 4 היא גילום המשפט האלוהי בהיסטוריה. יהוא (ישראל) נמשח בידי אלישע ובונה שרשרת רצח אגדית: הורג את יורם בן אחאב, את אחזיה מלך יהודה, את איזבל, את 70 בני אחאב בשומרון ואת כל נביאי הבעל — בקיום מושלם של נבואות אליהו. ביהודה הדרמה הפוכה: יהורם (רשע) נושא את עתליה בת אחאב; אחזיה בנו נהרג ע״י יהוא; עתליה תופסת את השלטון בכוח — המלכת אישה יחידה בספר — ומשמידה את זרע דוד עד שיהוידע הכהן מציל את יהואש הקטן ומדיח אותה. יהואש עצמו מתחיל כצדיק (בהשפעת יהוידע) אך מסיים רשע ונהרג בידי עבדיו. שלושה רוצחי מלכים ברצף אחד.",
       subtitle: "הכרתת בית אחאב וימי יהוא",
       range: "מלכים ב, ח'-ט\"ו",
       icon: "⚔️",
@@ -885,6 +902,7 @@ const MELAKHIM_DATA = {
       id: 5,
       num: "ה",
       title: "הכיבוש האשורי",
+      kings_note: "תקופה 5 היא קריסת ממלכת ישראל. יהואש (ישראל, נינו של יהוא) וירבעם בן יואש מחזירים זמנית את הכוח הצפוני, אך אחריהם מתחילה שרשרת-רצח שלמה: זכריה←שלום בן יבש←מנחם בן גדי←פקחיה←פקח←הושע. חמש הפיכות ברצף, כולן רשעים אדומים בטבלה. מעצמות: פול (תגלת פלאסר) קונה את מנחם בשוחד; תגלת פלאסר גוזר גלות גלעד וגליל בימי פקח; שלמנאסר צר על שומרון בימי הושע 3 שנים — וכובש. גלות עשרת השבטים. ביהודה: אחז נכנע לאשור ('עבדך ובנך אני'), מעתיק מזבח דמשק. יותם ועוזיה (עזריה) שומרים על יראת ה׳. זו התקופה שבה חצי האחד (יהודה) שורד, וחצי השני (ישראל) נעלם לעד.",
       subtitle: "חורבן ממלכת ישראל ונס ירושלים",
       range: "מלכים ב, ט\"ו-כ'",
       icon: "🏛️",
@@ -948,6 +966,7 @@ const MELAKHIM_DATA = {
       id: 6,
       num: "ו",
       title: "סופה של ממלכת יהודה וחורבן המקדש",
+      kings_note: "תקופה 6 היא החורבן של יהודה — בהיעדר ישראל, רק מלכי בית דוד נותרו. היא פותחת בחזקיהו הצדיק הגדול (ירוק) שמצליח לעצור את סנחריב בנס; בנו מנשה הרשע (אדום, 55 שנה!) חוטא יותר מכל קודמיו ובגזרתו נחתם גורל ירושלים. אמון בנו נהרג ע״י עבדיו. יאשיהו הצדיק מגלה את ספר התורה, עושה רפורמה, אך נהרג במגידו ע״י פרעה נכה. אחריו ארבעה בני-דוד אחרונים (יהואחז, יהויקים, יהויכין, צדקיהו) כולם רשעים; שלושה מהם גולים, והרביעי רואה את בניו נשחטים לעיניו ואז עיניו מוסרות. נבוכדנצר הבבלי חורב את המקדש בט׳ באב 586 לפנה״ס. הספר נחתם בקרן תקווה — יהויכין בכלא בבל זוכה לכבוד מלכים — רמז להמשך שושלת בית דוד.",
       subtitle: "הכיבוש הבבלי",
       range: "מלכים ב, כ\"א-כ\"ה",
       icon: "🔥",
@@ -2576,6 +2595,7 @@ function UnitDetail({unitId,S,setRoute,awardXP,update}){
     {id:"characters",icon:"👥",title:"הדמויות",desc:"מי פועל מתי"},
     {id:"places",icon:"📍",title:"המקומות",desc:"איפה קרה מה"},
     {id:"quotes",icon:"💬",title:"מי אמר למי",desc:"ציטוטים חיוניים"},
+    {id:"kings",  icon:"👑",title:"מלכי היחידה",desc:"כל המלכים בתקופה — הערכה, ציטוט, נביאים, מקומות"},
     {id:"quiz",icon:"⚔️",title:"מבחן היחידה",desc:"בדוק שאתה יודע"}
   ];
   return (
@@ -2622,8 +2642,11 @@ function Lesson({unitId,mode,setRoute,S,awardXP,update}){
     awardXP(20);
     setRoute({page:"unit",unitId});
   };
-  const items = {summary:null, events:u.keyEvents, characters:u.characters, places:u.places, quotes:u.quotes}[mode];
-  const titles = {summary:"📖 תקציר",events:"⚡ אירועים",characters:"👥 דמויות",places:"📍 מקומות",quotes:"💬 מי אמר למי"};
+  const items = {summary:null, events:u.keyEvents, characters:u.characters, places:u.places, quotes:u.quotes, kings:null}[mode];
+  const titles = {summary:"📖 תקציר",events:"⚡ אירועים",characters:"👥 דמויות",places:"📍 מקומות",quotes:"💬 מי אמר למי",kings:"👑 מלכי היחידה"};
+  const eraKings = (mode==="kings" && typeof window!=='undefined' && Array.isArray(window.KINGS_DATA))
+    ? window.KINGS_DATA.filter(kk => kk.era === u.id)
+    : [];
   return (
     <div className="space-y-4">
       <button onClick={()=>setRoute({page:"unit",unitId})} className="text-amber-300 text-sm hover:underline">→ חזור ליחידה</button>
@@ -2662,7 +2685,97 @@ function Lesson({unitId,mode,setRoute,S,awardXP,update}){
           <div className="space-y-2">{items.map((q,i) => <QuoteCard key={i} q={q} unit={u}/>)}</div>
         </div>
       )}
+      {mode==="kings" && (
+        <div className="space-y-3">
+          {u.kings_note && (
+            <div className="parchment rounded-xl p-4 text-amber-950 text-sm leading-relaxed">{u.kings_note}</div>
+          )}
+          {eraKings.length === 0 && (
+            <div className="card rounded-xl p-4 text-amber-100/70 text-sm">
+              אין מלכים במקור הנתונים ליחידה זו.
+            </div>
+          )}
+          {eraKings.map(kk => <KingEraCard key={kk.id} kk={kk} setRoute={setRoute}/>)}
+        </div>
+      )}
       <button onClick={markDone} className="gold-btn w-full py-3 rounded-xl text-base">✅ סיימתי · +20 XP</button>
+    </div>
+  );
+}
+
+// Per-unit king panel sourced from data/kings.js via window.KINGS_DATA.
+function KingEraCard({kk, setRoute}){
+  const [open, setOpen] = useState(false);
+  const KU = (typeof window!=='undefined') && window.KingsUtils;
+  const col  = KU ? KU.assessmentColor(kk) : {cls:'assess-mixed',hex:'#8b6d2d'};
+  const dyn  = KU ? KU.dynastyBadge({house:kk.dynasty,kingdom:kk.kingdom,name:kk.name_niqqud||kk.id}) : null;
+  const kindLabel = col.cls==='assess-tzadik'?'צדיק':col.cls==='assess-rasha'?'רשע':'מעורב';
+  const goFull = () => setRoute({page:'character', id:kk.id});
+  const goChar = (id) => setRoute({page:'character', id});
+  const idx = (window.__ENTITY_INDEX__||{});
+  const labelFor = (id, bucket) => {
+    const b = idx[bucket]||{}; const e = b[id];
+    if (!e) return id;
+    return e.name_niqqud || e.heading || e.name || e.title || id;
+  };
+  return (
+    <div className="card rounded-xl p-4" style={{borderInlineStart:`4px solid ${col.hex}`}}>
+      <div className="flex items-start justify-between flex-wrap gap-2">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="font-display text-lg font-black text-amber-100 hebrew">{kk.name_niqqud || kk.id}</h3>
+            <span className={"kt-assess-pill " + col.cls}>{kindLabel}</span>
+            {kk.kingdom && <span className="text-xs px-2 py-0.5 rounded-full bg-amber-900/40 text-amber-200">{kk.kingdom}</span>}
+            {dyn && <span className="text-xs font-bold" style={{color:dyn.color}}>· {dyn.name}</span>}
+          </div>
+          <div className="text-xs text-amber-200/70 mt-1">
+            {kk.reign_years != null && <span>{kk.reign_years} שנות מלוכה</span>}
+            {kk.succession_type && <span> · {kk.succession_type}</span>}
+          </div>
+        </div>
+        <button onClick={goFull} className="kt-full-link" style={{padding:'6px 12px',fontSize:12}}>📖 פתח דף מלא</button>
+      </div>
+      {kk.assessment_quote && (
+        <blockquote className="hebrew" style={{marginTop:10,marginBottom:0,padding:'8px 12px',borderInlineStart:'3px solid #C89B3C',background:'rgba(212,165,116,.10)',borderRadius:6,fontSize:13.5,lineHeight:1.65,color:'#F5D670'}}>
+          {kk.assessment_quote}
+        </blockquote>
+      )}
+      {kk.short_summary && (
+        <div className="mt-2">
+          <p className="text-amber-100/90 text-sm leading-relaxed hebrew" style={{display:open?'block':'-webkit-box',WebkitLineClamp:open?'unset':3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>
+            {kk.short_summary}
+          </p>
+          <button onClick={()=>setOpen(v=>!v)} className="text-xs text-amber-300 hover:underline mt-1">
+            {open?'▼ פחות':'▶ קרא עוד'}
+          </button>
+        </div>
+      )}
+      <div className="mt-2 space-y-1">
+        {(kk.related_prophets||[]).length>0 && (
+          <div className="kt-chips">
+            <span className="text-[11px] text-amber-200/70 me-1">נביאים:</span>
+            {(kk.related_prophets||[]).map(pid => (
+              <button key={pid} className="kt-chip kt-chip-prophet" onClick={()=>goChar(pid)}>{labelFor(pid,'character')}</button>
+            ))}
+          </div>
+        )}
+        {(kk.related_places||[]).length>0 && (
+          <div className="kt-chips">
+            <span className="text-[11px] text-amber-200/70 me-1">מקומות:</span>
+            {(kk.related_places||[]).map(pid => (
+              <span key={pid} className="kt-chip kt-chip-place">{labelFor(pid,'archaeology')}</span>
+            ))}
+          </div>
+        )}
+        {(kk.related_events||[]).length>0 && (
+          <div className="kt-chips">
+            <span className="text-[11px] text-amber-200/70 me-1">אירועים:</span>
+            {(kk.related_events||[]).map(pid => (
+              <span key={pid} className="kt-chip kt-chip-event">{labelFor(pid,'story')}</span>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
