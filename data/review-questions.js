@@ -679,6 +679,227 @@
       related_entities:["char:eliyahu","char:elisha","place:yarden","event:aliyat_eliyahu"]
     },
     // === יחידה ד — מהפכות ותמורות ===
+    {
+      id:"rq-u4-001", unit:4, type:"character_details", difficulty:"קל",
+      prompt_niqqud:"מִי הָיָה אֱלִישָׁע בֶּן שָׁפָט?",
+      answer_points:[
+        "חורש השדה באבל מחולה — אליהו משליך עליו אדרתו",
+        "״פי שנים ברוחך עלי״ — קיבל כפל רוח מאליהו",
+        "נביא במשך כחמישים שנה בממלכת ישראל",
+        "פעל בצמידות לחצר המלך; פעיל גם בצרתו הלאומית"
+      ],
+      related_entities:["char:elisha","char:eliyahu","place:avel_mechola"]
+    },
+    {
+      id:"rq-u4-002", unit:4, type:"place_events", difficulty:"בינוני",
+      prompt_niqqud:"מָה הָיָה נֵס הַמַּיִם בִּירִיחוֹ וּמָה הַסֵּמֶל?",
+      answer_points:[
+        "אנשי יריחו התלוננו: ״המים רעים והארץ משכלת״",
+        "אלישע שם מלח חדש במעיין המים — הבריאם",
+        "״לא יהיה עוד משם מות ומשכלת״",
+        "סמל חיבה של הנביא החדש לעם; דוגמא לברכה בתוך הרע"
+      ],
+      related_entities:["char:elisha","place:yericho","event:mei_yericho"]
+    },
+    {
+      id:"rq-u4-003", unit:4, type:"short_answer", difficulty:"בינוני",
+      prompt_niqqud:"מָה הִתְרַחֵשׁ עִם 42 הַיְלָדִים בְּבֵית אֵל (אֱלִישָׁע)?",
+      answer_points:[
+        "אלישע עלה מיריחו לבית אל",
+        "נערים קטנים לעגו: ״עלה קרח עלה קרח״",
+        "אלישע קילל בשם ה׳; 2 דובים הרגו 42 ילדים",
+        "מסר על כבוד הנביא; גם שלילי על קשיחות הפועל"
+      ],
+      related_entities:["char:elisha","place:beit_el","event:yaldei_dubim"]
+    },
+    {
+      id:"rq-u4-004", unit:4, type:"mi_amar_lemi", difficulty:"קשה",
+      prompt_niqqud:"״הַאָפַסְ רוֹעֶה בְּיִשְׂרָאֵל אֵין נָבִיא עוֹד״ — מִי אָמַר לְמִי?",
+      answer_points:[
+        "יהורם בן אחאב לאלישע הנביא",
+        "במלחמת מואב (יהורם, יהושפט ומלך אדום)",
+        "כאשר נגמרו המים במדבר אדום",
+        "אלישע עונה: ״לוא פני יהושפט מלך יהודה אני נשא אם אביט אליך״"
+      ],
+      related_entities:["char:yehoram","char:elisha","char:yehoshafat","event:milchemet_moav"]
+    },
+    {
+      id:"rq-u4-005", unit:4, type:"character_details", difficulty:"בינוני",
+      prompt_niqqud:"מִי הָיָה נַעֲמָן שַׂר צְבָא אֲרָם וּמָה קָרָה לוֹ?",
+      answer_points:[
+        "שר צבא חזק ומצליח — ״איש גדול״ — אך מצורע",
+        "נערה קטנה מישראל שבויה בביתו הפנתה אותו לאלישע",
+        "אלישע ציווה לטבול 7 פעמים בירדן — נאמן לבסוף",
+        "נעמן האמין בה׳ — לקח עפר מישראל לבנות מזבח"
+      ],
+      related_entities:["char:naaman","char:elisha","place:yarden","event:tvilat_naaman"]
+    },
+    {
+      id:"rq-u4-006", unit:4, type:"al_mi_neemar", difficulty:"בינוני",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״וְצָרָעַת נַעֲמָן תִּדְבַּק בְּךָ וּבְזַרְעֲךָ לְעוֹלָם״?",
+      answer_points:[
+        "על גיחזי נער אלישע",
+        "רץ אחר נעמן בהסתר ולקח כסף ובגדים",
+        "שיקר לאלישע: ״לא הלך עבדך אנה ואנה״",
+        "אלישע קילל — ״וירע מלפניו מצרע כשלג״"
+      ],
+      related_entities:["char:gichazi","char:naaman","char:elisha"]
+    },
+    {
+      id:"rq-u4-007", unit:4, type:"short_answer", difficulty:"בינוני",
+      prompt_niqqud:"תָאֵר אֶת מְרַד יֵהוּא בְּבֵית אַחְאָב.",
+      answer_points:[
+        "אלישע שלח נער למשוח את יהוא ברמות גלעד",
+        "יהוא דוהר ליזרעאל — הורג את יהורם בחלקת נבות",
+        "הורג גם את אחזיהו מלך יהודה שברח; איזבל נזרקת מחלון ונרמסת",
+        "הורג 70 בני אחאב בשומרון ואת כל נביאי הבעל במסיבה"
+      ],
+      related_entities:["char:yehu","char:yehoram","char:izevel","char:achazyahu","event:mered_yehu","place:yizrael","place:shomron"]
+    },
+    {
+      id:"rq-u4-008", unit:4, type:"mi_amar_lemi", difficulty:"קל",
+      prompt_niqqud:"״הֲשָׁלוֹם זִמְרִי הֹרֵג אֲדוֹנָיו״ — מִי לְמִי?",
+      answer_points:[
+        "איזבל ליהוא (מחלון היכלה ביזרעאל)",
+        "תלמית רעיונית — מזכירה את זמרי שהרג את אלה",
+        "יהוא לא משיב לה; אומר לסריסים: ״שמטוה״",
+        "איזבל נזרקת מחלון; דמה נרוק על הכלב והסוסים"
+      ],
+      related_entities:["char:izevel","char:yehu","place:yizrael"]
+    },
+    {
+      id:"rq-u4-009", unit:4, type:"al_mi_neemar", difficulty:"בינוני",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״וַיַּשְׁמֵד יֵהוּא אֶת הַבַּעַל מִיִּשְׂרָאֵל״?",
+      answer_points:[
+        "על יהוא בן נמשי",
+        "אסף את כל עובדי הבעל בבית הבעל — והורגם",
+        "שרף את מצבת הבעל",
+        "אך לא סר מחטאת ירבעם — עגלי הזהב נשארו"
+      ],
+      related_entities:["char:yehu","event:hashmadat_habaal"]
+    },
+    {
+      id:"rq-u4-010", unit:4, type:"character_details", difficulty:"בינוני",
+      prompt_niqqud:"מִי הָיְתָה עֲתַלְיָה וּמָה עָשְׂתָה לְאַחַר מוֹת בְּנָהּ?",
+      answer_points:[
+        "בת אחאב ואיזבל; אם אחזיהו מלך יהודה",
+        "לאחר הריגת אחזיהו ע״י יהוא — שלטה 6 שנים ביהודה",
+        "הרגה את כל זרע המלוכה של בית דוד",
+        "יהושבעת הצילה את יואש (בן אחזיה) — גדל במקדש 6 שנים"
+      ],
+      related_entities:["char:atalya","char:yoash","char:yehosheva","event:mered_yehoyada"]
+    },
+    {
+      id:"rq-u4-011", unit:4, type:"place_events", difficulty:"קשה",
+      prompt_niqqud:"כֵּיצַד הִמְלִיךְ יְהוֹיָדָע הַכֹּהֵן אֶת יוֹאָשׁ?",
+      answer_points:[
+        "בשנה השביעית, תאם עם שרי המאות ובני הגוארים",
+        "בנה סביב יואש גדר של נושאי כלים — ביום השבת במקדש",
+        "הקריא לפניו את ״עדות״ — התורה; המליך, משח, תקעו בשופר",
+        "עתליה שמעה ״וקרעה את בגדיה בגדיה וצעקה קשר קשר״ — הוצאה והומתה"
+      ],
+      related_entities:["char:yehoyada","char:yoash","char:atalya","event:hamlachat_yoash","place:mikdash"]
+    },
+    {
+      id:"rq-u4-012", unit:4, type:"be_eize_hekhsher", difficulty:"בינוני",
+      prompt_niqqud:"״אַרְבַּעַת מְצֹרָעִים״ — בְּאֵיזֶה הֶקְשֵׁר?",
+      answer_points:[
+        "מצור ארם בן־הדד על שומרון — רעב כבד",
+        "4 מצורעים פתח השער: ״אם נבוא העיר — נמות; נלך למחנה ארם״",
+        "מצאו את המחנה ריק — ה׳ השמיע רעש גדול, ארם ברח",
+        "הם בישרו בעיר; אלישע ניבא שבקב קמח ישתלם בשקל ביום הבא"
+      ],
+      related_entities:["char:elisha","char:ben_hadad","event:matzor_shomron","place:shomron"]
+    },
+    {
+      id:"rq-u4-013", unit:4, type:"short_answer", difficulty:"בינוני",
+      prompt_niqqud:"הַסְבֵּר אֶת סִפּוּר הַשּׁוּנָמִית.",
+      answer_points:[
+        "אישה גדולה מעיר שונם — ארחה את אלישע כל פעם",
+        "בנתה לו עלייה קטנה — ״חדר אלישע״",
+        "אלישע ברכה בבן — נולד ומת לאחר שנים",
+        "אלישע החיה את הילד — נס תחיית המתים"
+      ],
+      related_entities:["char:elisha","char:shunamit","place:shunem","event:hachayat_ben_shunamit"]
+    },
+    {
+      id:"rq-u4-014", unit:4, type:"al_mi_neemar", difficulty:"קשה",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״הִכִּיתָ שָׁלֹשׁ פְּעָמִים וַתַּעְצֹר אָז הִכִּיתָ אֲרָם עַד כַּלֵּה״?",
+      answer_points:[
+        "אלישע ליואש מלך ישראל",
+        "במראה הנביא לפני מותו",
+        "ציווה להכות בחצים בארץ — יואש הכה שלוש",
+        "יואש יכה את ארם שלוש פעמים — אך לא יכלה אותה"
+      ],
+      related_entities:["char:elisha","char:yoash_israel","event:chitzim_lvanot"]
+    },
+    {
+      id:"rq-u4-015", unit:4, type:"character_details", difficulty:"בינוני",
+      prompt_niqqud:"מִי הָיָה חֲזָאֵל מֶלֶךְ אֲרָם וְכֵיצַד עָלָה לַמַּלְכוּת?",
+      answer_points:[
+        "היה שר בחצר בן־הדד מלך ארם",
+        "בן־הדד חלה; שלח את חזאל לשאול באלישע",
+        "אלישע בכה — יודע מה הנזק שיעשה לישראל",
+        "חזאל חנק את בן־הדד במטפחת רטובה; מלך תחתיו"
+      ],
+      related_entities:["char:chazael","char:ben_hadad","char:elisha","place:damesek"]
+    },
+    {
+      id:"rq-u4-016", unit:4, type:"short_answer", difficulty:"בינוני",
+      prompt_niqqud:"תָאֵר אֶת נֵס שֶׁמֶן הַאִשָּׁה (אֱלִישָׁע וְאִשַּׁת אַחַד בְּנֵי הַנְּבִיאִים).",
+      answer_points:[
+        "בעלה נפטר; הנושה באה לקחת את שני ילדיה לעבדים",
+        "אלישע שאל מה יש לה — רק ״אסוך שמן״",
+        "ציווה ללוות כלים ריקים מהשכנים, להכניסם הביתה",
+        "השמן זרם עד שנגמרו הכלים; מכרה ופרעה חוב"
+      ],
+      related_entities:["char:elisha","event:assuch_hashemen"]
+    },
+    {
+      id:"rq-u4-017", unit:4, type:"mi_amar_lemi", difficulty:"בינוני",
+      prompt_niqqud:"״אָבִי אָבִי רֶכֶב יִשְׂרָאֵל וּפָרָשָׁיו״ — מִי לְמִי, וּבְאֵיזוֹ הִזְדַּמְּנוּת?",
+      answer_points:[
+        "אלישע לאליהו הנביא",
+        "בעת עלייתו בסערה השמימה",
+        "ביטוי של שיא הכבוד — הנביא כעוצמה הצבאית של ישראל",
+        "נאמר שוב ע״י יואש מלך ישראל על אלישע במותו"
+      ],
+      related_entities:["char:elisha","char:eliyahu","event:aliyat_eliyahu"]
+    },
+    {
+      id:"rq-u4-018", unit:4, type:"place_events", difficulty:"קשה",
+      prompt_niqqud:"מָה הָיָה עָנְיָהּ שֶׁל מַמְלֶכֶת יִשְׂרָאֵל בְּיָמֵי יְהוֹאָחָז בֶּן יֵהוּא?",
+      answer_points:[
+        "חזאל ובנו בן־הדד לחצו את ישראל כל הימים",
+        "רק 50 פרשים, 10 רכב ו־10,000 רגלי נשארו",
+        "יהואחז התפלל; ה׳ ״נתן לישראל מושיע״",
+        "הישועה הגיעה בימי ירבעם השני — שיבת הגבולות"
+      ],
+      related_entities:["char:yehoachaz","char:chazael","char:yarovam_2","event:ani_israel"]
+    },
+    {
+      id:"rq-u4-019", unit:4, type:"character_details", difficulty:"בינוני",
+      prompt_niqqud:"מִי הָיָה אֲמַצְיָה מֶלֶךְ יְהוּדָה?",
+      answer_points:[
+        "בן יואש מלך יהודה. ״עשה הישר בעיני ה׳ רק לא כדוד אביו״",
+        "הכה את אדום בגיא המלח — 10,000 איש",
+        "אך הביא את אלהי אדום כאלוהיו",
+        "יצא למלחמה נגד יואש מלך ישראל — הובס בבית שמש; יואש פרץ חומת ירושלים"
+      ],
+      related_entities:["char:amatzya","char:yoash_israel","event:milchemet_beit_shemesh"]
+    },
+    {
+      id:"rq-u4-020", unit:4, type:"be_eize_hekhsher", difficulty:"קשה",
+      prompt_niqqud:"״הֵיטִבּוֹתָ כַאֲשֶׁר בִּלְבָבִי״ — בְּאֵיזֶה הֶקְשֵׁר נֶאֶמְרוּ הַדְּבָרִים?",
+      answer_points:[
+        "ה׳ ליהוא לאחר השמדת בית אחאב",
+        "״בני רבעים ישבו לך על כסא ישראל״",
+        "ובאמת: יהואחז, יואש, ירבעם ב׳, זכריה — 4 דורות",
+        "הבטחה מותנית שהתקיימה ביד אצילה"
+      ],
+      related_entities:["char:yehu"]
+    },
+    // === יחידה ה — הכיבוש האשורי ===
     // questions inserted incrementally (3 at a time)
   ];
   if (typeof window !== 'undefined'){
