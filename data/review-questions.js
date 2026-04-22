@@ -900,6 +900,227 @@
       related_entities:["char:yehu"]
     },
     // === יחידה ה — הכיבוש האשורי ===
+    {
+      id:"rq-u5-001", unit:5, type:"character_details", difficulty:"קל",
+      prompt_niqqud:"מִי הָיָה יָרָבְעָם בֶּן יוֹאָשׁ (יָרָבְעָם הַשֵּׁנִי)?",
+      answer_points:[
+        "מלך ישראל 41 שנה — בן יואש ונכד יהוא",
+        "״עשה הרע בעיני ה׳״ — לא סר מחטאי ירבעם",
+        "ואמנם הרחיב את גבולות ישראל — ״מלבוא חמת עד ים הערבה״",
+        "ה׳ ריחם בדבריו על יונה בן אמיתי הנביא"
+      ],
+      related_entities:["char:yarovam_2","char:yona","event:shivat_gvulot"]
+    },
+    {
+      id:"rq-u5-002", unit:5, type:"short_answer", difficulty:"בינוני",
+      prompt_niqqud:"מָה הָיָה הַיַּחַס בֵּין מַצָּב רוּחָנִי לְמַצָּב מְדִינִי בִּימֵי יָרָבְעָם הַשֵּׁנִי?",
+      answer_points:[
+        "שפל רוחני: ״עשה הרע״; חטאת ירבעם המשיכה",
+        "שיא מדיני: גבולות נרחבים, שלווה כלכלית",
+        "נביאי דור — עמוס והושע — הוכיחו את הפער",
+        "מקרה קלאסי לעקרון שמצב רוחני־מדיני אינו תמיד ישיר"
+      ],
+      related_entities:["char:yarovam_2","char:amos","char:hoshea_navi"]
+    },
+    {
+      id:"rq-u5-003", unit:5, type:"place_events", difficulty:"בינוני",
+      prompt_niqqud:"אֵיךְ נָפְלָה מַמְלֶכֶת יִשְׂרָאֵל בִּידֵי אַשּׁוּר (זְכַרְיָה עַד הוֹשֵׁעַ)?",
+      answer_points:[
+        "5 מלכים ב־25 שנה; ארבעה מהם נרצחו",
+        "זכריה נרצח בידי שלום בן יבש (קץ בית יהוא)",
+        "מנחם בן גדי שילם לפול מלך אשור (תגלת פלאסר) 1000 כיכר כסף",
+        "סוף — הושע בן אלה; שלמנאסר עלה עליו בשל הברית עם סוא מצרים"
+      ],
+      related_entities:["char:zacharya","char:shalum","char:menachem","char:hoshea","char:tiglat_pileser","event:nefilat_shomron"]
+    },
+    {
+      id:"rq-u5-004", unit:5, type:"mi_amar_lemi", difficulty:"קל",
+      prompt_niqqud:"״עַבְדְּךָ וּבִנְךָ אָנִי״ — מִי לְמִי?",
+      answer_points:[
+        "אחז מלך יהודה לתגלת פלאסר מלך אשור",
+        "בברית כניעה — אחז שלח לאשור בקשת עזרה",
+        "נגד רצין מלך ארם ופקח מלך ישראל (מלחמת אחז)",
+        "ביטוי חסר תקדים של כניעה של מלך יהודה"
+      ],
+      related_entities:["char:achaz","char:tiglat_pileser","event:milchemet_achaz"]
+    },
+    {
+      id:"rq-u5-005", unit:5, type:"be_eize_hekhsher", difficulty:"בינוני",
+      prompt_niqqud:"״וַיִּרְאֶה הַמֶּלֶךְ אָחָז אֶת הַמִּזְבֵּחַ אֲשֶׁר בְּדַמֶּשֶׂק״ — בְּאֵיזֶה הֶקְשֵׁר?",
+      answer_points:[
+        "אחז עלה לדמשק לפגוש את תגלת פלאסר",
+        "ראה שם מזבח והעתיקו ע״י אוריה הכהן",
+        "החליף את מזבח הנחושת של שלמה במזבח דמשק",
+        "פירק חלקי מקדש: מוסרי המכונות, הים מעל שוורי הנחושת"
+      ],
+      related_entities:["char:achaz","char:uriya","event:mizbach_damesek","place:damesek","place:mikdash"]
+    },
+    {
+      id:"rq-u5-006", unit:5, type:"al_mi_neemar", difficulty:"קל",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״הוּא הָיָה בַּמְּדִבָּר וַיַּעֲבֵר אֶת בְּנוֹ בָּאֵשׁ״?",
+      answer_points:[
+        "על אחז מלך יהודה",
+        "״העביר בנו באש״ — עבודת המולך (בגיא בן־הנום)",
+        "סימן חמור של הגדרת הרוע במלכי יהודה",
+        "נחשב שיא הכפירה עד חזקיה שתיקן"
+      ],
+      related_entities:["char:achaz","event:haavarat_ben_baesh"]
+    },
+    {
+      id:"rq-u5-007", unit:5, type:"short_answer", difficulty:"בינוני",
+      prompt_niqqud:"מָה הַסִּבּוֹת שֶׁמָּנָה מל\"ב י\"ז לִנְפִילַת שֹׁמְרוֹן?",
+      answer_points:[
+        "בני ישראל חטאו לה׳: הלכו בחטאות ירבעם",
+        "עבדו אלילים, הקימו מצבות ואשרים, עשו להם עגלי מסכה",
+        "לא שמעו בדברי הנביאים שה׳ שלח להזהיר",
+        "ה׳ ״הסיר את ישראל מעל פניו״ — גלות לחלח, חבור, נהר גוזן וערי מדי"
+      ],
+      related_entities:["event:nefilat_shomron","place:shomron","place:chalach"]
+    },
+    {
+      id:"rq-u5-008", unit:5, type:"place_events", difficulty:"קשה",
+      prompt_niqqud:"מִי יָשַׁב בְּשֹׁמְרוֹן לְאַחַר הַגָּלוּת? תָאֵר אֶת ״אַרְיוֹת שֹׁמְרוֹן״.",
+      answer_points:[
+        "מלך אשור הביא אנשים מבבל, כותה, עוה, חמת וספרוים",
+        "המתיישבים החדשים לא יראו את ה׳",
+        "ה׳ שילח בהם אריות; המתים רבו",
+        "מלך אשור החזיר כהן מהגולה ללמד את ״משפט אלהי הארץ״"
+      ],
+      related_entities:["event:ariyot_shomron","place:shomron"]
+    },
+    {
+      id:"rq-u5-009", unit:5, type:"character_details", difficulty:"בינוני",
+      prompt_niqqud:"מִי הָיָה הוֹשֵׁעַ בֶּן אֵלָה וּמָה מְיַחֵד אוֹתוֹ בְּהַעֲרָכָה?",
+      answer_points:[
+        "המלך האחרון של ממלכת ישראל",
+        "״עשה הרע... רק לא כמלכי ישראל אשר היו לפניו״",
+        "כלומר — פחות רע מקודמיו; אך לא מציל את ישראל",
+        "בריתו עם סוא מצרים הביאה את מסע שלמנאסר"
+      ],
+      related_entities:["char:hoshea","char:sua","char:shalmaneser","event:nefilat_shomron"]
+    },
+    {
+      id:"rq-u5-010", unit:5, type:"mi_amar_lemi", difficulty:"בינוני",
+      prompt_niqqud:"״בְּחַרְתָּ לָכֶם הַיּוֹם בַּמַּיִם הָרָעִים לָעַם הַזֶּה״ — מִי לְמִי? (רמז: מל״ב יד)",
+      answer_points:[
+        "יואש מלך ישראל לאמציה מלך יהודה",
+        "כאתגר למלחמה בבית שמש",
+        'משל החוח הקרחמוני: "הארז אשר בלבנון... ותעבר חית השדה אשר בלבנון ותרמס את החוח"',
+        "אמציה לא שמע — התוצאה: שבי ופריצת חומות ירושלים"
+      ],
+      related_entities:["char:yoash_israel","char:amatzya","event:milchemet_beit_shemesh"]
+    },
+    {
+      id:"rq-u5-011", unit:5, type:"short_answer", difficulty:"קשה",
+      prompt_niqqud:"מָה עָשָׂה פֶּקַח בֶּן רְמַלְיָהוּ בְּמַמְלֶכֶת יִשְׂרָאֵל?",
+      answer_points:[
+        "שליש של פקחיה — הרגו בשומרון",
+        "מלך 20 שנה; כבש את דן וגלעד",
+        "נלחם נגד אחז יחד עם רצין מלך ארם (״מלחמת סוריה־אפרים״)",
+        "תגלת פלאסר בימיו גלה את דן, אבל בית מעכה, עיון וחצור"
+      ],
+      related_entities:["char:pekach","char:retzin","char:achaz","event:galut_tiglat_pileser"]
+    },
+    {
+      id:"rq-u5-012", unit:5, type:"be_eize_hekhsher", difficulty:"בינוני",
+      prompt_niqqud:"״וְלֹא הָיְתָה זֹאת בְּיַרְבְעָם בֶּן נְבָט״ — בְּאֵיזֶה הֶקְשֵׁר?",
+      answer_points:[
+        "בסיכום נפילת שומרון (מל״ב י״ז)",
+        "הפסוק מבאר שחטאת ירבעם הראשון החריבה את ממלכת ישראל",
+        "״ממכרה להם לעשות הרע בעיני ה׳״",
+        "רמז: חטא פרטי יכול להפיל אומה שלמה לדורות"
+      ],
+      related_entities:["char:yarovam","event:nefilat_shomron"]
+    },
+    {
+      id:"rq-u5-013", unit:5, type:"character_details", difficulty:"קל",
+      prompt_niqqud:"מִי הָיָה מְנַחֵם בֶּן גָּדִי וְאֵיזוֹ מַנְהִיגוּת הָפְגִּין?",
+      answer_points:[
+        "שר בצבא; הרג את שלום בן יבש והמליך עצמו",
+        "הכה את תפסח ופיצחו את העוברות — אכזריות מפורסמת",
+        "שילם לפול (תגלת פלאסר) 1000 כיכר כסף",
+        "הסתמך על אשור כדי לשמור על שלטונו — תחילת ירידת ישראל"
+      ],
+      related_entities:["char:menachem","char:pul","event:gviya_mehatpasach"]
+    },
+    {
+      id:"rq-u5-014", unit:5, type:"al_mi_neemar", difficulty:"בינוני",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״הוּא עָשָׂה אֲשֶׁר יֵשַׁר בְּעֵינֵי ה׳ רַק הַבָּמוֹת לֹא סָרוּ״?",
+      answer_points:[
+        "ביטוי חוזר — על מלכי יהודה ״הכשרים״ (אסא, יהושפט, יואש, אמציה, עזיה/עוזיה)",
+        "עשו הישר אך השאירו במות שבהם הקריבו העם",
+        "ביקורת עדינה של הכתוב — לא פעולה מלאה לתיקון",
+        "רק חזקיה ויאשיהו הסירו את הבמות"
+      ],
+      related_entities:["char:asa","char:yehoshafat","char:uziya","char:yoash","event:bamot"]
+    },
+    {
+      id:"rq-u5-015", unit:5, type:"place_events", difficulty:"בינוני",
+      prompt_niqqud:"מָה הָיוּ הָעָרִים שֶׁכָּבַשׁ תִּגְלַת פִּלְאֶסֶר בְּמַסָּעוֹ בְּיָמֵי פֶּקַח?",
+      answer_points:[
+        "עיון, אבל בית מעכה, ינוח, קדש, חצור",
+        "הגלעד והגליל — כל ארץ נפתלי",
+        "הגלה את התושבים לאשור",
+        "זוהי גלות השבטים הראשונה — 733 לפנה״ס"
+      ],
+      related_entities:["char:tiglat_pileser","char:pekach","place:gilad","place:galil","event:galut_tiglat_pileser"]
+    },
+    {
+      id:"rq-u5-016", unit:5, type:"short_answer", difficulty:"בינוני",
+      prompt_niqqud:"תָאֵר אֶת הַמָּצוֹר עַל שֹׁמְרוֹן וְאֶת נְפִילָתָהּ.",
+      answer_points:[
+        "שלמנאסר עלה על הושע בעקבות הברית עם מצרים",
+        "הושע נכלא. מצור 3 שנים על שומרון",
+        "בשנה ה־9 להושע נפלה העיר",
+        "מלך אשור (סרגון II) גלה את ישראל לחלח, חבור וערי מדי"
+      ],
+      related_entities:["char:shalmaneser","char:hoshea","event:nefilat_shomron","place:shomron"]
+    },
+    {
+      id:"rq-u5-017", unit:5, type:"mi_amar_lemi", difficulty:"קשה",
+      prompt_niqqud:"״כִּי לֹא הֵרִים אֶת מִשְׁפָּט אֱלֹהֵי הָאָרֶץ״ — בְּאֵיזֶה הֶקְשֵׁר?",
+      answer_points:[
+        "המתיישבים החדשים בשומרון אומרים זאת",
+        "לאחר ששלחה בהם ה׳ אריות",
+        "מלך אשור שאל למה; נענה שאינם יודעים את ״משפט אלהי הארץ״",
+        "שלח כהן מהגולה ללמדם"
+      ],
+      related_entities:["event:ariyot_shomron","place:shomron"]
+    },
+    {
+      id:"rq-u5-018", unit:5, type:"be_eize_hekhsher", difficulty:"בינוני",
+      prompt_niqqud:"״חוֹמַת יְרוּשָׁלִַם מְפֹרֶצֶת״ — בְּאֵיזֶה הֶקְשֵׁר?",
+      answer_points:[
+        "לאחר מלחמת יואש (ישראל) ואמציה (יהודה) בבית שמש",
+        "יואש פרץ 400 אמה מחומת ירושלים מפינת שער אפרים",
+        "לקח גם אוצרות בית ה׳ ואת הערבונות",
+        "פגיעה קשה בבירת יהודה מידי אחיה מהצפון"
+      ],
+      related_entities:["char:yoash_israel","char:amatzya","place:yerushalayim","event:milchemet_beit_shemesh"]
+    },
+    {
+      id:"rq-u5-019", unit:5, type:"character_details", difficulty:"קשה",
+      prompt_niqqud:"מִי הָיָה עֲזַרְיָהוּ (עֻזִּיָּהוּ) מֶלֶךְ יְהוּדָה?",
+      answer_points:[
+        "בן אמציה; ״עשה הישר בעיני ה׳״",
+        "בנה את עציון גבר; נלחם בפלשתים",
+        "בסוף ימיו נתקלף בצרעת לאחר שניסה להקטיר במקדש",
+        "בנו יותם מלך במקומו בחייו"
+      ],
+      related_entities:["char:uziya","char:yotam"]
+    },
+    {
+      id:"rq-u5-020", unit:5, type:"al_mi_neemar", difficulty:"קשה",
+      prompt_niqqud:"עַל מִי נֶאֱמַר: ״וַיָּשָׁב וַיָּכֶה אֶת דַּמֶּשֶׂק וְאֶת חֲמָת לִיהוּדָה בְּיִשְׂרָאֵל״?",
+      answer_points:[
+        "על ירבעם בן יואש (השני)",
+        "הרחיב את גבולות ישראל — חזר למלא־מרחב דוד ושלמה",
+        "נוסח ייחודי: ״ליהודה בישראל״ — מרמז על איחוד סימבולי",
+        "בלי שמיר רוחני — העם חטא; הצלה דרך רוע"
+      ],
+      related_entities:["char:yarovam_2","place:damesek","place:chamat","event:shivat_gvulot"]
+    },
+    // === יחידה ו — חורבן יהודה ===
     // questions inserted incrementally (3 at a time)
   ];
   if (typeof window !== 'undefined'){
