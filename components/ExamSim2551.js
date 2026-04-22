@@ -310,6 +310,7 @@
     const [selectedBC, setSelectedBC] = useState([]);
     const [draft, setDraft] = useState(() => loadInProgress());
     const [resumeData, setResumeData] = useState(null);
+    const [finalRun, setFinalRun] = useState(null);
 
     const startExam = (cfg) => { setExamCfg(cfg); setPhase("select"); };
 
@@ -371,18 +372,31 @@
         durationSec={(examCfg&&examCfg.durationSec)||DURATION_STANDARD}
         accommodation={!!(examCfg&&examCfg.accommodation)}
         resume={resumeData}
-        onFinish={()=>{ setResumeData(null); setPhase("grade"); }}
+        onFinish={(payload)=>{ setFinalRun(payload); setResumeData(null); setPhase("grade"); }}
         onExit={()=>{ setResumeData(null); setPhase("intro"); }}
       />;
     }
 
-    return (
-      <div className="max-w-xl mx-auto text-center py-12 space-y-3">
-        <div className="text-5xl">🏗</div>
-        <p className="text-amber-200">שלב הדירוג בפיתוח — הקומיט הבא.</p>
-        <button onClick={()=>setPhase("intro")} className="gold-btn px-4 py-2 rounded-lg">חזרה</button>
-      </div>
-    );
+    if (phase === "grade") {
+      return <ExamGrade
+        selectedA={selectedA} selectedBC={selectedBC}
+        answers={(finalRun&&finalRun.answers)||{}}
+        elapsedSec={(finalRun&&finalRun.elapsedSec)||0}
+        accommodation={!!(examCfg&&examCfg.accommodation)}
+        onDone={()=>{ setFinalRun(null); setPhase("done"); }}
+      />;
+    }
+
+    if (phase === "done") {
+      return (
+        <div className="max-w-xl mx-auto text-center py-12 space-y-3">
+          <div className="text-6xl">🎉</div>
+          <p className="text-amber-200">הבחינה הוגשה ונשמרה בהיסטוריית הניסיונות.</p>
+          <button onClick={()=>{ setSelectedA([]); setSelectedBC([]); setExamCfg(null); setPhase("intro"); }} className="gold-btn px-4 py-2 rounded-lg">חזרה למסך הפתיחה</button>
+        </div>
+      );
+    }
+    return null;
   }
 
   function ExamRunning({ selectedA, selectedBC, durationSec, accommodation, resume, onFinish, onExit }){
@@ -469,6 +483,144 @@
           <button onClick={onExit} className="card py-3 rounded-xl text-amber-200">← יציאה</button>
           <button onClick={finish} className="gold-btn py-3 rounded-xl font-bold">📤 הגש לבדיקה</button>
         </div>
+      </div>
+    );
+  }
+
+  // --- grading helpers ---
+  function scoreForGrade(grade, maxPoints){
+    if (grade === "know")    return maxPoints;
+    if (grade === "partial") return maxPoints / 2;
+    return 0;
+  }
+
+  function loadAttempts(){
+    try { const r = localStorage.getItem(ATTEMPTS_KEY); return r ? JSON.parse(r) : []; }
+    catch { return []; }
+  }
+  function pushAttempt(rec){
+    const list = loadAttempts();
+    list.push(rec);
+    try { localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(list)); } catch {}
+  }
+
+  function ExamGrade({ selectedA, selectedBC, answers, elapsedSec, accommodation, onDone }){
+    const partAQs  = PART_A_POOL.filter(q => selectedA.includes(q.id));
+    const partBCQs = PART_BC_POOL.filter(q => selectedBC.includes(q.id));
+    const allQs = [...partAQs, ...partBCQs];
+
+    const [editAnswers, setEditAnswers] = useState(() => ({...answers}));
+    const [grades, setGrades] = useState({});
+    const [saved, setSaved] = useState(false);
+
+    const setGrade = (id, g) => setGrades(prev => ({...prev, [id]: g}));
+    const setAns   = (id, v) => setEditAnswers(prev => ({...prev, [id]: v}));
+
+    const partAScore = partAQs.reduce((s,q) => s + scoreForGrade(grades[q.id], q.points||9), 0);
+    const partBCScore = partBCQs.reduce((s,q) => s + scoreForGrade(grades[q.id], q.points||8), 0);
+    const total = partAScore + partBCScore;
+    const allGraded = allQs.every(q => grades[q.id]);
+
+    const weakTopics = allQs.filter(q => grades[q.id] === "dont").map(q => q.title);
+
+    const submit = () => {
+      const rec = {
+        date: new Date().toISOString(),
+        total: Math.round(total*10)/10,
+        partA: Math.round(partAScore*10)/10,
+        partBC: Math.round(partBCScore*10)/10,
+        accommodation,
+        elapsedSec,
+        weakTopics,
+        grades,
+        selectedA, selectedBC
+      };
+      pushAttempt(rec);
+      setSaved(true);
+    };
+
+    return (
+      <div className="max-w-3xl mx-auto space-y-4">
+        <div className="card rounded-xl p-4 flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h2 className="font-display text-xl font-bold text-amber-300">📝 דירוג עצמי מול תשובות מצופות</h2>
+            <div className="text-xs text-amber-200/70">
+              זמן שלקח: <span dir="ltr">{fmtHMS(elapsedSec)}</span> · מצב התאמה: {accommodation?"פעיל":"רגיל"}
+            </div>
+          </div>
+          <div className="text-left">
+            <div className="text-xs text-amber-200/70">ציון נוכחי</div>
+            <div className="font-mono font-bold text-amber-300 text-2xl" dir="ltr">
+              {Math.round(total*10)/10}/101
+            </div>
+            <div className="text-[10px] text-amber-200/60">
+              א: <span dir="ltr">{Math.round(partAScore*10)/10}/45</span> · ב+ג: <span dir="ltr">{Math.round(partBCScore*10)/10}/56</span>
+            </div>
+          </div>
+        </div>
+
+        {allQs.map(q => {
+          const g = grades[q.id];
+          return (
+            <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
+              <div className="flex items-center gap-2 text-xs">
+                <span className={`px-2 py-0.5 rounded-full text-white font-bold ${q.part?"bg-purple-700":"bg-amber-700"}`}>
+                  {q.part ? `סעיף ${q.n}` : `שאלה ${q.n}`}
+                </span>
+                <span className="text-amber-800">{q.points} נק׳</span>
+                <span className="text-amber-900 font-bold mr-auto">{q.title}</span>
+              </div>
+              <div className="hebrew text-amber-950 leading-relaxed text-sm">{q.prompt}</div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div>
+                  <div className="text-[10px] font-bold text-amber-800 mb-1">התשובה שלך:</div>
+                  <textarea value={editAnswers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)} rows={4}
+                    className="w-full px-2 py-1.5 rounded-lg bg-white/80 border border-amber-700/40 text-amber-950 hebrew text-sm leading-relaxed"/>
+                </div>
+                <div>
+                  <div className="text-[10px] font-bold text-emerald-800 mb-1">תשובה מצופה (מהספר):</div>
+                  <ul className="list-disc pr-5 text-xs text-emerald-950 hebrew leading-relaxed space-y-1 bg-emerald-50/60 rounded-lg p-2">
+                    {(q.expected_points||[]).map((p,i)=><li key={i}>{p}</li>)}
+                  </ul>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 pt-2">
+                {[
+                  {g:"know",    label:"✅ יודע",   cls:g==="know"   ?"bg-emerald-600 text-white":"bg-white/60 text-emerald-900"},
+                  {g:"partial", label:"⚠ חלקי",   cls:g==="partial"?"bg-amber-600 text-white":"bg-white/60 text-amber-900"},
+                  {g:"dont",    label:"❌ לא יודע", cls:g==="dont"   ?"bg-red-700 text-white":"bg-white/60 text-red-900"}
+                ].map(b => (
+                  <button key={b.g} onClick={()=>setGrade(q.id, b.g)}
+                    className={`rounded-lg py-2 text-sm font-bold transition ${b.cls}`}>
+                    {b.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+
+        {!saved ? (
+          <button onClick={submit} disabled={!allGraded}
+            className={`w-full py-3 rounded-xl text-base font-bold ${allGraded?"gold-btn":"bg-slate-700 text-slate-400 cursor-not-allowed"}`}>
+            {allGraded ? `💾 שמור ציון ${Math.round(total*10)/10}/101 בהיסטוריה` : "דרג את כל הסעיפים כדי לשמור"}
+          </button>
+        ) : (
+          <div className="card rounded-xl p-4 space-y-2">
+            <div className="text-emerald-400 font-bold text-center">✅ נשמר בהיסטוריית הניסיונות</div>
+            {weakTopics.length > 0 && (
+              <div>
+                <div className="text-xs text-red-300 font-bold mb-1">🎯 נקודות חלשות לחזרה:</div>
+                <ul className="list-disc pr-5 text-xs text-amber-100 hebrew space-y-0.5">
+                  {weakTopics.map((t,i)=><li key={i}>{t}</li>)}
+                </ul>
+              </div>
+            )}
+            <button onClick={onDone} className="gold-btn w-full py-2 rounded-lg font-bold mt-2">המשך</button>
+          </div>
+        )}
       </div>
     );
   }
