@@ -50,12 +50,16 @@
   }
 
   function resolveCharacter(id){
+    // Primary source: window.CHARACTERS_DATA (data/characters.js v2)
+    const cd = Array.isArray(window.CHARACTERS_DATA) ? window.CHARACTERS_DATA : [];
+    const fromData = cd.find(x => x && x.id === id);
+    if (fromData) return fromData;
     const KU = window.KingsUtils;
     if (KU && KU.getCharacter){
       const c = KU.getCharacter(id);
       if (c) return c;
     }
-    // try kings index / timeline by id
+    // fallback: kings timeline by id
     const k = allKings().find(k => k.id === id);
     if (k) return { id:k.id, name:k.name, role:'מלך', kingdom:k.dynasty, era:k.years ? (k.years+' שנות מלוכה') : '', bio:'', _king:k };
     return null;
