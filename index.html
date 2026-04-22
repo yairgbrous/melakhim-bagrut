@@ -23,6 +23,42 @@
 <link rel="stylesheet" href="assets/layout-fix.css?v=500">
 <script>
 /* =========================================================================
+   localStorage write hook (feature-gated downstream).
+   Wraps localStorage.setItem so progress-prefixed keys broadcast a
+   'mb-local-write' CustomEvent with {key, value}. The live app reads
+   exactly as before — the original setItem is always called first.
+   Prefixes captured: "jarvis." (exam/quiz/flashcard) and "melakhim_pro_"
+   (legacy profile blob). Everything else is pass-through.
+   AuthProvider listens to these events; when signed-in + feature flag on,
+   it debounces 2s then pushes a diff to RTDB users/{uid}/progress.
+   ========================================================================= */
+(function(){
+  if (typeof window === "undefined" || !window.localStorage) return;
+  const PREFIXES = ["jarvis.", "melakhim_pro_"];
+  const orig = window.localStorage.setItem.bind(window.localStorage);
+  try {
+    window.localStorage.setItem = function(key, value){
+      orig(key, value);
+      try {
+        if (typeof key === "string" && PREFIXES.some(p => key.indexOf(p) === 0)) {
+          window.dispatchEvent(new CustomEvent("mb-local-write", { detail: { key, value } }));
+        }
+      } catch {}
+    };
+    window.__MB_LOCAL_HOOK__ = true;
+  } catch (e) { /* iframes / strict mode sandboxes may reject — fall through */ }
+
+  // Feature flag for RTDB auth + progress sync. OFF by default. Flip in
+  // devtools with `window.MELAKHIM_AUTH_ENABLED = true; window.MelakhimAuth.init()`
+  // once the Firebase config is pasted into localStorage["melakhim_firebase_config"]
+  // AND database rules have been deployed (see database.rules.json).
+  if (typeof window !== "undefined" && window.MELAKHIM_AUTH_ENABLED === undefined) {
+    window.MELAKHIM_AUTH_ENABLED = false;
+  }
+})();
+</script>
+<script>
+/* =========================================================================
    Entity index bootstrap — loads data modules into window.__ENTITY_INDEX__
    Fails gracefully per-file. Dispatches 'entity-index-ready' when done.
    Non-module files (motifs.js, archaeology.js, hebrew-dates.js) are eval'd
@@ -137,15 +173,16 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=700"></script>
-<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=700"></script>
-<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=700"></script>
-<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=700"></script>
-<script src="./components/KingsUtils.js?v=802"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=802"></script>
-<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=802"></script>
-<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=700"></script>
-<script src="./components/BreadthPage.js?v=700"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=900"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=900"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=900"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=900"></script>
+<script src="./components/KingsUtils.js?v=900"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=900"></script>
+<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=900"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=900"></script>
+<script src="./components/BreadthPage.js?v=900"></script>
+<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=900"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -2183,6 +2220,7 @@ function App(){
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
+            {typeof window!=="undefined" && window.AuthButtonComponent ? <window.AuthButtonComponent/> : null}
             <button onClick={toggleTheme} className="theme-tog" aria-label="החלף מצב כהה/בהיר" title="החלף מצב כהה/בהיר">
               {theme==='light'?'🌙':'☀️'}
             </button>
