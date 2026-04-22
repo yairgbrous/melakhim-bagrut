@@ -324,7 +324,45 @@
       notes:["אליהו מחולל נסים בגבולות הממלכה ומחוצה לה"],
       book_page:213
     },
-    // maps inserted incrementally below
+    {
+      id:"masai_elisha",
+      number:18, unit:4,
+      title:"מסעי אלישע",
+      era_label:"אלישע בן שפט, ימי יהורם ויהוא",
+      caption:"זירות הנסים: ירדן (מים מרים), יריחו, דותן (סנוורים לארמים), שונם (בן השונמית), שומרון (מצור ורווחה), דמשק (חזאל).",
+      pins:[
+        {n:1, place:"ירדן / יריחו", placeId:"yericho", x:55, y:72},
+        {n:2, place:"אבל מחולה", placeId:"avel_mechola", x:60, y:52},
+        {n:3, place:"גלגל", placeId:"gilgal", x:52, y:68},
+        {n:4, place:"דותן", placeId:"dotan", x:42, y:46},
+        {n:5, place:"שונם", placeId:"shunem", x:48, y:37},
+        {n:6, place:"הר הכרמל", placeId:"karmel", x:38, y:36},
+        {n:7, place:"שומרון", placeId:"shomron", x:42, y:42},
+        {n:8, place:"דמשק", placeId:"damesek", x:76, y:18}
+      ],
+      notes:["אלישע נע בין ישראל לארם; פעילותו מחוץ לחצר המלך"],
+      book_page:214
+    },
+    {
+      id:"medinot_saviv",
+      number:19, unit:5,
+      title:"המדינות סביב — מצרים, אשור, בבל, ארם ועמי הארץ",
+      era_label:"מעצמות וממלכות סביב ישראל ויהודה",
+      caption:"מעצמות גדולות בצפון ובדרום; ממלכות קטנות בגבול (ארם, פלשת, מואב, עמון, אדום) — סיבה מתמדת לעימותים.",
+      pins:[
+        {n:1, place:"מצרים", placeId:"mitzrayim", x:8, y:94},
+        {n:2, place:"אשור (נינווה)", placeId:"ninveh", x:92, y:6},
+        {n:3, place:"בבל", placeId:"bavel", x:92, y:22},
+        {n:4, place:"ארם (דמשק)", placeId:"damesek", x:76, y:18},
+        {n:5, place:"פלשת (עזה)", placeId:"plishtim", x:18, y:82},
+        {n:6, place:"מואב", placeId:"moav", x:62, y:78},
+        {n:7, place:"עמון (רבת)", placeId:"amon", x:72, y:62},
+        {n:8, place:"אדום (בצרה)", placeId:"edom", x:52, y:95},
+        {n:9, place:"צור/צידון", placeId:"tzor", x:38, y:22}
+      ],
+      notes:["רקע דיפלומטי וצבאי לכל מסעות המלחמה בספר"],
+      book_page:214
+    }
   ];
 
   function normalizeMap(m, idx){
