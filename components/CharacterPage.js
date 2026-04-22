@@ -344,6 +344,12 @@
               <div className="kt-chips">{c.tags.map((t,i)=><Chip key={i} label={t}/>)}</div>
             </Section>
           )}
+
+          {significance && (
+            <Section title="✨ משמעות לספר מלכים">
+              <p className="kt-bio hebrew" style={{fontStyle:'italic',color:'#4a3612'}}>{renderText(significance)}</p>
+            </Section>
+          )}
         </div>
       </div>
     );
