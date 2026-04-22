@@ -48,21 +48,81 @@
     emit();
   }
 
-  function init(){
+  const FIREBASE_VERSION = "10.12.0";
+  const SDK_URLS = [
+    `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/firebase-app-compat.js`,
+    `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/firebase-auth-compat.js`
+  ];
+
+  function loadScript(src){
+    return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[data-firebase-sdk="${src}"]`)) { resolve(); return; }
+      const s = document.createElement("script");
+      s.src = src;
+      s.async = false;
+      s.dataset.firebaseSdk = src;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("failed to load "+src));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function loadFirebaseSDK(){
+    for (const u of SDK_URLS) await loadScript(u);
+    if (!window.firebase || !window.firebase.auth) throw new Error("firebase SDK missing after load");
+  }
+
+  async function initFirebase(cfg){
+    await loadFirebaseSDK();
+    if (!window.firebase.apps.length) {
+      window.firebase.initializeApp(cfg);
+    }
+    // Persistence best-effort; Safari private mode can fail — don't block.
+    try { await window.firebase.auth().setPersistence(window.firebase.auth.Auth.Persistence.LOCAL); } catch {}
+    window.firebase.auth().onAuthStateChanged(user => {
+      if (user) setStatus("signed-in", { user, error: null });
+      else      setStatus("ready",     { user: null });
+    });
+  }
+
+  async function init(){
     if (typeof window === "undefined") return;
     if (!window.MELAKHIM_AUTH_ENABLED) { setStatus("disabled"); return; }
     const cfg = readConfig();
     if (!cfg) { setStatus("no-config"); return; }
     state.config = cfg;
-    // SDK load + auth wiring land in subsequent commits.
-    setStatus("ready");
+    setStatus("loading");
+    try {
+      await initFirebase(cfg);
+      // onAuthStateChanged will transition to "ready" or "signed-in".
+    } catch (e) {
+      console.warn("[auth] init failed", e);
+      setStatus("error", { error: (e && e.message) || String(e) });
+    }
   }
 
-  // Public API placeholder — filled in by later commits.
+  async function signIn(){
+    try {
+      if (!window.firebase || !window.firebase.auth) throw new Error("auth not initialized");
+      const provider = new window.firebase.auth.GoogleAuthProvider();
+      await window.firebase.auth().signInWithPopup(provider);
+      // onAuthStateChanged updates the state.
+    } catch (e) {
+      console.warn("[auth] signIn failed", e);
+      setStatus("error", { error: (e && e.message) || String(e) });
+    }
+  }
+
+  async function signOut(){
+    try {
+      if (window.firebase && window.firebase.auth) await window.firebase.auth().signOut();
+    } catch (e) { console.warn("[auth] signOut failed", e); }
+  }
+
   const MelakhimAuth = {
     init,
-    signIn: async () => { console.warn("[auth] signIn not yet wired"); },
-    signOut: async () => { console.warn("[auth] signOut not yet wired"); },
+    signIn,
+    signOut,
     subscribe: (fn) => { state.listeners.add(fn); fn({...state}); return () => state.listeners.delete(fn); },
     getState: () => ({...state})
   };
