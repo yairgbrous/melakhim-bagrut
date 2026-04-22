@@ -121,9 +121,9 @@
     const breadth  = c.breadth_topics || c.breadth || [];
     const units    = c.units || (c.unit ? [c.unit] : []);
 
-    const goChar = (cid) => setRoute({page:'character', id:cid});
-    const openArch = (id) => { try{ window.openEntityDrawer && window.openEntityDrawer('place', id); }catch(e){} };
-    const openStory = (id) => { try{ window.openEntityDrawer && window.openEntityDrawer('event', id); }catch(e){} };
+    const goChar  = (cid) => setRoute({page:'character', id:cid});
+    const goPlace = (pid) => setRoute({page:'place',     id:pid});
+    const goEvent = (eid) => setRoute({page:'event',     id:eid});
     const firePractice = () => {
       try{ window.dispatchEvent(new CustomEvent('practice-entity', {detail:{type:(isKing?'king':'character'), id:c.id}})); }catch(e){}
     };
@@ -251,13 +251,13 @@
 
           {placeChips.length>0 && (
             <Section title="📍 מקומות">
-              <div className="kt-chips">{placeChips.map(p=><Chip key={p.id} tone="place" label={p.label} onClick={()=>openArch(p.id)}/>)}</div>
+              <div className="kt-chips">{placeChips.map(p=><Chip key={p.id} tone="place" label={p.label} onClick={()=>goPlace(p.id)}/>)}</div>
             </Section>
           )}
 
           {eventChips.length>0 && (
             <Section title="📜 אירועים">
-              <div className="kt-chips">{eventChips.map(p=><Chip key={p.id} tone="event" label={p.label} onClick={()=>openStory(p.id)}/>)}</div>
+              <div className="kt-chips">{eventChips.map(p=><Chip key={p.id} tone="event" label={p.label} onClick={()=>goEvent(p.id)}/>)}</div>
             </Section>
           )}
 
