@@ -212,7 +212,13 @@
     );
   }
 
-  function ExpandedRow({k, onPractice}){
+  function ExpandedRow({k, onPractice, allKings}){
+    const KU = window.KingsUtils;
+    const killedBy = useMemo(()=> (KU && allKings) ? KU.killed_by(allKings, k.id) : [], [k.id, allKings]);
+    const killedOf = useMemo(()=> (KU && allKings) ? KU.killed(allKings, k.id)    : [], [k.id, allKings]);
+    const foreign  = useMemo(()=> (KU ? KU.foreign_event_for(k) : null), [k.id]);
+    const openFull = () => { if (KU) KU.navigateToCharacter(k.id); };
+    const goKing = (id) => { if (id && KU) KU.navigateToCharacter(id); };
     const rel = useMemo(() => gatherRelated(k), [k.id, k.name]);
     const chipsProphets = (k.related_prophets.length ? k.related_prophets.map(p => ({id:p, label:p})) : rel.prophets.map(c => ({id:c.id, label:c.heading||c.name}))).slice(0, 12);
     const chipsPlaces   = (k.related_places.length ? k.related_places.map(p => ({id:p, label:p})) : rel.places.map(c => ({id:c.id, label:c.heading||c.name_hebrew||c.id}))).slice(0, 12);
@@ -242,7 +248,7 @@
           <div className="kt-sect">
             <div className="kt-sect-h">🔮 נביאים בעת מלכותו</div>
             <div className="kt-chips">{chipsProphets.map(c =>
-              <button key={c.id} className="kt-chip kt-chip-prophet" onClick={()=>navigateToStudyTab('character', c.id)}>{c.label}</button>
+              <button key={c.id} className="kt-chip kt-chip-prophet" onClick={()=>{ const KU=window.KingsUtils; if(KU) KU.navigateToCharacter(c.id); else navigateToStudyTab('character', c.id); }}>{c.label}</button>
             )}</div>
           </div>
         )}
@@ -262,9 +268,46 @@
             )}</div>
           </div>
         )}
-        <div className="kt-actions-row">
-          <button className="gold-btn kt-practice-btn" onClick={()=>onPractice(k.id)}>
+        {(killedBy.length>0 || killedOf.length>0) && (
+          <div className="kt-sect">
+            <div className="kt-sect-h">⚔️ שרשרת רצח / ירושה בכוח</div>
+            {killedBy.length>0 && (
+              <div className="kt-kill-row">
+                <span className="kt-kill-row-label">נהרג על ידי:</span>
+                {killedBy.map((p,i)=>(
+                  <span key={i} className="kt-kill-chip" onClick={(e)=>{e.stopPropagation(); goKing(p.killer_id);}}>
+                    {p.killer_name}{p.note?` · ${p.note}`:''}
+                  </span>
+                ))}
+              </div>
+            )}
+            {killedOf.length>0 && (
+              <div className="kt-kill-row">
+                <span className="kt-kill-row-label">הרג את:</span>
+                {killedOf.map((p,i)=>(
+                  <span key={i} className="kt-kill-chip" onClick={(e)=>{e.stopPropagation(); goKing(p.victim_id);}}>
+                    {p.victim_name}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {foreign && (
+          <div className="kt-sect">
+            <div className="kt-sect-h">🌍 מעצמה זרה</div>
+            <div className="kt-foreign-chip" style={{display:'inline-block'}}>
+              <strong>{foreign.name}</strong> ({foreign.empire}) — {foreign.event}
+              {foreign.book_ref && <span style={{opacity:.7}}> · {foreign.book_ref}</span>}
+            </div>
+          </div>
+        )}
+        <div className="kt-actions-row" style={{flexWrap:'wrap',gap:10}}>
+          <button className="gold-btn kt-practice-btn" onClick={(e)=>{e.stopPropagation(); onPractice(k.id);}}>
             ⚔️ תרגל על מלך זה
+          </button>
+          <button className="kt-full-link" onClick={(e)=>{e.stopPropagation(); openFull();}}>
+            📖 פתח דף מלא
           </button>
         </div>
       </div>
@@ -418,7 +461,7 @@
                     {isExpanded && (
                       <tr className="kt-row-detail">
                         <td colSpan={5} className="kt-td-detail">
-                          <ExpandedRow k={k} onPractice={firePractice}/>
+                          <ExpandedRow k={k} onPractice={firePractice} allKings={all}/>
                         </td>
                       </tr>
                     )}
