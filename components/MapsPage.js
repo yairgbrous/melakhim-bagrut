@@ -32,6 +32,56 @@
   // Coord system: x,y in 0..100 (percentage of canvas).
   // -------------------------------------------------------------------------
   const MAPS_19 = [
+    {
+      id:"pilug_yerovam",
+      number:2, unit:2,
+      title:"פילוג הממלכה וערי הפולחן של ירבעם",
+      era_label:"ירבעם בן נבט, ~931 לפנה״ס",
+      caption:"יהודה בדרום, ישראל בצפון. ירבעם מקים עגלי זהב בבית אל ובדן, ופנואל לבירה בעבר הירדן.",
+      pins:[
+        {n:1, place:"ירושלים", placeId:"yerushalayim", x:40, y:70},
+        {n:2, place:"שכם", placeId:"shchem", x:44, y:48},
+        {n:3, place:"בית אל", placeId:"beit_el", x:41, y:60},
+        {n:4, place:"דן", placeId:"dan", x:55, y:12},
+        {n:5, place:"פנואל", placeId:"pnuel", x:78, y:52}
+      ],
+      notes:["4 סיכות בבגרות (מתכונת תשפ״ו): בית אל, דן, פנואל ושכם"],
+      book_page:213
+    },
+    {
+      id:"sancheriv_701",
+      number:11, unit:6,
+      title:"מסע סנחריב על יהודה 701 לפנה״ס",
+      era_label:"חזקיהו מלך יהודה",
+      caption:"סנחריב יורד לכיבוש ערי יהודה הבצורות, צר על לכיש ועל ירושלים; רבשקה משמיע נאומו מ״שדה כובס״.",
+      pins:[
+        {n:1, place:"ירושלים", placeId:"yerushalayim", x:40, y:70},
+        {n:2, place:"לכיש", placeId:"lachish", x:30, y:78},
+        {n:3, place:"גת", placeId:"gat", x:25, y:75},
+        {n:4, place:"עקרון", placeId:"ekron", x:22, y:68},
+        {n:5, place:"לבנה", placeId:"livna", x:28, y:82},
+        {n:6, place:"ניניוה (אשור)", placeId:"ninveh", x:92, y:6},
+        {n:7, place:"מצרים", placeId:"mitzrayim", x:8, y:94}
+      ],
+      notes:["מפת שיא הכיבוש האשורי ומפת נס ההצלה של חזקיהו"],
+      book_page:214
+    },
+    {
+      id:"yoshiyahu_megido",
+      number:12, unit:6,
+      title:"יאשיהו במגידו — 609 לפנה״ס",
+      era_label:"יאשיהו מלך יהודה, פרעה נכה",
+      caption:"פרעה נכה עולה דרך חוף הים לעזרת אשור בכרכמיש; יאשיהו חוצה לו דרך ונהרג במגידו.",
+      pins:[
+        {n:1, place:"ירושלים", placeId:"yerushalayim", x:40, y:70},
+        {n:2, place:"מגידו", placeId:"megido", x:42, y:38},
+        {n:3, place:"כרכמיש", placeId:"karkemish", x:80, y:6},
+        {n:4, place:"מצרים", placeId:"mitzrayim", x:8, y:94},
+        {n:5, place:"נהר פרת", placeId:"prat", x:88, y:20}
+      ],
+      notes:["נקודת המפנה מאשור לבבל; מות יאשיהו סוגר את עידן הצדק"],
+      book_page:214
+    },
     // maps inserted incrementally below
   ];
 
