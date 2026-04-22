@@ -125,6 +125,87 @@
     );
   }
 
+  // ---- TODAY'S FOCUS -----------------------------------------------------
+  // Pulls weak areas from jarvis.quiz.* keys in localStorage.
+  // Key convention: jarvis.quiz.miss.<entityType>.<entityId> → numeric miss count.
+  function readWeakAreas(){
+    const out = [];
+    try{
+      if (typeof localStorage === 'undefined') return out;
+      for (let i = 0; i < localStorage.length; i++){
+        const k = localStorage.key(i);
+        if (!k || !k.startsWith('jarvis.quiz.miss.')) continue;
+        const parts = k.split('.');
+        if (parts.length < 5) continue;
+        const type = parts[3];
+        const id = parts.slice(4).join('.');
+        const count = parseInt(localStorage.getItem(k), 10) || 0;
+        if (count > 0) out.push({type, id, count});
+      }
+    } catch(e){}
+    return out.sort((a,b)=>b.count - a.count);
+  }
+
+  function resolveEntityName(type, id){
+    const idx = (typeof window !== 'undefined' && window.__ENTITY_INDEX__) || {};
+    const bucket = idx[type] || {};
+    const ent = bucket[id];
+    if (ent && (ent.name || ent.title)) return ent.name || ent.title;
+    // Fallback heuristic: humanize id
+    return (id || '').replace(/_/g, ' ');
+  }
+
+  function routeForEntity(type, id){
+    if (type === 'character' || type === 'char' || type === 'king') return {page:'character', id};
+    if (type === 'event') return {page:'event', id};
+    if (type === 'place') return {page:'place', id};
+    if (type === 'theme') return {page:'themes', focusId:id};
+    return {page:'quiz'};
+  }
+
+  function TodayFocus({setRoute}){
+    const weak = useMemo(() => readWeakAreas().slice(0, 3), []);
+
+    const fallback = [
+      {type:'character', id:'chizkiyahu', label:'עליך לחזור על חזקיהו', sub:'מלך יהודה · מרכזי בבגרות'},
+      {type:'event',     id:'imut_karmel', label:'אירוע חסר ידע: מעמד הר הכרמל', sub:'אליהו מול נביאי הבעל'},
+      {type:'theme',     id:'melech_navi', label:'נושא רוחב חלש: מלך ונביא', sub:'יחסי מלך־נביא לאורך הספר'}
+    ];
+
+    const items = weak.length
+      ? weak.map(w => ({
+          type: w.type, id: w.id,
+          label: 'עליך לחזור על ' + resolveEntityName(w.type, w.id),
+          sub: w.count + ' טעויות בחידונים · לחץ למידע מלא'
+        }))
+      : fallback;
+
+    return (
+      <section className="today-focus-wrap">
+        <div className="flex items-center justify-between mb-2 px-1">
+          <h2 className="font-display text-base md:text-lg font-bold text-on-parchment">🎯 מיקוד להיום</h2>
+          <span className="text-xs text-on-parchment-muted">
+            {weak.length ? 'מבוסס על טעויות בחידונים' : 'המלצה כללית'}
+          </span>
+        </div>
+        <div className="today-focus-list">
+          {items.map((it, i) => (
+            <button key={i} type="button"
+              onClick={()=>setRoute(routeForEntity(it.type, it.id))}
+              className="today-focus-card">
+              <div className="today-focus-rank" aria-hidden="true">{i+1}</div>
+              <div className="today-focus-body">
+                <div className="today-focus-title">{it.label}</div>
+                <div className="today-focus-sub">{it.sub}</div>
+              </div>
+              <div className="today-focus-arrow" aria-hidden="true">←</div>
+            </button>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   // ---- MAIN ---------------------------------------------------------------
   function Home({S, setRoute, level, nextLv}){
     const [tick, setTick] = useState(0);
@@ -139,6 +220,7 @@
         <Hero S={S} setRoute={setRoute} dExam={dExam} currentUnit={currentUnit}/>
         <ProgressStrip units={units} S={S} setRoute={setRoute} currentUnit={currentUnit}/>
         <QuickActions setRoute={setRoute}/>
+        <TodayFocus setRoute={setRoute}/>
         {/* QUICK ACTIONS — added in commit 3 */}
         {/* TODAY'S FOCUS — added in commit 4 */}
         {/* STATS STRIP — added in commit 5 */}
