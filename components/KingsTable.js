@@ -203,33 +203,44 @@
     }));
   }
 
-  // Interleave Judah + Israel kings into rows, grouping by unit.
-  // Strategy: walk the chronologically-ordered list. If two adjacent kings are
-  // from opposite dynasties AND share the same unit+period, pair them on one
-  // row (e.g. רחבעם+ירבעם). The second king's row is marked _skip.
+  // Build rows by ERA. kings.js lists all 20 Judah kings first and then all
+  // 19 Israel kings, so the old "pair-adjacent" heuristic never paired anything
+  // and the Israel column appeared empty next to Judah kings. Instead: for each
+  // era (1..6), bucket kings by kingdom, then emit max(|judah|,|israel|) rows
+  // pairing by positional index (רחבעם #0 ↔ ירבעם #0, אביה #1 ↔ נדב #1, …).
+  // After era 5 Israel is gone so only Judah cells remain.
   function buildRows(kings){
-    const rows = kings.map((k, i) => ({...k, _row: i}));
-    for (let i = 0; i < rows.length - 1; i++){
-      const a = rows[i], b = rows[i+1];
-      if (a._skip || b._skip) continue;
-      if (a.dynasty && b.dynasty && a.dynasty !== b.dynasty
-          && a.unitId === b.unitId
-          && (a.period||'') === (b.period||'')){
-        a._pair = b;
-        b._skip = true;
+    const byEra = new Map();
+    kings.forEach(k => {
+      const e = k.unitId || k.era || 1;
+      if (!byEra.has(e)) byEra.set(e, {judah:[], israel:[]});
+      const b = byEra.get(e);
+      if (k.dynasty === 'ישראל') b.israel.push(k);
+      else b.judah.push(k);   // Judah + united (Solomon) render in Judah column.
+    });
+    const eras = [...byEra.keys()].sort((a,b)=>a-b);
+    const out = [];
+    eras.forEach(era => {
+      const {judah, israel} = byEra.get(era);
+      const n = Math.max(judah.length, israel.length, 1);
+      for (let i = 0; i < n; i++){
+        const j = judah[i]  || null;
+        const s = israel[i] || null;
+        const primary = j || s;
+        if (!primary) continue;
+        out.push({ ...primary, unitId: era, era, _j: j, _s: s, _paired: !!(j && s) });
       }
-    }
-    // Pre-compute rowspans for the יחידה column — only over visible rows.
-    const visibleIdx = rows.map((r,i)=>r._skip?-1:i).filter(i=>i>=0);
+    });
+    // Rowspan for the יחידה column per era run (rows are already era-sorted).
     const unitSpans = {};
     let runStart = 0;
-    for (let i = 1; i <= visibleIdx.length; i++){
-      if (i === visibleIdx.length || rows[visibleIdx[i]].unitId !== rows[visibleIdx[runStart]].unitId){
-        unitSpans[visibleIdx[runStart]] = i - runStart;
+    for (let i = 1; i <= out.length; i++){
+      if (i === out.length || out[i].unitId !== out[runStart].unitId){
+        unitSpans[runStart] = i - runStart;
         runStart = i;
       }
     }
-    return rows.map((r, i) => ({...r, _unitSpan: unitSpans[i] || 0}));
+    return out.map((r,i)=>({...r, _unitSpan: unitSpans[i] || 0}));
   }
 
   function navigateToStudyTab(tab, focusId){
@@ -551,26 +562,20 @@
             </thead>
             <tbody>
               {rows.map((k, i) => {
-                if (k._skip) return null;
                 const unitMeta = UNIT_META[k.unitId] || UNIT_META[1];
-                // previous visible row's unit:
-                let prevUnit = null;
-                for (let j=i-1; j>=0; j--){ if (!rows[j]._skip){ prevUnit = rows[j].unitId; break; } }
+                const prevUnit = i>0 ? rows[i-1].unitId : null;
                 const showUnitCell = k.unitId !== prevUnit;
-                const pair = k._pair || null;
-                const judahKing  = k.dynasty === 'יהודה' ? k : (pair && pair.dynasty === 'יהודה' ? pair : null);
-                const israelKing = k.dynasty === 'ישראל' ? k : (pair && pair.dynasty === 'ישראל' ? pair : null);
-                const kids = [k.id, pair && pair.id].filter(Boolean);
-                const expandedKing = (expanded === k.id) ? k : (pair && expanded === pair.id ? pair : null);
+                const judahKing  = k._j || null;
+                const israelKing = k._s || null;
+                const rowKey = (judahKing && judahKing.id) || (israelKing && israelKing.id) || ('r'+i);
+                const expandedKing = (judahKing && expanded === judahKing.id) ? judahKing
+                                   : (israelKing && expanded === israelKing.id) ? israelKing
+                                   : null;
                 const rowHasExpand = !!expandedKing;
                 const toggle = (cand) => setExpand(expanded === cand.id ? null : cand.id);
-                const anyCell = pair ? null : k;
                 return (
-                  <React.Fragment key={k.id}>
-                    <tr
-                      className={'kt-row ' + (rowHasExpand?'kt-row-expanded':'')}
-                      onClick={()=>{ if(anyCell) toggle(anyCell); }}
-                    >
+                  <React.Fragment key={rowKey}>
+                    <tr className={'kt-row ' + (rowHasExpand?'kt-row-expanded':'')}>
                       {showUnitCell && (
                         <td rowSpan={k._unitSpan || 1} className="kt-td kt-td-unit"
                             style={{background:unitMeta.color + '33', borderInlineEndColor:unitMeta.color}}>
@@ -583,16 +588,16 @@
                         {judahKing ? <KingCell k={judahKing} side="judah"/> : <span className="kt-empty-cell">·</span>}
                       </td>
                       <td className="kt-td kt-td-prophets">
-                        <ProphetsCell k={k}/>
-                        {pair && <ProphetsCell k={pair}/>}
+                        {judahKing && <ProphetsCell k={judahKing}/>}
+                        {israelKing && <ProphetsCell k={israelKing}/>}
                       </td>
                       <td className="kt-td kt-td-israel" onClick={(e)=>{ if(israelKing){ e.stopPropagation(); toggle(israelKing); } }}>
                         {israelKing ? <KingCell k={israelKing} side="israel"/> : <span className="kt-empty-cell">·</span>}
                       </td>
                       <td className="kt-td kt-td-empire" style={{background:unitMeta.color + '18'}}>
                         {showUnitCell && <div className="kt-empire" style={{marginBottom:4,fontWeight:800}}>{unitMeta.empire}</div>}
-                        <ForeignCell k={k}/>
-                        {pair && <ForeignCell k={pair}/>}
+                        {judahKing && <ForeignCell k={judahKing}/>}
+                        {israelKing && <ForeignCell k={israelKing}/>}
                       </td>
                     </tr>
                     {rowHasExpand && (
