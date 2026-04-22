@@ -47,6 +47,14 @@
     };
     window.__MB_LOCAL_HOOK__ = true;
   } catch (e) { /* iframes / strict mode sandboxes may reject — fall through */ }
+
+  // Feature flag for RTDB auth + progress sync. OFF by default. Flip in
+  // devtools with `window.MELAKHIM_AUTH_ENABLED = true; window.MelakhimAuth.init()`
+  // once the Firebase config is pasted into localStorage["melakhim_firebase_config"]
+  // AND database rules have been deployed (see database.rules.json).
+  if (typeof window !== "undefined" && window.MELAKHIM_AUTH_ENABLED === undefined) {
+    window.MELAKHIM_AUTH_ENABLED = false;
+  }
 })();
 </script>
 <script>
@@ -174,6 +182,7 @@
 <script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=802"></script>
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=700"></script>
 <script src="./components/BreadthPage.js?v=700"></script>
+<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=900"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -2211,6 +2220,7 @@ function App(){
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
+            {typeof window!=="undefined" && window.AuthButtonComponent ? <window.AuthButtonComponent/> : null}
             <button onClick={toggleTheme} className="theme-tog" aria-label="החלף מצב כהה/בהיר" title="החלף מצב כהה/בהיר">
               {theme==='light'?'🌙':'☀️'}
             </button>
