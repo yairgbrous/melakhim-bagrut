@@ -183,6 +183,57 @@
       notes:["יהואש נרצח ע״י עבדיו לאחר הכניעה לחזאל"],
       book_page:213
     },
+    {
+      id:"yerovam_sheni_gvulot",
+      number:8, unit:5,
+      title:"שיבת גבולות ירבעם השני",
+      era_label:"ירבעם בן יואש מלך ישראל",
+      caption:"״הוא השיב את גבול ישראל מלבוא חמת עד ים הערבה״ — שיא גאוגרפי של ישראל, אך שפל דתי.",
+      pins:[
+        {n:1, place:"שומרון", placeId:"shomron", x:42, y:42},
+        {n:2, place:"לבוא חמת", placeId:"levoa_chamat", x:72, y:6},
+        {n:3, place:"ים הערבה (ים המלח)", placeId:"yam_haarava", x:52, y:80},
+        {n:4, place:"דמשק", placeId:"damesek", x:76, y:18},
+        {n:5, place:"נינווה", placeId:"ninveh", x:92, y:6}
+      ],
+      notes:["״וירא ה׳ את עני ישראל... ויושיעם ביד ירבעם״"],
+      book_page:213
+    },
+    {
+      id:"tiglat_pileser",
+      number:9, unit:5,
+      title:"גלויות תגלת פלאסר — 733-732 לפנה״ס",
+      era_label:"פקח מלך ישראל, אחז מלך יהודה",
+      caption:"תגלת פלאסר כובש את הגליל ועבר הירדן ומגלה את השבטים. אחז שכר אותו בכסף אוצרות בית ה׳.",
+      pins:[
+        {n:1, place:"דן", placeId:"dan", x:55, y:12},
+        {n:2, place:"אבל בית מעכה", placeId:"avel_beit_maacha", x:56, y:14},
+        {n:3, place:"חצור", placeId:"chatzor", x:52, y:26},
+        {n:4, place:"קדש", placeId:"kadesh", x:54, y:22},
+        {n:5, place:"גלעד", placeId:"gilad", x:72, y:48},
+        {n:6, place:"גליל", placeId:"galil", x:48, y:30},
+        {n:7, place:"אשור (נינווה)", placeId:"ninveh", x:92, y:6}
+      ],
+      notes:["גלות ראשונה — השבטים בצפון ובעבר הירדן"],
+      book_page:213
+    },
+    {
+      id:"nefilat_shomron",
+      number:10, unit:5,
+      title:"נפילת שומרון — 722 לפנה״ס",
+      era_label:"הושע בן אלה, שלמנאסר וסרגון",
+      caption:"שלמנאסר עולה לאחר שהושע כרת ברית עם סוא מצרים. מצור על שומרון 3 שנים; סרגון מגלה את יתר העם לחלח וחבור.",
+      pins:[
+        {n:1, place:"שומרון", placeId:"shomron", x:42, y:42},
+        {n:2, place:"חלח", placeId:"chalach", x:88, y:8},
+        {n:3, place:"חבור נהר גוזן", placeId:"chabor_gozan", x:85, y:10},
+        {n:4, place:"ערי מדי", placeId:"madai", x:95, y:18},
+        {n:5, place:"מצרים (סוא)", placeId:"mitzrayim", x:8, y:94},
+        {n:6, place:"נינווה (אשור)", placeId:"ninveh", x:92, y:6}
+      ],
+      notes:["סוף ממלכת ישראל; מיקום הגלות לחלח וחבור"],
+      book_page:214
+    },
     // maps inserted incrementally below
   ];
 
