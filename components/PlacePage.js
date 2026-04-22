@@ -14,7 +14,7 @@
       character: "bg-orange-500/20 border-orange-500/40 text-orange-100",
       map:       "bg-emerald-500/20 border-emerald-500/40 text-emerald-100"
     };
-    const cls = styles[color] || "bg-amber-500/20 border-amber-500/40 text-amber-100";
+    const cls = styles[color] || "bg-amber-500/20 border-amber-500/40 text-on-parchment-muted";
     return (
       <button onClick={onClick}
         className={`px-2.5 py-1 rounded-full text-xs font-bold border transition hover:scale-105 ${cls}`}>
@@ -40,10 +40,10 @@
 
     return (
       <div className="max-w-2xl mx-auto space-y-4 p-2">
-        <button onClick={()=>go("study")} className="text-amber-300 text-sm">→ חזרה לאזור הלימוד</button>
+        <button onClick={()=>go("study")} className="text-on-parchment-accent text-sm">→ חזרה לאזור הלימוד</button>
 
         <header className="card rounded-2xl p-5">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300 hebrew">
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent hebrew">
             📍 {pl.name_niqqud || pl.name || id}
           </h1>
           <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
@@ -51,12 +51,12 @@
             {pl.required_for_exam && (
               <span className="px-2 py-0.5 rounded-full bg-red-700 text-red-100 font-bold">⭐ נדרש למבחן</span>
             )}
-            {pl.unit && <span className="text-amber-200/70">יחידה {pl.unit}</span>}
+            {pl.unit && <span className="text-on-parchment">יחידה {pl.unit}</span>}
           </div>
         </header>
 
         {!hasData && (
-          <div className="card rounded-xl p-4 text-amber-100/70 text-sm">
+          <div className="card rounded-xl p-4 text-on-parchment-muted text-sm">
             יוצג בקרוב · נתוני המקום טרם הוזנו ל-<code>window.PLACES_DATA</code>.
           </div>
         )}
@@ -70,7 +70,7 @@
 
         {Array.isArray(pl.related_events) && pl.related_events.length > 0 && (
           <section>
-            <h3 className="text-xs font-bold text-amber-200 mb-2">⚔️ אירועים קשורים</h3>
+            <h3 className="text-xs font-bold text-on-parchment mb-2">⚔️ אירועים קשורים</h3>
             <div className="flex flex-wrap gap-1.5">
               {pl.related_events.map(e => {
                 const eid = typeof e === "string" ? e : e.id;
@@ -83,7 +83,7 @@
 
         {Array.isArray(pl.related_characters) && pl.related_characters.length > 0 && (
           <section>
-            <h3 className="text-xs font-bold text-amber-200 mb-2">👤 דמויות קשורות</h3>
+            <h3 className="text-xs font-bold text-on-parchment mb-2">👤 דמויות קשורות</h3>
             <div className="flex flex-wrap gap-1.5">
               {pl.related_characters.map(c => {
                 const cid = typeof c === "string" ? c : c.id;
@@ -96,7 +96,7 @@
 
         {Array.isArray(pl.map_numbers) && pl.map_numbers.length > 0 && (
           <section>
-            <h3 className="text-xs font-bold text-amber-200 mb-2">🗺 סימון במפה</h3>
+            <h3 className="text-xs font-bold text-on-parchment mb-2">🗺 סימון במפה</h3>
             <div className="flex flex-wrap gap-1.5">
               {pl.map_numbers.map(n => (
                 <Chip key={n} color="map" label={`#${n}`} onClick={()=>go("maps", {hash: String(n)})}/>
