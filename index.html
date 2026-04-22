@@ -124,8 +124,9 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=500"></script>
-<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=500"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=700"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=700"></script>
+<script src="./components/BreadthPage.js?v=700"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -2161,7 +2162,7 @@ function App(){
         {route.page==="flashcards" && (()=>{ const X=window.FlashcardDrillComponent; return X ? <X S={S} update={update} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען כרטיסיות...</div>; })()}
         {route.page==="quizPlay" && <QuizRun params={route} S={S} setRoute={setRoute} awardXP={awardXP} update={update} publishActivity={publishActivity} soundOn={soundOn}/>}
         {route.page==="quizResult" && <QuizResult {...route} S={S} setRoute={setRoute}/>}
-        {route.page==="themes" && <Themes S={S} update={update}/>}
+        {route.page==="themes" && (window.BreadthPage ? React.createElement(window.BreadthPage) : <Themes S={S} update={update}/>)}
         {route.page==="quotes" && <QuotesBrowser S={S} update={update} awardXP={awardXP}/>}
         {route.page==="timeline" && <Timeline/>}
         {route.page==="maps" && <MapsPage S={S} update={update} awardXP={awardXP}/>}
