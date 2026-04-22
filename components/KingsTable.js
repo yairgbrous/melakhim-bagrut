@@ -121,39 +121,85 @@
     return {prophets, places, events};
   }
 
+  // Normalize kingdom strings from either 'judah/israel/united' or Hebrew.
+  function normKingdom(kk){
+    const v = (kk.kingdom || '').toLowerCase();
+    if (v === 'judah' || kk.kingdom === 'יהודה') return 'יהודה';
+    if (v === 'israel' || kk.kingdom === 'ישראל') return 'ישראל';
+    if (v === 'united' || kk.kingdom === 'מאוחדת') return 'יהודה'; // Solomon renders in Judah column
+    return kk.kingdom || 'יהודה';
+  }
+  function assessmentToGood(a){
+    if (a === 'צדיק' || a === 'righteous' || a === 'good') return true;
+    if (a === 'רשע'  || a === 'wicked'    || a === 'bad')  return false;
+    return null; // מעורב / mixed
+  }
+  // era 1..6 → MELAKHIM_DATA.units.id is 1..6, so unitId = era directly.
   function pickKingsData(){
+    const raw = (typeof window!=='undefined' && window.KINGS_DATA) || [];
+    if (raw.length > 0){
+      return raw.map(k => ({
+        id: k.id,
+        name: k.name_niqqud || k.name || k.id,
+        name_niqqud: k.name_niqqud || '',
+        dynasty: normKingdom(k),              // 'יהודה' | 'ישראל'
+        house:   k.dynasty || '',             // 'בית דוד' | 'בית עמרי' | …
+        good: assessmentToGood(k.assessment),
+        assessment: k.assessment,
+        assessment_quote: k.assessment_quote || '',
+        years: k.reign_years != null ? (k.reign_years + ' שנ׳') : '',
+        period: '',                           // period label not used when era present
+        unitId: k.era || 1,
+        era: k.era || 1,
+        notes: (k.short_summary || '').split('.').slice(0,1).join('.') + '.',
+        bio: k.short_summary || '',
+        short_summary: k.short_summary || '',
+        key_actions: [],
+        related_prophets: k.related_prophets || [],
+        related_places:   k.related_places   || [],
+        related_events:   k.related_events   || [],
+        killed:    k.killed || [],
+        killed_by: k.killed_by || null,
+        succession_type: k.succession_type || '',
+        book_page: k.book_page || null
+      }));
+    }
+    // Legacy fallback: __ENTITY_INDEX__.king (if kings.js not yet loaded)
     const idx = (typeof window!=='undefined' && window.__ENTITY_INDEX__) || {};
     const live = idx.king ? Object.values(idx.king) : [];
     if (live.length > 0){
       return live.map(k => ({
         id: k.id,
         name: k.name || k.heading || k.id,
-        dynasty: k.kingdom === 'israel' ? 'ישראל' : (k.kingdom === 'judah' ? 'יהודה' : (k.dynasty || 'יהודה')),
-        good: k.assessment === 'righteous' ? true : (k.assessment === 'wicked' ? false : !!k.good),
+        dynasty: normKingdom(k),
+        house: k.dynasty || '',
+        good: assessmentToGood(k.assessment),
         assessment: k.assessment,
+        assessment_quote: k.assessment_quote || '',
         years: k.reign_years || k.years || '',
         period: k.period || '',
-        unitId: k.unit || PERIOD_TO_UNIT[k.period] || 1,
+        unitId: k.era || k.unit || PERIOD_TO_UNIT[k.period] || 1,
+        era: k.era || 1,
         notes: k.summary || k.heading_note || k.notes || '',
-        bio: k.bio || k.summary_hebrew || '',
+        bio: k.short_summary || k.bio || '',
+        short_summary: k.short_summary || '',
         key_actions: k.key_actions || [],
         related_prophets: k.related_prophets || [],
         related_places:   k.related_places   || [],
-        related_events:   k.related_events   || []
+        related_events:   k.related_events   || [],
+        killed:    k.killed || [],
+        killed_by: k.killed_by || null
       }));
     }
-    // Fallback: MELAKHIM_DATA.timeline
+    // Last-resort fallback: MELAKHIM_DATA.timeline (pre-kings.js shape).
     const tl = (typeof MELAKHIM_DATA !== 'undefined' && MELAKHIM_DATA.timeline) || [];
     return tl.map((k,i) => ({
       id: 'tl-' + i + '-' + k.name.replace(/\s/g,'-'),
-      name: k.name,
-      dynasty: k.dynasty,
-      good: !!k.good,
-      years: k.years,
-      period: k.period,
-      unitId: PERIOD_TO_UNIT[k.period] || 1,
-      notes: k.notes,
-      bio: '', key_actions: [], related_prophets: [], related_places: [], related_events: []
+      name: k.name, dynasty: k.dynasty, good: !!k.good,
+      years: k.years, period: k.period, unitId: PERIOD_TO_UNIT[k.period] || 1,
+      era: PERIOD_TO_UNIT[k.period] || 1, notes: k.notes,
+      bio: '', key_actions: [], related_prophets: [], related_places: [], related_events: [],
+      killed: [], killed_by: null
     }));
   }
 
