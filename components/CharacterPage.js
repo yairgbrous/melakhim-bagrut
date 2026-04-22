@@ -14,6 +14,18 @@
     return t.replace(/\{\{[a-zA-Zא-ת_]+:[^|}]+\|([^}]+)\}\}/g, '$1');
   };
 
+  // If index.html has exposed window.parseTokens (bridged from its Babel app
+  // block), use it so {{type:id|Display}} tokens in bios render as clickable
+  // EntityChips. Otherwise fall back to plain unwrapped text.
+  const renderText = (t) => {
+    if (typeof t !== 'string' || !t) return t || '';
+    if (t.indexOf('{{') < 0) return t;
+    if (typeof window.parseTokens === 'function') {
+      try { return window.parseTokens(t); } catch(e) {}
+    }
+    return stripTokens(t);
+  };
+
   function findKingByName(name){
     try{
       const tl = (typeof MELAKHIM_DATA !== 'undefined') ? (MELAKHIM_DATA.timeline||[]) : [];
@@ -38,12 +50,16 @@
   }
 
   function resolveCharacter(id){
+    // Primary source: window.CHARACTERS_DATA (data/characters.js v2)
+    const cd = Array.isArray(window.CHARACTERS_DATA) ? window.CHARACTERS_DATA : [];
+    const fromData = cd.find(x => x && x.id === id);
+    if (fromData) return fromData;
     const KU = window.KingsUtils;
     if (KU && KU.getCharacter){
       const c = KU.getCharacter(id);
       if (c) return c;
     }
-    // try kings index / timeline by id
+    // fallback: kings timeline by id
     const k = allKings().find(k => k.id === id);
     if (k) return { id:k.id, name:k.name, role:'מלך', kingdom:k.dynasty, era:k.years ? (k.years+' שנות מלוכה') : '', bio:'', _king:k };
     return null;
@@ -54,6 +70,22 @@
     const col = (KU && KU.assessmentColor) ? KU.assessmentColor(k) : {cls:'assess-mixed',hex:'#8b6d2d'};
     const lbl = col.cls==='assess-tzadik'?'צדיק':col.cls==='assess-rasha'?'רשע':'מעורב';
     return <span className={"kt-assess-pill " + col.cls} style={{marginInlineStart:8}}>{lbl}</span>;
+  }
+
+  const ROLE_LABEL = {
+    'נביא':'נביא', 'prophet':'נביא', 'queen':'מלכה', 'אשה':'אשה',
+    'king':'מלך', 'מלך':'מלך', 'פקיד':'פקיד', 'עם':'זר/עם',
+  };
+  function RoleBadge({role}){
+    if (!role) return null;
+    const label = ROLE_LABEL[role] || role;
+    return <span className="kt-assess-pill assess-mixed" style={{marginInlineStart:8,background:'rgba(139,111,31,.18)',color:'#3a2a0d'}}>{label}</span>;
+  }
+  function EraBadge({era}){
+    if (era == null || era === '') return null;
+    const n = typeof era === 'number' ? era : parseInt(era,10);
+    const label = Number.isFinite(n) ? ('יחידה ' + n) : ('יחידה ' + era);
+    return <span className="kt-assess-pill assess-mixed" style={{marginInlineStart:6,background:'rgba(200,155,60,.22)',color:'#5a3d0d'}}>{label}</span>;
   }
 
   function Chip({label, onClick, tone}){
@@ -84,8 +116,9 @@
       );
     }
 
-    const isKing = !!c._king || /מלך|king/i.test(c.role||'');
-    const k = c._king || (kings.find(x => x.id === c.id) || null);
+    const isKing = !!c._kingsData || !!c._king || /מלך|king/i.test(c.role||'');
+    // Real king row from kings.js — the character IS the king, so pass `c` itself.
+    const k = c._kingsData ? c : (c._king || (kings.find(x => x.id === c.id) || null));
 
     const prophets = (k && KU && KU.prophets_by_reign) ? KU.prophets_by_reign(Object.values((window.__ENTITY_INDEX__||{}).character||{}), k) : [];
     const foreign  = (k && KU && KU.foreign_event_for) ? KU.foreign_event_for(k) : null;
@@ -93,15 +126,46 @@
     const killedOf = (k && KU) ? KU.killed(kings, k.id)    : [];
 
     const dyn = (k && KU && KU.dynastyBadge) ? KU.dynastyBadge(k) : null;
-    const bio = stripTokens(c.bio || c.summary || c.description || '');
+    const bioRaw = c.short_summary || c.bio || c.summary || c.description || '';
+    const bio = stripTokens(bioRaw);
+    const assessmentQuote = c.assessment_quote || '';
+    const succession = c.succession_type || '';
+    const bookPage = c.book_page || null;
+    const reignYears = (c.reign_years != null) ? c.reign_years : null;
     const quotesBy = c.quotes_by || c.quotes || [];
     const quotesTo = c.quotes_to || [];
-    const places   = c.related_places || c.places || [];
-    const events   = c.related_events || c.events || [];
+    // related_prophets/places/events may be arrays of string IDs (kings.js)
+    // or arrays of {id,label} (legacy). Normalize to {id,label}.
+    const idx = (window.__ENTITY_INDEX__ || {});
+    const labelForId = (id, bucket) => {
+      const b = idx[bucket] || {};
+      const entry = b[id];
+      if (!entry) return id;
+      return entry.name_niqqud || entry.heading || entry.name || entry.title || id;
+    };
+    const toChips = (raw, bucket) => (raw || []).map(v => {
+      if (v && typeof v === 'object') return { id: v.id || v.label, label: v.label || v.name || v.id };
+      return { id: v, label: labelForId(v, bucket) };
+    });
+    const prophetChips = toChips(c.related_prophets || [], 'character');
+    const placeChips   = toChips(c.related_places   || c.places || [], 'archaeology');
+    const eventChips   = toChips(c.related_events   || c.events || [], 'story');
+    const labelForKing = (kid) => {
+      const row = kings.find(x => x.id === kid);
+      return row ? (row.name_niqqud || row.name || kid) : kid;
+    };
+    const kingChips = (c.related_kings || []).map(v =>
+      (v && typeof v==='object') ? {id:v.id||v.label, label:v.label||v.name||v.id} : {id:v, label:labelForKing(v)}
+    );
+    const keyQuotes = c.key_quotes || [];
+    const bookRefs  = c.book_refs  || [];
+    const significance = c.significance || '';
     const breadth  = c.breadth_topics || c.breadth || [];
     const units    = c.units || (c.unit ? [c.unit] : []);
 
-    const goChar = (cid) => setRoute({page:'character', id:cid});
+    const goChar  = (cid) => setRoute({page:'character', id:cid});
+    const goPlace = (pid) => setRoute({page:'place',     id:pid});
+    const goEvent = (eid) => setRoute({page:'event',     id:eid});
     const firePractice = () => {
       try{ window.dispatchEvent(new CustomEvent('practice-entity', {detail:{type:(isKing?'king':'character'), id:c.id}})); }catch(e){}
     };
@@ -114,29 +178,53 @@
           <div className="flex items-start justify-between flex-wrap gap-2">
             <div>
               <h1 className="font-display text-2xl md:text-3xl font-black text-amber-900 hebrew">
-                {c.name || c.heading || c.id}
+                {c.name_niqqud || c.name || c.heading || c.id}
                 {isKing && k && <KingAssess k={k}/>}
+                {!isKing && <RoleBadge role={c.role}/>}
+                <EraBadge era={c.era}/>
               </h1>
               <div className="text-amber-800 text-sm mt-1">
-                {c.role && <span>{c.role}</span>}
-                {c.kingdom && <span> · {c.kingdom}</span>}
-                {c.era && <span> · {c.era}</span>}
-                {k && k.years && <span> · {k.years} שנות מלוכה</span>}
-                {dyn && <span> · {dyn.name}</span>}
+                {c.kingdom && <span>{c.kingdom}</span>}
+                {reignYears != null && <span> · {reignYears} שנות מלוכה</span>}
+                {dyn && dyn.name && <span> · {dyn.name}</span>}
+                {succession && <span> · {succession}</span>}
+                {bookPage != null && <span> · עמוד {bookPage}</span>}
               </div>
               {units && units.length>0 && <div className="text-xs text-amber-700 mt-1">יחידות: {units.join(', ')}</div>}
             </div>
             <button onClick={firePractice} className="gold-btn px-4 py-2 rounded-xl font-bold">⚔️ תרגל על דמות זו</button>
           </div>
+
+          {assessmentQuote && (
+            <blockquote
+              className="hebrew"
+              style={{
+                marginTop:14, marginBottom:0,
+                padding:'10px 14px',
+                borderInlineStart:'4px solid #8B6F1F',
+                background:'rgba(212,165,116,.18)',
+                borderRadius:8,
+                fontFamily:"'Frank Ruhl Libre', serif",
+                fontSize:15, lineHeight:1.7,
+                color:'#3a2a0d'
+              }}
+            >
+              {assessmentQuote}
+            </blockquote>
+          )}
         </div>
 
         <div className="kt-expanded rounded-2xl" style={{border:'1px solid rgba(212,165,116,.25)'}}>
-          {bio && <Section title="📖 ביוגרפיה"><p className="kt-bio">{bio}</p></Section>}
-          {k && k.notes && !bio && <Section title="📖 תקציר"><p className="kt-bio">{stripTokens(k.notes)}</p></Section>}
+          {bioRaw && (
+            <Section title="📖 ביוגרפיה">
+              <p className="kt-bio hebrew">{renderText(bioRaw)}</p>
+            </Section>
+          )}
+          {k && k.notes && !bioRaw && <Section title="📖 תקציר"><p className="kt-bio hebrew">{renderText(k.notes)}</p></Section>}
 
           {c.key_actions && c.key_actions.length>0 && (
             <Section title="⚡ מעשים מרכזיים">
-              <ul className="kt-actions">{c.key_actions.map((a,i)=><li key={i}>{stripTokens(a)}</li>)}</ul>
+              <ul className="kt-actions">{c.key_actions.map((a,i)=><li key={i}>{renderText(a)}</li>)}</ul>
             </Section>
           )}
 
@@ -175,12 +263,24 @@
             </Section>
           )}
 
+          {keyQuotes.length>0 && (
+            <Section title="💬 ציטוטים מרכזיים (מי אמר למי)">
+              <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                {keyQuotes.map((q,i)=>(
+                  <blockquote key={i} className="hebrew" style={{margin:0,padding:'10px 14px',borderInlineStart:'3px solid #8B6F1F',background:'rgba(212,165,116,.15)',borderRadius:6,fontFamily:"'Frank Ruhl Libre', serif",fontSize:15,lineHeight:1.75,color:'#3a2a0d'}}>
+                    {typeof q === 'string' ? q : (q.text || q.ref || '')}
+                  </blockquote>
+                ))}
+              </div>
+            </Section>
+          )}
+
           {quotesBy.length>0 && (
             <Section title="💬 ציטוטים שאמר/ה">
               <div style={{display:'flex',flexDirection:'column',gap:6}}>
                 {quotesBy.map((q,i)=>(
                   <div key={i} className="kt-quote-cite">
-                    <div>„{stripTokens(q.text || q)}"</div>
+                    <div>„{renderText(q.text || q)}"</div>
                     {q.ref && <div style={{fontSize:11,opacity:.7,marginTop:3}}>{q.ref}</div>}
                   </div>
                 ))}
@@ -193,7 +293,7 @@
               <div style={{display:'flex',flexDirection:'column',gap:6}}>
                 {quotesTo.map((q,i)=>(
                   <div key={i} className="kt-quote-cite">
-                    <div>„{stripTokens(q.text || q)}"</div>
+                    <div>„{renderText(q.text || q)}"</div>
                     {q.ref && <div style={{fontSize:11,opacity:.7,marginTop:3}}>{q.ref}</div>}
                   </div>
                 ))}
@@ -201,15 +301,35 @@
             </Section>
           )}
 
-          {places.length>0 && (
-            <Section title="📍 מקומות">
-              <div className="kt-chips">{places.map((p,i)=><Chip key={i} tone="place" label={p.label||p.name||p}/>)}</div>
+          {prophetChips.length>0 && prophets.length===0 && (
+            <Section title="🔮 נביאים בעת מלכותו">
+              <div className="kt-chips">{prophetChips.map(p => <Chip key={p.id} tone="prophet" label={p.label} onClick={()=>goChar(p.id)}/>)}</div>
             </Section>
           )}
 
-          {events.length>0 && (
+          {kingChips.length>0 && (
+            <Section title="👑 מלכים קשורים">
+              <div className="kt-chips">{kingChips.map(p=><Chip key={p.id} tone="prophet" label={p.label} onClick={()=>goChar(p.id)}/>)}</div>
+            </Section>
+          )}
+
+          {placeChips.length>0 && (
+            <Section title="📍 מקומות">
+              <div className="kt-chips">{placeChips.map(p=><Chip key={p.id} tone="place" label={p.label} onClick={()=>goPlace(p.id)}/>)}</div>
+            </Section>
+          )}
+
+          {eventChips.length>0 && (
             <Section title="📜 אירועים">
-              <div className="kt-chips">{events.map((p,i)=><Chip key={i} tone="event" label={p.label||p.title||p}/>)}</div>
+              <div className="kt-chips">{eventChips.map(p=><Chip key={p.id} tone="event" label={p.label} onClick={()=>goEvent(p.id)}/>)}</div>
+            </Section>
+          )}
+
+          {bookRefs.length>0 && (
+            <Section title="📚 מקורות בספר מלכים">
+              <ul className="kt-actions" style={{columnCount:2,columnGap:18}}>
+                {bookRefs.map((r,i)=><li key={i} style={{breakInside:'avoid'}}>{r}</li>)}
+              </ul>
             </Section>
           )}
 
@@ -222,6 +342,12 @@
           {c.tags && c.tags.length>0 && (
             <Section title="🏷 תגיות">
               <div className="kt-chips">{c.tags.map((t,i)=><Chip key={i} label={t}/>)}</div>
+            </Section>
+          )}
+
+          {significance && (
+            <Section title="✨ משמעות לספר מלכים">
+              <p className="kt-bio hebrew" style={{fontStyle:'italic',color:'#4a3612'}}>{renderText(significance)}</p>
             </Section>
           )}
         </div>

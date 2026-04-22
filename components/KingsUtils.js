@@ -34,12 +34,18 @@
 
   function assessmentKind(k){
     if (!k) return 'rasha';
-    const name = (k.name||'').trim();
-    if (MIXED_KINGS.has(name)) return 'mixed';
-    if (RIGHTEOUS_OVERRIDES.has(name)) return 'tzadik';
+    // PREFER explicit Hebrew assessment from kings.js.
+    const raw = k.assessment;
+    if (raw === 'צדיק')  return 'tzadik';
+    if (raw === 'רשע')   return 'rasha';
+    if (raw === 'מעורב') return 'mixed';
+    // Name-based overrides (legacy timeline rows that lack assessment field).
+    const bare = (k.name||'').replace(/[֑-ׇ]/g,'').trim();
+    if (MIXED_KINGS.has(bare))        return 'mixed';
+    if (RIGHTEOUS_OVERRIDES.has(bare)) return 'tzadik';
     if (k.good === true)  return 'tzadik';
     if (k.good === false) return 'rasha';
-    const v = (k.assessment||'').toLowerCase();
+    const v = (raw||'').toLowerCase();
     if (v === 'righteous' || v === 'good')  return 'tzadik';
     if (v === 'wicked'   || v === 'bad')    return 'rasha';
     if (v === 'mixed')                      return 'mixed';
@@ -66,12 +72,32 @@
     ]
   };
 
+  // Map real dynasty strings from kings.js to a color.
+  const DYNASTY_COLOR = {
+    'בית דוד':     '#8B6F1F',
+    'בית ירבעם':   '#7A1F2A',
+    'בית בעשא':    '#4A2C6F',
+    'זמרי':        '#5C1010',
+    'בית עמרי':    '#1E4D7A',
+    'בית יהוא':    '#4E6B2E',
+    'שלום':        '#5C1010',
+    'בית מנחם':    '#5C3A1F',
+    'פקח':         '#5C1010',
+    'הושע':        '#5C1010',
+    'עתליה':       '#5C1010'
+  };
   function dynastyBadge(k){
     if (!k) return FALLBACK_DYNASTIES.judah;
-    const name = (k.name||'').trim();
-    if (k.dynasty === 'יהודה' || k.kingdom === 'judah') return FALLBACK_DYNASTIES.judah;
-    const d = FALLBACK_DYNASTIES.israel.find(d => d.kings.includes(name));
+    // kings.js row uses `house` (authentic dynasty label like "בית דוד").
+    const house = k.house || k.dynasty_name || null;
+    if (house && DYNASTY_COLOR[house]) return { id:house, name:house, color:DYNASTY_COLOR[house] };
+    // dynasty field that is actually kingdom ('יהודה' / 'ישראל') — legacy path.
+    if (k.dynasty === 'יהודה' || k.kingdom === 'judah' || k.kingdom === 'יהודה' || k.kingdom === 'מאוחדת')
+      return FALLBACK_DYNASTIES.judah;
+    const bare = (k.name||'').replace(/[֑-ׇ]/g,'').trim();
+    const d = FALLBACK_DYNASTIES.israel.find(d => d.kings.includes(bare));
     if (d) return d;
+    if (house) return { id:house, name:house, color:'#5C3A1F' };
     return { id:'israel', name:'ישראל', color:'#5C3A1F' };
   }
 
@@ -97,24 +123,64 @@
     { victim:'יאשיהו',            killer:'פרעה נכה',     killer_kind:'foreign'   }
   ];
 
-  // Build [{killer_id, victim_id, killer_kind, ...}] from normalized kings list.
+  // Build [{killer_id, victim_id, killer_kind, ...}]. Prefers real data from
+  // window.KINGS_DATA (killed[] / killed_by fields) when available; falls back
+  // to the hardcoded FALLBACK_KILLINGS table keyed by Hebrew name.
   function succession_chain(all_kings){
-    const byName = {};
-    (all_kings||[]).forEach(k => { if (k && k.name) byName[k.name.trim()] = k; });
     const pairs = [];
-    FALLBACK_KILLINGS.forEach(rec => {
-      const victim = byName[rec.victim];
-      if (!victim) return;
-      const killer = byName[rec.killer];
-      pairs.push({
-        victim_id: victim.id,
-        victim_name: victim.name,
-        killer_id: killer ? killer.id : null,
-        killer_name: rec.killer,
-        killer_kind: rec.killer_kind,
-        note: rec.note || ''
+    const seen = new Set();
+    const raw = (typeof window !== 'undefined' && window.KINGS_DATA) || [];
+    const byId = {};
+    raw.forEach(k => { byId[k.id] = k; });
+
+    // 1) From kings.js: each king's killed[] lists victims the king killed;
+    //    killed_by (string id or descriptor) lists who killed this king.
+    raw.forEach(killer => {
+      (killer.killed || []).forEach(vid => {
+        const victim = byId[vid];
+        const pair = {
+          victim_id: victim ? victim.id : vid,
+          victim_name: victim ? (victim.name_niqqud || victim.id) : vid,
+          killer_id: killer.id,
+          killer_name: killer.name_niqqud || killer.id,
+          killer_kind: victim ? 'king' : 'character',
+          note: ''
+        };
+        const key = pair.killer_id + '>' + pair.victim_id;
+        if (!seen.has(key)) { seen.add(key); pairs.push(pair); }
       });
     });
+    raw.forEach(victim => {
+      const kb = victim.killed_by;
+      if (!kb) return;
+      const killer = byId[kb];
+      const pair = {
+        victim_id: victim.id,
+        victim_name: victim.name_niqqud || victim.id,
+        killer_id: killer ? killer.id : null,
+        killer_name: killer ? (killer.name_niqqud || killer.id) : String(kb),
+        killer_kind: killer ? 'king' : 'foreign',
+        note: ''
+      };
+      const key = (pair.killer_id||pair.killer_name) + '>' + pair.victim_id;
+      if (!seen.has(key)) { seen.add(key); pairs.push(pair); }
+    });
+
+    // 2) Fallback table by name — for rows sourced from the legacy timeline.
+    if (pairs.length === 0){
+      const byName = {};
+      (all_kings||[]).forEach(k => { if (k && k.name) byName[k.name.trim()] = k; });
+      FALLBACK_KILLINGS.forEach(rec => {
+        const victim = byName[rec.victim]; if (!victim) return;
+        const killer = byName[rec.killer];
+        pairs.push({
+          victim_id: victim.id, victim_name: victim.name,
+          killer_id: killer ? killer.id : null,
+          killer_name: rec.killer, killer_kind: rec.killer_kind,
+          note: rec.note || ''
+        });
+      });
+    }
     return pairs;
   }
 
@@ -155,14 +221,36 @@
     { id:'ovadya',     name:'עבדיהו (הניצב על הבית)', kings:['אחאב'] }
   ];
 
+  // Prophet id → display name (falls back to FALLBACK_PROPHETS table).
+  function prophetName(id){
+    const f = FALLBACK_PROPHETS.find(p => p.id === id);
+    if (f) return f.name;
+    // try entity-index characters
+    const idx = (typeof window !== 'undefined' && window.__ENTITY_INDEX__) || {};
+    const c = (idx.character || {})[id];
+    if (c) return c.name_niqqud || c.name || id;
+    return id;
+  }
+
   function prophets_by_reign(all_chars, king){
-    const name = (typeof king === 'string') ? king : (king && king.name);
-    if (!name) return [];
-    const kingName = name.trim();
     const out = [];
     const seen = new Set();
 
-    // 1) Try live entity-index characters (role contains נביא).
+    // 1) PREFER real data — king.related_prophets is an array of ids.
+    const rp = (king && typeof king === 'object' && king.related_prophets) ? king.related_prophets : null;
+    if (rp && rp.length){
+      rp.forEach(pid => {
+        if (seen.has(pid)) return;
+        seen.add(pid);
+        out.push({ id: pid, name: prophetName(pid), source: 'kings_js' });
+      });
+      return out;
+    }
+
+    // 2) Legacy: lookup by Hebrew name against entity-index characters.
+    const name = (typeof king === 'string') ? king : (king && (king.name || king.name_niqqud));
+    if (!name) return out;
+    const kingName = name.trim();
     (all_chars || []).forEach(c => {
       if (!c) return;
       const roleStr = (c.role||'') + ' ' + ((c.tags||[]).join(' '));
@@ -175,7 +263,7 @@
       }
     });
 
-    // 2) Fallback table.
+    // 3) Fallback table by name.
     FALLBACK_PROPHETS.forEach(p => {
       if (p.kings.indexOf(kingName) < 0) return;
       if (seen.has(p.id)) return;
@@ -210,9 +298,33 @@
 
   function foreign_event_for(kingOrId){
     if (!kingOrId) return null;
-    const name = (typeof kingOrId === 'string') ? kingOrId : kingOrId.name;
+    // Allow lookup by kings.js id first (for real data).
+    const idKey = (typeof kingOrId === 'object') ? kingOrId.id : null;
+    const KING_ID_TO_FOREIGN = {
+      rehavam:        FALLBACK_FOREIGN['רחבעם'],
+      basha:          FALLBACK_FOREIGN['בעשא'],
+      achav:          FALLBACK_FOREIGN['אחאב'],
+      yehu:           FALLBACK_FOREIGN['יהוא'],
+      yehoachaz_yis:  FALLBACK_FOREIGN['יהואחז'],
+      yoash_yis:      FALLBACK_FOREIGN['יואש (ישראל)'],
+      menachem:       FALLBACK_FOREIGN['מנחם בן גדי'],
+      pekach:         FALLBACK_FOREIGN['פקח בן רמליהו'],
+      achaz:          FALLBACK_FOREIGN['אחז'],
+      hoshea:         FALLBACK_FOREIGN['הושע בן אלה'],
+      chizkiyahu:     FALLBACK_FOREIGN['חזקיהו'],
+      menasheh:       FALLBACK_FOREIGN['מנשה'],
+      yoshiyahu:      FALLBACK_FOREIGN['יאשיהו'],
+      yehoachaz_yhd:  FALLBACK_FOREIGN['יהואחז'],
+      yehoyakim:      FALLBACK_FOREIGN['יהויקים'],
+      yehoyachin:     FALLBACK_FOREIGN['יהויכין'],
+      tzidkiyahu:     FALLBACK_FOREIGN['צדקיהו']
+    };
+    if (idKey && KING_ID_TO_FOREIGN[idKey]) return KING_ID_TO_FOREIGN[idKey];
+    const name = (typeof kingOrId === 'string') ? kingOrId : (kingOrId.name_niqqud || kingOrId.name);
     if (!name) return null;
-    return FALLBACK_FOREIGN[name.trim()] || null;
+    // Strip niqqud before lookup so "רְחַבְעָם" matches "רחבעם".
+    const bare = name.replace(/[֑-ׇ]/g, '').trim();
+    return FALLBACK_FOREIGN[bare] || FALLBACK_FOREIGN[name.trim()] || null;
   }
 
   // -------- Token helpers (keep short — index.html has full parseTokens) ----
@@ -226,6 +338,45 @@
   function getCharacter(id){
     if (!id) return null;
     const idx = (typeof window !== 'undefined' && window.__ENTITY_INDEX__) || {};
+    const king = (idx.king || {})[id];
+    const chr  = (idx.character || {})[id];
+    // If both sources carry this id (e.g. shlomo), merge: character wins on
+    // bio/tags (it has tokenized narrative), king wins on era/reign/assessment.
+    if (king && chr) {
+      return Object.assign({}, king, chr, {
+        _kingsData: true,
+        _charData:  true,
+        name: chr.name || king.name_niqqud || king.id,
+        name_niqqud: chr.name || king.name_niqqud,
+        role: chr.role || (king.kingdom === 'ישראל' ? 'מלך ישראל' : (king.kingdom === 'יהודה' ? 'מלך יהודה' : 'מלך')),
+        kingdom: chr.kingdom || king.kingdom,
+        era: king.era,
+        bio: chr.bio || king.short_summary || '',
+        short_summary: chr.bio || king.short_summary || '',
+        summary: chr.bio || king.short_summary || '',
+        assessment: king.assessment,
+        assessment_quote: king.assessment_quote,
+        related_prophets: king.related_prophets || chr.related_prophets || [],
+        related_places:   king.related_places   || chr.related_places   || [],
+        related_events:   king.related_events   || chr.related_events   || [],
+        killed: king.killed || [],
+        killed_by: king.killed_by || null,
+        reign_years: king.reign_years,
+        succession_type: king.succession_type
+      });
+    }
+    // Prefer real king entry from kings.js if id matches.
+    if (king) {
+      return Object.assign({}, king, {
+        name: king.name_niqqud || king.name || king.id,
+        role: king.kingdom === 'ישראל' ? 'מלך ישראל' : (king.kingdom === 'יהודה' ? 'מלך יהודה' : 'מלך'),
+        kingdom: king.kingdom,
+        era: king.era,
+        bio: king.short_summary || '',
+        summary: king.short_summary || '',
+        _kingsData: true
+      });
+    }
     const c = (idx.character||{})[id];
     if (c) return c;
     // Fallback: prophet in our table
