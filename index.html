@@ -137,10 +137,14 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="./components/KingsUtils.js?v=800"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=800"></script>
-<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=800"></script>
-<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=803"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=700"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=700"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=700"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=700"></script>
+<script src="./components/KingsUtils.js?v=802"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=802"></script>
+<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=802"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=700"></script>
 <script src="./components/BreadthPage.js?v=700"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
@@ -1520,6 +1524,38 @@ function EntityText({text, as="span", className}){
   return <Tag className={className}>{parseTokens(text)}</Tag>;
 }
 
+// Bridge parseTokens + EntityChip so other Babel scripts (CharacterPage) can
+// render tokenized text. Idempotent — set once per mount.
+if (typeof window !== 'undefined') {
+  window.parseTokens = parseTokens;
+  window.EntityChipComponent = EntityChip;
+}
+
+// Full-page view for a place/event/motif/archaeology/story/etc. Reuses the
+// same EntityDetail used by the drawer, wrapped with a back button.
+function EntityFullPage({type, id, setRoute}){
+  const idx = (typeof window!=='undefined' && window.__ENTITY_INDEX__) || {};
+  const resolvedType = ENTITY_TYPE_ALIAS[type] || type;
+  const data = (idx[resolvedType] || {})[id];
+  const heading = data && (data.heading || data.name_hebrew_nikud || data.name || data.title || id);
+  const typeLabel = ENTITY_TYPE_LABELS[type] || type;
+  const icon = type === 'place' ? '📍' : type === 'event' ? '📜' : '🔎';
+  return (
+    <div className="max-w-3xl mx-auto space-y-4">
+      <button onClick={()=>setRoute({page:'timeline'})} className="text-amber-300 text-sm">→ חזרה לציר המלכים</button>
+      <div className="parchment rounded-2xl p-5 md:p-6">
+        <div className="text-xs text-amber-800 font-bold">{typeLabel}</div>
+        <h1 className="font-display text-2xl md:text-3xl font-black text-amber-900 hebrew">
+          {icon} {heading || id}
+        </h1>
+      </div>
+      <div className="kt-expanded rounded-2xl" style={{border:'1px solid rgba(212,165,116,.25)',padding:14}}>
+        <EntityDetail type={type} id={id} label={heading||id}/>
+      </div>
+    </div>
+  );
+}
+
 // Renders inline the entity's full content. Nested EntityChips handle further expansion.
 function EntityDetail({type, id, label}){
   if(type === 'verse') return <VersePanel id={id} label={label}/>;
@@ -2192,6 +2228,9 @@ function App(){
         {route.page==="lesson" && <Lesson unitId={route.unitId} mode={route.mode} setRoute={setRoute} S={S} awardXP={awardXP} update={update}/>}
         {route.page==="quiz" && <QuizLobby S={S} setRoute={setRoute}/>}
         {route.page==="flashcards" && (()=>{ const X=window.FlashcardDrillComponent; return X ? <X S={S} update={update} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען כרטיסיות...</div>; })()}
+        {route.page==="exam-sim" && (()=>{ const X=window.ExamSim2551; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/> : <div className="text-amber-200 text-center py-8">טוען מתכונת...</div>; })()}
+        {route.page==="event" && (()=>{ const X=window.EventPage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אירוע...</div>; })()}
+        {route.page==="place" && (()=>{ const X=window.PlacePage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען מקום...</div>; })()}
         {route.page==="quizPlay" && <QuizRun params={route} S={S} setRoute={setRoute} awardXP={awardXP} update={update} publishActivity={publishActivity} soundOn={soundOn}/>}
         {route.page==="quizResult" && <QuizResult {...route} S={S} setRoute={setRoute}/>}
         {route.page==="themes" && (window.BreadthPage ? React.createElement(window.BreadthPage, {setRoute}) : <Themes S={S} update={update}/>)}
@@ -2203,6 +2242,8 @@ function App(){
         {route.page==="profile" && <MeTab S={S} update={update} setRoute={setRoute}/>}
         {route.page==="study" && <StudyHub setRoute={setRoute}/>}
         {route.page==="character" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף דמות...</div>; })()}
+        {route.page==="place" && <EntityFullPage type="place" id={route.id} setRoute={setRoute}/>}
+        {route.page==="event" && <EntityFullPage type="event" id={route.id} setRoute={setRoute}/>}
         </>}
       </main>
 
