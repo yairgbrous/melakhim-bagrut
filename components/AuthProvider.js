@@ -79,10 +79,126 @@
     }
     // Persistence best-effort; Safari private mode can fail — don't block.
     try { await window.firebase.auth().setPersistence(window.firebase.auth.Auth.Persistence.LOCAL); } catch {}
-    window.firebase.auth().onAuthStateChanged(user => {
-      if (user) setStatus("signed-in", { user, error: null });
-      else      setStatus("ready",     { user: null });
+    window.firebase.auth().onAuthStateChanged(async user => {
+      if (user) {
+        setStatus("signed-in", { user, error: null });
+        try { await pullAndMerge(user); } catch (e) { console.warn("[auth] pull+merge failed", e); }
+        startSyncLoop();
+      } else {
+        stopSyncLoop();
+        setStatus("ready", { user: null });
+      }
     });
+  }
+
+  // ---- RTDB sync (debounced 2s) ----
+  const PREFIXES = ["jarvis.", "melakhim_pro_"];
+  const DEBOUNCE_MS = 2000;
+  let syncBuffer = {};   // key → value (latest)
+  let debounceTimer = null;
+  let writeListener = null;
+
+  function encodeKey(k){ return k.replace(/[.#$/\[\]]/g, "_"); }
+
+  function dbBase(){
+    const cfg = state.config;
+    const url = (cfg && cfg.databaseURL) || "";
+    return url.replace(/\/+$/, "");
+  }
+
+  async function authedFetch(path, init){
+    const user = state.user;
+    if (!user || !dbBase()) throw new Error("not ready");
+    const token = await user.getIdToken();
+    const url = `${dbBase()}${path}${path.indexOf("?")>=0?"&":"?"}auth=${encodeURIComponent(token)}`;
+    return fetch(url, init);
+  }
+
+  async function pushBuffer(){
+    if (!state.user) { syncBuffer = {}; return; }
+    const pending = syncBuffer;
+    syncBuffer = {};
+    const uid = state.user.uid;
+    const payload = {};
+    Object.keys(pending).forEach(k => { payload[encodeKey(k)] = pending[k]; });
+    try {
+      const r = await authedFetch(`/users/${uid}/progress.json`, {
+        method: "PATCH",
+        body: JSON.stringify(payload)
+      });
+      if (!r.ok) console.warn("[auth] sync PATCH failed", r.status);
+    } catch (e) {
+      console.warn("[auth] sync failed, re-queueing", e);
+      // re-queue keys that weren't already replaced
+      Object.keys(pending).forEach(k => { if (!(k in syncBuffer)) syncBuffer[k] = pending[k]; });
+    }
+  }
+
+  function scheduleSync(){
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => { debounceTimer = null; pushBuffer(); }, DEBOUNCE_MS);
+  }
+
+  function onLocalWrite(ev){
+    const d = ev && ev.detail; if (!d) return;
+    const { key, value } = d;
+    if (!key || !PREFIXES.some(p => key.indexOf(p) === 0)) return;
+    syncBuffer[key] = value;
+    scheduleSync();
+  }
+
+  function startSyncLoop(){
+    if (writeListener) return;
+    writeListener = onLocalWrite;
+    window.addEventListener("mb-local-write", writeListener);
+  }
+
+  function stopSyncLoop(){
+    if (writeListener) window.removeEventListener("mb-local-write", writeListener);
+    writeListener = null;
+    if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; }
+    syncBuffer = {};
+  }
+
+  async function pullAndMerge(user){
+    if (!dbBase()) return;
+    const uid = user.uid;
+    let remote = null;
+    try {
+      const r = await authedFetch(`/users/${uid}/progress.json`, { method: "GET" });
+      if (r.ok) remote = await r.json();
+    } catch {}
+    if (!remote || typeof remote !== "object") return;
+
+    // Merge: remote value wins iff local is missing for that key (conservative —
+    // avoids clobbering fresh local edits). Local-only keys are pushed up.
+    const toPushUp = {};
+    Object.keys(remote).forEach(encKey => {
+      // we can't reliably invert encodeKey (replacement is lossy); carry as-is.
+      // Local keys that never appeared remote will be pushed below.
+      const raw = remote[encKey];
+      // try a best-effort restore of the common dots → dots pattern (jarvis.X.Y)
+      const candidate = encKey.replace(/_/g, ".");
+      if (localStorage.getItem(candidate) == null && typeof raw === "string") {
+        try { localStorage.setItem(candidate, raw); } catch {}
+      }
+    });
+    // Push any local progress-prefixed key that is not in remote.
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k || !PREFIXES.some(p => k.indexOf(p) === 0)) continue;
+        const enc = encodeKey(k);
+        if (!(enc in (remote || {}))) toPushUp[enc] = localStorage.getItem(k);
+      }
+    } catch {}
+    if (Object.keys(toPushUp).length) {
+      try {
+        await authedFetch(`/users/${uid}/progress.json`, {
+          method: "PATCH", body: JSON.stringify(toPushUp)
+        });
+      } catch {}
+    }
   }
 
   async function init(){
