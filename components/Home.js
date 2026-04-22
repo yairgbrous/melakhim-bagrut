@@ -84,6 +84,47 @@
     );
   }
 
+  // ---- QUICK ACTIONS ROW -------------------------------------------------
+  function QuickAction({icon, title, subtitle, onClick, accent}){
+    return (
+      <button type="button" onClick={onClick}
+        className={'quick-action-card ' + (accent || '')}
+        aria-label={title}>
+        <div className="quick-action-icon" aria-hidden="true">{icon}</div>
+        <div className="quick-action-title">{title}</div>
+        <div className="quick-action-sub">{subtitle}</div>
+      </button>
+    );
+  }
+
+  function QuickActions({setRoute}){
+    const openBook = () => {
+      const pool = (typeof window !== 'undefined' && window.__ENTITY_INDEX__ && window.__ENTITY_INDEX__.quote) || {};
+      const quotes = Object.values(pool);
+      if (quotes.length){
+        const q = quotes[Math.floor(Math.random() * quotes.length)];
+        setRoute({page:'quotes', focusId: q.id});
+      } else {
+        setRoute({page:'quotes'});
+      }
+    };
+    return (
+      <section className="quick-actions-wrap">
+        <h2 className="font-display text-base md:text-lg font-bold text-on-parchment mb-2 px-1">⚡ פעולות מהירות</h2>
+        <div className="quick-actions-grid">
+          <QuickAction icon="⚡" title="חידון מהיר" subtitle="10 שאלות אקראיות"
+            onClick={()=>setRoute({page:'quizPlay', mode:'quick'})} accent="qa-gold"/>
+          <QuickAction icon="📝" title="סימולציה מלאה" subtitle="שעתיים · 100 נקודות"
+            onClick={()=>setRoute({page:'exam'})} accent="qa-crimson"/>
+          <QuickAction icon="☀️" title="אתגר היום" subtitle="שאלה אחת · פעם ביום"
+            onClick={()=>setRoute({page:'quizPlay', mode:'daily'})} accent="qa-purple"/>
+          <QuickAction icon="📖" title="פתיחת ספר" subtitle="ציטוט אקראי מהספר"
+            onClick={openBook} accent="qa-emerald"/>
+        </div>
+      </section>
+    );
+  }
+
   // ---- MAIN ---------------------------------------------------------------
   function Home({S, setRoute, level, nextLv}){
     const [tick, setTick] = useState(0);
@@ -97,6 +138,7 @@
       <div className="space-y-5">
         <Hero S={S} setRoute={setRoute} dExam={dExam} currentUnit={currentUnit}/>
         <ProgressStrip units={units} S={S} setRoute={setRoute} currentUnit={currentUnit}/>
+        <QuickActions setRoute={setRoute}/>
         {/* QUICK ACTIONS — added in commit 3 */}
         {/* TODAY'S FOCUS — added in commit 4 */}
         {/* STATS STRIP — added in commit 5 */}
