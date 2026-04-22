@@ -1,0 +1,1 @@
+function ExamSim2551(){return React.createElement("div",{className:"p-6"},React.createElement("h1",null,"מתכונת בגרות תשפ״ו"),React.createElement("div",null,"2:15 + התאמה 15%=2:35 | 101 נק׳ | 5 מ-8 בקיאות + 7 מ-14 ידע/רוחב"),React.createElement("div",null,"בפיתוח"));}window.ExamSim2551=ExamSim2551;
