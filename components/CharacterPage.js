@@ -72,6 +72,22 @@
     return <span className={"kt-assess-pill " + col.cls} style={{marginInlineStart:8}}>{lbl}</span>;
   }
 
+  const ROLE_LABEL = {
+    'נביא':'נביא', 'prophet':'נביא', 'queen':'מלכה', 'אשה':'אשה',
+    'king':'מלך', 'מלך':'מלך', 'פקיד':'פקיד', 'עם':'זר/עם',
+  };
+  function RoleBadge({role}){
+    if (!role) return null;
+    const label = ROLE_LABEL[role] || role;
+    return <span className="kt-assess-pill assess-mixed" style={{marginInlineStart:8,background:'rgba(139,111,31,.18)',color:'#3a2a0d'}}>{label}</span>;
+  }
+  function EraBadge({era}){
+    if (era == null || era === '') return null;
+    const n = typeof era === 'number' ? era : parseInt(era,10);
+    const label = Number.isFinite(n) ? ('יחידה ' + n) : ('יחידה ' + era);
+    return <span className="kt-assess-pill assess-mixed" style={{marginInlineStart:6,background:'rgba(200,155,60,.22)',color:'#5a3d0d'}}>{label}</span>;
+  }
+
   function Chip({label, onClick, tone}){
     const cls = tone ? ('kt-chip kt-chip-'+tone) : 'kt-chip';
     return <button className={cls} onClick={onClick}>{label}</button>;
