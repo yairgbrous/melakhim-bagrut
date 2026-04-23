@@ -567,4 +567,66 @@ window.QUOTES_DATA = [
     significance:
       "הבטחת גדליהו לשארית יהודה — שיתוף פעולה עם בבל כדרך לרמוח יציבה. מיד אחריו נרצח. ציון של ״צום גדליהו״.",
   },
+  {
+    id: "q-michayahu-tzon-no-roe",
+    text_niqqud:
+      "רָאִיתִי אֶת־כָּל־יִשְׂרָאֵל נְפֹצִים אֶל־הֶהָרִים כַּצֹּאן אֲשֶׁר אֵין־לָהֶם רֹעֶה",
+    speaker_id: "michayahu_ben_yimla",
+    addressee_id: "achav",
+    context_event_id: "nevuat_michayahu",
+    book_ref: "מלכים א כב יז",
+    type: "prophecy",
+    unit: 3,
+    significance:
+      "נבואת מיכיהו על מפלת אחאב ברמות גלעד — משל צאן ללא רועה. חשיפת גזר דין מלכותי במפגן פומבי.",
+  },
+  {
+    id: "q-michayahu-im-shov",
+    text_niqqud: "אִם־שׁוֹב תָּשׁוּב בְּשָׁלוֹם לֹא־דִבֶּר יְהוָה בִּי",
+    speaker_id: "michayahu_ben_yimla",
+    addressee_id: "achav",
+    context_event_id: "nevuat_michayahu",
+    book_ref: "מלכים א כב כח",
+    type: "oath",
+    unit: 3,
+    significance:
+      "מבחן הנביא הציבורי — אם אחאב ישוב בשלום, אני שקרן. אחאב נהרג באותו יום. ממחיש את קריטריון הנבואה האמיתית.",
+  },
+  {
+    id: "q-achaziah-mibli-ein-elohim",
+    text_niqqud:
+      "הֲמִבְּלִי אֵין־אֱלֹהִים בְּיִשְׂרָאֵל אַתֶּם הֹלְכִים לִדְרֹשׁ בְּבַעַל זְבוּב אֱלֹהֵי עֶקְרוֹן",
+    speaker_id: "eliyahu",
+    addressee_id: "achaziah_yisrael",
+    context_event_id: "drisha_lebaal_zvuv",
+    book_ref: "מלכים ב א ג",
+    type: "rebuke",
+    unit: 3,
+    significance:
+      "תוכחת אליהו על אחזיהו ששלח לדרוש בבעל זבוב אלוהי עקרון. הדיבור התקיף על ייחוד ה׳ מול פולחן זר.",
+  },
+  {
+    id: "q-eliyahu-harei-avdcha",
+    text_niqqud: "וְעַבְדְּךָ יָרֵא אֶת־יְהוָה מִנְּעֻרָי",
+    speaker_id: "ovadyahu_asher_al_habayit",
+    addressee_id: "eliyahu",
+    context_event_id: "maamad_har_carmel",
+    book_ref: "מלכים א יח יב",
+    type: "confession",
+    unit: 3,
+    significance:
+      "וידוי עובדיהו המכולכל של נביאי ה׳ — יראת ה׳ בפנים בית אחאב. דוגמת ירא ה׳ בחצר רשעה.",
+  },
+  {
+    id: "q-eliyahu-kina-ka'ne'ti",
+    text_niqqud: "קַנֹּא קִנֵּאתִי לַיהוָה אֱלֹהֵי צְבָאוֹת",
+    speaker_id: "eliyahu",
+    addressee_id: "god",
+    context_event_id: "hitgalut_chorev",
+    book_ref: "מלכים א יט י",
+    type: "confession",
+    unit: 3,
+    significance:
+      "טענת אליהו בחורב — ״קנאתי לה׳״ (פעמיים). חשיפת הייאוש של נביא שהרגיש יחיד. תיאור עצמי בעל מתח פנימי.",
+  },
 ];
