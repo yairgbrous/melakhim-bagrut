@@ -312,4 +312,66 @@ window.QUOTES_DATA = [
     significance:
       "דברי רחבעם לעם — דחיית עצת הזקנים בלשון שעיבדה את עצמה להיות סיסמת הקיצוניות של השלטון. מיד אחריו הפילוג.",
   },
+  {
+    id: "q-elisha-widow",
+    text_niqqud: "מַה־יֶּשׁ־לָךְ בַּבָּיִת",
+    speaker_id: "elisha",
+    addressee_id: "almanat_tzorefat",
+    context_event_id: "nisey_elisha",
+    book_ref: "מלכים ב ד ב",
+    type: "question",
+    unit: 4,
+    significance:
+      "שאלת אלישע לאלמנת אחד מבני הנביאים — הנס מתחיל ממה שקיים. העיקרון שהנס לא בא מן האין אלא מהמועט.",
+  },
+  {
+    id: "q-shunamit-btoch-ami",
+    text_niqqud: "בְּתוֹךְ עַמִּי אָנֹכִי יֹשָׁבֶת",
+    speaker_id: "shunamit",
+    addressee_id: "elisha",
+    context_event_id: "nisey_elisha",
+    book_ref: "מלכים ב ד יג",
+    type: "confession",
+    unit: 4,
+    significance:
+      "תשובת השונמית לאלישע — היא לא חסרה דבר חברתי. עצמאות אישית בולטת בהקשר הנשי של הספר.",
+  },
+  {
+    id: "q-maid-achlei",
+    text_niqqud:
+      "אַחֲלֵי אֲדֹנִי לִפְנֵי הַנָּבִיא אֲשֶׁר בְּשֹׁמְרוֹן אָז יֶאֱסֹף אֹתוֹ מִצָּרַעְתּוֹ",
+    speaker_id: "naara_ktana_miyisrael",
+    addressee_id: "naaman",
+    context_event_id: "ripuy_naaman",
+    book_ref: "מלכים ב ה ג",
+    type: "plea",
+    unit: 4,
+    significance:
+      "משפט אחד של שפחה שבויה שמניע את כל סיפור ריפוי נעמן. דוגמה חזקה שהקטנים והחלשים יכולים לשנות מהלך היסטורי.",
+  },
+  {
+    id: "q-naaman-ein-elohim",
+    text_niqqud:
+      "הִנֵּה־נָא יָדַעְתִּי כִּי אֵין אֱלֹהִים בְּכָל־הָאָרֶץ כִּי אִם־בְּיִשְׂרָאֵל",
+    speaker_id: "naaman",
+    addressee_id: "elisha",
+    context_event_id: "ripuy_naaman",
+    book_ref: "מלכים ב ה טו",
+    type: "confession",
+    unit: 4,
+    significance:
+      "וידוי נעמן הארמי אחרי ריפויו — הכרת ה׳ באופן בלעדי בישראל. מדגיש שהנס נועד גם להציג את ה׳ לגויים.",
+  },
+  {
+    id: "q-metzoraim-yom-bsora",
+    text_niqqud: "הַיּוֹם הַזֶּה יוֹם־בְּשֹׂרָה הוּא וַאֲנַחְנוּ מַחְשִׁים",
+    speaker_id: "arbaat_hametzoraim",
+    addressee_id: "arbaat_hametzoraim",
+    context_event_id: "matziyat_shomron_bechol_haarba",
+    book_ref: "מלכים ב ז ט",
+    type: "command",
+    unit: 4,
+    significance:
+      "מוסר עצמי של ארבעת המצורעים — אפילו פסולי חברה מכירים בחובת הפרסום של נס. הופכים מתחלואיים למבשרי גאולה.",
+  },
 ];
