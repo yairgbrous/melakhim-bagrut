@@ -171,6 +171,7 @@
     const kingChips = (c.related_kings || []).map(v =>
       (v && typeof v==='object') ? {id:v.id||v.label, label:v.label||v.name||v.id} : {id:v, label:labelForKing(v)}
     );
+    const charChips = toChips(c.related_characters || [], 'character');
     const keyQuotes = c.key_quotes || [];
     const bookRefs  = c.book_refs  || [];
     const significance = c.significance || '';
@@ -324,6 +325,12 @@
           {kingChips.length>0 && (
             <Section title="👑 מלכים קשורים">
               <div className="kt-chips">{kingChips.map(p => renderEntity('king', p.id, p.label, 'kt-chip kt-chip-amber', setRoute))}</div>
+            </Section>
+          )}
+
+          {charChips.length>0 && (
+            <Section title="👥 דמויות קשורות">
+              <div className="kt-chips">{charChips.map(p => renderEntity('character', p.id, p.label, 'kt-chip kt-chip-cream', setRoute))}</div>
             </Section>
           )}
 
