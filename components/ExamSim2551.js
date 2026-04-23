@@ -714,6 +714,9 @@
       };
       pushAttempt(rec);
       setSaved(true);
+      if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
+        window.showToast('💾 הבחינה נשמרה בהיסטוריה · ציון ' + (Math.round(total*10)/10) + '/101', 'success');
+      }
     };
 
     return (

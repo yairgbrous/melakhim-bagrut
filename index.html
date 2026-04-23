@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-theme="dark">
+<html lang="he" dir="rtl" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=5">
@@ -26,6 +26,7 @@
 <link rel="stylesheet" href="assets/quote-cards.css?v=500">
 <link rel="stylesheet" href="assets/contrast-hotfix.css?v=500">
 <link rel="stylesheet" href="assets/layout-fix.css?v=500">
+<link rel="stylesheet" href="assets/readability-pass.css?v=1340">
 <script>
 /* =========================================================================
    localStorage write hook (feature-gated downstream).
@@ -183,6 +184,10 @@
 <script src="./data/_entity-index.js?v=1100"></script>
 <script type="module" src="./data/past-exams.js?v=1200"></script>
 <script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=1100"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1340"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=1340"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=1100"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=1100"></script>
 <script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1100"></script>
 <script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=1200"></script>
 <script type="text/babel" data-presets="react" src="./components/EventPage.js?v=1330"></script>
@@ -194,6 +199,9 @@
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=1100"></script>
 <script src="./components/BreadthPage.js?v=1150"></script>
 <script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=1100"></script>
+<script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=1340"></script>
+<script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=1340"></script>
+<script type="text/babel" data-presets="react" src="./components/Toast.js?v=1340"></script>
 <script type="text/babel" data-presets="react" src="./components/Home.js?v=1320"></script>
 <script type="text/babel" data-presets="react" src="./components/XpBadge.js?v=1320"></script>
 <script type="text/babel" data-presets="react" src="./components/InstantSearch.js?v=1320"></script>
@@ -260,6 +268,18 @@ details summary::-webkit-details-marker{display:none}
 .podium-row .pad .av{font-size:34px;line-height:1}
 .podium-row .pad .meta{font-size:11px;opacity:.85;margin-top:.25rem}
 .podium-row .rank-bubble{position:absolute;inset-inline-end:8px;top:6px;background:rgba(0,0,0,.18);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px}
+/* dark mode overrides — core surfaces (bg, parchment, text-on-parchment, gold gradients) */
+html[data-theme='dark'] body{background:#0A1628;color:#F7F1E1}
+html[data-theme='dark'] body::before{background:radial-gradient(circle at 15% 20%,rgba(212,165,116,.10),transparent 50%),radial-gradient(circle at 85% 75%,rgba(107,91,149,.10),transparent 55%),radial-gradient(circle at 50% 95%,rgba(168,50,64,.06),transparent 50%)}
+html[data-theme='dark'] .parchment{background:linear-gradient(135deg,#1A2747 0%,#0F1F3A 100%);color:#F5E6C8;border-color:rgba(212,165,116,.45);box-shadow:0 8px 32px rgba(0,0,0,.55)}
+html[data-theme='dark'] .parchment .text-on-parchment,html[data-theme='dark'] .text-on-parchment{color:#F5E6C8!important}
+html[data-theme='dark'] .parchment .text-on-parchment-accent,html[data-theme='dark'] .text-on-parchment-accent{color:#F4D58D!important}
+html[data-theme='dark'] .parchment .text-on-parchment-muted,html[data-theme='dark'] .text-on-parchment-muted{color:rgba(245,230,200,.75)!important}
+html[data-theme='dark'] .parchment .text-on-parchment-meta,html[data-theme='dark'] .text-on-parchment-meta{color:rgba(245,230,200,.6)!important}
+html[data-theme='dark'] .gold-btn{background:linear-gradient(135deg,#F5D670 0%,#C89B3C 100%);color:#1A1611;border-color:#F4D58D}
+html[data-theme='dark'] .gold-btn:hover:not(:disabled){box-shadow:0 6px 20px rgba(245,214,112,.45)}
+html[data-theme='dark'] .rank-chip,html[data-theme='dark'] .me-chip{background:linear-gradient(135deg,#F5D670,#C89B3C);color:#1A1611;border-color:#F4D58D}
+html[data-theme='dark'] header{background:rgba(10,22,40,.85)!important;border-color:rgba(212,165,116,.3)!important}
 /* light mode override */
 html[data-theme='light'] body{background:#F7F1E1;color:#1A1611}
 html[data-theme='light'] body::before{background:radial-gradient(circle at 15% 20%,rgba(212,165,116,.18),transparent 50%),radial-gradient(circle at 85% 75%,rgba(107,91,149,.10),transparent 55%)}
@@ -270,6 +290,34 @@ html[data-theme='light'] .text-amber-100\/60,html[data-theme='light'] .text-ambe
 html[data-theme='light'] input,html[data-theme='light'] textarea{background:#fff!important;color:#1A1611!important}
 .theme-tog{padding:.35rem .55rem;border-radius:999px;background:rgba(212,165,116,.18);border:1px solid rgba(212,165,116,.45);color:#F4D58D;font-size:14px}
 html[data-theme='light'] .theme-tog{color:#1A1611;background:rgba(139,111,71,.15)}
+/* ---- ErrorBoundary fallback screen ---- */
+.eb-screen{min-height:60vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.eb-card{max-width:560px;width:100%;padding:28px 22px;border-radius:18px;background:linear-gradient(135deg,rgba(168,50,64,.18),rgba(107,91,149,.14));border:1px solid #A83240;color:#F7F1E1;font-family:'Heebo','Frank Ruhl Libre',sans-serif;text-align:center;box-shadow:0 16px 40px -12px rgba(0,0,0,.55)}
+html[data-theme='light'] .eb-card{color:#1A1611;background:linear-gradient(135deg,rgba(168,50,64,.10),rgba(212,165,116,.18));border-color:#A83240}
+.eb-icon{font-size:54px;margin-bottom:6px;line-height:1}
+.eb-title{font-family:'Frank Ruhl Libre',serif;font-size:26px;font-weight:900;margin:0 0 6px;color:#F4D58D}
+html[data-theme='light'] .eb-title{color:#8B1F2A}
+.eb-msg{font-size:14px;line-height:1.7;opacity:.92;margin:0 auto 14px;max-width:46ch}
+.eb-trace{direction:ltr;text-align:left;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.5;background:rgba(0,0,0,.25);color:#F7F1E1;padding:10px 12px;border-radius:10px;max-height:160px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0 0 16px}
+html[data-theme='light'] .eb-trace{background:rgba(26,22,17,.06);color:#3a2e20}
+.eb-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.eb-btn{padding:10px 20px;border-radius:12px;font-weight:800;font-size:14px;border:1px solid transparent;cursor:pointer;transition:transform .1s ease,box-shadow .15s ease}
+.eb-btn:active{transform:scale(.97)}
+.eb-btn-primary{background:linear-gradient(135deg,#F5D670,#C89B3C);color:#1A1611;border-color:#F4D58D}
+.eb-btn-primary:hover{box-shadow:0 6px 18px rgba(245,214,112,.35)}
+.eb-btn-secondary{background:rgba(107,91,149,.22);color:#C9B8E0;border-color:rgba(107,91,149,.55)}
+.eb-btn-secondary:hover{background:rgba(107,91,149,.35)}
+html[data-theme='light'] .eb-btn-secondary{background:rgba(107,91,149,.14);color:#4A3D7A;border-color:rgba(107,91,149,.45)}
+/* ---- Toast notifications (window.showToast) ---- */
+.toast-host{position:fixed;inset-inline:0;bottom:calc(72px + env(safe-area-inset-bottom));z-index:120;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 12px}
+.toast-item{pointer-events:auto;display:inline-flex;align-items:center;gap:10px;max-width:min(560px,92vw);padding:.7rem 1.1rem;border-radius:14px;font-weight:700;font-size:14px;line-height:1.35;color:#fff;box-shadow:0 12px 30px -10px rgba(0,0,0,.55);border:1px solid transparent;cursor:pointer;animation:toastInUp .3s cubic-bezier(.3,.8,.3,1)}
+.toast-item .toast-ico{font-size:18px;line-height:1;flex-shrink:0}
+.toast-item .toast-msg{font-family:'Heebo','Frank Ruhl Libre',sans-serif}
+.toast-success{background:linear-gradient(135deg,#3E8E7E 0%,#2a6b5e 100%);border-color:#5FB39F;color:#F0FFF8}
+.toast-error{background:linear-gradient(135deg,#A83240 0%,#7a1f2a 100%);border-color:#D94E5F;color:#FFF1F3}
+.toast-info{background:linear-gradient(135deg,#3B6BB5 0%,#1E468C 100%);border-color:#6FA0E0;color:#E8F1FF}
+@keyframes toastInUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media (prefers-reduced-motion:reduce){.toast-item{animation:none}}
 /* ---- Home redesign v1 + 20 polish ---- */
 body{padding-bottom:72px}
 .bottom-nav{position:fixed;bottom:0;inset-inline:0;z-index:45;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:rgba(10,22,40,.92);backdrop-filter:blur(14px);border-top:1px solid rgba(212,165,116,.35);box-shadow:0 -4px 16px rgba(0,0,0,.35)}
@@ -2322,11 +2370,16 @@ function App(){
   const [route, setRoute] = useState({page:"home"});
   const isTeacher = typeof window!=='undefined' && /[?&]teacher=1/.test(window.location.search);
   const [firstTime, setFirstTime] = useState(!S.name && !isTeacher);
-  const [theme, setTheme] = useState(()=>document.documentElement.getAttribute('data-theme')||'dark');
+  const [theme, setTheme] = useState(()=>document.documentElement.getAttribute('data-theme')||'light');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [soundOn, setSoundOn] = useState(()=>{ try{return localStorage.getItem('mb_sound')!=='0'}catch{return true} });
   const toggleSound = ()=>{ setSoundOn(v=>{ const nv=!v; try{localStorage.setItem('mb_sound',nv?'1':'0')}catch{} return nv; }); };
-  const toggleTheme = ()=>{ const t=theme==='dark'?'light':'dark'; setTheme(t); document.documentElement.setAttribute('data-theme',t); try{localStorage.setItem('mb_theme',t);}catch{} };
+  const toggleTheme = ()=>{ if (typeof window.toggleJarvisTheme==='function') { const t=window.toggleJarvisTheme(); setTheme(t); return; } const t=theme==='dark'?'light':'dark'; setTheme(t); document.documentElement.setAttribute('data-theme',t); try{localStorage.setItem('jarvis.theme',t);}catch{} };
+  useEffect(()=>{
+    const onChange = (e) => { const t = (e && e.detail && e.detail.theme) || document.documentElement.getAttribute('data-theme') || 'light'; setTheme(t); };
+    window.addEventListener('jarvis-theme-change', onChange);
+    return ()=>window.removeEventListener('jarvis-theme-change', onChange);
+  }, []);
 
   useEffect(() => {
     const ilDay = (t=Date.now())=>new Date(t).toLocaleDateString('en-CA',{timeZone:'Asia/Jerusalem'});
@@ -2506,9 +2559,9 @@ function App(){
               className="theme-tog"
             >🔍</button>
             {typeof window!=="undefined" && window.AuthButtonComponent ? <window.AuthButtonComponent/> : null}
-            <button onClick={toggleTheme} className="theme-tog" aria-label="החלף מצב כהה/בהיר" title="החלף מצב כהה/בהיר">
-              {theme==='light'?'🌙':'☀️'}
-            </button>
+            {typeof window!=="undefined" && window.ThemeToggleComponent
+              ? React.createElement(window.ThemeToggleComponent)
+              : <button onClick={toggleTheme} className="theme-tog" aria-label="החלף מצב כהה/בהיר" title="החלף מצב כהה/בהיר">{theme==='light'?'🌙':'☀️'}</button>}
             <button onClick={()=>setDrawerOpen(true)} className="hmb" aria-label="תפריט ראשי" aria-expanded={drawerOpen}>☰</button>
           </div>
         </div>
@@ -2544,7 +2597,10 @@ function App(){
       )}
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-3 md:px-5 py-4 md:py-6 fade-up">
-        {isTeacher ? <TeacherView S={S}/> : <>
+        {(() => {
+          const RouteEB = (typeof window!=="undefined" && window.ErrorBoundaryComponent) || null;
+          const onHomeReset = () => { try { setRoute({page:"home"}); } catch {} };
+          const routeContent = isTeacher ? <TeacherView S={S}/> : <>
         {route.page==="home" && (window.HomeComponent
           ? React.createElement(window.HomeComponent, {S, setRoute, level, nextLv})
           : <div className="text-amber-200 text-center py-8">טוען דף בית...</div>)}
@@ -2571,6 +2627,11 @@ function App(){
         {route.page==="exam-sim" && (()=>{ const X=window.ExamSim2551; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/> : <div className="text-amber-200 text-center py-8">טוען מתכונת...</div>; })()}
         {route.page==="event" && (()=>{ const X=window.EventPage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אירוע...</div>; })()}
         {route.page==="place" && (()=>{ const X=window.PlacePage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען מקום...</div>; })()}
+        </>;
+          return RouteEB
+            ? React.createElement(RouteEB, { onHome: onHomeReset, key: route.page }, routeContent)
+            : routeContent;
+        })()}
         {route.page==="daily" && (()=>{ const X=window.DailyChallenge; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אתגר יומי...</div>; })()}
         </>}
       </main>
@@ -4174,39 +4235,53 @@ function Profile({S,update,setRoute}){
 }
 
 // ============ RENDER ============
-class EB extends React.Component {
-  constructor(p){ super(p); this.state={err:null}; }
-  static getDerivedStateFromError(err){ return {err}; }
-  componentDidCatch(err,info){ try{console.error('EB',err,info);}catch{} }
-  render(){
-    if(this.state.err) return (
-      <div style={{maxWidth:540,margin:'48px auto',padding:24,borderRadius:16,background:'rgba(168,50,64,.18)',border:'1px solid #A83240',color:'#F7F1E1',fontFamily:'Heebo,sans-serif',textAlign:'center'}}>
-        <div style={{fontSize:48,marginBottom:8}}>😕</div>
-        <div style={{fontSize:20,fontWeight:800,marginBottom:8}}>משהו השתבש</div>
-        <div style={{fontSize:13,opacity:.75,marginBottom:14}}>{String(this.state.err.message||this.state.err)}</div>
-        <button onClick={()=>location.reload()} style={{padding:'8px 18px',borderRadius:10,background:'linear-gradient(135deg,#D4A574,#8B6F47)',color:'#1A1611',fontWeight:800,border:0,cursor:'pointer'}} aria-label="רענן את הדף">רענן</button>
-      </div>
-    );
-    return this.props.children;
-  }
-}
-// init theme from prefers-color-scheme + saved
+// ErrorBoundary is loaded from components/ErrorBoundary.js (window.ErrorBoundaryComponent).
+// Minimal inline fallback kept only for the (unlikely) case that the external
+// file fails to load before the render call below.
+const EB = (typeof window !== 'undefined' && window.ErrorBoundaryComponent)
+  ? window.ErrorBoundaryComponent
+  : (function(){
+      class _EBFallback extends React.Component {
+        constructor(p){ super(p); this.state={err:null}; }
+        static getDerivedStateFromError(err){ return {err}; }
+        componentDidCatch(err,info){ try{console.error('EB',err,info);}catch{} }
+        render(){
+          if(!this.state.err) return this.props.children;
+          return React.createElement('div', {style:{maxWidth:540,margin:'48px auto',padding:24,textAlign:'center'}},
+            React.createElement('div', null, 'משהו השתבש'),
+            React.createElement('button', {onClick:()=>location.reload()}, 'רענן')
+          );
+        }
+      }
+      return _EBFallback;
+    })();
+// init theme from localStorage['jarvis.theme']; first visit honors prefers-color-scheme; default light
 (function(){
   try{
-    const saved = localStorage.getItem('mb_theme');
-    const prefDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const t = saved || (prefDark ? 'dark' : 'light');
+    const saved = localStorage.getItem('jarvis.theme');
+    let t = saved;
+    if (!t) {
+      const prefDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      t = prefDark ? 'dark' : 'light';
+    }
     document.documentElement.setAttribute('data-theme', t);
-  }catch{ document.documentElement.setAttribute('data-theme','dark'); }
+  }catch{ document.documentElement.setAttribute('data-theme','light'); }
 })();
-ReactDOM.createRoot(document.getElementById("root")).render(<EB><App/></EB>);
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <EB>
+    <App/>
+    {typeof window !== "undefined" && window.ToastHostComponent
+      ? React.createElement(window.ToastHostComponent)
+      : null}
+  </EB>
+);
 </script>
 <script>
   // PWA service worker: register, and auto-activate a new SW as soon as
   // it's installed so users don't need to hard-reload between deploys.
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./sw.js?v=1100').then(function(reg){
+      navigator.serviceWorker.register('./sw.js?v=1340').then(function(reg){
         if (!reg) return;
         reg.addEventListener('updatefound', function(){
           var sw = reg.installing;
