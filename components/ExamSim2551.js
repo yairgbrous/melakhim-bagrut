@@ -227,6 +227,7 @@
       : disabled
         ? "bg-white/30 border-amber-700/10 text-amber-900/50 cursor-not-allowed"
         : "bg-white/60 border-amber-700/30 text-amber-900 hover:bg-amber-500/10";
+    const hasQuotes = Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0;
     return (
       <button onClick={onToggle} disabled={disabled && !selected}
         className={`w-full text-right rounded-xl border-2 p-3 transition ${cls}`}>
@@ -236,11 +237,44 @@
           </span>
           <div className="flex-1 min-w-0 text-right">
             <div className="font-bold text-sm hebrew">{q.title}</div>
+            {hasQuotes && (
+              <div className="text-[11px] mt-1 text-amber-900/80 hebrew">
+                כולל {q.verbatim_quotes.length} ציטוטי מקרא (בניקוד)
+              </div>
+            )}
             <div className="text-xs mt-0.5 hebrew leading-relaxed opacity-80">{q.prompt}</div>
             <div className="text-[10px] mt-1 opacity-70">{q.points} נק׳</div>
           </div>
         </div>
       </button>
+    );
+  }
+
+  function PartTabBar({ tab, onTab, selectedA, selectedBC }){
+    const tabs = [
+      { id: "A", label: "חלק א׳ · בקיאות",      n: selectedA.length,  max: MAX_A },
+      { id: "B", label: "חלק ב׳ · ידע",         n: null,              max: null  },
+      { id: "C", label: "חלק ג׳ · ניתוח/רוחב",  n: null,              max: null  },
+      { id: "BC",label: "ב+ג · מצרפי",           n: selectedBC.length, max: MAX_BC }
+    ];
+    return (
+      <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30">
+        {tabs.map(t => {
+          const active = tab === t.id;
+          const cls = active
+            ? "bg-amber-600 text-white font-bold"
+            : "bg-white/10 text-on-parchment hover:bg-white/20";
+          return (
+            <button key={t.id} onClick={()=>onTab(t.id)}
+              className={`text-[11px] md:text-xs px-2 py-1.5 rounded-lg transition ${cls}`}>
+              <div className="hebrew leading-tight">{t.label}</div>
+              {t.n !== null && (
+                <div className="text-[10px] opacity-90" dir="ltr">{t.n}/{t.max}</div>
+              )}
+            </button>
+          );
+        })}
+      </div>
     );
   }
 
@@ -368,6 +402,8 @@
     const [examCfg, setExamCfg] = useState(null);
     const [selectedA, setSelectedA] = useState([]);
     const [selectedBC, setSelectedBC] = useState([]);
+    const [selectTab, setSelectTab] = useState("A");
+    const [runTab, setRunTab] = useState("A");
     const [draft, setDraft] = useState(() => loadInProgress());
     const [resumeData, setResumeData] = useState(null);
     const [finalRun, setFinalRun] = useState(null);
@@ -408,6 +444,11 @@
 
     if (phase === "select") {
       const ready = selectedA.length === MAX_A && selectedBC.length === MAX_BC;
+      const tab = selectTab;
+      const partB = partBCList().filter(q => q.part === "B");
+      const partC = partBCList().filter(q => q.part === "C");
+      const fullA  = selectedA.length  >= MAX_A;
+      const fullBC = selectedBC.length >= MAX_BC;
       return (
         <div className="max-w-2xl mx-auto space-y-4">
           <div className="card rounded-xl p-3 flex items-center justify-between text-sm">
@@ -416,8 +457,61 @@
               א: <span dir="ltr" className="font-bold">{selectedA.length}/{MAX_A}</span> · ב+ג: <span dir="ltr" className="font-bold">{selectedBC.length}/{MAX_BC}</span>
             </div>
           </div>
-          <PartASelect selected={selectedA} onToggle={toggleA}/>
-          <PartBCSelect selected={selectedBC} onToggle={toggleBC}/>
+          <PartTabBar tab={tab} onTab={setSelectTab} selectedA={selectedA} selectedBC={selectedBC}/>
+          {tab === "A" && (
+            <section className="space-y-2">
+              <div className="text-sm font-bold text-on-parchment-accent hebrew">
+                חלק א׳ — בקיאות · בחר 5 מתוך 8 · <span dir="ltr">{selectedA.length}/{MAX_A} נבחרו</span>
+              </div>
+              {partAList().map(q => (
+                <SelectionCard key={q.id} q={q} selected={selectedA.includes(q.id)}
+                  onToggle={()=>toggleA(q.id)} disabled={fullA}/>
+              ))}
+            </section>
+          )}
+          {tab === "B" && (
+            <section className="space-y-2">
+              <div className="text-sm font-bold text-purple-200 hebrew">
+                חלק ב׳ — ידע וזיכרון · נספר למכסת ב+ג · <span dir="ltr">{selectedBC.length}/{MAX_BC} נבחרו</span>
+              </div>
+              {partB.map(q => (
+                <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
+                  onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
+              ))}
+            </section>
+          )}
+          {tab === "C" && (
+            <section className="space-y-2">
+              <div className="text-sm font-bold text-purple-200 hebrew">
+                חלק ג׳ — ניתוח ורוחב · נספר למכסת ב+ג · <span dir="ltr">{selectedBC.length}/{MAX_BC} נבחרו</span>
+              </div>
+              {partC.map(q => (
+                <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
+                  onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
+              ))}
+            </section>
+          )}
+          {tab === "BC" && (
+            <section className="space-y-3">
+              <div className="text-sm font-bold text-purple-200 hebrew">
+                בחר 7 מתוך 14 (ב+ג) · <span dir="ltr">{selectedBC.length}/{MAX_BC} נבחרו</span>
+              </div>
+              <div className="text-[10px] text-on-parchment-meta">פרק ב׳</div>
+              <div className="space-y-2">
+                {partB.map(q => (
+                  <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
+                    onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
+                ))}
+              </div>
+              <div className="text-[10px] text-on-parchment-meta mt-3">פרק ג׳</div>
+              <div className="space-y-2">
+                {partC.map(q => (
+                  <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
+                    onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
+                ))}
+              </div>
+            </section>
+          )}
           <button onClick={()=>setPhase("running")} disabled={!ready}
             className={`w-full py-4 rounded-2xl text-lg font-bold ${ready?"gold-btn glow":"bg-slate-700 text-slate-400 cursor-not-allowed"}`}>
             {ready ? `🏁 התחל מבחן · ${fmtHMS(examCfg&&examCfg.durationSec||DURATION_STANDARD)}` : `בחר ${MAX_A-selectedA.length} בפרק א ו-${MAX_BC-selectedBC.length} בפרקים ב+ג`}
