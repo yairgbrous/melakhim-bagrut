@@ -374,4 +374,69 @@ window.QUOTES_DATA = [
     significance:
       "מוסר עצמי של ארבעת המצורעים — אפילו פסולי חברה מכירים בחובת הפרסום של נס. הופכים מתחלואיים למבשרי גאולה.",
   },
+  {
+    id: "q-ravshake-mishenet",
+    text_niqqud:
+      "הִנֵּה בָטַחְתָּ לְּךָ עַל־מִשְׁעֶנֶת הַקָּנֶה הָרָצוּץ הַזֶּה עַל־מִצְרַיִם",
+    speaker_id: "ravshake",
+    addressee_id: "chizkiyahu",
+    context_event_id: "matzor_sancheriv",
+    book_ref: "מלכים ב יח כא",
+    type: "rebuke",
+    unit: 6,
+    significance:
+      "תעמולת רבשקה — ביקורת פוליטית על ברית יהודה עם מצרים. ציור ״משענת הקנה הרצוץ״ נזכר גם בנבואת ישעיהו.",
+  },
+  {
+    id: "q-ravshake-al-yavtachchem",
+    text_niqqud:
+      "אַל־יַבְטַח אֶתְכֶם חִזְקִיָּהוּ אֶל־יְהוָה לֵאמֹר הַצֵּל יַצִּילֵנוּ יְהוָה",
+    speaker_id: "ravshake",
+    addressee_id: "am",
+    context_event_id: "matzor_sancheriv",
+    book_ref: "מלכים ב יח ל",
+    type: "rebuke",
+    unit: 6,
+    significance:
+      "רבשקה מנסה לערער את אמון העם על חזקיהו — פונה עברית מעל לראש המשלחת. דוגמת תעמולת פסיכולוגית.",
+  },
+  {
+    id: "q-ravshake-elohei-goyim",
+    text_niqqud:
+      "הַהַצֵּל הִצִּילוּ אֱלֹהֵי הַגּוֹיִם אִישׁ אֶת־אַרְצוֹ מִיַּד מֶלֶךְ אַשּׁוּר",
+    speaker_id: "ravshake",
+    addressee_id: "am",
+    context_event_id: "matzor_sancheriv",
+    book_ref: "מלכים ב יח לג",
+    type: "rebuke",
+    unit: 6,
+    significance:
+      "שיא הגידוף של רבשקה — משווה את ה׳ לאלוהי הגויים. דיוק התיאולוגי שהצליח לחרות בלב חזקיהו ישעיהו לעמוד מולו.",
+  },
+  {
+    id: "q-yeshayahu-ganoti",
+    text_niqqud:
+      "וְגַנּוֹתִי אֶל־הָעִיר הַזֹּאת לְהוֹשִׁיעָהּ לְמַעֲנִי וּלְמַעַן דָּוִד עַבְדִּי",
+    speaker_id: "yeshayahu",
+    addressee_id: "chizkiyahu",
+    context_event_id: "nes_yerushalayim",
+    book_ref: "מלכים ב יט לד",
+    type: "prophecy",
+    unit: 6,
+    significance:
+      "הבטחת ה׳ להציל את ירושלים מידי סנחריב בזכות שתי זכויות: שמו־הוא ובית דוד. מוטיב ״ברית דוד״ כמגן ליהודה.",
+  },
+  {
+    id: "q-yeshayahu-bavel",
+    text_niqqud:
+      "הִנֵּה יָמִים בָּאִים וְנִשָּׂא כָּל־אֲשֶׁר בְּבֵיתֶךָ וַאֲשֶׁר אָצְרוּ אֲבֹתֶיךָ עַד־הַיּוֹם הַזֶּה בָּבֶלָה לֹא־יִוָּתֵר דָּבָר",
+    speaker_id: "yeshayahu",
+    addressee_id: "chizkiyahu",
+    context_event_id: "shagirut_merodach_baladan",
+    book_ref: "מלכים ב כ יז",
+    type: "prophecy",
+    unit: 6,
+    significance:
+      "הנבואה הראשונה המפורשת על הגלות הבבלית — בעקבות התפארות חזקיהו לפני שליחי מרודך בלאדן. יומן־הפוך של ההצלה.",
+  },
 ];
