@@ -1,0 +1,1 @@
+window.QUOTES_DATA=[];
