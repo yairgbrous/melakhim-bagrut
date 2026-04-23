@@ -188,4 +188,66 @@ window.QUOTES_DATA = [
     significance:
       "הצוואה הרוחנית של דוד לשלמה. עקרון הברית הדויטרונומי — הליכה בדרכי ה׳ כתנאי להצלחת המלוכה. (דוד→שלמה)",
   },
+  {
+    id: "q-eliyahu-chay-hashem",
+    text_niqqud:
+      "חַי־יְהוָה אֱלֹהֵי יִשְׂרָאֵל אֲשֶׁר עָמַדְתִּי לְפָנָיו אִם־יִהְיֶה הַשָּׁנִים הָאֵלֶּה טַל וּמָטָר כִּי אִם־לְפִי דְבָרִי",
+    speaker_id: "eliyahu",
+    addressee_id: "achav",
+    context_event_id: "batzoret_eliyahu",
+    book_ref: "מלכים א יז א",
+    type: "oath",
+    unit: 3,
+    significance:
+      "הופעת אליהו — שבועת הבצורת. מפגן הראשוני של אליהו כמי שעומד לפני ה׳ ומחזיק בגורל הטבע.",
+  },
+  {
+    id: "q-eliyahu-posschim",
+    text_niqqud:
+      "עַד־מָתַי אַתֶּם פֹּסְחִים עַל־שְׁתֵּי הַסְּעִפִּים אִם־יְהוָה הָאֱלֹהִים לְכוּ אַחֲרָיו",
+    speaker_id: "eliyahu",
+    addressee_id: "am",
+    context_event_id: "maamad_har_carmel",
+    book_ref: "מלכים א יח כא",
+    type: "rebuke",
+    unit: 3,
+    significance:
+      "האתגר של אליהו לעם בהר הכרמל — אין דרך אמצע בין ה׳ לבעל. דרישה להכרעה דתית חד־משמעית.",
+  },
+  {
+    id: "q-am-hu-haelohim",
+    text_niqqud: "יְהוָה הוּא הָאֱלֹהִים יְהוָה הוּא הָאֱלֹהִים",
+    speaker_id: "am",
+    addressee_id: "all",
+    context_event_id: "maamad_har_carmel",
+    book_ref: "מלכים א יח לט",
+    type: "confession",
+    unit: 3,
+    significance:
+      "קריאת העם אחרי נפילת האש — הכרעה ברורה באלוהי ישראל. זוהי השורה שסוגרת את נעילת יום הכיפורים.",
+  },
+  {
+    id: "q-kol-dmama-daka",
+    text_niqqud: "וְאַחַר הָאֵשׁ קוֹל דְּמָמָה דַקָּה",
+    speaker_id: "god",
+    addressee_id: "eliyahu",
+    context_event_id: "hitgalut_chorev",
+    book_ref: "מלכים א יט יב",
+    type: "prophecy",
+    unit: 3,
+    significance:
+      "ההתגלות בחורב — ה׳ נמצא בקול הדממה הדקה ולא ברעש וברוח. שינוי תפיסת ההתגלות מן הכוח הפיזי לאופן אחר.",
+  },
+  {
+    id: "q-ma-lecha-po",
+    text_niqqud: "מַה־לְּךָ פֹה אֵלִיָּהוּ",
+    speaker_id: "god",
+    addressee_id: "eliyahu",
+    context_event_id: "hitgalut_chorev",
+    book_ref: "מלכים א יט ט",
+    type: "question",
+    unit: 3,
+    significance:
+      "שאלת ה׳ לאליהו המסתתר במערה — שאלת אתגר לנביא: למה ברחת מעמדך? חוזרת פעמיים לפני ואחרי ההתגלות.",
+  },
 ];
