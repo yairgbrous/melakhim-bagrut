@@ -182,6 +182,7 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <!-- Cross-entity connectivity: load BEFORE pages so window.__ENTITY_INDEX__
      has all buckets + window.EntityLinkComponent is available at render. -->
+<<<<<<< claude/audit-fix-id-aliases
 <script src="./data/_entity-index.js?v=1100"></script>
 <script type="module" src="./data/past-exams.js?v=1200"></script>
 <script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=1400"></script>
@@ -204,6 +205,26 @@
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=1340"></script>
 <script type="text/babel" data-presets="react" src="./components/Toast.js?v=1340"></script>
 <script type="text/babel" data-presets="react" src="./components/Home.js?v=1100"></script>
+=======
+<script src="./data/_entity-index.js?v=2000"></script>
+<script type="module" src="./data/past-exams.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=2000"></script>
+<script src="./components/KingsUtils.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=2000"></script>
+<script src="./components/BreadthPage.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/Toast.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=2000"></script>
+>>>>>>> main
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -916,7 +937,7 @@ html[data-theme='dark'] .stats-cell{
 <body>
 <div id="root"></div>
 <!-- Tab D: authentic quiz / exam-sim / flashcards components (attach to window before main render) -->
-<script type="text/babel" data-presets="react" src="./components/FlashcardDrill.js"></script>
+<script type="text/babel" data-presets="react" src="./components/FlashcardDrill.js?v=2000"></script>
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
