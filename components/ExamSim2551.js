@@ -454,7 +454,7 @@
           <div className="card rounded-xl p-3 flex items-center justify-between text-sm">
             <div className="font-bold text-on-parchment">שלב בחירת שאלות</div>
             <div className="text-xs text-on-parchment">
-              א: <span dir="ltr" className="font-bold">{selectedA.length}/{MAX_A}</span> · ב+ג: <span dir="ltr" className="font-bold">{selectedBC.length}/{MAX_BC}</span>
+              <span dir="ltr" className="font-bold">{selectedA.length}/{MAX_A}</span> בחלק א · <span dir="ltr" className="font-bold">{selectedBC.length}/{MAX_BC}</span> בחלקים ב+ג
             </div>
           </div>
           <PartTabBar tab={tab} onTab={setSelectTab} selectedA={selectedA} selectedBC={selectedBC}/>
