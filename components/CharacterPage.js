@@ -93,6 +93,20 @@
     return <button className={cls} onClick={onClick}>{label}</button>;
   }
 
+  // Entity-index-driven chip. Uses window.EntityLinkComponent (PR #34) when
+  // the id resolves against window.__ENTITY_INDEX__[type]; otherwise falls
+  // back to a disabled span with "(אין דף עדיין)" tooltip.
+  function renderEntity(type, id, label, className, setRoute){
+    const idx    = (typeof window !== 'undefined' && window.__ENTITY_INDEX__) || {};
+    const bucket = idx[type] || (type === 'king' ? (idx.king || idx.character) : null);
+    const exists = !!(bucket && id && bucket[id]);
+    const EL     = typeof window !== 'undefined' ? window.EntityLinkComponent : null;
+    if (exists && EL) {
+      return <EL type={type} id={id} label={label} setRoute={setRoute} className={className}/>;
+    }
+    return <span className={(className||'kt-chip')+' kt-chip-missing'} title="(אין דף עדיין)" aria-label={(label||id)+' — (אין דף עדיין)'}>{label || id}</span>;
+  }
+
   function Section({title, children}){
     if (!children || (Array.isArray(children) && children.every(x=>!x))) return null;
     return <div className="kt-sect"><div className="kt-sect-h">{title}</div>{children}</div>;
