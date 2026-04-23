@@ -250,4 +250,66 @@ window.QUOTES_DATA = [
     significance:
       "שאלת ה׳ לאליהו המסתתר במערה — שאלת אתגר לנביא: למה ברחת מעמדך? חוזרת פעמיים לפני ואחרי ההתגלות.",
   },
+  {
+    id: "q-yarovam-calves",
+    text_niqqud: "הִנֵּה אֱלֹהֶיךָ יִשְׂרָאֵל אֲשֶׁר הֶעֱלוּךָ מֵאֶרֶץ מִצְרָיִם",
+    speaker_id: "yarovam",
+    addressee_id: "am",
+    context_event_id: "egli_zahav",
+    book_ref: "מלכים א יב כח",
+    type: "command",
+    unit: 2,
+    significance:
+      "הכרזת עגלי הזהב — הנוסחה שמהדהדת את חטא העגל במדבר. פתיחת חטאת ירבעם שתעוות את כל מלכי ישראל.",
+  },
+  {
+    id: "q-navot-chalila",
+    text_niqqud: "חָלִילָה לִּי מֵיְהוָה מִתִּתִּי אֶת־נַחֲלַת אֲבֹתַי לָךְ",
+    speaker_id: "navot",
+    addressee_id: "achav",
+    context_event_id: "kerem_navot",
+    book_ref: "מלכים א כא ג",
+    type: "oath",
+    unit: 3,
+    significance:
+      "סירוב נבות למכור את נחלת אבותיו — עמידה חוקית-דתית על חוק נחלת האבות. המוטיב שחותך את ההשקפה הכנענית של אחאב.",
+  },
+  {
+    id: "q-izevel-kazek",
+    text_niqqud:
+      "כֹּה־יַעֲשׂוּן אֱלֹהִים וְכֹה יוֹסִפוּן כִּי־כָעֵת מָחָר אָשִׂים אֶת־נַפְשְׁךָ כְּנֶפֶשׁ אַחַד מֵהֶם",
+    speaker_id: "izevel",
+    addressee_id: "eliyahu",
+    context_event_id: "maamad_har_carmel",
+    book_ref: "מלכים א יט ב",
+    type: "oath",
+    unit: 3,
+    significance:
+      "איום איזבל על חיי אליהו אחרי הר הכרמל — זה שדוחף אותו לחורב. מדגים שיש כוח מעשי בחצר שהנביא אינו יכול לגבור בו.",
+  },
+  {
+    id: "q-izevel-zimri",
+    text_niqqud: "הֲשָׁלוֹם זִמְרִי הֹרֵג אֲדֹנָיו",
+    speaker_id: "izevel",
+    addressee_id: "yehu",
+    context_event_id: "retsach_izevel",
+    book_ref: "מלכים ב ט לא",
+    type: "rebuke",
+    unit: 4,
+    significance:
+      "דברי איזבל האחרונים — לעג לעג מעל חלון, משווה את יהוא לזמרי שהתאבד. השיא של אימפריית הדיבור שלה ממש לפני מותה.",
+  },
+  {
+    id: "q-rehavam-asif-ol",
+    text_niqqud:
+      "אָבִי הֶעֱמִיס עֲלֵיכֶם עֹל כָּבֵד וַאֲנִי אֹסִיף עַל־עֻלְּכֶם אָבִי יִסַּר אֶתְכֶם בַּשּׁוֹטִים וַאֲנִי אֲיַסֵּר אֶתְכֶם בָּעַקְרַבִּים",
+    speaker_id: "rehavam",
+    addressee_id: "am",
+    context_event_id: "pilug_bishchem",
+    book_ref: "מלכים א יב יא",
+    type: "rebuke",
+    unit: 2,
+    significance:
+      "דברי רחבעם לעם — דחיית עצת הזקנים בלשון שעיבדה את עצמה להיות סיסמת הקיצוניות של השלטון. מיד אחריו הפילוג.",
+  },
 ];
