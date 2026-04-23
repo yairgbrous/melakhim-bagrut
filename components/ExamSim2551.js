@@ -523,6 +523,7 @@
     if (phase === "running") {
       return <ExamRunning
         selectedA={selectedA} selectedBC={selectedBC}
+        tab={runTab} onTab={setRunTab}
         durationSec={(examCfg&&examCfg.durationSec)||DURATION_STANDARD}
         accommodation={!!(examCfg&&examCfg.accommodation)}
         resume={resumeData}
@@ -553,7 +554,7 @@
     return null;
   }
 
-  function ExamRunning({ selectedA, selectedBC, durationSec, accommodation, resume, onFinish, onExit }){
+  function ExamRunning({ selectedA, selectedBC, tab, onTab, durationSec, accommodation, resume, onFinish, onExit }){
     const [timeLeft, setTimeLeft] = useState(() => (resume && typeof resume.timeLeft === "number") ? resume.timeLeft : durationSec);
     const [answers, setAnswers]   = useState(() => (resume && resume.answers) || {});
     const [startTime]             = useState(() => (resume && resume.startTime) || Date.now());
@@ -581,11 +582,43 @@
       onFinish({ answers, elapsedSec: durationSec - timeLeft });
     };
 
-    const partAQs = partAList().filter(q => selectedA.includes(q.id));
-    const partBCQs = partBCList().filter(q => selectedBC.includes(q.id));
+    const partAQs  = partAList().filter(q => selectedA.includes(q.id));
+    const partBQs  = partBCList().filter(q => selectedBC.includes(q.id) && q.part === "B");
+    const partCQs  = partBCList().filter(q => selectedBC.includes(q.id) && q.part === "C");
+    const partBCQs = [...partBQs, ...partCQs];
     const mins = Math.floor(timeLeft/60), secs = timeLeft%60;
 
     const setAns = (id, v) => setAnswers(a => ({...a, [id]: v}));
+    const activeTab = tab || "A";
+
+    function RunningCard({ q }){
+      const isA = q.part === "A";
+      return (
+        <div className="parchment rounded-xl p-4 space-y-3">
+          <div className="flex items-center gap-2 text-xs">
+            <span className={`px-2 py-0.5 rounded-full text-white font-bold ${isA?"bg-amber-700":"bg-purple-700"}`}>
+              {isA ? `שאלה ${q.n}` : `סעיף ${q.n}`}
+            </span>
+            <span className="text-amber-800">{q.points} נק׳</span>
+            <span className="text-amber-900 font-bold mr-auto">{isA ? q.title : `פרק ${q.part} · ${q.title}`}</span>
+          </div>
+          {Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0 && (
+            <VerbatimQuotes quotes={q.verbatim_quotes}/>
+          )}
+          <div className="hebrew text-amber-950 leading-relaxed" style={{fontSize:"1.15rem"}}>{q.prompt}</div>
+          <textarea value={answers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)}
+            rows={5} placeholder="כתוב את תשובתך כאן..."
+            className="w-full px-3 py-2 rounded-lg bg-white/80 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"/>
+        </div>
+      );
+    }
+
+    const tabs = [
+      { id:"A", label:`חלק א׳ (${partAQs.length})`,   color:"amber"  },
+      { id:"B", label:`חלק ב׳ (${partBQs.length})`,   color:"purple" },
+      { id:"C", label:`חלק ג׳ (${partCQs.length})`,   color:"purple" }
+    ];
+    const visibleQs = activeTab === "A" ? partAQs : activeTab === "B" ? partBQs : partCQs;
 
     return (
       <div className="max-w-3xl mx-auto space-y-4">
@@ -599,38 +632,28 @@
           <button onClick={finish} className="px-3 py-1.5 rounded-lg bg-red-700 text-white text-xs font-bold">הגשה</button>
         </div>
 
-        <section className="space-y-2">
-          <h2 className="font-display text-lg font-bold text-on-parchment-accent">פרק א — בקיאות</h2>
-          {partAQs.map(q => (
-            <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
-              <div className="flex items-center gap-2 text-xs">
-                <span className="px-2 py-0.5 rounded-full bg-amber-700 text-white font-bold">שאלה {q.n}</span>
-                <span className="text-amber-800">{q.points} נק׳</span>
-                <span className="text-amber-900 font-bold mr-auto">{q.title}</span>
-              </div>
-              <div className="hebrew text-amber-950 leading-relaxed">{q.prompt}</div>
-              <textarea value={answers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)}
-                rows={4} placeholder="כתוב את תשובתך כאן..."
-                className="w-full px-3 py-2 rounded-lg bg-white/80 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"/>
-            </div>
-          ))}
-        </section>
+        <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30">
+          {tabs.map(t => {
+            const active = activeTab === t.id;
+            const cls = active
+              ? "bg-amber-600 text-white font-bold"
+              : "bg-white/10 text-on-parchment hover:bg-white/20";
+            return (
+              <button key={t.id} onClick={()=>onTab && onTab(t.id)}
+                className={`text-xs md:text-sm px-2 py-2 rounded-lg transition hebrew ${cls}`}>
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
 
         <section className="space-y-2">
-          <h2 className="font-display text-lg font-bold text-purple-300">פרק ב + ג — ידע ורוחב</h2>
-          {partBCQs.map(q => (
-            <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
-              <div className="flex items-center gap-2 text-xs">
-                <span className="px-2 py-0.5 rounded-full bg-purple-700 text-white font-bold">סעיף {q.n}</span>
-                <span className="text-amber-800">{q.points} נק׳</span>
-                <span className="text-amber-900 font-bold mr-auto">פרק {q.part} · {q.title}</span>
-              </div>
-              <div className="hebrew text-amber-950 leading-relaxed">{q.prompt}</div>
-              <textarea value={answers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)}
-                rows={4} placeholder="כתוב את תשובתך כאן..."
-                className="w-full px-3 py-2 rounded-lg bg-white/80 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"/>
+          {visibleQs.map(q => <RunningCard key={q.id} q={q}/>)}
+          {visibleQs.length === 0 && (
+            <div className="text-center text-on-parchment-meta text-sm py-6 hebrew">
+              אין שאלות שנבחרו עבור חלק זה
             </div>
-          ))}
+          )}
         </section>
 
         <div className="grid grid-cols-2 gap-2">
