@@ -381,6 +381,13 @@ html[data-theme='light'] .hmb{color:#8B6F1F;background:rgba(139,111,71,.15)}
   .hebrew,.font-display{color:#000!important}
   .bottom-nav,footer{display:none!important}
 }
+/* ---- Mobile header: collapse stats to icon-only on narrow screens ---- */
+@media (max-width:480px){
+  .mini-stats{ gap:6px; font-size:13px; }
+  .mini-stats .ms .num{ display:none; }
+  .mini-stats .ms{ gap:0; padding:2px 4px; border-radius:8px; background:rgba(212,165,116,.10); }
+  .rank-chip{ font-size:10px; padding:2px 6px; }
+}
 /* Service worker update toast already uses .toast */
 
 /* ---- Entity chips + drawer (integrate-clickables) ---- */
