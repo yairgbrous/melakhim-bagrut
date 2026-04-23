@@ -741,13 +741,18 @@
           return (
             <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
               <div className="flex items-center gap-2 text-xs">
-                <span className={`px-2 py-0.5 rounded-full text-white font-bold ${q.part?"bg-purple-700":"bg-amber-700"}`}>
-                  {q.part ? `סעיף ${q.n}` : `שאלה ${q.n}`}
+                <span className={`px-2 py-0.5 rounded-full text-white font-bold ${q.part==="A"?"bg-amber-700":"bg-purple-700"}`}>
+                  {q.part==="A" ? `שאלה ${q.n}` : `סעיף ${q.n}`}
                 </span>
                 <span className="text-amber-800">{q.points} נק׳</span>
-                <span className="text-amber-900 font-bold mr-auto">{q.title}</span>
+                <span className="text-amber-900 font-bold mr-auto">
+                  {q.part==="A" ? q.title : `פרק ${q.part} · ${q.title}`}
+                </span>
               </div>
-              <div className="hebrew text-amber-950 leading-relaxed text-sm">{q.prompt}</div>
+              {Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0 && (
+                <VerbatimQuotes quotes={q.verbatim_quotes}/>
+              )}
+              <div className="hebrew text-amber-950 leading-relaxed" style={{fontSize:"1.05rem"}}>{q.prompt}</div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
