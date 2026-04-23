@@ -12,8 +12,8 @@
 
    Bump CACHE_VERSION on every release so old caches are cleaned.
    ========================================================================= */
-const CACHE_VERSION = 'melakhim-v1100';
-const RUNTIME_CACHE = 'melakhim-runtime-v1100';
+const CACHE_VERSION = 'melakhim-v1340';
+const RUNTIME_CACHE = 'melakhim-runtime-v1340';
 const CDN_CACHE     = 'melakhim-cdn-v1';
 
 const PRECACHE_URLS = [
@@ -41,6 +41,9 @@ const PRECACHE_URLS = [
   './components/Home.js',
   './components/EntityLink.js',
   './components/FlashcardDrill.js',
+  './components/ThemeToggle.js',
+  './components/ErrorBoundary.js',
+  './components/Toast.js',
 
   // data
   './data/_entity-index.js',
