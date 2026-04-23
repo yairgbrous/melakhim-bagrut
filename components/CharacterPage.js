@@ -335,7 +335,7 @@
 
           {eventChips.length>0 && (
             <Section title="📜 אירועים">
-              <div className="kt-chips">{eventChips.map(p=><Chip key={p.id} tone="event" label={p.label} onClick={()=>goEvent(p.id)}/>)}</div>
+              <div className="kt-chips">{eventChips.map(p => renderEntity('event', p.id, p.label, 'kt-chip kt-chip-event', setRoute))}</div>
             </Section>
           )}
 
