@@ -173,18 +173,22 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<!-- Cross-entity connectivity: load BEFORE pages so window.__ENTITY_INDEX__
+     has all buckets + window.EntityLinkComponent is available at render. -->
+<script src="./data/_entity-index.js?v=1100"></script>
 <script type="module" src="./data/past-exams.js?v=1200"></script>
-<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1000"></script>
+<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=1100"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1100"></script>
 <script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=1200"></script>
-<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=1000"></script>
-<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=1000"></script>
-<script src="./components/KingsUtils.js?v=1000"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=1000"></script>
-<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=1000"></script>
-<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=1000"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=1100"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=1100"></script>
+<script src="./components/KingsUtils.js?v=1100"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=1100"></script>
+<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=1100"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=1100"></script>
 <script src="./components/BreadthPage.js?v=1150"></script>
-<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=1000"></script>
-<script type="text/babel" data-presets="react" src="./components/Home.js?v=1000"></script>
+<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=1100"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=1100"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
