@@ -244,7 +244,7 @@
 
           {prophets.length>0 && (
             <Section title="🔮 נביאים בעת מלכותו">
-              <div className="kt-chips">{prophets.map(p => <Chip key={p.id} tone="prophet" label={p.name} onClick={()=>goChar(p.id)}/>)}</div>
+              <div className="kt-chips">{prophets.map(p => renderEntity('character', p.id, p.name, 'kt-chip kt-chip-prophet', setRoute))}</div>
             </Section>
           )}
 
