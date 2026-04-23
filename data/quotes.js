@@ -62,4 +62,67 @@ window.QUOTES_DATA = [
     significance:
       "קריאת אלישע בעת עליית אליהו בסערה — הגדרת אליהו כצבא ישראל הרוחני. קובעת את מעמד הנביא כהגנה על האומה.",
   },
+  {
+    id: "q-achiya-ten-tribes",
+    text_niqqud:
+      "הִנְנִי קֹרֵעַ אֶת־הַמַּמְלָכָה מִיַּד שְׁלֹמֹה וְנָתַתִּי לְךָ אֵת עֲשָׂרָה הַשְּׁבָטִים",
+    speaker_id: "achiya_hashiloni",
+    addressee_id: "yarovam",
+    context_event_id: "pilug_kingdom_prophecy",
+    book_ref: "מלכים א יא לא",
+    type: "prophecy",
+    unit: 1,
+    significance:
+      "הלגיטימציה הנבואית לקריעת עשרת השבטים בגלל עבודה זרה של שלמה. נקודת המוצא של כל ממלכת ישראל.",
+  },
+  {
+    id: "q-man-of-god-yoshiyahu",
+    text_niqqud:
+      "מִזְבֵּחַ מִזְבֵּחַ כֹּה אָמַר יְהוָה הִנֵּה־בֵן נוֹלָד לְבֵית־דָּוִד יֹאשִׁיָּהוּ שְׁמוֹ",
+    speaker_id: "ish_haelohim_yehuda",
+    addressee_id: "all",
+    context_event_id: "mizbeach_beit_el",
+    book_ref: "מלכים א יג ב",
+    type: "prophecy",
+    unit: 2,
+    significance:
+      "נבואה בשם מפורש שלוש מאות שנה לפני התקיימותה. דוגמה קלאסית לנבואה רחוקה שתתממש בימי יאשיהו.",
+  },
+  {
+    id: "q-eliyahu-haratzachta",
+    text_niqqud: "הֲרָצַחְתָּ וְגַם־יָרָשְׁתָּ",
+    speaker_id: "eliyahu",
+    addressee_id: "achav",
+    context_event_id: "kerem_navot",
+    book_ref: "מלכים א כא יט",
+    type: "rebuke",
+    unit: 3,
+    significance:
+      "שתי מילים שמגדירות את פשע אחאב ואיזבל על נבות. מכלילה את הרצח ואת השוד כמעשה אחד של אחאב אף שאיזבל היא היזמה.",
+  },
+  {
+    id: "q-eliyahu-izevel-klavim",
+    text_niqqud: "הַכְּלָבִים יֹאכְלוּ אֶת־אִיזֶבֶל בְּחֵל יִזְרְעֶאל",
+    speaker_id: "eliyahu",
+    addressee_id: "achav",
+    context_event_id: "nevuat_eliyahu_achav",
+    book_ref: "מלכים א כא כג",
+    type: "prophecy",
+    unit: 3,
+    significance:
+      "הגזרה הספציפית על איזבל — תתקיים בדיוק ביד יהוא ביזרעאל. סמל של התממשות נבואה באופן ציורי.",
+  },
+  {
+    id: "q-shemaya-no-war",
+    text_niqqud:
+      "לֹא־תַעֲלוּ וְלֹא־תִלָּחֲמוּן עִם־אֲחֵיכֶם בְּנֵי־יִשְׂרָאֵל שׁוּבוּ אִישׁ לְבֵיתוֹ כִּי מֵאִתִּי נִהְיָה הַדָּבָר הַזֶּה",
+    speaker_id: "shemaya_ish_haelohim",
+    addressee_id: "rehavam",
+    context_event_id: "milchemet_achim",
+    book_ref: "מלכים א יב כד",
+    type: "command",
+    unit: 2,
+    significance:
+      "מניעת מלחמת אחים מיד לאחר הפילוג. מאשר שהפילוג הוא גזרת ה׳ ולא סתם מרד פוליטי.",
+  },
 ];
