@@ -194,6 +194,7 @@
 <script src="./components/BreadthPage.js?v=1150"></script>
 <script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=1100"></script>
 <script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=1340"></script>
+<script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=1340"></script>
 <script type="text/babel" data-presets="react" src="./components/Home.js?v=1100"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
@@ -280,6 +281,24 @@ html[data-theme='light'] .text-amber-100\/60,html[data-theme='light'] .text-ambe
 html[data-theme='light'] input,html[data-theme='light'] textarea{background:#fff!important;color:#1A1611!important}
 .theme-tog{padding:.35rem .55rem;border-radius:999px;background:rgba(212,165,116,.18);border:1px solid rgba(212,165,116,.45);color:#F4D58D;font-size:14px}
 html[data-theme='light'] .theme-tog{color:#1A1611;background:rgba(139,111,71,.15)}
+/* ---- ErrorBoundary fallback screen ---- */
+.eb-screen{min-height:60vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.eb-card{max-width:560px;width:100%;padding:28px 22px;border-radius:18px;background:linear-gradient(135deg,rgba(168,50,64,.18),rgba(107,91,149,.14));border:1px solid #A83240;color:#F7F1E1;font-family:'Heebo','Frank Ruhl Libre',sans-serif;text-align:center;box-shadow:0 16px 40px -12px rgba(0,0,0,.55)}
+html[data-theme='light'] .eb-card{color:#1A1611;background:linear-gradient(135deg,rgba(168,50,64,.10),rgba(212,165,116,.18));border-color:#A83240}
+.eb-icon{font-size:54px;margin-bottom:6px;line-height:1}
+.eb-title{font-family:'Frank Ruhl Libre',serif;font-size:26px;font-weight:900;margin:0 0 6px;color:#F4D58D}
+html[data-theme='light'] .eb-title{color:#8B1F2A}
+.eb-msg{font-size:14px;line-height:1.7;opacity:.92;margin:0 auto 14px;max-width:46ch}
+.eb-trace{direction:ltr;text-align:left;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.5;background:rgba(0,0,0,.25);color:#F7F1E1;padding:10px 12px;border-radius:10px;max-height:160px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0 0 16px}
+html[data-theme='light'] .eb-trace{background:rgba(26,22,17,.06);color:#3a2e20}
+.eb-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.eb-btn{padding:10px 20px;border-radius:12px;font-weight:800;font-size:14px;border:1px solid transparent;cursor:pointer;transition:transform .1s ease,box-shadow .15s ease}
+.eb-btn:active{transform:scale(.97)}
+.eb-btn-primary{background:linear-gradient(135deg,#F5D670,#C89B3C);color:#1A1611;border-color:#F4D58D}
+.eb-btn-primary:hover{box-shadow:0 6px 18px rgba(245,214,112,.35)}
+.eb-btn-secondary{background:rgba(107,91,149,.22);color:#C9B8E0;border-color:rgba(107,91,149,.55)}
+.eb-btn-secondary:hover{background:rgba(107,91,149,.35)}
+html[data-theme='light'] .eb-btn-secondary{background:rgba(107,91,149,.14);color:#4A3D7A;border-color:rgba(107,91,149,.45)}
 /* ---- Home redesign v1 + 20 polish ---- */
 body{padding-bottom:72px}
 .bottom-nav{position:fixed;bottom:0;inset-inline:0;z-index:45;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:rgba(10,22,40,.92);backdrop-filter:blur(14px);border-top:1px solid rgba(212,165,116,.35);box-shadow:0 -4px 16px rgba(0,0,0,.35)}
@@ -2550,7 +2569,10 @@ function App(){
       )}
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-3 md:px-5 py-4 md:py-6 fade-up">
-        {isTeacher ? <TeacherView S={S}/> : <>
+        {(() => {
+          const RouteEB = (typeof window!=="undefined" && window.ErrorBoundaryComponent) || null;
+          const onHomeReset = () => { try { setRoute({page:"home"}); } catch {} };
+          const routeContent = isTeacher ? <TeacherView S={S}/> : <>
         {route.page==="home" && (window.HomeComponent
           ? React.createElement(window.HomeComponent, {S, setRoute, level, nextLv})
           : <div className="text-amber-200 text-center py-8">טוען דף בית...</div>)}
@@ -2576,7 +2598,11 @@ function App(){
         {route.page==="exam-sim" && (()=>{ const X=window.ExamSim2551; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/> : <div className="text-amber-200 text-center py-8">טוען מתכונת...</div>; })()}
         {route.page==="event" && (()=>{ const X=window.EventPage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אירוע...</div>; })()}
         {route.page==="place" && (()=>{ const X=window.PlacePage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען מקום...</div>; })()}
-        </>}
+        </>;
+          return RouteEB
+            ? React.createElement(RouteEB, { onHome: onHomeReset, key: route.page }, routeContent)
+            : routeContent;
+        })()}
       </main>
 
       {!isTeacher && (
@@ -4177,22 +4203,26 @@ function Profile({S,update,setRoute}){
 }
 
 // ============ RENDER ============
-class EB extends React.Component {
-  constructor(p){ super(p); this.state={err:null}; }
-  static getDerivedStateFromError(err){ return {err}; }
-  componentDidCatch(err,info){ try{console.error('EB',err,info);}catch{} }
-  render(){
-    if(this.state.err) return (
-      <div style={{maxWidth:540,margin:'48px auto',padding:24,borderRadius:16,background:'rgba(168,50,64,.18)',border:'1px solid #A83240',color:'#F7F1E1',fontFamily:'Heebo,sans-serif',textAlign:'center'}}>
-        <div style={{fontSize:48,marginBottom:8}}>😕</div>
-        <div style={{fontSize:20,fontWeight:800,marginBottom:8}}>משהו השתבש</div>
-        <div style={{fontSize:13,opacity:.75,marginBottom:14}}>{String(this.state.err.message||this.state.err)}</div>
-        <button onClick={()=>location.reload()} style={{padding:'8px 18px',borderRadius:10,background:'linear-gradient(135deg,#D4A574,#8B6F47)',color:'#1A1611',fontWeight:800,border:0,cursor:'pointer'}} aria-label="רענן את הדף">רענן</button>
-      </div>
-    );
-    return this.props.children;
-  }
-}
+// ErrorBoundary is loaded from components/ErrorBoundary.js (window.ErrorBoundaryComponent).
+// Minimal inline fallback kept only for the (unlikely) case that the external
+// file fails to load before the render call below.
+const EB = (typeof window !== 'undefined' && window.ErrorBoundaryComponent)
+  ? window.ErrorBoundaryComponent
+  : (function(){
+      class _EBFallback extends React.Component {
+        constructor(p){ super(p); this.state={err:null}; }
+        static getDerivedStateFromError(err){ return {err}; }
+        componentDidCatch(err,info){ try{console.error('EB',err,info);}catch{} }
+        render(){
+          if(!this.state.err) return this.props.children;
+          return React.createElement('div', {style:{maxWidth:540,margin:'48px auto',padding:24,textAlign:'center'}},
+            React.createElement('div', null, 'משהו השתבש'),
+            React.createElement('button', {onClick:()=>location.reload()}, 'רענן')
+          );
+        }
+      }
+      return _EBFallback;
+    })();
 // init theme from localStorage['jarvis.theme']; first visit honors prefers-color-scheme; default light
 (function(){
   try{
