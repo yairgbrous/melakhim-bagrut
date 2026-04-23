@@ -403,6 +403,12 @@ html[data-theme='light'] .mp-section-count { color: #5A4517; background: rgba(13
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 12px;
 }
+/* Mobile: force single-column so the wider map cards stay readable and
+   the callout sections don't cram into a two-col grid at ~414px. */
+@media (max-width: 600px) {
+  .mp-grid { grid-template-columns: 1fr; gap: 10px; }
+  .mp-full-list-grid { grid-template-columns: 1fr !important; }
+}
 
 .mp-card {
   text-align: start;
