@@ -2565,7 +2565,15 @@ function App(){
         </div>
       </header>
 
-      {drawerOpen && (
+      {drawerOpen && (()=>{
+        const primaryNavs = [
+          {p:"home",     l:"ראשי",        i:"🏠"},
+          {p:"study",    l:"מרכז למידה",   i:"📚"},
+          {p:"timeline", l:"ציר מלכים",    i:"📜"},
+          {p:"maps",     l:"מפות",        i:"🗺️"},
+          {p:"exam-sim", l:"אזור בחינה",   i:"✍️"}
+        ];
+        return (
         <>
           <div className="drawer-overlay" onClick={()=>setDrawerOpen(false)} aria-hidden="true"/>
           <aside className="drawer" role="dialog" aria-label="תפריט ניווט">
@@ -2574,15 +2582,16 @@ function App(){
               <button onClick={()=>setDrawerOpen(false)} className="hmb" aria-label="סגור תפריט">✕</button>
             </div>
             <div className="space-y-1">
-              {navs.map(n => (
+              {primaryNavs.map(n => (
                 <button key={n.p} onClick={()=>go(n.p)} className={`drawer-link ${route.page===n.p?"active":""}`}>
                   <span className="dico">{n.i}</span><span>{n.l}</span>
                 </button>
               ))}
+              <div className="divider my-2"/>
+              <div className="text-[11px] font-bold text-amber-200/80 px-3 mb-1">⚙ הגדרות</div>
               <button onClick={()=>go("profile")} className={`drawer-link ${route.page==="profile"?"active":""}`}>
                 <span className="dico">👤</span><span>הפרופיל שלי</span>
               </button>
-              <div className="divider my-2"/>
               <button onClick={toggleSound} className="drawer-link" aria-pressed={soundOn}>
                 <span className="dico">{soundOn?"🔊":"🔇"}</span><span>צלילים: {soundOn?"מופעל":"כבוי"}</span>
               </button>
@@ -2592,7 +2601,8 @@ function App(){
             </div>
           </aside>
         </>
-      )}
+        );
+      })()}
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-3 md:px-5 py-4 md:py-6 fade-up">
         {(() => {
