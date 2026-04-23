@@ -2,24 +2,56 @@
    PlacePage — /place/:id
    Reads window.PLACES_DATA (array of {id, name, name_niqqud, type,
    required_for_exam, significance, related_events[], related_characters[],
-   map_numbers[]}). Chips navigate: related_events → /event/:id,
-   related_characters → /character/:id, map_numbers → /maps#N.
+   map_numbers[]}).
+
+   Entity chips are rendered through window.EntityLinkComponent:
+     related_events[]      → type="event"
+     related_characters[]  → type="character"
+
+   map_numbers[] are not entity ids (they are pin indices on MapsPage), so
+   they use a small local MapPinChip that navigates to /maps with the pin
+   number as hash. EntityLinkComponent is not touched to add a "map" type.
+
    "📍 מצא במפה" routes to /maps with the first map_number as hash.
    Exposes: window.PlacePage
    ========================================================================= */
 (function(){
-  function Chip({ label, onClick, color }){
-    const styles = {
-      event:     "bg-red-500/20 border-red-500/40 text-red-100",
-      character: "bg-orange-500/20 border-orange-500/40 text-orange-100",
-      map:       "bg-emerald-500/20 border-emerald-500/40 text-emerald-100"
-    };
-    const cls = styles[color] || "bg-amber-500/20 border-amber-500/40 text-on-parchment-muted";
+  function MapPinChip({ n, onClick }){
     return (
       <button onClick={onClick}
-        className={`px-2.5 py-1 rounded-full text-xs font-bold border transition hover:scale-105 ${cls}`}>
-        {label}
+        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border bg-emerald-500/20 border-emerald-500/40 text-emerald-100 transition hover:scale-105 mr-1 mb-1"
+        title={`סימון מפה #${n}`}>
+        <span>#{n}</span>
       </button>
+    );
+  }
+
+  function EntityList({ items, type, setRoute }){
+    if (!Array.isArray(items) || items.length === 0) return null;
+    const EL = (typeof window !== "undefined" && window.EntityLinkComponent) || null;
+    return (
+      <div className="flex flex-wrap gap-0">
+        {items.map((raw, i) => {
+          const id    = typeof raw === "string" ? raw : (raw && raw.id);
+          const label = typeof raw === "string"
+            ? null
+            : (raw && (raw.name_niqqud || raw.name || raw.label || raw.title)) || null;
+          if (!id) return null;
+          if (!EL) {
+            return <span key={i+":"+id} className="px-2 py-0.5 mr-1 mb-1 text-xs text-on-parchment-muted">{label || id}</span>;
+          }
+          return <EL key={i+":"+id} type={type} id={id} label={label} setRoute={setRoute}/>;
+        })}
+      </div>
+    );
+  }
+
+  function Section({ title, children }){
+    return (
+      <section>
+        <h3 className="text-xs font-bold text-on-parchment mb-2">{title}</h3>
+        {children}
+      </section>
     );
   }
 
@@ -69,40 +101,25 @@
         )}
 
         {Array.isArray(pl.related_events) && pl.related_events.length > 0 && (
-          <section>
-            <h3 className="text-xs font-bold text-on-parchment mb-2">⚔️ אירועים קשורים</h3>
-            <div className="flex flex-wrap gap-1.5">
-              {pl.related_events.map(e => {
-                const eid = typeof e === "string" ? e : e.id;
-                const label = typeof e === "string" ? e : (e.title || e.label || e.id);
-                return <Chip key={eid} color="event" label={label} onClick={()=>go("event", {id: eid})}/>;
-              })}
-            </div>
-          </section>
+          <Section title="⚔️ אירועים קשורים">
+            <EntityList items={pl.related_events} type="event" setRoute={setRoute}/>
+          </Section>
         )}
 
         {Array.isArray(pl.related_characters) && pl.related_characters.length > 0 && (
-          <section>
-            <h3 className="text-xs font-bold text-on-parchment mb-2">👤 דמויות קשורות</h3>
-            <div className="flex flex-wrap gap-1.5">
-              {pl.related_characters.map(c => {
-                const cid = typeof c === "string" ? c : c.id;
-                const label = typeof c === "string" ? c : (c.name || c.label || c.id);
-                return <Chip key={cid} color="character" label={label} onClick={()=>go("character", {id: cid})}/>;
-              })}
-            </div>
-          </section>
+          <Section title="👤 דמויות קשורות">
+            <EntityList items={pl.related_characters} type="character" setRoute={setRoute}/>
+          </Section>
         )}
 
         {Array.isArray(pl.map_numbers) && pl.map_numbers.length > 0 && (
-          <section>
-            <h3 className="text-xs font-bold text-on-parchment mb-2">🗺 סימון במפה</h3>
-            <div className="flex flex-wrap gap-1.5">
+          <Section title="🗺 סימון במפה">
+            <div className="flex flex-wrap gap-0">
               {pl.map_numbers.map(n => (
-                <Chip key={n} color="map" label={`#${n}`} onClick={()=>go("maps", {hash: String(n)})}/>
+                <MapPinChip key={n} n={n} onClick={()=>go("maps", {hash: String(n)})}/>
               ))}
             </div>
-          </section>
+          </Section>
         )}
 
         <button onClick={onFindOnMap} className="gold-btn w-full py-3 rounded-xl text-base font-bold">
