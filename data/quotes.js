@@ -629,4 +629,66 @@ window.QUOTES_DATA = [
     significance:
       "טענת אליהו בחורב — ״קנאתי לה׳״ (פעמיים). חשיפת הייאוש של נביא שהרגיש יחיד. תיאור עצמי בעל מתח פנימי.",
   },
+  {
+    id: "q-shlomo-evyatar",
+    text_niqqud:
+      "לֵךְ עֲנָתוֹת עַל־שָׂדֶיךָ כִּי אִישׁ מָוֶת אָתָּה וּבַיּוֹם הַזֶּה לֹא אֲמִיתֶךָ כִּי נָשָׂאתָ אֶת־אֲרוֹן אֲדֹנָי יְהוִה",
+    speaker_id: "shlomo",
+    addressee_id: "evyatar_hakohen",
+    context_event_id: "gerush_evyatar",
+    book_ref: "מלכים א ב כו",
+    type: "command",
+    unit: 1,
+    significance:
+      "שלמה מגרש את אביתר מכהונה — זכר מפני שנשא את הארון לפני דוד. סוף בית עלי ככהני המשכן. מקיים גזרה עתיקה.",
+  },
+  {
+    id: "q-yoav-kipo-amut",
+    text_niqqud: "כִּי פֹה אָמוּת",
+    speaker_id: "yoav",
+    addressee_id: "benayahu_ben_yehoyada",
+    context_event_id: "haracat_yoav",
+    book_ref: "מלכים א ב ל",
+    type: "oath",
+    unit: 1,
+    significance:
+      "דברי יואב אחרי שנמלט אל קרנות המזבח — לא ייצא. שלמה פוקד להכותו שם. שבירת מסורת העמידה בקרנות המזבח.",
+  },
+  {
+    id: "q-shlomo-shuv-raat-rashacha",
+    text_niqqud: "תָּשׁוּב רָעָתְךָ בְּרֹאשֶׁךָ",
+    speaker_id: "shlomo",
+    addressee_id: "shimi_ben_gera",
+    context_event_id: "haracat_shimi",
+    book_ref: "מלכים א ב מד",
+    type: "oath",
+    unit: 1,
+    significance:
+      "דברי שלמה לשמעי כשהפר את האיסור לצאת מירושלים — סיגור חשבון מפני קללת דוד. עקרון של מידה כנגד מידה.",
+  },
+  {
+    id: "q-yehoyada-brit",
+    text_niqqud:
+      "וַיִּכְרֹת יְהוֹיָדָע אֶת־הַבְּרִית בֵּין יְהוָה וּבֵין הַמֶּלֶךְ וּבֵין הָעָם לִהְיוֹת לְעָם לַיהוָה",
+    speaker_id: "yehoyada_hakohen",
+    addressee_id: "all",
+    context_event_id: "hamlachat_yehoash",
+    book_ref: "מלכים ב יא יז",
+    type: "blessing",
+    unit: 4,
+    significance:
+      "יהוידע הכהן כורת ברית שלושית — ה׳, מלך, עם. חידוש הברית אחרי עתליה. משחזר את ברית סיני המקראית.",
+  },
+  {
+    id: "q-atalyah-kesher",
+    text_niqqud: "קֶשֶׁר קָשֶׁר",
+    speaker_id: "atalyah_char",
+    addressee_id: "all",
+    context_event_id: "haricat_atalya",
+    book_ref: "מלכים ב יא יד",
+    type: "rebuke",
+    unit: 4,
+    significance:
+      "דברי עתליה האחרונים כשגילתה את הפיכת יהוידע. שתי מילים שמתארות את המהפך שבא אליה דרך נגיעה במציאות.",
+  },
 ];
