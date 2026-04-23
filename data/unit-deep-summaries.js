@@ -221,6 +221,60 @@ export const unitDeepSummaries = [
     breadth_themes: ["prophet_and_king", "double_causality", "kingship_and_covenant"],
     recurring_items: ["prophecy_fulfilled", "house_extermination", "dogs_eating_blood", "chattat_yarovam", "royal_rescue"],
   },
+  {
+    unit: 5,
+    title: "הכיבוש האשורי",
+    intro:
+      "יחידה 5 היא קריסת ממלכת ישראל מול אשור. היא פותחת בחמש הפיכות עוקבות בצפון: זכריה בן ירבעם נהרג בידי שלום בן יבש (״זה דבר ה׳ אשר דיבר אל יהוא לאמור בני רבעים ישבו לך על כסא ישראל״ — מתקיים ונסגר), שלום נהרג בידי מנחם בן גדי שהכה גם את תפסח (עיר שלא פתחה בפניו) ובטן ההרות בה בוקעו. מנחם משלם אלף ככר כסף לפול (תגלת פלאסר הראשון) להחזיק בממלכה. פקחיה בנו נרצח בידי פקח בן רמליהו, שלישו. פקח קורע ברית עם רצין מלך ארם נגד אחז מלך יהודה — ה״ברית הסורו־אפרימית״. אחז, במקום לבטוח בה׳ (ישעיה מציע לו אות), שולח שוחד לתגלת פלאסר ומכריז ״עבדך ובנך אני״; האשורי עולה, כובש את הגלעד, הגליל וארץ נפתלי, ומגלה את ראשוני שבטי ישראל. אחר כך — הושע בן אלה קשר עם סוא מלך מצרים ומורד באשור. שלמנאסר הגולה אוסרו, צר על שומרון שלוש שנים; בשנה התשיעית להושע (722 לפנה״ס) שומרון נופלת, ועשרת השבטים גולים ל{{place:chalach|חלח, חבור, נהר גוזן וערי מדי}} — ואינם שבים. ביהודה — חזקיהו בן אחז מתעמק ברפורמה: הסיר הבמות, כיתת את נחש הנחושת של משה שכונה נחושתן, וכרת את אשרה. סנחריב עולה על ערי יהודה הבצורות, לוכד לכיש, שולח את רבשקה לירושלים בנאום הבוז ״משענת הקנה הרצוץ הזה״. חזקיהו מתפלל בבית ה׳, ישעיהו מבטיח ״לא יבוא אל העיר הזאת״. בלילה מלאך ה׳ מכה 185,000 איש במחנה אשור; סנחריב שב לנינוה ונרצח בידי בניו.",
+    turning_points: [
+      {
+        fact: "חמש הפיכות בישראל — זכריה←שלום, שלום←מנחם (ובטן ההרות בתפסח בוקעו), פקחיה←פקח",
+        participants: ["zacharia", "shalum", "menachem", "pekachya", "pekach"],
+        places: ["shomron", "tirtza", "tifsach"],
+        events: [],
+      },
+      {
+        fact: "מנחם משלם אלף ככר כסף לפול (תגלת פלאסר) — המס הראשון של ישראל לאשור",
+        participants: ["menachem", "tiglat_pilaser"],
+        places: ["shomron", "asshur"],
+        events: [],
+      },
+      {
+        fact: "הברית הסורו־אפרימית — פקח + רצין ארם נגד אחז; אחז שולח שוחד לתגלת פלאסר ומכריז ״עבדך ובנך אני״",
+        participants: ["pekach", "rezin", "achaz", "tiglat_pilaser", "yeshayahu"],
+        places: ["jerusalem", "aram", "asshur"],
+        events: [],
+      },
+      {
+        fact: "תגלת פלאסר לוקח הגלעד והגליל וארץ נפתלי — הגלות הראשונה של שבטי ישראל",
+        participants: ["tiglat_pilaser", "pekach"],
+        places: ["gilad", "galil", "naftali", "asshur"],
+        events: [],
+      },
+      {
+        fact: "הושע בן אלה מורד בשלמנאסר בברית עם סוא מצרים; מצור שומרון שלוש שנים",
+        participants: ["hoshea", "shalmaneser", "sua"],
+        places: ["shomron", "mitzrayim"],
+        events: [],
+      },
+      {
+        fact: "נפילת שומרון 722 לפנה״ס — גלות עשרת השבטים לחלח, חבור, נהר גוזן וערי מדי; כותים מיושבים במקומם",
+        participants: ["hoshea", "shalmaneser", "sargon"],
+        places: ["shomron", "chalach", "chavor", "gozan", "madai"],
+        events: ["samaria_fall"],
+      },
+      {
+        fact: "חזקיהו מסיר הבמות וכותת נחושתן; סנחריב עולה, רבשקה בנאום ״משענת הקנה״; תפילת חזקיהו, נבואת ישעיהו; מלאך ה׳ מכה 185,000 במחנה אשור",
+        participants: ["chizkiyahu", "yeshayahu", "sancheriv", "ravshakeh"],
+        places: ["jerusalem", "lakhish", "mikdash"],
+        events: [],
+      },
+    ],
+    significance:
+      "יחידה זו היא ההוכחה הגדולה של {{motif:double_causality|הסיבתיות הכפולה}} — נפילת שומרון מוסברת בארוכה בפרק י״ז לא כאירוע פוליטי־צבאי בלבד אלא כמימוש {{motif:chattat_yarovam|חטאת ירבעם}} שהצטברה 209 שנה. 19 מלכים רשעים, עגלי זהב, חגים בדויים, כוהנים שאינם מלוים — התוצאה: גלות בלתי הפיכה של עשרת השבטים. לעומת זאת, הצלת ירושלים בזמן חזקיהו מגלמת את העיקרון ההפוך: ברית נשמרת = קיום. הצלה זו היא מודל אב־טיפוסי לתקופות גלות עתידיות — תפילה + נביא + צדיק = נס.",
+    breadth_themes: ["foreign_nations_and_israel", "double_causality", "prophet_and_king", "kingship_and_covenant"],
+    recurring_items: ["galut", "chattat_yarovam", "tribute", "miraculous_deliverance", "reed_support", "angel_plague"],
+  },
 ];
 
 export default unitDeepSummaries;
