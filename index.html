@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-theme="dark">
+<html lang="he" dir="rtl" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=5">
@@ -193,6 +193,7 @@
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=1100"></script>
 <script src="./components/BreadthPage.js?v=1150"></script>
 <script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=1100"></script>
+<script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=1340"></script>
 <script type="text/babel" data-presets="react" src="./components/Home.js?v=1100"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
@@ -257,6 +258,18 @@ details summary::-webkit-details-marker{display:none}
 .podium-row .pad .av{font-size:34px;line-height:1}
 .podium-row .pad .meta{font-size:11px;opacity:.85;margin-top:.25rem}
 .podium-row .rank-bubble{position:absolute;inset-inline-end:8px;top:6px;background:rgba(0,0,0,.18);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px}
+/* dark mode overrides — core surfaces (bg, parchment, text-on-parchment, gold gradients) */
+html[data-theme='dark'] body{background:#0A1628;color:#F7F1E1}
+html[data-theme='dark'] body::before{background:radial-gradient(circle at 15% 20%,rgba(212,165,116,.10),transparent 50%),radial-gradient(circle at 85% 75%,rgba(107,91,149,.10),transparent 55%),radial-gradient(circle at 50% 95%,rgba(168,50,64,.06),transparent 50%)}
+html[data-theme='dark'] .parchment{background:linear-gradient(135deg,#1A2747 0%,#0F1F3A 100%);color:#F5E6C8;border-color:rgba(212,165,116,.45);box-shadow:0 8px 32px rgba(0,0,0,.55)}
+html[data-theme='dark'] .parchment .text-on-parchment,html[data-theme='dark'] .text-on-parchment{color:#F5E6C8!important}
+html[data-theme='dark'] .parchment .text-on-parchment-accent,html[data-theme='dark'] .text-on-parchment-accent{color:#F4D58D!important}
+html[data-theme='dark'] .parchment .text-on-parchment-muted,html[data-theme='dark'] .text-on-parchment-muted{color:rgba(245,230,200,.75)!important}
+html[data-theme='dark'] .parchment .text-on-parchment-meta,html[data-theme='dark'] .text-on-parchment-meta{color:rgba(245,230,200,.6)!important}
+html[data-theme='dark'] .gold-btn{background:linear-gradient(135deg,#F5D670 0%,#C89B3C 100%);color:#1A1611;border-color:#F4D58D}
+html[data-theme='dark'] .gold-btn:hover:not(:disabled){box-shadow:0 6px 20px rgba(245,214,112,.45)}
+html[data-theme='dark'] .rank-chip,html[data-theme='dark'] .me-chip{background:linear-gradient(135deg,#F5D670,#C89B3C);color:#1A1611;border-color:#F4D58D}
+html[data-theme='dark'] header{background:rgba(10,22,40,.85)!important;border-color:rgba(212,165,116,.3)!important}
 /* light mode override */
 html[data-theme='light'] body{background:#F7F1E1;color:#1A1611}
 html[data-theme='light'] body::before{background:radial-gradient(circle at 15% 20%,rgba(212,165,116,.18),transparent 50%),radial-gradient(circle at 85% 75%,rgba(107,91,149,.10),transparent 55%)}
@@ -2319,11 +2332,16 @@ function App(){
   const [route, setRoute] = useState({page:"home"});
   const isTeacher = typeof window!=='undefined' && /[?&]teacher=1/.test(window.location.search);
   const [firstTime, setFirstTime] = useState(!S.name && !isTeacher);
-  const [theme, setTheme] = useState(()=>document.documentElement.getAttribute('data-theme')||'dark');
+  const [theme, setTheme] = useState(()=>document.documentElement.getAttribute('data-theme')||'light');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [soundOn, setSoundOn] = useState(()=>{ try{return localStorage.getItem('mb_sound')!=='0'}catch{return true} });
   const toggleSound = ()=>{ setSoundOn(v=>{ const nv=!v; try{localStorage.setItem('mb_sound',nv?'1':'0')}catch{} return nv; }); };
-  const toggleTheme = ()=>{ const t=theme==='dark'?'light':'dark'; setTheme(t); document.documentElement.setAttribute('data-theme',t); try{localStorage.setItem('mb_theme',t);}catch{} };
+  const toggleTheme = ()=>{ if (typeof window.toggleJarvisTheme==='function') { const t=window.toggleJarvisTheme(); setTheme(t); return; } const t=theme==='dark'?'light':'dark'; setTheme(t); document.documentElement.setAttribute('data-theme',t); try{localStorage.setItem('jarvis.theme',t);}catch{} };
+  useEffect(()=>{
+    const onChange = (e) => { const t = (e && e.detail && e.detail.theme) || document.documentElement.getAttribute('data-theme') || 'light'; setTheme(t); };
+    window.addEventListener('jarvis-theme-change', onChange);
+    return ()=>window.removeEventListener('jarvis-theme-change', onChange);
+  }, []);
 
   useEffect(() => {
     const ilDay = (t=Date.now())=>new Date(t).toLocaleDateString('en-CA',{timeZone:'Asia/Jerusalem'});
@@ -2494,9 +2512,9 @@ function App(){
           </div>
           <div className="flex items-center gap-1 shrink-0">
             {typeof window!=="undefined" && window.AuthButtonComponent ? <window.AuthButtonComponent/> : null}
-            <button onClick={toggleTheme} className="theme-tog" aria-label="החלף מצב כהה/בהיר" title="החלף מצב כהה/בהיר">
-              {theme==='light'?'🌙':'☀️'}
-            </button>
+            {typeof window!=="undefined" && window.ThemeToggleComponent
+              ? React.createElement(window.ThemeToggleComponent)
+              : <button onClick={toggleTheme} className="theme-tog" aria-label="החלף מצב כהה/בהיר" title="החלף מצב כהה/בהיר">{theme==='light'?'🌙':'☀️'}</button>}
             <button onClick={()=>setDrawerOpen(true)} className="hmb" aria-label="תפריט ראשי" aria-expanded={drawerOpen}>☰</button>
           </div>
         </div>
@@ -4175,14 +4193,17 @@ class EB extends React.Component {
     return this.props.children;
   }
 }
-// init theme from prefers-color-scheme + saved
+// init theme from localStorage['jarvis.theme']; first visit honors prefers-color-scheme; default light
 (function(){
   try{
-    const saved = localStorage.getItem('mb_theme');
-    const prefDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const t = saved || (prefDark ? 'dark' : 'light');
+    const saved = localStorage.getItem('jarvis.theme');
+    let t = saved;
+    if (!t) {
+      const prefDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      t = prefDark ? 'dark' : 'light';
+    }
     document.documentElement.setAttribute('data-theme', t);
-  }catch{ document.documentElement.setAttribute('data-theme','dark'); }
+  }catch{ document.documentElement.setAttribute('data-theme','light'); }
 })();
 ReactDOM.createRoot(document.getElementById("root")).render(<EB><App/></EB>);
 </script>
