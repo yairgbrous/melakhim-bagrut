@@ -286,6 +286,9 @@
       <div className="max-w-2xl mx-auto space-y-4">
         {shabbat && <ShabbatModal onDismiss={()=>setRoute && setRoute({page:"quiz"})}/>}
         <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">📝 מתכונת בגרות · שאלון 2551 · תשפ"ו</h1>
+        <div className="text-sm md:text-base text-on-parchment hebrew leading-relaxed" style={{background:"rgba(0,0,0,.25)",padding:"0.75rem 1rem",borderRadius:"0.75rem"}}>
+          בחינת מתכונת תשפ״ו · 22 שאלות · בחר 5 מתוך 8 חלק א · 7 מתוך 14 חלקים ב+ג · 101 נק׳ · 2:15 (או 2:35 התאמה)
+        </div>
         <div className="parchment rounded-2xl p-5 md:p-7 space-y-3">
           <h2 className="font-display text-xl font-bold text-amber-900">ספר מלכים · מתכונת מלאה</h2>
           <div className="text-sm text-amber-950 space-y-1.5">
