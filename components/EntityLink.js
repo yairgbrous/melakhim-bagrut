@@ -49,9 +49,42 @@
   function resolve(type, id){
     if (!id) return null;
     const idx = (typeof window !== "undefined" && window.__ENTITY_INDEX__) || {};
+    const aliases = (typeof window !== "undefined" && window.__ENTITY_ALIASES__) || {};
     const bucket = idx[type] || (type === "king" ? idx.king || idx.character : null);
-    if (!bucket) return null;
-    return bucket[id] || null;
+
+    // 1. Direct hit.
+    if (bucket && bucket[id]) return bucket[id];
+
+    // 2. Alias lookup. `null` alias = intentional stub (no real entity page,
+    //    render plain label without "not found" warning).
+    const aliasMap = aliases[type] || (type === "king" ? (aliases.king || aliases.character) : null);
+    if (aliasMap && Object.prototype.hasOwnProperty.call(aliasMap, id)) {
+      const aliased = aliasMap[id];
+      if (aliased === null) return { __stub: true, id };
+      if (typeof aliased === "string" && bucket && bucket[aliased]) return bucket[aliased];
+      // cross-bucket fallback (e.g., character alias resolves to a king id)
+      if (typeof aliased === "string") {
+        for (const k of Object.keys(idx)) {
+          if (idx[k] && idx[k][aliased]) return idx[k][aliased];
+        }
+      }
+    }
+
+    // 3. Slugify fallback on label (or id) for same-bucket hit.
+    if (bucket) {
+      const slug = slugify(id);
+      if (slug && bucket[slug]) return bucket[slug];
+      // also try swapping underscore <-> dash
+      const swapped = id.indexOf("_") >= 0 ? id.replace(/_/g, "-") : id.replace(/-/g, "_");
+      if (bucket[swapped]) return bucket[swapped];
+    }
+
+    return null;
+  }
+
+  function slugify(s){
+    if (!s || typeof s !== "string") return "";
+    return s.trim().toLowerCase().replace(/[\s_]+/g, "-").replace(/[^֐-׿a-z0-9-]/g, "");
   }
 
   function go(setRoute, r){
@@ -67,9 +100,12 @@
     const setRoute = props.setRoute;
 
     const entry   = resolve(type, id);
-    const exists  = !!entry;
+    const isStub  = !!(entry && entry.__stub);
+    const exists  = !!entry && !isStub;
     const display = label || (entry && (entry.heading || entry.name_niqqud || entry.name || entry.title)) || id || "—";
-    const title   = exists ? (entry.summary || display) : "(אין דף עדיין)";
+    // Stubs are intentional non-entities (collective labels like "his servants")
+    // — show plain tooltip, not "(אין דף עדיין)".
+    const title   = exists ? (entry.summary || display) : (isStub ? display : "(אין דף עדיין)");
 
     const tone = TONE[type] || TONE.character;
 
@@ -83,6 +119,21 @@
     const base = `inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border transition mr-1 mb-1`;
     const live = `${tone.bg} ${tone.bd} ${tone.fg} hover:scale-105 cursor-pointer`;
     const dead = `bg-slate-700/40 border-slate-600/40 text-slate-300 cursor-not-allowed opacity-70`;
+    const stubCls = `${tone.bg} ${tone.bd} ${tone.fg} opacity-80`;
+
+    // Stubs (collective labels like "his servants", "all Baal prophets"): render
+    // as an inactive chip in the same tone — no warning state, no click, no "·".
+    if (isStub) {
+      return (
+        <span title={display}
+          data-entity-type={type}
+          data-entity-id={id}
+          data-entity-stub="1"
+          className={`${base} ${stubCls}`}>
+          <span>{display}</span>
+        </span>
+      );
+    }
 
     return (
       <button type="button"

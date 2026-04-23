@@ -94,7 +94,8 @@
   await Promise.all([
     evalFile('./data/motifs.js', ['motifs']),
     evalFile('./data/archaeology.js', ['archaeologyFinds']),
-    evalFile('./data/hebrew-dates.js', [])
+    evalFile('./data/hebrew-dates.js', []),
+    evalFile('./data/_id-aliases.js?v=1400', []),
   ]);
   const [chars, stories, flashcards, keyConcepts, kingsMod] = await Promise.all([
     importModule('./data/characters.js'),
@@ -183,7 +184,7 @@
      has all buckets + window.EntityLinkComponent is available at render. -->
 <script src="./data/_entity-index.js?v=1100"></script>
 <script type="module" src="./data/past-exams.js?v=1200"></script>
-<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=1100"></script>
+<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=1400"></script>
 <script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1340"></script>
 <script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=1340"></script>
 <script type="text/babel" data-presets="react" src="./components/EventPage.js?v=1100"></script>
