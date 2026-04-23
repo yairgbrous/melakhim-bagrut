@@ -184,6 +184,28 @@
     );
   }
 
+  // --- VerbatimQuotes: renders the 4 Tanakh verses from Q A1 (niqqud-aware).
+  //     Quotes are Biblical text (public domain) and are displayed exactly as
+  //     supplied in window.EXAM_2551_DATA.questions[A1].verbatim_quotes.
+  function VerbatimQuotes({ quotes }){
+    if (!Array.isArray(quotes) || quotes.length === 0) return null;
+    return (
+      <div className="space-y-2">
+        {quotes.map((q, i) => (
+          <blockquote key={i}
+            className="parchment-inset rounded-lg p-3 border-r-4 border-amber-700/60 hebrew"
+            style={{background:"rgba(244,213,141,.28)"}}>
+            <div className="text-amber-950 leading-relaxed" style={{fontSize:"1.05rem"}}>
+              <span className="font-bold text-amber-900 ml-1" dir="ltr">({i+1})</span>
+              {" "}"{q.text_he}"
+            </div>
+            {q.book_ref && <div className="text-[11px] text-amber-800 mt-1">{q.book_ref}</div>}
+          </blockquote>
+        ))}
+      </div>
+    );
+  }
+
   function AccommodationToggle({ value, onChange }){
     return (
       <label className="flex items-start gap-3 cursor-pointer rounded-xl p-3 bg-white/50 border-2 border-amber-700/30 hover:border-amber-700/60 transition">
