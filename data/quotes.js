@@ -125,4 +125,67 @@ window.QUOTES_DATA = [
     significance:
       "מניעת מלחמת אחים מיד לאחר הפילוג. מאשר שהפילוג הוא גזרת ה׳ ולא סתם מרד פוליטי.",
   },
+  {
+    id: "q-shlomo-lev-shomea",
+    text_niqqud:
+      "וְנָתַתָּ לְעַבְדְּךָ לֵב שֹׁמֵעַ לִשְׁפֹּט אֶת־עַמְּךָ לְהָבִין בֵּין־טוֹב לְרָע",
+    speaker_id: "shlomo",
+    addressee_id: "god",
+    context_event_id: "hitgalut_givon",
+    book_ref: "מלכים א ג ט",
+    type: "plea",
+    unit: 1,
+    significance:
+      "הבקשה שהגדירה את עידן הזהב של שלמה. במקום עושר או אריכות ימים — חכמת משפט. תגובת ה׳ לבקשה הזאת מעצבת את זכויותיו.",
+  },
+  {
+    id: "q-shlomo-cut-baby",
+    text_niqqud: "גִּזְרוּ אֶת־הַיֶּלֶד הַחַי לִשְׁנָיִם וּתְנוּ אֶת־הַחֲצִי לְאַחַת וְאֶת־הַחֲצִי לְאֶחָת",
+    speaker_id: "shlomo",
+    addressee_id: "all",
+    context_event_id: "mishpat_shlomo",
+    book_ref: "מלכים א ג כה",
+    type: "command",
+    unit: 1,
+    significance:
+      "הצו המבריק שחשף את האם האמיתית. המודל הפרדיגמטי לחכמת שלמה שהעם קיבל כ״חכמת אלוהים בקרבו״.",
+  },
+  {
+    id: "q-real-mother",
+    text_niqqud:
+      "בִּי אֲדֹנִי תְּנוּ־לָהּ אֶת־הַיָּלוּד הַחַי וְהָמֵת אַל־תְּמִיתֻהוּ",
+    speaker_id: "shtey_hanashim_hazonot",
+    addressee_id: "shlomo",
+    context_event_id: "mishpat_shlomo",
+    book_ref: "מלכים א ג כו",
+    type: "plea",
+    unit: 1,
+    significance:
+      "תגובת האם האמיתית — אהבת הבן על פני אחיזה בצדק. הראיה לחכמת שלמה שהבחין בין אמת לשקר דרך רגש.",
+  },
+  {
+    id: "q-bat-sheva-nishbata",
+    text_niqqud:
+      "אֲדֹנִי הַמֶּלֶךְ אַתָּה נִשְׁבַּעְתָּ בַּיהוָה אֱלֹהֶיךָ לַאֲמָתֶךָ כִּי־שְׁלֹמֹה בְנֵךְ יִמְלֹךְ אַחֲרָי וְהוּא יֵשֵׁב עַל־כִּסְאִי",
+    speaker_id: "bat_sheva",
+    addressee_id: "shlomo",
+    context_event_id: "hamlachat_shlomo",
+    book_ref: "מלכים א א יז",
+    type: "plea",
+    unit: 1,
+    significance:
+      "תחילתו של ספר מלכים — הזכרת בת שבע לדוד על שבועתו בשלמה. הפתח לכל הסיפור ההיסטורי של מלכי ישראל.",
+  },
+  {
+    id: "q-david-chazak",
+    text_niqqud: "חֲזַק וֶהְיֵה לְאִישׁ וְשָׁמַרְתָּ אֶת־מִשְׁמֶרֶת יְהוָה אֱלֹהֶיךָ",
+    speaker_id: "shlomo",
+    addressee_id: "shlomo",
+    context_event_id: "hamlachat_shlomo",
+    book_ref: "מלכים א ב ב",
+    type: "command",
+    unit: 1,
+    significance:
+      "הצוואה הרוחנית של דוד לשלמה. עקרון הברית הדויטרונומי — הליכה בדרכי ה׳ כתנאי להצלחת המלוכה. (דוד→שלמה)",
+  },
 ];
