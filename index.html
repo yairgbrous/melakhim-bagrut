@@ -3810,10 +3810,11 @@ function ExamSim({S,update,awardXP,setRoute,publishActivity}){
   const [examQs, setExamQs] = useState([]);
 
   const buildExam = () => {
+    // תשפ"ו structure: Part A — 5 בקיאות (9 נק׳ כ״א = 45), Part B+C — 7 ידע/רוחב (8 נק׳ כ״א = 56), סה״כ 101.
     const bekiut = QUESTIONS.filter(q => q.d === "easy").sort(()=>Math.random()-0.5).slice(0, 5);
-    const yeda = QUESTIONS.filter(q => q.d === "medium").sort(()=>Math.random()-0.5).slice(0, 2);
-    const rachav = QUESTIONS.filter(q => q.d === "hard").sort(()=>Math.random()-0.5).slice(0, 1);
-    return [...bekiut, ...yeda, ...rachav].map((q,i) => ({...q, n:i+1, points: i<5?8:(i<7?18:24)}));
+    const yeda   = QUESTIONS.filter(q => q.d === "medium").sort(()=>Math.random()-0.5).slice(0, 4);
+    const rachav = QUESTIONS.filter(q => q.d === "hard").sort(()=>Math.random()-0.5).slice(0, 3);
+    return [...bekiut, ...yeda, ...rachav].map((q,i) => ({...q, n:i+1, points: i<5 ? 9 : 8}));
   };
 
   useEffect(() => {
@@ -3826,8 +3827,9 @@ function ExamSim({S,update,awardXP,setRoute,publishActivity}){
 
   const start = () => {
     setExamQs(buildExam());
-    setPhase("running"); 
-    setTimeLeft(2*60*60 + 18*60);
+    setPhase("running");
+    // תשפ״ו: 2:15 (2h 15m) standard. Accommodation +15% (2:35) handled in new ExamSim2551.
+    setTimeLeft(2*60*60 + 15*60);
     setAnswers({});
   };
 
@@ -3854,7 +3856,7 @@ function ExamSim({S,update,awardXP,setRoute,publishActivity}){
             <div><strong>🎓 כיתה:</strong> {EXAM_INFO.grade}</div>
             <div><strong>⏱ זמן:</strong> {EXAM_INFO.duration}</div>
             <div><strong>📖 חומר עזר:</strong> {EXAM_INFO.allowed}</div>
-            <div><strong>📊 ניקוד:</strong> 100 נקודות</div>
+            <div><strong>📊 ניקוד:</strong> 101 נקודות (45 בפרק א + 56 בפרקים ב+ג)</div>
             <div className="text-xs text-amber-700 pt-2 border-t border-amber-700/30">{EXAM_INFO.source}</div>
           </div>
           <div className="divider my-4"/>
@@ -3869,7 +3871,7 @@ function ExamSim({S,update,awardXP,setRoute,publishActivity}){
             ))}
           </div>
         </div>
-        <div className="card rounded-xl p-4 text-sm text-amber-100/80">💡 הסימולציה כוללת 8 שאלות מייצגות. השג 80+ להישג "מוכן לבגרות".</div>
+        <div className="card rounded-xl p-4 text-sm text-amber-100/80">💡 הסימולציה כוללת 12 שאלות מייצגות (5 בקיאות + 7 ידע/רוחב) — 101 נק׳ סה״כ. השג 80+ להישג "מוכן לבגרות".</div>
         <button onClick={start} className="gold-btn w-full py-4 rounded-2xl text-lg font-bold glow">🚀 התחל סימולציה</button>
       </div>
     );
@@ -3884,7 +3886,7 @@ function ExamSim({S,update,awardXP,setRoute,publishActivity}){
         <div className="text-center py-6">
           <div className="text-7xl mb-3">{letter}</div>
           <h1 className="font-display text-3xl md:text-4xl font-black text-amber-300">ציון: {points}</h1>
-          <p className="text-amber-100/70 mt-2">{correctQs.length} / 8 נכונות</p>
+          <p className="text-amber-100/70 mt-2">{correctQs.length} / {examQs.length} נכונות · 101 נק׳ בסך</p>
         </div>
         <div className="space-y-2">
           <h3 className="font-bold text-amber-200">סקירה:</h3>
