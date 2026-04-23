@@ -691,4 +691,69 @@ window.QUOTES_DATA = [
     significance:
       "דברי עתליה האחרונים כשגילתה את הפיכת יהוידע. שתי מילים שמתארות את המהפך שבא אליה דרך נגיעה במציאות.",
   },
+  {
+    id: "q-chizkiyahu-lo-ka-mohu",
+    text_niqqud:
+      "בַּיהוָה אֱלֹהֵי־יִשְׂרָאֵל בָּטָח וְאַחֲרָיו לֹא־הָיָה כָמֹהוּ בְּכֹל מַלְכֵי יְהוּדָה",
+    speaker_id: "god",
+    addressee_id: "chizkiyahu",
+    context_event_id: "taharat_mikdash",
+    book_ref: "מלכים ב יח ה",
+    type: "blessing",
+    unit: 6,
+    significance:
+      "הערכת חזקיהו — הבטחון הדתי העליון בין מלכי יהודה. מעמדו הראשון בטור הצדיקים.",
+  },
+  {
+    id: "q-shlomo-lev-lo-shalem",
+    text_niqqud:
+      "וַיְהִי לְעֵת זִקְנַת שְׁלֹמֹה נָשָׁיו הִטּוּ אֶת־לְבָבוֹ אַחֲרֵי אֱלֹהִים אֲחֵרִים וְלֹא־הָיָה לְבָבוֹ שָׁלֵם עִם־יְהוָה אֱלֹהָיו",
+    speaker_id: "god",
+    addressee_id: "shlomo",
+    context_event_id: "pilug_kingdom_prophecy",
+    book_ref: "מלכים א יא ד",
+    type: "rebuke",
+    unit: 1,
+    significance:
+      "הסיבה העמוקה לפילוג הממלכה — לב שלמה לא היה שלם עם ה׳. זהו הפסוק המנמק את גזרת הפילוג.",
+  },
+  {
+    id: "q-yarovam-lechata'ot",
+    text_niqqud:
+      "וְהַדָּבָר הַזֶּה הָיָה לְחַטָּאת בֵּית יָרָבְעָם וּלְהַכְחִיד וּלְהַשְׁמִיד מֵעַל פְּנֵי הָאֲדָמָה",
+    speaker_id: "god",
+    addressee_id: "yarovam",
+    context_event_id: "egli_zahav",
+    book_ref: "מלכים א יג לד",
+    type: "rebuke",
+    unit: 2,
+    significance:
+      "הגנאי המקראי על עגלי הזהב — גזר דין על בית ירבעם. ציר מסגרת לכל הערכות מלכי ישראל הבאים.",
+  },
+  {
+    id: "q-menashe-keeves",
+    text_niqqud:
+      "וַיֵּטְעוּם מְנַשֶּׁה לַעֲשׂוֹת אֶת־הָרַע מִן־הַגּוֹיִם אֲשֶׁר הִשְׁמִיד יְהוָה מִפְּנֵי בְּנֵי יִשְׂרָאֵל",
+    speaker_id: "god",
+    addressee_id: "menashe",
+    context_event_id: "nevuat_churban",
+    book_ref: "מלכים ב כא ט",
+    type: "rebuke",
+    unit: 6,
+    significance:
+      "גנאי מנשה — רע מן הגויים שה׳ הוריש מישראל. מצדיק את חורבן הבית בזכות חטאים המזכירים את חטאי הכנענים.",
+  },
+  {
+    id: "q-evil-merodach-chessed",
+    text_niqqud:
+      "נָשָׂא אֱוִיל מְרֹדַךְ מֶלֶךְ בָּבֶל בִּשְׁנַת מָלְכוֹ אֶת־רֹאשׁ יְהוֹיָכִין מֶלֶךְ־יְהוּדָה מִבֵּית כֶּלֶא",
+    speaker_id: "god",
+    addressee_id: "yehoyachin",
+    context_event_id: "chesed_evil_merodach",
+    book_ref: "מלכים ב כה כז",
+    type: "report",
+    unit: 6,
+    significance:
+      "הפסוק החותם את ספר מלכים — אויל מרודך משחרר את יהויכין. נקודת תקווה בחשכת הגלות; שושלת דוד לא נכחדה.",
+  },
 ];
