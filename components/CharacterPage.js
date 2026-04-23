@@ -93,6 +93,21 @@
     return <button className={cls} onClick={onClick}>{label}</button>;
   }
 
+  // Entity-index-driven chip. Uses window.EntityLinkComponent (PR #34) when
+  // the id resolves against window.__ENTITY_INDEX__[type]; otherwise falls
+  // back to a disabled span with "(אין דף עדיין)" tooltip.
+  function renderEntity(type, id, label, className, setRoute, key){
+    const idx    = (typeof window !== 'undefined' && window.__ENTITY_INDEX__) || {};
+    const bucket = idx[type] || (type === 'king' ? (idx.king || idx.character) : null);
+    const exists = !!(bucket && id && bucket[id]);
+    const EL     = typeof window !== 'undefined' ? window.EntityLinkComponent : null;
+    const k      = key != null ? key : (type + ':' + id);
+    if (exists && EL) {
+      return <EL key={k} type={type} id={id} label={label} setRoute={setRoute} className={className}/>;
+    }
+    return <span key={k} className={(className||'kt-chip')+' kt-chip-missing'} title="(אין דף עדיין)" aria-label={(label||id)+' — (אין דף עדיין)'}>{label || id}</span>;
+  }
+
   function Section({title, children}){
     if (!children || (Array.isArray(children) && children.every(x=>!x))) return null;
     return <div className="kt-sect"><div className="kt-sect-h">{title}</div>{children}</div>;
@@ -157,6 +172,7 @@
     const kingChips = (c.related_kings || []).map(v =>
       (v && typeof v==='object') ? {id:v.id||v.label, label:v.label||v.name||v.id} : {id:v, label:labelForKing(v)}
     );
+    const charChips = toChips(c.related_characters || [], 'character');
     const keyQuotes = c.key_quotes || [];
     const bookRefs  = c.book_refs  || [];
     const significance = c.significance || '';
@@ -230,7 +246,7 @@
 
           {prophets.length>0 && (
             <Section title="🔮 נביאים בעת מלכותו">
-              <div className="kt-chips">{prophets.map(p => <Chip key={p.id} tone="prophet" label={p.name} onClick={()=>goChar(p.id)}/>)}</div>
+              <div className="kt-chips">{prophets.map(p => renderEntity('character', p.id, p.name, 'kt-chip kt-chip-prophet', setRoute))}</div>
             </Section>
           )}
 
@@ -303,25 +319,31 @@
 
           {prophetChips.length>0 && prophets.length===0 && (
             <Section title="🔮 נביאים בעת מלכותו">
-              <div className="kt-chips">{prophetChips.map(p => <Chip key={p.id} tone="prophet" label={p.label} onClick={()=>goChar(p.id)}/>)}</div>
+              <div className="kt-chips">{prophetChips.map(p => renderEntity('character', p.id, p.label, 'kt-chip kt-chip-prophet', setRoute))}</div>
             </Section>
           )}
 
           {kingChips.length>0 && (
             <Section title="👑 מלכים קשורים">
-              <div className="kt-chips">{kingChips.map(p=><Chip key={p.id} tone="prophet" label={p.label} onClick={()=>goChar(p.id)}/>)}</div>
+              <div className="kt-chips">{kingChips.map(p => renderEntity('king', p.id, p.label, 'kt-chip kt-chip-amber', setRoute))}</div>
+            </Section>
+          )}
+
+          {charChips.length>0 && (
+            <Section title="👥 דמויות קשורות">
+              <div className="kt-chips">{charChips.map(p => renderEntity('character', p.id, p.label, 'kt-chip kt-chip-cream', setRoute))}</div>
             </Section>
           )}
 
           {placeChips.length>0 && (
             <Section title="📍 מקומות">
-              <div className="kt-chips">{placeChips.map(p=><Chip key={p.id} tone="place" label={p.label} onClick={()=>goPlace(p.id)}/>)}</div>
+              <div className="kt-chips">{placeChips.map(p => renderEntity('place', p.id, p.label, 'kt-chip kt-chip-place', setRoute))}</div>
             </Section>
           )}
 
           {eventChips.length>0 && (
             <Section title="📜 אירועים">
-              <div className="kt-chips">{eventChips.map(p=><Chip key={p.id} tone="event" label={p.label} onClick={()=>goEvent(p.id)}/>)}</div>
+              <div className="kt-chips">{eventChips.map(p => renderEntity('event', p.id, p.label, 'kt-chip kt-chip-event', setRoute))}</div>
             </Section>
           )}
 

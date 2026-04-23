@@ -1,28 +1,48 @@
 /* =========================================================================
    EventPage — /event/:id
    Reads window.EVENTS_DATA (array of {id, title, unit, chapters, summary,
-   significance, participants[], places[], related_breadth[],
-   related_recurring_items[]}). All chips are clickable; clicking a
-   participant → /character/:id, place → /place/:id, breadth/recurring →
-   /themes (with #hash).
+   significance, participants[], places[], related_characters[],
+   related_breadth[], related_recurring_items[]}).
+
+   All entity chips are rendered through window.EntityLinkComponent so
+   routing, dead-link fallback, and tone are consistent with the rest of
+   the app. Types used:
+     participants[], related_characters[]  → type="character"
+     places[]                               → type="place"
+     related_breadth[]                      → type="breadth"
+     related_recurring_items[]              → type="recurring"
+
    "⚔️ תרגל על אירוע זה" dispatches window 'practice-entity' CustomEvent.
    Exposes: window.EventPage
    ========================================================================= */
 (function(){
-  function Chip({ label, onClick, color }){
-    const styles = {
-      king:       "bg-amber-500/20 border-amber-500/40 text-on-parchment-muted",
-      character:  "bg-orange-500/20 border-orange-500/40 text-orange-100",
-      place:      "bg-emerald-500/20 border-emerald-500/40 text-emerald-100",
-      breadth:    "bg-purple-500/20 border-purple-500/40 text-purple-100",
-      recurring:  "bg-pink-500/20 border-pink-500/40 text-pink-100"
-    };
-    const cls = styles[color] || "bg-amber-500/20 border-amber-500/40 text-on-parchment-muted";
+  function EntityList({ items, type, setRoute }){
+    if (!Array.isArray(items) || items.length === 0) return null;
+    const EL = (typeof window !== "undefined" && window.EntityLinkComponent) || null;
     return (
-      <button onClick={onClick}
-        className={`px-2.5 py-1 rounded-full text-xs font-bold border transition hover:scale-105 ${cls}`}>
-        {label}
-      </button>
+      <div className="flex flex-wrap gap-0">
+        {items.map((raw, i) => {
+          const id    = typeof raw === "string" ? raw : (raw && raw.id);
+          const label = typeof raw === "string"
+            ? null
+            : (raw && (raw.name_niqqud || raw.name || raw.label || raw.title)) || null;
+          if (!id) return null;
+          if (!EL) {
+            return <span key={i+":"+id} className="px-2 py-0.5 mr-1 mb-1 text-xs text-on-parchment-muted">{label || id}</span>;
+          }
+          return <EL key={i+":"+id} type={type} id={id} label={label} setRoute={setRoute}/>;
+        })}
+      </div>
+    );
+  }
+
+  function Section({ title, items, type, setRoute }){
+    if (!Array.isArray(items) || items.length === 0) return null;
+    return (
+      <section>
+        <h3 className="text-xs font-bold text-on-parchment mb-2">{title}</h3>
+        <EntityList items={items} type={type} setRoute={setRoute}/>
+      </section>
     );
   }
 
@@ -74,57 +94,11 @@
           </section>
         )}
 
-        {Array.isArray(ev.participants) && ev.participants.length > 0 && (
-          <section>
-            <h3 className="text-xs font-bold text-on-parchment mb-2">👤 דמויות באירוע</h3>
-            <div className="flex flex-wrap gap-1.5">
-              {ev.participants.map(p => {
-                const pid = typeof p === "string" ? p : p.id;
-                const label = typeof p === "string" ? p : (p.name || p.label || p.id);
-                return <Chip key={pid} color="character" label={label} onClick={()=>go("character", {id: pid})}/>;
-              })}
-            </div>
-          </section>
-        )}
-
-        {Array.isArray(ev.places) && ev.places.length > 0 && (
-          <section>
-            <h3 className="text-xs font-bold text-on-parchment mb-2">📍 מקומות</h3>
-            <div className="flex flex-wrap gap-1.5">
-              {ev.places.map(p => {
-                const pid = typeof p === "string" ? p : p.id;
-                const label = typeof p === "string" ? p : (p.name_niqqud || p.name || p.label || p.id);
-                return <Chip key={pid} color="place" label={label} onClick={()=>go("place", {id: pid})}/>;
-              })}
-            </div>
-          </section>
-        )}
-
-        {Array.isArray(ev.related_breadth) && ev.related_breadth.length > 0 && (
-          <section>
-            <h3 className="text-xs font-bold text-on-parchment mb-2">🌐 נושאי רוחב</h3>
-            <div className="flex flex-wrap gap-1.5">
-              {ev.related_breadth.map(t => {
-                const tid = typeof t === "string" ? t : t.id;
-                const label = typeof t === "string" ? t : (t.label || t.title || t.id);
-                return <Chip key={tid} color="breadth" label={label} onClick={()=>go("themes", {hash: tid})}/>;
-              })}
-            </div>
-          </section>
-        )}
-
-        {Array.isArray(ev.related_recurring_items) && ev.related_recurring_items.length > 0 && (
-          <section>
-            <h3 className="text-xs font-bold text-on-parchment mb-2">🔁 פריטים חוזרים</h3>
-            <div className="flex flex-wrap gap-1.5">
-              {ev.related_recurring_items.map(t => {
-                const tid = typeof t === "string" ? t : t.id;
-                const label = typeof t === "string" ? t : (t.label || t.title || t.id);
-                return <Chip key={tid} color="recurring" label={label} onClick={()=>go("themes", {hash: "recurring-"+tid})}/>;
-              })}
-            </div>
-          </section>
-        )}
+        <Section title="👤 דמויות באירוע"       items={ev.participants}             type="character" setRoute={setRoute}/>
+        <Section title="👤 דמויות קשורות"       items={ev.related_characters}       type="character" setRoute={setRoute}/>
+        <Section title="📍 מקומות"              items={ev.places}                   type="place"     setRoute={setRoute}/>
+        <Section title="🌐 נושאי רוחב"          items={ev.related_breadth}          type="breadth"   setRoute={setRoute}/>
+        <Section title="🔁 פריטים חוזרים"       items={ev.related_recurring_items}  type="recurring" setRoute={setRoute}/>
 
         <button onClick={onPractice} className="gold-btn w-full py-3 rounded-xl text-base font-bold">
           ⚔️ תרגל על אירוע זה
