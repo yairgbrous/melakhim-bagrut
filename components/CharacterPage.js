@@ -329,7 +329,7 @@
 
           {placeChips.length>0 && (
             <Section title="📍 מקומות">
-              <div className="kt-chips">{placeChips.map(p=><Chip key={p.id} tone="place" label={p.label} onClick={()=>goPlace(p.id)}/>)}</div>
+              <div className="kt-chips">{placeChips.map(p => renderEntity('place', p.id, p.label, 'kt-chip kt-chip-place', setRoute))}</div>
             </Section>
           )}
 
