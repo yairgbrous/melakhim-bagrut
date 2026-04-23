@@ -96,15 +96,16 @@
   // Entity-index-driven chip. Uses window.EntityLinkComponent (PR #34) when
   // the id resolves against window.__ENTITY_INDEX__[type]; otherwise falls
   // back to a disabled span with "(אין דף עדיין)" tooltip.
-  function renderEntity(type, id, label, className, setRoute){
+  function renderEntity(type, id, label, className, setRoute, key){
     const idx    = (typeof window !== 'undefined' && window.__ENTITY_INDEX__) || {};
     const bucket = idx[type] || (type === 'king' ? (idx.king || idx.character) : null);
     const exists = !!(bucket && id && bucket[id]);
     const EL     = typeof window !== 'undefined' ? window.EntityLinkComponent : null;
+    const k      = key != null ? key : (type + ':' + id);
     if (exists && EL) {
-      return <EL type={type} id={id} label={label} setRoute={setRoute} className={className}/>;
+      return <EL key={k} type={type} id={id} label={label} setRoute={setRoute} className={className}/>;
     }
-    return <span className={(className||'kt-chip')+' kt-chip-missing'} title="(אין דף עדיין)" aria-label={(label||id)+' — (אין דף עדיין)'}>{label || id}</span>;
+    return <span key={k} className={(className||'kt-chip')+' kt-chip-missing'} title="(אין דף עדיין)" aria-label={(label||id)+' — (אין דף עדיין)'}>{label || id}</span>;
   }
 
   function Section({title, children}){
