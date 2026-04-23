@@ -185,8 +185,9 @@
 <script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=1100"></script>
 <script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1100"></script>
 <script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=1200"></script>
-<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=1100"></script>
-<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=1100"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=1330"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=1330"></script>
+<script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=1330"></script>
 <script src="./components/KingsUtils.js?v=1100"></script>
 <script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=1100"></script>
 <script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=1100"></script>
@@ -2367,13 +2368,15 @@ function App(){
       home: 'home', learn: 'study', study: 'study',
       timeline: 'timeline', themes: 'themes', maps: 'maps',
       quiz: 'quiz', 'exam-sim': 'exam', exam: 'exam',
-      flashcards: 'flashcards', quotes: 'quotes', profile: 'profile', class: 'class'
+      flashcards: 'flashcards', quotes: 'quotes', profile: 'profile', class: 'class',
+      daily: 'daily'
     };
     const SLUG_FROM_PAGE = {
       home: 'home', study: 'learn', timeline: 'timeline', themes: 'themes',
       maps: 'maps', quiz: 'quiz', exam: 'exam-sim', flashcards: 'flashcards',
       quotes: 'quotes', profile: 'profile', class: 'class',
-      character: 'character', event: 'event', place: 'place', unit: 'unit', lesson: 'lesson'
+      character: 'character', event: 'event', place: 'place', unit: 'unit', lesson: 'lesson',
+      daily: 'daily'
     };
     const parseHash = () => {
       const raw = (window.location.hash || '').replace(/^#\/?/, '').trim();
@@ -2544,6 +2547,7 @@ function App(){
         {route.page==="exam-sim" && (()=>{ const X=window.ExamSim2551; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/> : <div className="text-amber-200 text-center py-8">טוען מתכונת...</div>; })()}
         {route.page==="event" && (()=>{ const X=window.EventPage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אירוע...</div>; })()}
         {route.page==="place" && (()=>{ const X=window.PlacePage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען מקום...</div>; })()}
+        {route.page==="daily" && (()=>{ const X=window.DailyChallenge; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אתגר יומי...</div>; })()}
         {route.page==="quizPlay" && <QuizRun params={route} S={S} setRoute={setRoute} awardXP={awardXP} update={update} publishActivity={publishActivity} soundOn={soundOn}/>}
         {route.page==="quizResult" && <QuizResult {...route} S={S} setRoute={setRoute}/>}
         {route.page==="themes" && (window.BreadthPage ? React.createElement(window.BreadthPage, {setRoute}) : <Themes S={S} update={update}/>)}
@@ -2558,6 +2562,7 @@ function App(){
         {route.page==="exam-sim" && (()=>{ const X=window.ExamSim2551; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/> : <div className="text-amber-200 text-center py-8">טוען מתכונת...</div>; })()}
         {route.page==="event" && (()=>{ const X=window.EventPage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אירוע...</div>; })()}
         {route.page==="place" && (()=>{ const X=window.PlacePage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען מקום...</div>; })()}
+        {route.page==="daily" && (()=>{ const X=window.DailyChallenge; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אתגר יומי...</div>; })()}
         </>}
       </main>
 
