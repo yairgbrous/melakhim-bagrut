@@ -167,6 +167,60 @@ export const unitDeepSummaries = [
     breadth_themes: ["prophet_and_king", "idolatry_vs_monotheism", "divine_intervention", "false_vs_true_prophecy"],
     recurring_items: ["fire_from_heaven", "quiet_voice", "drought", "eliyahu_mantle", "twofold_spirit", "kerem_navot", "lying_spirit", "three_anointings"],
   },
+  {
+    unit: 4,
+    title: "מהפכות ותמורות",
+    intro:
+      "המהפכה הגדולה בצפון פותחת את יחידה 4: אלישע שולח נער מבני הנביאים לרמות גלעד למשוח את יהוא בסתר, ״כי משחתיך ה׳ למלך על ישראל... והכית את בית אחאב אדניך, ונקמתי דמי עבדי הנביאים״. יהוא דוהר ליזרעאל — ״כי בשגעון ינהג״ — הורג את יורם בן אחאב בחלקת שדה נבות (מעגל הצדק נסגר!), רודף ומכה את אחזיה מלך יהודה שבא לבקר, ומגיע לארמון יזרעאל. איזבל מתקשטת, מציצה מהחלון; שלושה סריסים משליכים אותה, הסוסים רומסים והכלבים אוכלים בשרה — בקיום מדויק של נבואת אליהו. יהוא שולח לראשי שומרון ראשי 70 בני אחאב; מוציא כל נביאי הבעל בתחבולה (״אחאב עבד את הבעל מעט יהוא יעבדנו הרבה״) ומשמיד בית בעל. ביהודה, עתליה — בת אחאב ואם אחזיה — משמידה את זרע דוד כששמעה על מות בנה; יהוידע הכהן מסתיר את יהואש התינוק בבית ה׳ שש שנים, ובשנה השביעית מכתיר אותו וממית את עתליה. יהואש (תחת יהוידע) בונה את בדק הבית, אך לאחר מות יהוידע פונה לע״ז ונרצח בידי עבדיו. אמציה בנו מנצח את אדום ואז יוצא למלחמה ביואש מלך ישראל (משל החוח והארז) ונוצח. ירבעם השני בישראל מחזיר גבולות (״מלבוא חמת עד ים הערבה״ בזכות נבואת יונה), עוזיה/עזריה ביהודה מלך 52 שנה אך לוקה בצרעת בסוף ימיו.",
+    turning_points: [
+      {
+        fact: "משיחת יהוא ברמות גלעד בידי נער של אלישע — ״משחתיך ה׳ למלך... והכית את בית אחאב״",
+        participants: ["elisha", "yehu", "yoram_yisrael"],
+        places: ["ramot_gilad"],
+        events: [],
+      },
+      {
+        fact: "יהוא הורג את יורם בן אחאב בחלקת שדה נבות, רודף ומכה את אחזיה מלך יהודה",
+        participants: ["yehu", "yoram_yisrael", "achaziah_yehuda"],
+        places: ["yizrael", "shomron"],
+        events: [],
+      },
+      {
+        fact: "סוף איזבל — מושלכת מהחלון ביזרעאל, סוסים רומסים, כלבים אוכלים — קיום מדויק של נבואת אליהו",
+        participants: ["yehu", "izevel"],
+        places: ["yizrael"],
+        events: [],
+      },
+      {
+        fact: "השמדת 70 בני אחאב בשומרון + טבח עובדי הבעל — ״יהוא עשה ביעור בישראל״",
+        participants: ["yehu"],
+        places: ["shomron"],
+        events: [],
+      },
+      {
+        fact: "עתליה משמידה זרע דוד; יהוידע הכהן מסתיר את יהואש שש שנים בבית ה׳; מהפכת הכוהנים ממית את עתליה",
+        participants: ["atalya", "yehoyada", "yehoash_yehuda", "yehosheva"],
+        places: ["jerusalem", "mikdash"],
+        events: [],
+      },
+      {
+        fact: "יהואש יהודה תחת יהוידע — בדק הבית; לאחר מותו מתדרדר לע״ז ונרצח בידי עבדיו",
+        participants: ["yehoash_yehuda", "yehoyada"],
+        places: ["jerusalem", "mikdash"],
+        events: [],
+      },
+      {
+        fact: "אמציה מנצח את אדום, יוצא למלחמה ביואש מלך ישראל (משל החוח והארז) ונוצח; ירבעם השני מחזיר גבולות מצפון לדרום; עוזיה מולך 52 שנה ולוקה בצרעת",
+        participants: ["amatzya", "yoash_yisrael", "yarovam_beit", "uziyahu", "yona"],
+        places: ["shomron", "jerusalem", "yam_hamelach"],
+        events: [],
+      },
+    ],
+    significance:
+      "{{motif:prophecy_fulfilled|קיום נבואה בהיסטוריה}} מגיע לשיא במחזור יהוא — כל פרט בנבואת אליהו מתקיים עד הסוף: דם אחאב ודם איזבל על אותו שדה, כלבים אוכלים את בשרה, 70 בני אחאב נכרתים. המהפכה של יהוא טיהרה את הבעל הציבורי בישראל אך לא סרה ״חטאת ירבעם״ — עגלי הזהב נשארו. ביהודה, הצלתו של יהואש בידי יהוידע היא מגן נרפא על {{motif:dynastic_promise|שרשרת בית דוד}} בשעה הקריטית ביותר. התקופה ממחישה שהיסטוריה אינה אירועים מקריים — היא מימוש נבואי, לרבות המחיר הכבד של השבעה מלכים צדיקים ורשעים לסירוגין.",
+    breadth_themes: ["prophet_and_king", "double_causality", "kingship_and_covenant"],
+    recurring_items: ["prophecy_fulfilled", "house_extermination", "dogs_eating_blood", "chattat_yarovam", "royal_rescue"],
+  },
 ];
 
 export default unitDeepSummaries;
