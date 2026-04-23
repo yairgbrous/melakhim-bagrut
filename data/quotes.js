@@ -503,4 +503,68 @@ window.QUOTES_DATA = [
     significance:
       "מבוא לגזרה על ירושלים — חטאי מנשה גרמו לגזרה שאין להשיבה גם בידי יאשיהו הצדיק. ההסבר התיאולוגי לחורבן.",
   },
+  {
+    id: "q-shlomo-tfila-hashamayim",
+    text_niqqud:
+      "הִנֵּה הַשָּׁמַיִם וּשְׁמֵי הַשָּׁמַיִם לֹא יְכַלְכְּלוּךָ אַף כִּי־הַבַּיִת הַזֶּה אֲשֶׁר בָּנִיתִי",
+    speaker_id: "shlomo",
+    addressee_id: "god",
+    context_event_id: "chanukat_mikdash",
+    book_ref: "מלכים א ח כז",
+    type: "plea",
+    unit: 1,
+    significance:
+      "לב תפילת חנוכת המקדש — הכרה שה׳ אינו נתון בגבולות בית מוחש, אבל הבית מבטא נוכחות סמלית. יסוד התיאולוגיה של המקדש.",
+  },
+  {
+    id: "q-shlomo-baruch-menuchah",
+    text_niqqud:
+      "בָּרוּךְ יְהוָה אֲשֶׁר נָתַן מְנוּחָה לְעַמּוֹ יִשְׂרָאֵל כְּכֹל אֲשֶׁר דִּבֵּר לֹא־נָפַל דָּבָר אֶחָד מִכֹּל דְּבָרוֹ הַטּוֹב",
+    speaker_id: "shlomo",
+    addressee_id: "all",
+    context_event_id: "chanukat_mikdash",
+    book_ref: "מלכים א ח נו",
+    type: "blessing",
+    unit: 1,
+    significance:
+      "חיתום ברכת העם של שלמה — הברית התקיימה במלואה. ציר השיא של עידן הזהב, אחריו רק ירידה.",
+  },
+  {
+    id: "q-chazael-ma-avdcha",
+    text_niqqud: "וּמֶה עַבְדְּךָ הַכֶּלֶב כִּי יַעֲשֶׂה הַדָּבָר הַגָּדוֹל הַזֶּה",
+    speaker_id: "chazael",
+    addressee_id: "elisha",
+    context_event_id: "shibud_chazael",
+    book_ref: "מלכים ב ח יג",
+    type: "question",
+    unit: 4,
+    significance:
+      "מחאת חזאל כשאלישע ניבא שיעשה רעות לישראל. למחרת חנק חזאל את אדונו ומלך — הנבואה הפכה מציאות.",
+  },
+  {
+    id: "q-yehu-yeshirah-lavavecha",
+    text_niqqud:
+      "הֲיֵשׁ אֶת־לְבָבְךָ יָשָׁר כַּאֲשֶׁר לְבָבִי עִם־לְבָבֶךָ...לְכָה אִתִּי וּרְאֵה בְּקִנְאָתִי לַיהוָה",
+    speaker_id: "yehu",
+    addressee_id: "yehonadav_ben_rechav",
+    context_event_id: "mered_yehu",
+    book_ref: "מלכים ב י טו–טז",
+    type: "command",
+    unit: 4,
+    significance:
+      "ברית יהוא עם יהונדב בן רכב — שילוב דתי-פוליטי במרד נגד בית אחאב. הסכם נאמנות דתית יחודי בספר.",
+  },
+  {
+    id: "q-gedaliah-shvu-baaretz",
+    text_niqqud:
+      "אַל־תִּירְאוּ מֵעַבְדֵי הַכַּשְׂדִּים שְׁבוּ בָאָרֶץ וְעִבְדוּ אֶת־מֶלֶךְ בָּבֶל וְיִיטַב לָכֶם",
+    speaker_id: "gedalya_ben_achikam",
+    addressee_id: "all",
+    context_event_id: "retsach_gedalya",
+    book_ref: "מלכים ב כה כד",
+    type: "command",
+    unit: 6,
+    significance:
+      "הבטחת גדליהו לשארית יהודה — שיתוף פעולה עם בבל כדרך לרמוח יציבה. מיד אחריו נרצח. ציון של ״צום גדליהו״.",
+  },
 ];
