@@ -32,8 +32,43 @@
     try { localStorage.removeItem(IN_PROGRESS_KEY); } catch {}
   }
 
-  // --- hardcoded מתכונת תשפ"ו question pool (fallback until data/past-exams.js extends) ---
-  const PART_A_POOL = [
+  // --- adapter: build question pools from window.EXAM_2551_DATA (data/past-exams.js).
+  //     Shape coming in:  {id,part,points,topic_he,prompt_he,answer_points[],verbatim_quotes?,book_refs?,source_note}
+  //     Shape consumed:   {id,n,part,title,prompt,points,expected_points,verbatim_quotes?,book_refs?}
+  function buildPools(){
+    const data = (typeof window !== "undefined" && window.EXAM_2551_DATA) || null;
+    if (!data || !Array.isArray(data.questions)) return { A: [], BC: [] };
+    const A = [], BC = [];
+    let nA = 0, nBC = 0;
+    data.questions.forEach(q => {
+      const isA = q.part === "A";
+      const n = isA ? ++nA : ++nBC + 8;
+      const adapted = {
+        id: q.id,
+        n,
+        part: q.part,
+        title: q.topic_he || "",
+        prompt: q.prompt_he || "",
+        points: q.points || (isA ? 9 : 8),
+        expected_points: Array.isArray(q.answer_points) ? q.answer_points : [],
+        verbatim_quotes: Array.isArray(q.verbatim_quotes) ? q.verbatim_quotes : null,
+        book_refs: Array.isArray(q.book_refs) ? q.book_refs : []
+      };
+      if (isA) A.push(adapted); else BC.push(adapted);
+    });
+    return { A, BC };
+  }
+  let _POOLS = null;
+  function getPools(){
+    if (_POOLS) return _POOLS;
+    _POOLS = buildPools();
+    return _POOLS;
+  }
+  function partAList(){ const p = getPools().A; return p.length ? p : PART_A_POOL_FALLBACK; }
+  function partBCList(){ const p = getPools().BC; return p.length ? p : PART_BC_POOL_FALLBACK; }
+
+  // --- legacy hardcoded fallback kept only if window.EXAM_2551_DATA is absent ---
+  const PART_A_POOL_FALLBACK = [
     {id:"a1", n:1, title:"מלכות שלמה",
       prompt:"תאר/י שני מאפיינים מרכזיים של תקופת מלכות שלמה, והבא/י פסוק התומך בכל אחד מהם.",
       points:9, expected_points:["חכמה ובקשת לב שומע (מל״א ג׳)","בניין המקדש ושגשוג כלכלי (מל״א ו׳–י׳)"]},
@@ -70,7 +105,7 @@
       ]}
   ];
 
-  const PART_BC_POOL = [
+  const PART_BC_POOL_FALLBACK = [
     {id:"b1",  n:9,  part:"B", title:"פילוג הממלכה",
       prompt:"ציין/י שתי סיבות לפילוג הממלכה ותן/י פסוק לכל סיבה.",
       points:8, expected_points:["עונש על נשות שלמה הנוכריות (מל״א יא׳)","תגובת רחבעם לבקשת הקלת עול (מל״א יב׳)"]},
@@ -199,7 +234,7 @@
           </div>
         </div>
         <div className="space-y-2">
-          {PART_A_POOL.map(q => (
+          {partAList().map(q => (
             <SelectionCard key={q.id} q={q} selected={selected.includes(q.id)}
               onToggle={()=>onToggle(q.id)} disabled={full}/>
           ))}
@@ -211,8 +246,8 @@
   function PartBCSelect({ selected, onToggle }){
     const count = selected.length;
     const full = count >= MAX_BC;
-    const partB = PART_BC_POOL.filter(q => q.part === "B");
-    const partC = PART_BC_POOL.filter(q => q.part === "C");
+    const partB = partBCList().filter(q => q.part === "B");
+    const partC = partBCList().filter(q => q.part === "C");
     return (
       <section className="space-y-2">
         <div className="flex items-center justify-between sticky top-[108px] z-10 bg-slate-900/90 backdrop-blur-sm rounded-xl p-3 border border-purple-500/30">
@@ -427,8 +462,8 @@
       onFinish({ answers, elapsedSec: durationSec - timeLeft });
     };
 
-    const partAQs = PART_A_POOL.filter(q => selectedA.includes(q.id));
-    const partBCQs = PART_BC_POOL.filter(q => selectedBC.includes(q.id));
+    const partAQs = partAList().filter(q => selectedA.includes(q.id));
+    const partBCQs = partBCList().filter(q => selectedBC.includes(q.id));
     const mins = Math.floor(timeLeft/60), secs = timeLeft%60;
 
     const setAns = (id, v) => setAnswers(a => ({...a, [id]: v}));
@@ -505,8 +540,8 @@
   }
 
   function ExamGrade({ selectedA, selectedBC, answers, elapsedSec, accommodation, onDone }){
-    const partAQs  = PART_A_POOL.filter(q => selectedA.includes(q.id));
-    const partBCQs = PART_BC_POOL.filter(q => selectedBC.includes(q.id));
+    const partAQs  = partAList().filter(q => selectedA.includes(q.id));
+    const partBCQs = partBCList().filter(q => selectedBC.includes(q.id));
     const allQs = [...partAQs, ...partBCQs];
 
     const [editAnswers, setEditAnswers] = useState(() => ({...answers}));
