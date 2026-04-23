@@ -323,7 +323,7 @@
 
           {kingChips.length>0 && (
             <Section title="👑 מלכים קשורים">
-              <div className="kt-chips">{kingChips.map(p=><Chip key={p.id} tone="prophet" label={p.label} onClick={()=>goChar(p.id)}/>)}</div>
+              <div className="kt-chips">{kingChips.map(p => renderEntity('king', p.id, p.label, 'kt-chip kt-chip-amber', setRoute))}</div>
             </Section>
           )}
 
