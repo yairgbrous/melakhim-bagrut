@@ -113,6 +113,60 @@ export const unitDeepSummaries = [
     breadth_themes: ["kingship_and_covenant", "double_causality", "leadership_failure", "idolatry_vs_monotheism", "prophet_and_king"],
     recurring_items: ["chattat_yarovam", "golden_calves", "taxation", "youth_counsel", "elders_counsel", "coup", "gold_shields", "bronze_shields"],
   },
+  {
+    unit: 3,
+    title: "אליהו ואלישע",
+    intro:
+      "פולחן הבעל שהכניסה איזבל לישראל מוליד את מחזור אליהו — עימות ממושך בין נביא ומלך. אליהו התשבי מכריז בצורת של שלוש שנים, מסתתר בנחל כרית שעורבים מכלכלים אותו, ואחר כך אצל אלמנת צרפת (שם הוא מחיה את בנה). העימות מגיע לשיא במעמד הר הכרמל: 450 נביאי בעל מול נביא אחד, שתי עולות על שני מזבחות, ו{{motif:fire_from_heaven|אש ה׳ יורדת}} ואוכלת את העולה. העם מכריז ״ה׳ הוא האלוהים״, נביאי הבעל נשחטים בנחל קישון. איזבל מאיימת על חיי אליהו; הוא בורח אל חורב, שם מתגלה אליו ה׳ ב{{motif:quiet_voice|קול דממה דקה}} ומצווהו למשוח את חזאל, יהוא ואלישע. פרשת כרם נבות חושפת את עומק הרוע במלכות אחאב — איזבל יוזמת רצח משפטי, ואליהו מנבא: ״במקום אשר לקקו הכלבים את דם נבות ילקו הכלבים את דמך״. אחאב מת בקרב רמות גלעד, בקיום הנבואה. אליהו עולה בסערה ברכב אש, ואלישע מקבל ״פי שניים ברוחו״. מחזור אלישע כולל תחיית בן השונמית, ריפוי נעמן הארמי, הכאת צבא ארם בעיוורון, הצלת שומרון מהרעב בידי ארבעה מצורעים, וריבוי שמן אלמנת אחד מבני הנביאים.",
+    turning_points: [
+      {
+        fact: "הכרזת הבצורת לאחאב ״אם יהיה השנים האלה טל ומטר כי אם לפי דברי״; הסתתרות בנחל כרית וחיי בית אלמנת צרפת",
+        participants: ["eliyahu", "achav", "tzarfatit"],
+        places: ["nachal_krit", "tzarfat"],
+        events: ["eliyahu_drought"],
+      },
+      {
+        fact: "מעמד הר הכרמל — 450 נביאי בעל מול אליהו, אש ה׳ אוכלת את העולה, העם מכריז ״ה׳ הוא האלוהים״",
+        participants: ["eliyahu", "achav", "izevel"],
+        places: ["har_carmel", "nachal_kishon"],
+        events: ["carmel_confrontation"],
+      },
+      {
+        fact: "בריחה לחורב — קול דממה דקה, מינוי שלוש משיחות: חזאל, יהוא, אלישע",
+        participants: ["eliyahu", "elisha", "chazael", "yehu", "izevel"],
+        places: ["beer_sheva", "midbar", "chorev"],
+        events: ["chorev_revelation"],
+      },
+      {
+        fact: "פרשת כרם נבות — רצח משפטי ביוזמת איזבל; נבואת אליהו על כליה במקום אשר לקקו הכלבים את דם נבות",
+        participants: ["achav", "izevel", "navot", "eliyahu"],
+        places: ["yizrael"],
+        events: ["navot_vineyard"],
+      },
+      {
+        fact: "קרב רמות גלעד ומות אחאב — רוח שקר בפי נביאי החצר, חץ ״לתומו״ פוגע בין הדבקים",
+        participants: ["achav", "yehoshafat", "michayahu"],
+        places: ["ramot_gilad", "shomron"],
+        events: ["ramot_gilead_battle"],
+      },
+      {
+        fact: "הסתלקות אליהו ברכב אש וסוסי אש; אלישע מקבל פי שניים ברוחו ומעביר את האדרת על הירדן",
+        participants: ["eliyahu", "elisha"],
+        places: ["gilgal", "beit_el", "yericho", "yarden"],
+        events: ["elijah_ascension"],
+      },
+      {
+        fact: "מחזור נסי אלישע — שונמית (הולדת בן ותחייתו), נעמן הארמי (רפואה מצרעת), צבא ארם מוכה בעיוורון, מצור שומרון נפתר בידי ארבעה מצורעים, ריבוי שמן לאלמנת בני הנביאים",
+        participants: ["elisha", "shunamit", "naaman", "gechazi"],
+        places: ["shunem", "shomron", "yarden", "dothan"],
+        events: [],
+      },
+    ],
+    significance:
+      "השלב שבו הנבואה הופכת לכוח היסטורי ישיר — לא רק מוכיחה אלא מתערבת ומעצבת את מהלך העניינים. אליהו הוא דמות ייחודית בתנ״ך: אינו מת אלא עולה בסערה, והמסורת המקראית תהפוך אותו למבשר הגאולה. מעמד הר הכרמל הוא ההכרעה הגלויה ביותר נגד עבודה זרה; אך ה׳ מלמד את אליהו בחורב שהאמת האלוהית אינה רק בכוח המוחץ אלא ב״קול דממה דקה״ — שיקול מחדש של דרכי הופעת ה׳ בהיסטוריה. מחזור אלישע מרחיב את הנבואה מדמות יחיד לעם: הנביא פועל בעם, בחולים, ברעבים, גם מחוץ לישראל (נעמן, אלמנת צרפת).",
+    breadth_themes: ["prophet_and_king", "idolatry_vs_monotheism", "divine_intervention", "false_vs_true_prophecy"],
+    recurring_items: ["fire_from_heaven", "quiet_voice", "drought", "eliyahu_mantle", "twofold_spirit", "kerem_navot", "lying_spirit", "three_anointings"],
+  },
 ];
 
 export default unitDeepSummaries;
