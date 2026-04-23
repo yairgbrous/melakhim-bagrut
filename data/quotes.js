@@ -439,4 +439,68 @@ window.QUOTES_DATA = [
     significance:
       "הנבואה הראשונה המפורשת על הגלות הבבלית — בעקבות התפארות חזקיהו לפני שליחי מרודך בלאדן. יומן־הפוך של ההצלה.",
   },
+  {
+    id: "q-chilkiyahu-found",
+    text_niqqud: "סֵפֶר הַתּוֹרָה מָצָאתִי בְּבֵית יְהוָה",
+    speaker_id: "chilkiyahu_hakohen",
+    addressee_id: "shafan_hasofer",
+    context_event_id: "metziat_sefer_hatorah",
+    book_ref: "מלכים ב כב ח",
+    type: "report",
+    unit: 6,
+    significance:
+      "המשפט שפתח את הרפורמה הגדולה של יאשיהו. מציאת ספר התורה במקדש — הזינוק של תחיית הברית.",
+  },
+  {
+    id: "q-chulda-rech-bring-evil",
+    text_niqqud:
+      "כֹּה־אָמַר יְהוָה הִנְנִי מֵבִיא רָעָה אֶל־הַמָּקוֹם הַזֶּה וְעַל־יֹשְׁבָיו אֵת כָּל־דִּבְרֵי הַסֵּפֶר",
+    speaker_id: "chulda",
+    addressee_id: "yoshiyahu",
+    context_event_id: "nevuat_chulda",
+    book_ref: "מלכים ב כב טז",
+    type: "prophecy",
+    unit: 6,
+    significance:
+      "נבואת הרעה של חולדה לירושלים — הגזרה עומדת גם לאחר מציאת הספר וקריעת הבגדים של יאשיהו.",
+  },
+  {
+    id: "q-chulda-shalom-yoshiyahu",
+    text_niqqud:
+      "הִנְנִי אֹסִפְךָ עַל־אֲבֹתֶיךָ וְנֶאֱסַפְתָּ אֶל־קִבְרֹתֶיךָ בְּשָׁלוֹם וְלֹא־תִרְאֶינָה עֵינֶיךָ בְּכֹל הָרָעָה",
+    speaker_id: "chulda",
+    addressee_id: "yoshiyahu",
+    context_event_id: "nevuat_chulda",
+    book_ref: "מלכים ב כב כ",
+    type: "prophecy",
+    unit: 6,
+    significance:
+      "נבואת השלום האישית של חולדה ליאשיהו — תיאסף בשלום. מותו במגידו לפני החורבן מקיים את הנבואה במובן המהותי.",
+  },
+  {
+    id: "q-yoshiyahu-acharav-lo-kam",
+    text_niqqud:
+      "וְכָמֹהוּ לֹא־הָיָה לְפָנָיו מֶלֶךְ אֲשֶׁר־שָׁב אֶל־יְהוָה בְּכָל־לְבָבוֹ וּבְכָל־נַפְשׁוֹ וּבְכָל־מְאֹדוֹ",
+    speaker_id: "god",
+    addressee_id: "yoshiyahu",
+    context_event_id: "reforma_kultit",
+    book_ref: "מלכים ב כג כה",
+    type: "confession",
+    unit: 6,
+    significance:
+      "הערכת המקראי של יאשיהו — המלך המשיב בלב שלם ביותר. דיבור ישיר של המספר המלווה את שיא הרפורמה.",
+  },
+  {
+    id: "q-matkonet-nevuat-kav",
+    text_niqqud:
+      "וַיְדַבֵּר יְהוָה בְּיַד עֲבָדָיו הַנְּבִיאִים יַעַן אֲשֶׁר עָשָׂה מְנַשֶּׁה מֶלֶךְ־יְהוּדָה הַתֹּעֵבוֹת הָאֵלֶּה",
+    speaker_id: "god",
+    addressee_id: "menashe",
+    context_event_id: "nevuat_churban",
+    book_ref: "מלכים ב כא י–יא",
+    type: "prophecy",
+    unit: 6,
+    significance:
+      "מבוא לגזרה על ירושלים — חטאי מנשה גרמו לגזרה שאין להשיבה גם בידי יאשיהו הצדיק. ההסבר התיאולוגי לחורבן.",
+  },
 ];
