@@ -194,7 +194,9 @@
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=1100"></script>
 <script src="./components/BreadthPage.js?v=1150"></script>
 <script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=1100"></script>
-<script type="text/babel" data-presets="react" src="./components/Home.js?v=1100"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=1320"></script>
+<script type="text/babel" data-presets="react" src="./components/XpBadge.js?v=1320"></script>
+<script type="text/babel" data-presets="react" src="./components/InstantSearch.js?v=1320"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -2496,6 +2498,13 @@ function App(){
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
+            {typeof window!=="undefined" && window.XpBadgeComponent ? <window.XpBadgeComponent compact/> : null}
+            <button
+              onClick={()=>{ if(typeof window!=="undefined" && typeof window.openInstantSearch==="function") window.openInstantSearch(); }}
+              aria-label="חיפוש מהיר (Ctrl+K)"
+              title="חיפוש מהיר · Ctrl+K"
+              className="theme-tog"
+            >🔍</button>
             {typeof window!=="undefined" && window.AuthButtonComponent ? <window.AuthButtonComponent/> : null}
             <button onClick={toggleTheme} className="theme-tog" aria-label="החלף מצב כהה/בהיר" title="החלף מצב כהה/בהיר">
               {theme==='light'?'🌙':'☀️'}
@@ -2565,6 +2574,7 @@ function App(){
         {route.page==="daily" && (()=>{ const X=window.DailyChallenge; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אתגר יומי...</div>; })()}
         </>}
       </main>
+      {typeof window!=="undefined" && window.InstantSearchComponent ? <window.InstantSearchComponent setRoute={setRoute}/> : null}
 
       {!isTeacher && (
         <nav className="bottom-nav" role="navigation" aria-label="ניווט תחתון">
