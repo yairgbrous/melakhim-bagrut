@@ -337,7 +337,48 @@
     );
   }
 
-  function TopicCard({t, isOpen, onToggle, gotoUnit}){
+  function sefariaChapterUrl(book, chapter){
+    const slug = (book==='2' || book==='ב') ? 'II_Kings' : 'I_Kings';
+    if (!chapter) return 'https://www.sefaria.org.il/'+slug+'?lang=he';
+    return 'https://www.sefaria.org.il/'+slug+'.'+chapter+'?lang=he';
+  }
+
+  function InstanceRow({ins, parentId, parentType, idx, isExpanded, onToggle, gotoUnit}){
+    const label = ins.label || ins.context || '';
+    const hasQuote = !!ins.quote_niqqud;
+    const unitStr = ins.unit ? ' (יחידה '+ins.unit+')' : '';
+    const arrow = hasQuote ? (isExpanded ? '▾ ' : '▸ ') : '• ';
+    const onClick = hasQuote ? onToggle : ()=>gotoUnit(ins.unitId);
+    const openChapter = (e) => {
+      e && e.stopPropagation();
+      window.open(sefariaChapterUrl(ins.book, ins.chapter), '_blank', 'noopener,noreferrer');
+    };
+    const practiceInstance = (e) => {
+      e && e.stopPropagation();
+      try { window.dispatchEvent(new CustomEvent('practice-entity', {detail:{type:parentType, id:parentId, instance:idx, label:label}})); } catch(err){}
+      if (typeof window !== 'undefined' && window.__appSetRoute__) window.__appSetRoute__({page:'quiz'});
+    };
+    return React.createElement('li', {className:'space-y-1'},
+      React.createElement('button', {
+        type:'button', onClick:onClick,
+        className:'w-full text-right text-on-parchment hover:underline'
+      }, arrow + label + unitStr),
+      hasQuote && isExpanded && React.createElement('div', {className:'me-2 mt-1 p-3 rounded-lg bg-amber-900/20 border border-amber-700/30 space-y-2'},
+        React.createElement('blockquote', {className:'hebrew text-base leading-loose text-on-parchment border-e-4 border-amber-500/60 pe-3 py-1'},
+          '"' + ins.quote_niqqud + '"'
+        ),
+        ins.book_ref && React.createElement('div', {className:'text-xs font-bold text-on-parchment-accent'}, '— ' + ins.book_ref),
+        ins.significance && React.createElement('p', {className:'text-xs text-on-parchment-muted leading-relaxed'}, ins.significance),
+        React.createElement('div', {className:'flex flex-wrap gap-1.5 pt-1'},
+          React.createElement('button', {type:'button', onClick:openChapter, className:'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 border border-emerald-500/40 text-emerald-100 hover:scale-105 transition'}, '📖 פתח פרק בספר'),
+          React.createElement('button', {type:'button', onClick:practiceInstance, className:'px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 border border-amber-500/40 text-on-parchment-accent hover:scale-105 transition'}, '⚔️ תרגל על מופע זה'),
+          ins.unitId && React.createElement('button', {type:'button', onClick:(e)=>{e&&e.stopPropagation();gotoUnit(ins.unitId);}, className:'px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/20 border border-purple-500/40 text-purple-100 hover:scale-105 transition'}, '📚 עבור ליחידה')
+        )
+      )
+    );
+  }
+
+  function TopicCard({t, isOpen, onToggle, gotoUnit, expandedInstance, setExpandedInstance}){
     return React.createElement('div', {className:'card rounded-2xl p-4 text-right'},
       React.createElement('button', {type:'button', onClick:onToggle, className:'w-full text-right block'},
         React.createElement('h3', {className:'font-display text-lg font-bold text-on-parchment'}, t.title),
@@ -353,11 +394,15 @@
         t.key_instances && t.key_instances.length>0 && React.createElement('div', null,
           React.createElement('div', {className:'text-xs font-bold text-on-parchment-accent mb-1'}, '📌 דוגמאות מהספר'),
           React.createElement('ul', {className:'space-y-1.5 text-sm'},
-            t.key_instances.map((ki,i)=>React.createElement('li', {key:i},
-              React.createElement('button', {type:'button', onClick:()=>gotoUnit(ki.unitId), className:'text-on-parchment hover:underline text-right'},
-                '• ' + ki.label + (ki.unit?' (יחידה '+ki.unit+')':'')
-              )
-            ))
+            t.key_instances.map((ki,i)=>{
+              const key = t.id+':'+i;
+              return React.createElement(InstanceRow, {
+                key:i, ins:ki, parentId:t.id, parentType:'breadth', idx:i,
+                isExpanded: expandedInstance===key,
+                onToggle: ()=>setExpandedInstance(expandedInstance===key?null:key),
+                gotoUnit
+              });
+            })
           )
         ),
         t.questions && t.questions.length>0 && React.createElement('div', null,
@@ -370,7 +415,7 @@
     );
   }
 
-  function ItemCard({it, isOpen, onToggle, gotoUnit}){
+  function ItemCard({it, isOpen, onToggle, gotoUnit, expandedInstance, setExpandedInstance}){
     const count = (it.instances||[]).length;
     return React.createElement('div', {className:'card rounded-2xl p-4 text-right'},
       React.createElement('button', {type:'button', onClick:onToggle, className:'w-full text-right block'},
@@ -381,11 +426,15 @@
       ),
       isOpen && React.createElement('div', {className:'mt-3 pt-3 border-t border-amber-700/30 space-y-2'},
         it.instances && it.instances.length>0 && React.createElement('ul', {className:'space-y-1.5 text-sm'},
-          it.instances.map((ins,i)=>React.createElement('li', {key:i},
-            React.createElement('button', {type:'button', onClick:()=>gotoUnit(ins.unitId), className:'text-on-parchment hover:underline text-right'},
-              '• יחידה '+(ins.unit||'')+' — '+ins.context
-            )
-          ))
+          it.instances.map((ins,i)=>{
+            const key = it.id+':'+i;
+            return React.createElement(InstanceRow, {
+              key:i, ins:ins, parentId:it.id, parentType:'recurring', idx:i,
+              isExpanded: expandedInstance===key,
+              onToggle: ()=>setExpandedInstance(expandedInstance===key?null:key),
+              gotoUnit
+            });
+          })
         ),
         it.significance && React.createElement('p', {className:'text-xs text-on-parchment-muted leading-relaxed pt-1 border-t border-amber-700/20 mt-2'},
           React.createElement('strong', {className:'text-on-parchment-accent'}, 'משמעות: '),
@@ -402,6 +451,7 @@
     const [filter, setFilter] = useState(0);
     const [openTopic, setOpenTopic] = useState(null);
     const [openItem, setOpenItem] = useState(null);
+    const [expandedInstance, setExpandedInstance] = useState(null);
 
     const filteredTopics = useMemo(()=> filter===0 ? topics : topics.filter(t => (t.unit_coverage||[]).includes(filter)), [filter, topics]);
     const filteredItems = useMemo(()=> filter===0 ? items : items.filter(i => (i.instances||[]).some(inst => inst.unitId === filter)), [filter, items]);
@@ -421,7 +471,8 @@
           : React.createElement('div', {className:'grid grid-cols-1 md:grid-cols-2 gap-3'},
               filteredTopics.map(t => React.createElement(TopicCard, {
                 key:t.id, t:t, isOpen:openTopic===t.id,
-                onToggle:()=>setOpenTopic(openTopic===t.id?null:t.id), gotoUnit
+                onToggle:()=>setOpenTopic(openTopic===t.id?null:t.id), gotoUnit,
+                expandedInstance, setExpandedInstance
               }))
             )
       ),
@@ -432,7 +483,8 @@
           : React.createElement('div', {className:'grid grid-cols-1 md:grid-cols-2 gap-3'},
               filteredItems.map(it => React.createElement(ItemCard, {
                 key:it.id, it:it, isOpen:openItem===it.id,
-                onToggle:()=>setOpenItem(openItem===it.id?null:it.id), gotoUnit
+                onToggle:()=>setOpenItem(openItem===it.id?null:it.id), gotoUnit,
+                expandedInstance, setExpandedInstance
               }))
             )
       )
