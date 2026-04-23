@@ -32,8 +32,43 @@
     try { localStorage.removeItem(IN_PROGRESS_KEY); } catch {}
   }
 
-  // --- hardcoded מתכונת תשפ"ו question pool (fallback until data/past-exams.js extends) ---
-  const PART_A_POOL = [
+  // --- adapter: build question pools from window.EXAM_2551_DATA (data/past-exams.js).
+  //     Shape coming in:  {id,part,points,topic_he,prompt_he,answer_points[],verbatim_quotes?,book_refs?,source_note}
+  //     Shape consumed:   {id,n,part,title,prompt,points,expected_points,verbatim_quotes?,book_refs?}
+  function buildPools(){
+    const data = (typeof window !== "undefined" && window.EXAM_2551_DATA) || null;
+    if (!data || !Array.isArray(data.questions)) return { A: [], BC: [] };
+    const A = [], BC = [];
+    let nA = 0, nBC = 0;
+    data.questions.forEach(q => {
+      const isA = q.part === "A";
+      const n = isA ? ++nA : ++nBC + 8;
+      const adapted = {
+        id: q.id,
+        n,
+        part: q.part,
+        title: q.topic_he || "",
+        prompt: q.prompt_he || "",
+        points: q.points || (isA ? 9 : 8),
+        expected_points: Array.isArray(q.answer_points) ? q.answer_points : [],
+        verbatim_quotes: Array.isArray(q.verbatim_quotes) ? q.verbatim_quotes : null,
+        book_refs: Array.isArray(q.book_refs) ? q.book_refs : []
+      };
+      if (isA) A.push(adapted); else BC.push(adapted);
+    });
+    return { A, BC };
+  }
+  let _POOLS = null;
+  function getPools(){
+    if (_POOLS) return _POOLS;
+    _POOLS = buildPools();
+    return _POOLS;
+  }
+  function partAList(){ const p = getPools().A; return p.length ? p : PART_A_POOL_FALLBACK; }
+  function partBCList(){ const p = getPools().BC; return p.length ? p : PART_BC_POOL_FALLBACK; }
+
+  // --- legacy hardcoded fallback kept only if window.EXAM_2551_DATA is absent ---
+  const PART_A_POOL_FALLBACK = [
     {id:"a1", n:1, title:"מלכות שלמה",
       prompt:"תאר/י שני מאפיינים מרכזיים של תקופת מלכות שלמה, והבא/י פסוק התומך בכל אחד מהם.",
       points:9, expected_points:["חכמה ובקשת לב שומע (מל״א ג׳)","בניין המקדש ושגשוג כלכלי (מל״א ו׳–י׳)"]},
@@ -70,7 +105,7 @@
       ]}
   ];
 
-  const PART_BC_POOL = [
+  const PART_BC_POOL_FALLBACK = [
     {id:"b1",  n:9,  part:"B", title:"פילוג הממלכה",
       prompt:"ציין/י שתי סיבות לפילוג הממלכה ותן/י פסוק לכל סיבה.",
       points:8, expected_points:["עונש על נשות שלמה הנוכריות (מל״א יא׳)","תגובת רחבעם לבקשת הקלת עול (מל״א יב׳)"]},
@@ -149,6 +184,28 @@
     );
   }
 
+  // --- VerbatimQuotes: renders the 4 Tanakh verses from Q A1 (niqqud-aware).
+  //     Quotes are Biblical text (public domain) and are displayed exactly as
+  //     supplied in window.EXAM_2551_DATA.questions[A1].verbatim_quotes.
+  function VerbatimQuotes({ quotes }){
+    if (!Array.isArray(quotes) || quotes.length === 0) return null;
+    return (
+      <div className="space-y-2">
+        {quotes.map((q, i) => (
+          <blockquote key={i}
+            className="parchment-inset rounded-lg p-3 border-r-4 border-amber-700/60 hebrew"
+            style={{background:"rgba(244,213,141,.28)"}}>
+            <div className="text-amber-950 leading-relaxed" style={{fontSize:"1.05rem"}}>
+              <span className="font-bold text-amber-900 ml-1" dir="ltr">({i+1})</span>
+              {" "}"{q.text_he}"
+            </div>
+            {q.book_ref && <div className="text-[11px] text-amber-800 mt-1">{q.book_ref}</div>}
+          </blockquote>
+        ))}
+      </div>
+    );
+  }
+
   function AccommodationToggle({ value, onChange }){
     return (
       <label className="flex items-start gap-3 cursor-pointer rounded-xl p-3 bg-white/50 border-2 border-amber-700/30 hover:border-amber-700/60 transition">
@@ -170,6 +227,7 @@
       : disabled
         ? "bg-white/30 border-amber-700/10 text-amber-900/50 cursor-not-allowed"
         : "bg-white/60 border-amber-700/30 text-amber-900 hover:bg-amber-500/10";
+    const hasQuotes = Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0;
     return (
       <button onClick={onToggle} disabled={disabled && !selected}
         className={`w-full text-right rounded-xl border-2 p-3 transition ${cls}`}>
@@ -179,11 +237,44 @@
           </span>
           <div className="flex-1 min-w-0 text-right">
             <div className="font-bold text-sm hebrew">{q.title}</div>
+            {hasQuotes && (
+              <div className="text-[11px] mt-1 text-amber-900/80 hebrew">
+                כולל {q.verbatim_quotes.length} ציטוטי מקרא (בניקוד)
+              </div>
+            )}
             <div className="text-xs mt-0.5 hebrew leading-relaxed opacity-80">{q.prompt}</div>
             <div className="text-[10px] mt-1 opacity-70">{q.points} נק׳</div>
           </div>
         </div>
       </button>
+    );
+  }
+
+  function PartTabBar({ tab, onTab, selectedA, selectedBC }){
+    const tabs = [
+      { id: "A", label: "חלק א׳ · בקיאות",      n: selectedA.length,  max: MAX_A },
+      { id: "B", label: "חלק ב׳ · ידע",         n: null,              max: null  },
+      { id: "C", label: "חלק ג׳ · ניתוח/רוחב",  n: null,              max: null  },
+      { id: "BC",label: "ב+ג · מצרפי",           n: selectedBC.length, max: MAX_BC }
+    ];
+    return (
+      <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30">
+        {tabs.map(t => {
+          const active = tab === t.id;
+          const cls = active
+            ? "bg-amber-600 text-white font-bold"
+            : "bg-white/10 text-on-parchment hover:bg-white/20";
+          return (
+            <button key={t.id} onClick={()=>onTab(t.id)}
+              className={`text-[11px] md:text-xs px-2 py-1.5 rounded-lg transition ${cls}`}>
+              <div className="hebrew leading-tight">{t.label}</div>
+              {t.n !== null && (
+                <div className="text-[10px] opacity-90" dir="ltr">{t.n}/{t.max}</div>
+              )}
+            </button>
+          );
+        })}
+      </div>
     );
   }
 
@@ -199,7 +290,7 @@
           </div>
         </div>
         <div className="space-y-2">
-          {PART_A_POOL.map(q => (
+          {partAList().map(q => (
             <SelectionCard key={q.id} q={q} selected={selected.includes(q.id)}
               onToggle={()=>onToggle(q.id)} disabled={full}/>
           ))}
@@ -211,8 +302,8 @@
   function PartBCSelect({ selected, onToggle }){
     const count = selected.length;
     const full = count >= MAX_BC;
-    const partB = PART_BC_POOL.filter(q => q.part === "B");
-    const partC = PART_BC_POOL.filter(q => q.part === "C");
+    const partB = partBCList().filter(q => q.part === "B");
+    const partC = partBCList().filter(q => q.part === "C");
     return (
       <section className="space-y-2">
         <div className="flex items-center justify-between sticky top-[108px] z-10 bg-slate-900/90 backdrop-blur-sm rounded-xl p-3 border border-purple-500/30">
@@ -251,6 +342,9 @@
       <div className="max-w-2xl mx-auto space-y-4">
         {shabbat && <ShabbatModal onDismiss={()=>setRoute && setRoute({page:"quiz"})}/>}
         <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">📝 מתכונת בגרות · שאלון 2551 · תשפ"ו</h1>
+        <div className="text-sm md:text-base text-on-parchment hebrew leading-relaxed" style={{background:"rgba(0,0,0,.25)",padding:"0.75rem 1rem",borderRadius:"0.75rem"}}>
+          בחינת מתכונת תשפ״ו · 22 שאלות · בחר 5 מתוך 8 חלק א · 7 מתוך 14 חלקים ב+ג · 101 נק׳ · 2:15 (או 2:35 התאמה)
+        </div>
         <div className="parchment rounded-2xl p-5 md:p-7 space-y-3">
           <h2 className="font-display text-xl font-bold text-amber-900">ספר מלכים · מתכונת מלאה</h2>
           <div className="text-sm text-amber-950 space-y-1.5">
@@ -308,6 +402,8 @@
     const [examCfg, setExamCfg] = useState(null);
     const [selectedA, setSelectedA] = useState([]);
     const [selectedBC, setSelectedBC] = useState([]);
+    const [selectTab, setSelectTab] = useState("A");
+    const [runTab, setRunTab] = useState("A");
     const [draft, setDraft] = useState(() => loadInProgress());
     const [resumeData, setResumeData] = useState(null);
     const [finalRun, setFinalRun] = useState(null);
@@ -348,6 +444,11 @@
 
     if (phase === "select") {
       const ready = selectedA.length === MAX_A && selectedBC.length === MAX_BC;
+      const tab = selectTab;
+      const partB = partBCList().filter(q => q.part === "B");
+      const partC = partBCList().filter(q => q.part === "C");
+      const fullA  = selectedA.length  >= MAX_A;
+      const fullBC = selectedBC.length >= MAX_BC;
       return (
         <div className="max-w-2xl mx-auto space-y-4">
           <div className="card rounded-xl p-3 flex items-center justify-between text-sm">
@@ -356,8 +457,61 @@
               א: <span dir="ltr" className="font-bold">{selectedA.length}/{MAX_A}</span> · ב+ג: <span dir="ltr" className="font-bold">{selectedBC.length}/{MAX_BC}</span>
             </div>
           </div>
-          <PartASelect selected={selectedA} onToggle={toggleA}/>
-          <PartBCSelect selected={selectedBC} onToggle={toggleBC}/>
+          <PartTabBar tab={tab} onTab={setSelectTab} selectedA={selectedA} selectedBC={selectedBC}/>
+          {tab === "A" && (
+            <section className="space-y-2">
+              <div className="text-sm font-bold text-on-parchment-accent hebrew">
+                חלק א׳ — בקיאות · בחר 5 מתוך 8 · <span dir="ltr">{selectedA.length}/{MAX_A} נבחרו</span>
+              </div>
+              {partAList().map(q => (
+                <SelectionCard key={q.id} q={q} selected={selectedA.includes(q.id)}
+                  onToggle={()=>toggleA(q.id)} disabled={fullA}/>
+              ))}
+            </section>
+          )}
+          {tab === "B" && (
+            <section className="space-y-2">
+              <div className="text-sm font-bold text-purple-200 hebrew">
+                חלק ב׳ — ידע וזיכרון · נספר למכסת ב+ג · <span dir="ltr">{selectedBC.length}/{MAX_BC} נבחרו</span>
+              </div>
+              {partB.map(q => (
+                <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
+                  onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
+              ))}
+            </section>
+          )}
+          {tab === "C" && (
+            <section className="space-y-2">
+              <div className="text-sm font-bold text-purple-200 hebrew">
+                חלק ג׳ — ניתוח ורוחב · נספר למכסת ב+ג · <span dir="ltr">{selectedBC.length}/{MAX_BC} נבחרו</span>
+              </div>
+              {partC.map(q => (
+                <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
+                  onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
+              ))}
+            </section>
+          )}
+          {tab === "BC" && (
+            <section className="space-y-3">
+              <div className="text-sm font-bold text-purple-200 hebrew">
+                בחר 7 מתוך 14 (ב+ג) · <span dir="ltr">{selectedBC.length}/{MAX_BC} נבחרו</span>
+              </div>
+              <div className="text-[10px] text-on-parchment-meta">פרק ב׳</div>
+              <div className="space-y-2">
+                {partB.map(q => (
+                  <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
+                    onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
+                ))}
+              </div>
+              <div className="text-[10px] text-on-parchment-meta mt-3">פרק ג׳</div>
+              <div className="space-y-2">
+                {partC.map(q => (
+                  <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
+                    onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
+                ))}
+              </div>
+            </section>
+          )}
           <button onClick={()=>setPhase("running")} disabled={!ready}
             className={`w-full py-4 rounded-2xl text-lg font-bold ${ready?"gold-btn glow":"bg-slate-700 text-slate-400 cursor-not-allowed"}`}>
             {ready ? `🏁 התחל מבחן · ${fmtHMS(examCfg&&examCfg.durationSec||DURATION_STANDARD)}` : `בחר ${MAX_A-selectedA.length} בפרק א ו-${MAX_BC-selectedBC.length} בפרקים ב+ג`}
@@ -369,6 +523,7 @@
     if (phase === "running") {
       return <ExamRunning
         selectedA={selectedA} selectedBC={selectedBC}
+        tab={runTab} onTab={setRunTab}
         durationSec={(examCfg&&examCfg.durationSec)||DURATION_STANDARD}
         accommodation={!!(examCfg&&examCfg.accommodation)}
         resume={resumeData}
@@ -399,7 +554,7 @@
     return null;
   }
 
-  function ExamRunning({ selectedA, selectedBC, durationSec, accommodation, resume, onFinish, onExit }){
+  function ExamRunning({ selectedA, selectedBC, tab, onTab, durationSec, accommodation, resume, onFinish, onExit }){
     const [timeLeft, setTimeLeft] = useState(() => (resume && typeof resume.timeLeft === "number") ? resume.timeLeft : durationSec);
     const [answers, setAnswers]   = useState(() => (resume && resume.answers) || {});
     const [startTime]             = useState(() => (resume && resume.startTime) || Date.now());
@@ -427,11 +582,43 @@
       onFinish({ answers, elapsedSec: durationSec - timeLeft });
     };
 
-    const partAQs = PART_A_POOL.filter(q => selectedA.includes(q.id));
-    const partBCQs = PART_BC_POOL.filter(q => selectedBC.includes(q.id));
+    const partAQs  = partAList().filter(q => selectedA.includes(q.id));
+    const partBQs  = partBCList().filter(q => selectedBC.includes(q.id) && q.part === "B");
+    const partCQs  = partBCList().filter(q => selectedBC.includes(q.id) && q.part === "C");
+    const partBCQs = [...partBQs, ...partCQs];
     const mins = Math.floor(timeLeft/60), secs = timeLeft%60;
 
     const setAns = (id, v) => setAnswers(a => ({...a, [id]: v}));
+    const activeTab = tab || "A";
+
+    function RunningCard({ q }){
+      const isA = q.part === "A";
+      return (
+        <div className="parchment rounded-xl p-4 space-y-3">
+          <div className="flex items-center gap-2 text-xs">
+            <span className={`px-2 py-0.5 rounded-full text-white font-bold ${isA?"bg-amber-700":"bg-purple-700"}`}>
+              {isA ? `שאלה ${q.n}` : `סעיף ${q.n}`}
+            </span>
+            <span className="text-amber-800">{q.points} נק׳</span>
+            <span className="text-amber-900 font-bold mr-auto">{isA ? q.title : `פרק ${q.part} · ${q.title}`}</span>
+          </div>
+          {Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0 && (
+            <VerbatimQuotes quotes={q.verbatim_quotes}/>
+          )}
+          <div className="hebrew text-amber-950 leading-relaxed" style={{fontSize:"1.15rem"}}>{q.prompt}</div>
+          <textarea value={answers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)}
+            rows={5} placeholder="כתוב את תשובתך כאן..."
+            className="w-full px-3 py-2 rounded-lg bg-white/80 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"/>
+        </div>
+      );
+    }
+
+    const tabs = [
+      { id:"A", label:`חלק א׳ (${partAQs.length})`,   color:"amber"  },
+      { id:"B", label:`חלק ב׳ (${partBQs.length})`,   color:"purple" },
+      { id:"C", label:`חלק ג׳ (${partCQs.length})`,   color:"purple" }
+    ];
+    const visibleQs = activeTab === "A" ? partAQs : activeTab === "B" ? partBQs : partCQs;
 
     return (
       <div className="max-w-3xl mx-auto space-y-4">
@@ -445,38 +632,28 @@
           <button onClick={finish} className="px-3 py-1.5 rounded-lg bg-red-700 text-white text-xs font-bold">הגשה</button>
         </div>
 
-        <section className="space-y-2">
-          <h2 className="font-display text-lg font-bold text-on-parchment-accent">פרק א — בקיאות</h2>
-          {partAQs.map(q => (
-            <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
-              <div className="flex items-center gap-2 text-xs">
-                <span className="px-2 py-0.5 rounded-full bg-amber-700 text-white font-bold">שאלה {q.n}</span>
-                <span className="text-amber-800">{q.points} נק׳</span>
-                <span className="text-amber-900 font-bold mr-auto">{q.title}</span>
-              </div>
-              <div className="hebrew text-amber-950 leading-relaxed">{q.prompt}</div>
-              <textarea value={answers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)}
-                rows={4} placeholder="כתוב את תשובתך כאן..."
-                className="w-full px-3 py-2 rounded-lg bg-white/80 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"/>
-            </div>
-          ))}
-        </section>
+        <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30">
+          {tabs.map(t => {
+            const active = activeTab === t.id;
+            const cls = active
+              ? "bg-amber-600 text-white font-bold"
+              : "bg-white/10 text-on-parchment hover:bg-white/20";
+            return (
+              <button key={t.id} onClick={()=>onTab && onTab(t.id)}
+                className={`text-xs md:text-sm px-2 py-2 rounded-lg transition hebrew ${cls}`}>
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
 
         <section className="space-y-2">
-          <h2 className="font-display text-lg font-bold text-purple-300">פרק ב + ג — ידע ורוחב</h2>
-          {partBCQs.map(q => (
-            <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
-              <div className="flex items-center gap-2 text-xs">
-                <span className="px-2 py-0.5 rounded-full bg-purple-700 text-white font-bold">סעיף {q.n}</span>
-                <span className="text-amber-800">{q.points} נק׳</span>
-                <span className="text-amber-900 font-bold mr-auto">פרק {q.part} · {q.title}</span>
-              </div>
-              <div className="hebrew text-amber-950 leading-relaxed">{q.prompt}</div>
-              <textarea value={answers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)}
-                rows={4} placeholder="כתוב את תשובתך כאן..."
-                className="w-full px-3 py-2 rounded-lg bg-white/80 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"/>
+          {visibleQs.map(q => <RunningCard key={q.id} q={q}/>)}
+          {visibleQs.length === 0 && (
+            <div className="text-center text-on-parchment-meta text-sm py-6 hebrew">
+              אין שאלות שנבחרו עבור חלק זה
             </div>
-          ))}
+          )}
         </section>
 
         <div className="grid grid-cols-2 gap-2">
@@ -505,8 +682,8 @@
   }
 
   function ExamGrade({ selectedA, selectedBC, answers, elapsedSec, accommodation, onDone }){
-    const partAQs  = PART_A_POOL.filter(q => selectedA.includes(q.id));
-    const partBCQs = PART_BC_POOL.filter(q => selectedBC.includes(q.id));
+    const partAQs  = partAList().filter(q => selectedA.includes(q.id));
+    const partBCQs = partBCList().filter(q => selectedBC.includes(q.id));
     const allQs = [...partAQs, ...partBCQs];
 
     const [editAnswers, setEditAnswers] = useState(() => ({...answers}));
@@ -564,13 +741,18 @@
           return (
             <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
               <div className="flex items-center gap-2 text-xs">
-                <span className={`px-2 py-0.5 rounded-full text-white font-bold ${q.part?"bg-purple-700":"bg-amber-700"}`}>
-                  {q.part ? `סעיף ${q.n}` : `שאלה ${q.n}`}
+                <span className={`px-2 py-0.5 rounded-full text-white font-bold ${q.part==="A"?"bg-amber-700":"bg-purple-700"}`}>
+                  {q.part==="A" ? `שאלה ${q.n}` : `סעיף ${q.n}`}
                 </span>
                 <span className="text-amber-800">{q.points} נק׳</span>
-                <span className="text-amber-900 font-bold mr-auto">{q.title}</span>
+                <span className="text-amber-900 font-bold mr-auto">
+                  {q.part==="A" ? q.title : `פרק ${q.part} · ${q.title}`}
+                </span>
               </div>
-              <div className="hebrew text-amber-950 leading-relaxed text-sm">{q.prompt}</div>
+              {Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0 && (
+                <VerbatimQuotes quotes={q.verbatim_quotes}/>
+              )}
+              <div className="hebrew text-amber-950 leading-relaxed" style={{fontSize:"1.05rem"}}>{q.prompt}</div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
