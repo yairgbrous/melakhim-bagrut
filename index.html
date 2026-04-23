@@ -14,7 +14,12 @@
 <meta name="twitter:card" content="summary_large_image"/>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E📖%3C/text%3E%3C/svg%3E"/>
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E📖%3C/text%3E%3C/svg%3E"/>
-<link rel="manifest" href="manifest.json"/>
+<link rel="manifest" href="manifest.json?v=1100"/>
+<meta name="theme-color" content="#C89B3C"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="מלכים"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;700;800;900&family=Noto+Serif+Hebrew:wght@400;700&display=swap" rel="stylesheet">
@@ -4178,9 +4183,31 @@ class EB extends React.Component {
 ReactDOM.createRoot(document.getElementById("root")).render(<EB><App/></EB>);
 </script>
 <script>
+  // PWA service worker: register, and auto-activate a new SW as soon as
+  // it's installed so users don't need to hard-reload between deploys.
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./sw.js').catch(function(){});
+      navigator.serviceWorker.register('./sw.js?v=1100').then(function(reg){
+        if (!reg) return;
+        reg.addEventListener('updatefound', function(){
+          var sw = reg.installing;
+          if (!sw) return;
+          sw.addEventListener('statechange', function(){
+            if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+              // A newer SW is waiting; tell it to take over now.
+              try { sw.postMessage('SKIP_WAITING'); } catch (e) {}
+            }
+          });
+        });
+      }).catch(function(){});
+      // When the controlling SW changes (post-skipWaiting), reload once so
+      // the new precache is actually used.
+      var reloaded = false;
+      navigator.serviceWorker.addEventListener('controllerchange', function(){
+        if (reloaded) return;
+        reloaded = true;
+        window.location.reload();
+      });
     });
   }
 </script>
