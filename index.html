@@ -183,8 +183,8 @@
 <script src="./data/_entity-index.js?v=1100"></script>
 <script type="module" src="./data/past-exams.js?v=1200"></script>
 <script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=1100"></script>
-<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1100"></script>
-<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=1200"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1340"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=1340"></script>
 <script type="text/babel" data-presets="react" src="./components/EventPage.js?v=1100"></script>
 <script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=1100"></script>
 <script src="./components/KingsUtils.js?v=1100"></script>
@@ -195,6 +195,7 @@
 <script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=1100"></script>
 <script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=1340"></script>
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=1340"></script>
+<script type="text/babel" data-presets="react" src="./components/Toast.js?v=1340"></script>
 <script type="text/babel" data-presets="react" src="./components/Home.js?v=1100"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
@@ -299,6 +300,16 @@ html[data-theme='light'] .eb-trace{background:rgba(26,22,17,.06);color:#3a2e20}
 .eb-btn-secondary{background:rgba(107,91,149,.22);color:#C9B8E0;border-color:rgba(107,91,149,.55)}
 .eb-btn-secondary:hover{background:rgba(107,91,149,.35)}
 html[data-theme='light'] .eb-btn-secondary{background:rgba(107,91,149,.14);color:#4A3D7A;border-color:rgba(107,91,149,.45)}
+/* ---- Toast notifications (window.showToast) ---- */
+.toast-host{position:fixed;inset-inline:0;bottom:calc(72px + env(safe-area-inset-bottom));z-index:120;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 12px}
+.toast-item{pointer-events:auto;display:inline-flex;align-items:center;gap:10px;max-width:min(560px,92vw);padding:.7rem 1.1rem;border-radius:14px;font-weight:700;font-size:14px;line-height:1.35;color:#fff;box-shadow:0 12px 30px -10px rgba(0,0,0,.55);border:1px solid transparent;cursor:pointer;animation:toastInUp .3s cubic-bezier(.3,.8,.3,1)}
+.toast-item .toast-ico{font-size:18px;line-height:1;flex-shrink:0}
+.toast-item .toast-msg{font-family:'Heebo','Frank Ruhl Libre',sans-serif}
+.toast-success{background:linear-gradient(135deg,#3E8E7E 0%,#2a6b5e 100%);border-color:#5FB39F;color:#F0FFF8}
+.toast-error{background:linear-gradient(135deg,#A83240 0%,#7a1f2a 100%);border-color:#D94E5F;color:#FFF1F3}
+.toast-info{background:linear-gradient(135deg,#3B6BB5 0%,#1E468C 100%);border-color:#6FA0E0;color:#E8F1FF}
+@keyframes toastInUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media (prefers-reduced-motion:reduce){.toast-item{animation:none}}
 /* ---- Home redesign v1 + 20 polish ---- */
 body{padding-bottom:72px}
 .bottom-nav{position:fixed;bottom:0;inset-inline:0;z-index:45;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:rgba(10,22,40,.92);backdrop-filter:blur(14px);border-top:1px solid rgba(212,165,116,.35);box-shadow:0 -4px 16px rgba(0,0,0,.35)}
@@ -4235,14 +4246,21 @@ const EB = (typeof window !== 'undefined' && window.ErrorBoundaryComponent)
     document.documentElement.setAttribute('data-theme', t);
   }catch{ document.documentElement.setAttribute('data-theme','light'); }
 })();
-ReactDOM.createRoot(document.getElementById("root")).render(<EB><App/></EB>);
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <EB>
+    <App/>
+    {typeof window !== "undefined" && window.ToastHostComponent
+      ? React.createElement(window.ToastHostComponent)
+      : null}
+  </EB>
+);
 </script>
 <script>
   // PWA service worker: register, and auto-activate a new SW as soon as
   // it's installed so users don't need to hard-reload between deploys.
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./sw.js?v=1100').then(function(reg){
+      navigator.serviceWorker.register('./sw.js?v=1340').then(function(reg){
         if (!reg) return;
         reg.addEventListener('updatefound', function(){
           var sw = reg.installing;

@@ -409,6 +409,11 @@
       if (update) {
         update(p => ({ ...p, reviewScores: { ...(p.reviewScores||{}), [qid]: grade } }));
       }
+      if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
+        if (grade === 'know')       window.showToast('✅ יפה! יודע', 'success');
+        else if (grade === 'partial') window.showToast('⚠️ כמעט — חלקי', 'info');
+        else if (grade === 'dont')  window.showToast('❌ נסמן לחזרה', 'error');
+      }
     }, [update]);
 
     const next = () => {
