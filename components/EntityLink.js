@@ -36,13 +36,15 @@
   };
 
   function routeFor(type, id){
-    if (type === "character" || type === "king")  return { page: "character", id };
+    if (type === "king")                           return { page: "king",      id };
+    if (type === "character")                      return { page: "character", id };
     if (type === "place")                          return { page: "place",     id };
     if (type === "event")                          return { page: "event",     id };
-    if (type === "breadth")                        return { page: "themes",    hash: id };
+    if (type === "breadth")                        return { page: "breadth",   id };
     if (type === "recurringItem" || type === "recurring") {
       return { page: "themes", hash: "recurring-" + id };
     }
+    if (type === "quote")                          return { page: "event",     id: id }; // quotes open via event context when available
     return null;
   }
 

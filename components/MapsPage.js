@@ -552,7 +552,8 @@
     );
   }
 
-  function MapsPage(){
+  function MapsPage(props){
+    const focusMapId = props && props.focusMapId;
     const [ready, setReady] = useState(!!window.__ENTITY_INDEX_READY__);
     useEffect(()=>{
       if (ready) return;
@@ -571,6 +572,13 @@
     const [openMap, setOpenMap]       = useState(null);
 
     const maps = useMemo(() => pickMapsData(), [ready]);
+
+    // When routed via /#/map/:id, auto-open that map by id or number.
+    useEffect(() => {
+      if (!focusMapId || !maps.length || openMap) return;
+      const target = maps.find(m => m.id === focusMapId || String(m.number) === String(focusMapId));
+      if (target) setOpenMap(target);
+    }, [focusMapId, maps, openMap]);
 
     const filtered = useMemo(() => {
       let list = maps;

@@ -653,11 +653,12 @@
   }
 
   function BreadthPage(props){
-    const setRoute = (props && props.setRoute) || (typeof window!=='undefined' ? window.__setRoute : null);
+    const setRoute = (props && props.setRoute) || (typeof window!=='undefined' ? window.__appSetRoute__ || window.__setRoute : null);
+    const focusBreadthId = props && props.focusBreadthId;
     const topics = (window.BREADTH_DATA && window.BREADTH_DATA.length) ? window.BREADTH_DATA : BREADTH_FALLBACK;
     const items = (window.RECURRING_ITEMS_DATA && window.RECURRING_ITEMS_DATA.length) ? window.RECURRING_ITEMS_DATA : RECURRING_FALLBACK;
     const [filter, setFilter] = useState(0);
-    const [openTopic, setOpenTopic] = useState(null);
+    const [openTopic, setOpenTopic] = useState(focusBreadthId || null);
     const [openItem, setOpenItem] = useState(null);
     const [expandedInstance, setExpandedInstance] = useState(null);
 
