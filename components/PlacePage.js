@@ -16,6 +16,64 @@
    Exposes: window.PlacePage
    ========================================================================= */
 (function(){
+  function findMapForPlace(placeId){
+    const maps = (typeof window !== "undefined" && Array.isArray(window.MAPS_19)) ? window.MAPS_19 : [];
+    for (const m of maps) {
+      const pins = Array.isArray(m.pins) ? m.pins : [];
+      const pin  = pins.find(p => p && p.placeId === placeId);
+      if (pin) return { map: m, pin };
+    }
+    return null;
+  }
+
+  function MiniMap({ placeId, onOpen }){
+    const hit = findMapForPlace(placeId);
+    if (!hit) return null;
+    const { map, pin } = hit;
+    const palette = (typeof window !== "undefined" && window.MAPS_UNIT_COLOR) || {};
+    const color = palette[map.unit] || "#D4A574";
+    return (
+      <section className="card rounded-2xl p-4">
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h3 className="font-display text-base font-bold text-on-parchment">🗺 במפה {map.number}</h3>
+            <div className="text-xs text-on-parchment-muted">{map.title}</div>
+          </div>
+          <button onClick={onOpen} className="text-xs font-bold text-on-parchment-accent hover:underline">פתח מפה מלאה →</button>
+        </div>
+        <div style={{position:"relative", width:"100%", paddingTop:"60%", background:`linear-gradient(135deg, ${color}22, ${color}08)`, border:`1px solid ${color}55`, borderRadius:12, overflow:"hidden"}}>
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none"
+               style={{position:"absolute", inset:0, width:"100%", height:"100%"}}>
+            <path d="M 20 0 Q 30 30 22 60 T 35 100"
+                  stroke={color} strokeOpacity="0.55" strokeWidth="0.6" fill="none" strokeDasharray="1.2 1.2"/>
+            <path d="M 72 8 Q 70 35 75 60 T 78 95"
+                  stroke={color} strokeOpacity="0.55" strokeWidth="0.6" fill="none" strokeDasharray="1.2 1.2"/>
+          </svg>
+          {(map.pins || []).map((p, i) => {
+            const isSelf = p.placeId === placeId;
+            return (
+              <span key={i}
+                style={{
+                  position:"absolute",
+                  left: p.x + "%", top: p.y + "%",
+                  transform: "translate(-50%, -50%)",
+                  background: isSelf ? color : "#fff",
+                  color: isSelf ? "#fff" : color,
+                  border: `2px solid ${color}`,
+                  borderRadius: "50%",
+                  width: isSelf ? 26 : 18, height: isSelf ? 26 : 18,
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  fontWeight: 900, fontSize: isSelf ? 12 : 10,
+                  boxShadow: isSelf ? `0 0 0 4px ${color}33` : "none"
+                }}
+                title={p.place}>{p.n}</span>
+            );
+          })}
+        </div>
+      </section>
+    );
+  }
+
   function MapPinChip({ n, onClick }){
     return (
       <button onClick={onClick}
@@ -104,6 +162,8 @@
             <p className="hebrew text-amber-950 leading-relaxed">{pl.significance}</p>
           </section>
         )}
+
+        {pl && <MiniMap placeId={pl.id} onOpen={onFindOnMap}/>}
 
         {pl && Array.isArray(pl.related_events) && pl.related_events.length > 0 && (
           <Section title="⚔️ אירועים קשורים">
