@@ -8,6 +8,24 @@
 (function(){
   const { useMemo } = React;
 
+  function shareEntity(type, id, label){
+    const base = (window.location.origin || '') + window.location.pathname.replace(/[^/]*$/, '');
+    const url = base + '#/' + type + '/' + encodeURIComponent(id);
+    const text = (label || '') + ' · ספר מלכים · בגרות 2551';
+    const data = { title: label || 'ספר מלכים', text, url };
+    if (navigator.share){
+      navigator.share(data).catch(()=>{});
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(() => {
+        if (typeof window.showToast === 'function') window.showToast('📋 הקישור הועתק ללוח', 'success');
+      }).catch(()=>{});
+    } else {
+      window.prompt('העתק את הקישור:', url);
+    }
+  }
+
   const stripTokens = (t) => {
     if (window.KingsUtils && window.KingsUtils.stripTokens) return window.KingsUtils.stripTokens(t);
     if (typeof t !== 'string') return t || '';
@@ -208,7 +226,12 @@
               </div>
               {units && units.length>0 && <div className="text-xs text-amber-700 mt-1">יחידות: {units.join(', ')}</div>}
             </div>
-            <button onClick={firePractice} className="gold-btn px-4 py-2 rounded-xl font-bold">⚔️ תרגל על דמות זו</button>
+            <div className="flex flex-wrap items-center gap-2">
+              <button onClick={firePractice} className="gold-btn px-4 py-2 rounded-xl font-bold">⚔️ תרגל על דמות זו</button>
+              <button onClick={()=>shareEntity('character', c.id, c.name_niqqud || c.name || c.heading)} className="mb-share-btn" aria-label="שתף">
+                <span aria-hidden="true">🔗</span><span>שתף</span>
+              </button>
+            </div>
           </div>
 
           {assessmentQuote && (

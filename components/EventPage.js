@@ -16,6 +16,24 @@
    Exposes: window.EventPage
    ========================================================================= */
 (function(){
+  function shareEntity(type, id, label){
+    const base = (window.location.origin || '') + window.location.pathname.replace(/[^/]*$/, '');
+    const url = base + '#/' + type + '/' + encodeURIComponent(id);
+    const text = (label || '') + ' · ספר מלכים · בגרות 2551';
+    const data = { title: label || 'ספר מלכים', text, url };
+    if (navigator.share){
+      navigator.share(data).catch(()=>{});
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(() => {
+        if (typeof window.showToast === 'function') window.showToast('📋 הקישור הועתק ללוח', 'success');
+      }).catch(()=>{});
+    } else {
+      window.prompt('העתק את הקישור:', url);
+    }
+  }
+
   function EntityList({ items, type, setRoute }){
     if (!Array.isArray(items) || items.length === 0) return null;
     const EL = (typeof window !== "undefined" && window.EntityLinkComponent) || null;
@@ -68,9 +86,14 @@
         <button onClick={()=>go("study")} className="text-on-parchment-accent text-sm">→ חזרה לאזור הלימוד</button>
 
         <header className="card rounded-2xl p-5">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent hebrew">
-            ⚔️ {headingLabel}
-          </h1>
+          <div className="flex items-start justify-between gap-2 flex-wrap">
+            <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent hebrew">
+              ⚔️ {headingLabel}
+            </h1>
+            <button onClick={()=>shareEntity('event', id, headingLabel)} className="mb-share-btn" aria-label="שתף">
+              <span aria-hidden="true">🔗</span><span>שתף</span>
+            </button>
+          </div>
           <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
             {ev && ev.unit != null && <span className="px-2 py-0.5 rounded-full bg-amber-700 text-on-parchment-muted font-bold">יחידה {ev.unit}</span>}
             {ev && (ev.chapter_ref || ev.chapters) && <span className="text-on-parchment">{ev.chapter_ref || ev.chapters}</span>}
