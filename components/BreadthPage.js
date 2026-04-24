@@ -654,7 +654,13 @@
 
   function BreadthPage(props){
     const setRoute = (props && props.setRoute) || (typeof window!=='undefined' ? window.__setRoute : null);
-    const topics = (window.BREADTH_DATA && window.BREADTH_DATA.length) ? window.BREADTH_DATA : BREADTH_FALLBACK;
+    // Prefer the v2 data/breadth-topics.js miqud when present. Fall back to
+    // the legacy BREADTH_DATA entity-index bucket, then to the inline
+    // BREADTH_FALLBACK baked into this file. All three shapes share the
+    // {id,title,intro,unit_coverage,key_instances,questions} fields this
+    // component renders, so the swap is source-of-truth-only.
+    const topics = (window.BREADTH_TOPICS && window.BREADTH_TOPICS.length) ? window.BREADTH_TOPICS
+                 : ((window.BREADTH_DATA && window.BREADTH_DATA.length) ? window.BREADTH_DATA : BREADTH_FALLBACK);
     const items = (window.RECURRING_ITEMS_DATA && window.RECURRING_ITEMS_DATA.length) ? window.RECURRING_ITEMS_DATA : RECURRING_FALLBACK;
     const [filter, setFilter] = useState(0);
     const [openTopic, setOpenTopic] = useState(null);
