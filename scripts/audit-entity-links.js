@@ -66,6 +66,9 @@ function buildIndex(){
     if (error) { console.error(`[skip] ${f}: ${error}`); return; }
     const w = sandbox.window || {};
 
+    // Absorb alias table so refExists can consult it.
+    if (w.__ENTITY_ALIASES__) global.__ENTITY_ALIASES__ = w.__ENTITY_ALIASES__;
+
     // Kings: data/kings.js exports `kings`.
     const kingsArr = sandbox.kings || w.KINGS_DATA;
     if (Array.isArray(kingsArr)) kingsArr.forEach(k => { if (k && k.id) union.king[k.id] = k; });
@@ -112,7 +115,33 @@ const SCALAR_REL = [
 ];
 
 function refExists(union, buckets, id){
-  return buckets.some(b => union[b] && union[b][id]);
+  if (buckets.some(b => union[b] && union[b][id])) return true;
+  // Alias fallback — same strategy as components/EntityLink.js resolver.
+  const aliases = (global.__ENTITY_ALIASES__ || {});
+  // Collect alias maps from expected buckets AND all other alias buckets so
+  // cross-bucket references (e.g. related_kings → character id) resolve.
+  const mapsToCheck = new Set();
+  for (const b of buckets) {
+    if (aliases[b]) mapsToCheck.add(aliases[b]);
+    if (b === "king" && aliases.character) mapsToCheck.add(aliases.character);
+    if (b === "character" && aliases.king) mapsToCheck.add(aliases.king);
+  }
+  // Also allow any declared alias map to resolve (broad fallback).
+  for (const k of Object.keys(aliases)) { if (aliases[k]) mapsToCheck.add(aliases[k]); }
+  for (const map of mapsToCheck) {
+    if (!Object.prototype.hasOwnProperty.call(map, id)) continue;
+    const aliased = map[id];
+    if (aliased === null) return true; // intentional stub
+    if (typeof aliased === "string") {
+      for (const bn of Object.keys(union)) {
+        if (union[bn] && union[bn][aliased]) return true;
+      }
+    }
+  }
+  // Slugify swap: try toggling underscores <-> dashes.
+  const swapped = id.indexOf("_") >= 0 ? id.replace(/_/g, "-") : id.replace(/-/g, "_");
+  if (swapped !== id && buckets.some(b => union[b] && union[b][swapped])) return true;
+  return false;
 }
 
 function audit(union){

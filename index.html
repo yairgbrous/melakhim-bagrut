@@ -25,7 +25,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;700;800;900&family=Noto+Serif+Hebrew:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/quote-cards.css?v=500">
 <link rel="stylesheet" href="assets/contrast-hotfix.css?v=500">
-<link rel="stylesheet" href="assets/layout-fix.css?v=500">
+<link rel="stylesheet" href="assets/layout-fix.css?v=2300">
 <link rel="stylesheet" href="assets/readability-pass.css?v=1340">
 <script>
 /* =========================================================================
@@ -37,7 +37,6 @@
    (legacy profile blob). Everything else is pass-through.
    AuthProvider listens to these events; when signed-in + feature flag on,
    it debounces 2s then pushes a diff to RTDB users/{uid}/progress.
-   ========================================================================= */
 (function(){
   if (typeof window === "undefined" || !window.localStorage) return;
   const PREFIXES = ["jarvis.", "melakhim_pro_"];
@@ -69,7 +68,6 @@
    Fails gracefully per-file. Dispatches 'entity-index-ready' when done.
    Non-module files (motifs.js, archaeology.js, hebrew-dates.js) are eval'd
    in a Function scope; module files via dynamic import.
-   ========================================================================= */
 (async function bootEntityIndex(){
   window.__ENTITY_INDEX__ = {
     motif:{}, date:{}, archaeology:{}, character:{},
@@ -94,7 +92,8 @@
   await Promise.all([
     evalFile('./data/motifs.js', ['motifs']),
     evalFile('./data/archaeology.js', ['archaeologyFinds']),
-    evalFile('./data/hebrew-dates.js', [])
+    evalFile('./data/hebrew-dates.js', []),
+    evalFile('./data/_id-aliases.js?v=1400', []),
   ]);
   const [chars, stories, flashcards, keyConcepts, kingsMod] = await Promise.all([
     importModule('./data/characters.js'),
@@ -181,28 +180,24 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <!-- Cross-entity connectivity: load BEFORE pages so window.__ENTITY_INDEX__
      has all buckets + window.EntityLinkComponent is available at render. -->
-<script src="./data/_entity-index.js?v=1100"></script>
-<script type="module" src="./data/past-exams.js?v=2100"></script>
-<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=1100"></script>
-<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1340"></script>
-<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=2100"></script>
-<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=1100"></script>
-<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=1100"></script>
-<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1100"></script>
-<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=2100"></script>
-<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=1330"></script>
-<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=1330"></script>
-<script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=1330"></script>
-<script src="./components/KingsUtils.js?v=1100"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=1100"></script>
-<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=1310"></script>
-<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=1100"></script>
-<script src="./components/BreadthPage.js?v=1150"></script>
-<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=1100"></script>
-<script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=1340"></script>
-<script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=1340"></script>
-<script type="text/babel" data-presets="react" src="./components/Toast.js?v=1340"></script>
-<script type="text/babel" data-presets="react" src="./components/Home.js?v=1100"></script>
+<script src="./data/_entity-index.js?v=2000"></script>
+<script type="module" src="./data/past-exams.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=2000"></script>
+<script src="./components/KingsUtils.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=2000"></script>
+<script src="./components/BreadthPage.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/Toast.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=2000"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -380,6 +375,13 @@ html[data-theme='light'] .hmb{color:#8B6F1F;background:rgba(139,111,71,.15)}
   .card,.parchment{background:#fff!important;color:#000!important;border:1px solid #888!important;box-shadow:none!important;page-break-inside:avoid}
   .hebrew,.font-display{color:#000!important}
   .bottom-nav,footer{display:none!important}
+}
+/* ---- Mobile header: collapse stats to icon-only on narrow screens ---- */
+@media (max-width:480px){
+  .mini-stats{ gap:6px; font-size:13px; }
+  .mini-stats .ms .num{ display:none; }
+  .mini-stats .ms{ gap:0; padding:2px 4px; border-radius:8px; background:rgba(212,165,116,.10); }
+  .rank-chip{ font-size:10px; padding:2px 6px; }
 }
 /* Service worker update toast already uses .toast */
 
@@ -727,7 +729,6 @@ html[data-theme='light'] .study-card{
 /* =========================================================================
    CONTRAST TOKENS — WCAG AA enforcement on parchment backgrounds.
    Primary ink #1A1611, secondary #4A3829, accent #8B6F1F, muted meta #6B5639.
-   ========================================================================= */
 .text-on-parchment{ color:#1A1611 !important; }
 .text-on-parchment-muted{ color:#4A3829 !important; font-weight:500; }
 .text-on-parchment-meta{ color:#6B5639 !important; }
@@ -745,7 +746,6 @@ html[data-theme='light'] .study-card{
 
 /* =========================================================================
    HOME HERO
-   ========================================================================= */
 .hero-parchment{ border:1px solid rgba(139,111,31,.35); }
 .hero-countdown{
   background:#7B1A1A; color:#FFF7ED;
@@ -755,13 +755,19 @@ html[data-theme='light'] .study-card{
 
 /* =========================================================================
    HOME PROGRESS STRIP
-   ========================================================================= */
 .progress-strip-wrap{ padding:4px 2px; }
 .progress-strip-rail{
   display:grid; grid-template-columns:repeat(6,1fr); gap:8px;
 }
-@media (max-width:768px){ .progress-strip-rail{ grid-template-columns:repeat(3,1fr); } }
-@media (max-width:420px){ .progress-strip-rail{ grid-template-columns:repeat(2,1fr); } }
+/* Mobile: 2 rows × 3 cards, all the way down to iPhone SE (375px). */
+@media (max-width:768px){
+  .progress-strip-rail{ grid-template-columns:repeat(3,1fr); gap:6px; }
+  .progress-strip-node{ padding:10px 8px 12px; min-height:80px; }
+  .progress-strip-title{ font-size:12px; }
+  .progress-strip-pct{ font-size:11px; }
+}
+/* Below 340px (unusual) drop to 2 cards per row as a last resort. */
+@media (max-width:340px){ .progress-strip-rail{ grid-template-columns:repeat(2,1fr); } }
 .progress-strip-node{
   position:relative; overflow:hidden;
   padding:12px 10px 14px; border-radius:16px;
@@ -810,12 +816,18 @@ html[data-theme='light'] .study-card{
 
 /* =========================================================================
    HOME QUICK ACTIONS
-   ========================================================================= */
 .quick-actions-wrap{ padding:2px; }
 .quick-actions-grid{
   display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
 }
-@media (max-width:768px){ .quick-actions-grid{ grid-template-columns:repeat(2,1fr); } }
+@media (max-width:768px){
+  .quick-actions-grid{ grid-template-columns:repeat(2,1fr); gap:10px; }
+  .quick-action-card{ padding:14px 10px; gap:6px; }
+  .quick-action-icon{ font-size:26px; }
+  .quick-action-title{ font-size:15px; }
+  .quick-action-sub{ font-size:11.5px; }
+}
+@media (max-width:360px){ .quick-actions-grid{ gap:8px; } .quick-action-card{ padding:12px 8px; } }
 .quick-action-card{
   padding:16px 14px; border-radius:18px; text-align:right; cursor:pointer;
   background:linear-gradient(180deg,#FBF6EB 0%,#F0E4C4 100%);
@@ -844,7 +856,6 @@ html[data-theme='light'] .study-card{
 
 /* =========================================================================
    HOME TODAY'S FOCUS
-   ========================================================================= */
 .today-focus-wrap{ padding:2px; }
 .today-focus-list{ display:flex; flex-direction:column; gap:8px; }
 .today-focus-card{
@@ -878,7 +889,6 @@ html[data-theme='light'] .study-card{
 
 /* =========================================================================
    HOME STATS STRIP
-   ========================================================================= */
 .stats-strip-wrap{ padding:2px; }
 .stats-strip-grid{
   display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
@@ -915,7 +925,7 @@ html[data-theme='dark'] .stats-cell{
 <body>
 <div id="root"></div>
 <!-- Tab D: authentic quiz / exam-sim / flashcards components (attach to window before main render) -->
-<script type="text/babel" data-presets="react" src="./components/FlashcardDrill.js"></script>
+<script type="text/babel" data-presets="react" src="./components/FlashcardDrill.js?v=2000"></script>
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
@@ -2557,7 +2567,15 @@ function App(){
         </div>
       </header>
 
-      {drawerOpen && (
+      {drawerOpen && (()=>{
+        const primaryNavs = [
+          {p:"home",     l:"ראשי",        i:"🏠"},
+          {p:"study",    l:"מרכז למידה",   i:"📚"},
+          {p:"timeline", l:"ציר מלכים",    i:"📜"},
+          {p:"maps",     l:"מפות",        i:"🗺️"},
+          {p:"exam-sim", l:"אזור בחינה",   i:"✍️"}
+        ];
+        return (
         <>
           <div className="drawer-overlay" onClick={()=>setDrawerOpen(false)} aria-hidden="true"/>
           <aside className="drawer" role="dialog" aria-label="תפריט ניווט">
@@ -2566,15 +2584,16 @@ function App(){
               <button onClick={()=>setDrawerOpen(false)} className="hmb" aria-label="סגור תפריט">✕</button>
             </div>
             <div className="space-y-1">
-              {navs.map(n => (
+              {primaryNavs.map(n => (
                 <button key={n.p} onClick={()=>go(n.p)} className={`drawer-link ${route.page===n.p?"active":""}`}>
                   <span className="dico">{n.i}</span><span>{n.l}</span>
                 </button>
               ))}
+              <div className="divider my-2"/>
+              <div className="text-[11px] font-bold text-amber-200/80 px-3 mb-1">⚙ הגדרות</div>
               <button onClick={()=>go("profile")} className={`drawer-link ${route.page==="profile"?"active":""}`}>
                 <span className="dico">👤</span><span>הפרופיל שלי</span>
               </button>
-              <div className="divider my-2"/>
               <button onClick={toggleSound} className="drawer-link" aria-pressed={soundOn}>
                 <span className="dico">{soundOn?"🔊":"🔇"}</span><span>צלילים: {soundOn?"מופעל":"כבוי"}</span>
               </button>
@@ -2584,7 +2603,8 @@ function App(){
             </div>
           </aside>
         </>
-      )}
+        );
+      })()}
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-3 md:px-5 py-4 md:py-6 fade-up">
         {(() => {
