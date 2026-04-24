@@ -1,123 +1,243 @@
 /* =========================================================================
-   EventPage — /event/:id
-   Reads window.EVENTS_DATA (array of {id, title, unit, chapters, summary,
-   significance, participants[], places[], related_characters[],
-   related_breadth[], related_recurring_items[]}).
-
-   All entity chips are rendered through window.EntityLinkComponent so
-   routing, dead-link fallback, and tone are consistent with the rest of
-   the app. Types used:
-     participants[], related_characters[]  → type="character"
-     places[]                               → type="place"
-     related_breadth[]                      → type="breadth"
-     related_recurring_items[]              → type="recurring"
-
-   "⚔️ תרגל על אירוע זה" dispatches window 'practice-entity' CustomEvent.
-   Exposes: window.EventPage
+   EventPage — /event/:id · full-screen rich view
+   ---------------------------------------------------------------------------
+   STICKY HEADER · HERO · BODY (תקציר · משמעות · משתתפים · מקומות · נושאי
+   רוחב · פריטים חוזרים · מקורות). Uses window.EntityLinkComponent for all
+   cross-links so navigation + alias fallback are consistent with the rest
+   of the app. Exposes: window.EventPage
    ========================================================================= */
 (function(){
-  function EntityList({ items, type, setRoute }){
-    if (!Array.isArray(items) || items.length === 0) return null;
-    const EL = (typeof window !== "undefined" && window.EntityLinkComponent) || null;
+  const { useMemo } = React;
+
+  function slug(s){
+    if (!s || typeof s !== "string") return "";
+    return s.trim().toLowerCase().replace(/[\s_]+/g, "-").replace(/[^֐-׿a-z0-9-]/g, "");
+  }
+
+  function resolveEvent(id){
+    if (!id) return null;
+    const pool = window.EVENTS_DATA || [];
+    const direct = pool.find(x => x && x.id === id);
+    if (direct) return direct;
+    const aliases = (window.__ENTITY_ALIASES__ || {}).event || {};
+    if (Object.prototype.hasOwnProperty.call(aliases, id)) {
+      const aliased = aliases[id];
+      if (aliased === null) return { id, __stub: true };
+      const hit = pool.find(x => x && x.id === aliased);
+      if (hit) return hit;
+    }
+    const swapped = id.indexOf("_")>=0 ? id.replace(/_/g,"-") : id.replace(/-/g,"_");
+    const swap = pool.find(x => x && x.id === swapped);
+    if (swap) return swap;
+    return null;
+  }
+
+  function nearestEvents(id){
+    const pool = window.EVENTS_DATA || [];
+    if (!id || !pool.length) return pool.slice(0, 6);
+    const s = slug(id);
+    return pool
+      .map(x => {
+        const xs = slug(x.id || "");
+        let score = 0;
+        if (xs.startsWith(s) || s.startsWith(xs)) score += 50;
+        if (xs.includes(s) || s.includes(xs)) score += 30;
+        const common = [...new Set(s.split("-"))].filter(p=>p&&xs.includes(p)).length;
+        score += common*10;
+        return { x, score };
+      })
+      .sort((a,b)=>b.score-a.score).slice(0,6).map(o=>o.x);
+  }
+
+  // book_ref → /#/book/:chapter
+  function bookRefSlug(ref){
+    if (!ref || typeof ref !== "string") return null;
+    const r = ref.replace(/[״׳]/g,"").trim();
+    const m = r.match(/^(?:מלכים|מל)\s*(א|ב)\s+([א-ת0-9א-ת]+)/);
+    if (!m) return null;
+    return `melachim-${m[1]}-${m[2]}`;
+  }
+  function BookRefLink({ ref }){
+    const h = bookRefSlug(ref);
+    if (!h) return <span>{ref}</span>;
+    return <a href={`#/book/${h}`} className="text-on-parchment-accent underline hover:opacity-80" title={`פתח ${ref}`}>{ref}</a>;
+  }
+
+  function Chip({ type, id, label, setRoute }){
+    const EL = window.EntityLinkComponent;
+    if (!EL) return <span className="kt-chip">{label || id}</span>;
+    return <EL type={type} id={id} label={label} setRoute={setRoute}/>;
+  }
+  function ChipList({ ids, type, setRoute }){
+    if (!Array.isArray(ids) || !ids.length) return null;
     return (
       <div className="flex flex-wrap gap-0">
-        {items.map((raw, i) => {
-          const id    = typeof raw === "string" ? raw : (raw && raw.id);
-          const label = typeof raw === "string"
-            ? null
-            : (raw && (raw.name_niqqud || raw.name || raw.label || raw.title)) || null;
+        {ids.map((raw,i)=>{
+          const id = typeof raw==="string" ? raw : (raw && raw.id);
           if (!id) return null;
-          if (!EL) {
-            return <span key={i+":"+id} className="px-2 py-0.5 mr-1 mb-1 text-xs text-on-parchment-muted">{label || id}</span>;
-          }
-          return <EL key={i+":"+id} type={type} id={id} label={label} setRoute={setRoute}/>;
+          const label = typeof raw==="object" ? (raw.label||raw.name||raw.name_niqqud) : null;
+          return <Chip key={i+":"+id} type={type} id={id} label={label} setRoute={setRoute}/>;
         })}
       </div>
     );
   }
 
-  function Section({ title, items, type, setRoute }){
-    if (!Array.isArray(items) || items.length === 0) return null;
+  function Section({ title, children, tone }){
+    const cls = tone === "parchment" ? "parchment rounded-2xl p-5 md:p-6" : "card rounded-2xl p-4 md:p-5";
     return (
-      <section>
-        <h3 className="text-xs font-bold text-on-parchment mb-2">{title}</h3>
-        <EntityList items={items} type={type} setRoute={setRoute}/>
+      <section className={cls}>
+        {title && <h2 className="font-display text-base md:text-lg font-bold text-on-parchment-accent mb-3 hebrew">{title}</h2>}
+        {children}
       </section>
     );
   }
 
-  function EventPage(props){
-    const id = props && props.id;
-    const setRoute = props && props.setRoute;
-    const ev = (window.EVENTS_DATA || []).find(x => x.id === id) || null;
-    const hasData = !!ev;
+  function StickyHeader({ crumb, setRoute }){
+    const goBack = () => {
+      try { if (window.history.length > 1) return window.history.back(); } catch {}
+      if (setRoute) setRoute({ page: "home" });
+    };
+    return (
+      <div className="sticky top-0 z-30 backdrop-blur bg-[var(--bg-surface,#0A1628)]/85 border-b border-amber-500/20 px-3 py-2 flex items-center justify-between">
+        <nav className="text-xs md:text-sm hebrew text-on-parchment-muted truncate">
+          <a href="#/home" className="hover:text-on-parchment-accent">ראשי</a>
+          <span className="mx-2 opacity-60">›</span>
+          <a href="#/study" className="hover:text-on-parchment-accent">{crumb.section}</a>
+          <span className="mx-2 opacity-60">›</span>
+          <span className="text-on-parchment-accent font-bold">{crumb.leaf}</span>
+        </nav>
+        <button onClick={goBack}
+          className="shrink-0 px-3 py-1.5 rounded-lg border border-amber-500/40 text-on-parchment-accent text-sm font-bold hover:bg-amber-500/10">
+          ← חזור
+        </button>
+      </div>
+    );
+  }
 
-    const go = (page, extra) => setRoute && setRoute({ page, ...(extra||{}) });
+  function Hero({ title, subtitle, breadthIds, setRoute }){
+    return (
+      <header className="px-4 md:px-6 pt-5 pb-4">
+        <div className="text-xs text-on-parchment-muted mb-1">⚔️ אירוע</div>
+        <h1 className="font-display text-3xl md:text-5xl font-black text-on-parchment-accent hebrew leading-tight"
+            style={{textShadow:"0 2px 8px rgba(200,155,60,.15)"}}>
+          {title}
+        </h1>
+        {subtitle && <div className="text-sm md:text-base text-on-parchment mt-2 hebrew">{subtitle}</div>}
+        {Array.isArray(breadthIds) && breadthIds.length>0 && (
+          <div className="mt-3"><ChipList ids={breadthIds} type="breadth" setRoute={setRoute}/></div>
+        )}
+      </header>
+    );
+  }
+
+  function NotFound({ id, setRoute }){
+    const suggestions = useMemo(()=>nearestEvents(id), [id]);
+    return (
+      <div className="min-h-screen flex flex-col">
+        <StickyHeader crumb={{section:"אירועים", leaf:"לא נמצא"}} setRoute={setRoute}/>
+        <div className="max-w-3xl mx-auto w-full px-4 py-8 space-y-6">
+          <div className="parchment rounded-2xl p-6 text-center">
+            <div className="text-5xl mb-3">🔎</div>
+            <h2 className="font-display text-xl text-amber-900 font-bold mb-2">אירוע לא נמצא</h2>
+            <div className="text-sm text-amber-800">מזהה שחיפשת: <code className="px-2 py-0.5 bg-black/5 rounded">{id||"—"}</code></div>
+          </div>
+          {suggestions.length>0 && (
+            <Section title="💡 אירועים דומים">
+              <ChipList ids={suggestions.map(s=>s.id)} type="event" setRoute={setRoute}/>
+            </Section>
+          )}
+          <button onClick={()=>setRoute && setRoute({page:"home"})}
+            className="w-full gold-btn py-3 rounded-xl font-bold">חזרה לדף הראשי</button>
+        </div>
+      </div>
+    );
+  }
+
+  function EventPage({ id, setRoute }){
+    const ev = useMemo(()=>resolveEvent(id), [id]);
+    if (!ev || ev.__stub) return <NotFound id={id} setRoute={setRoute}/>;
+
+    const title = ev.title_niqqud || ev.title || ev.name_hebrew || ev.id;
+    const subtitleBits = [
+      ev.unit != null ? `יחידה ${ev.unit}` : null,
+      ev.chapter_ref || ev.chapters || null,
+      ev.date_bce != null ? `~${ev.date_bce} לפנה״ס` : null,
+    ].filter(Boolean);
+
+    const participants = ev.participants || [];
+    const places = ev.places || [];
+    const relatedChars = ev.related_characters || [];
+    const relatedBreadth = ev.related_breadth || [];
+    const relatedRecurring = ev.related_recurring_items || [];
+    const bookRefs = ev.book_refs || [];
 
     const onPractice = () => {
-      const detail = { type: "event", id: (ev && ev.id) || id };
-      try { window.dispatchEvent(new CustomEvent("practice-entity", { detail })); } catch {}
-      go("quiz");
+      try { window.dispatchEvent(new CustomEvent("practice-entity", {detail:{type:"event", id:ev.id}})); } catch {}
+      setRoute && setRoute({page:"quiz"});
     };
 
-    const headingLabel = (ev && (ev.title_niqqud || ev.title || ev.name_hebrew)) || id || "אירוע";
-    const bookRefs = (ev && Array.isArray(ev.book_refs)) ? ev.book_refs : [];
-
     return (
-      <div className="max-w-2xl mx-auto space-y-4 p-2">
-        <button onClick={()=>go("study")} className="text-on-parchment-accent text-sm">→ חזרה לאזור הלימוד</button>
+      <div className="min-h-screen flex flex-col">
+        <StickyHeader crumb={{section:"אירועים", leaf:title}} setRoute={setRoute}/>
+        <main className="max-w-3xl mx-auto w-full pb-24">
+          <Hero title={title} subtitle={subtitleBits.join(" · ")} breadthIds={relatedBreadth} setRoute={setRoute}/>
 
-        <header className="card rounded-2xl p-5">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent hebrew">
-            ⚔️ {headingLabel}
-          </h1>
-          <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
-            {ev && ev.unit != null && <span className="px-2 py-0.5 rounded-full bg-amber-700 text-on-parchment-muted font-bold">יחידה {ev.unit}</span>}
-            {ev && (ev.chapter_ref || ev.chapters) && <span className="text-on-parchment">{ev.chapter_ref || ev.chapters}</span>}
-            {ev && ev.date_bce != null && <span className="text-on-parchment-muted">~{ev.date_bce} לפנה״ס</span>}
+          <div className="px-4 md:px-6 space-y-4">
+            {ev.summary && (
+              <Section title="📖 תקציר" tone="parchment">
+                <p className="hebrew text-amber-950 leading-relaxed whitespace-pre-line">{ev.summary}</p>
+              </Section>
+            )}
+
+            {ev.significance && (
+              <Section title="✨ משמעות">
+                <p className="hebrew text-on-parchment leading-relaxed">{ev.significance}</p>
+              </Section>
+            )}
+
+            {(participants.length>0 || places.length>0 || relatedChars.length>0 || relatedRecurring.length>0) && (
+              <Section title="🔗 קשרים">
+                {participants.length>0 && (
+                  <div className="mb-2">
+                    <div className="text-xs text-on-parchment-muted mb-1">👤 דמויות באירוע</div>
+                    <ChipList ids={participants} type="character" setRoute={setRoute}/>
+                  </div>
+                )}
+                {relatedChars.length>0 && (
+                  <div className="mb-2">
+                    <div className="text-xs text-on-parchment-muted mb-1">👤 דמויות קשורות</div>
+                    <ChipList ids={relatedChars} type="character" setRoute={setRoute}/>
+                  </div>
+                )}
+                {places.length>0 && (
+                  <div className="mb-2">
+                    <div className="text-xs text-on-parchment-muted mb-1">📍 מקומות</div>
+                    <ChipList ids={places} type="place" setRoute={setRoute}/>
+                  </div>
+                )}
+                {relatedRecurring.length>0 && (
+                  <div className="mb-2">
+                    <div className="text-xs text-on-parchment-muted mb-1">🔁 פריטים חוזרים</div>
+                    <ChipList ids={relatedRecurring} type="recurring" setRoute={setRoute}/>
+                  </div>
+                )}
+              </Section>
+            )}
+
+            {bookRefs.length>0 && (
+              <Section title="📚 מקורות בספר מלכים">
+                <ul className="text-sm hebrew text-on-parchment-muted" style={{columnCount:2, columnGap:20, listStyle:"none", padding:0, margin:0}}>
+                  {bookRefs.map((r,i)=><li key={i} style={{breakInside:"avoid", marginBottom:4}}>• <BookRefLink ref={r}/></li>)}
+                </ul>
+              </Section>
+            )}
+
+            <button onClick={onPractice}
+              className="w-full gold-btn py-3 rounded-xl text-base font-bold mt-4">
+              ⚔️ תרגל על אירוע זה
+            </button>
           </div>
-        </header>
-
-        {!hasData && (
-          <div className="card rounded-xl p-4 text-on-parchment-muted text-sm">
-            יוצג בקרוב · האירוע <code>{id}</code> טרם הוזן ל-<code>window.EVENTS_DATA</code>.
-          </div>
-        )}
-
-        {ev && ev.summary && (
-          <section className="parchment rounded-2xl p-5">
-            <h2 className="font-display text-base font-bold text-amber-900 mb-2">תקציר</h2>
-            <p className="hebrew text-amber-950 leading-relaxed">{ev.summary}</p>
-          </section>
-        )}
-
-        {ev && ev.significance && (
-          <section className="card rounded-xl p-4">
-            <h2 className="font-display text-base font-bold text-on-parchment mb-2">משמעות</h2>
-            <p className="hebrew text-on-parchment-muted leading-relaxed">{ev.significance}</p>
-          </section>
-        )}
-
-        {ev && <Section title="👤 דמויות באירוע"       items={ev.participants}             type="character" setRoute={setRoute}/>}
-        {ev && <Section title="👤 דמויות קשורות"       items={ev.related_characters}       type="character" setRoute={setRoute}/>}
-        {ev && <Section title="📍 מקומות"              items={ev.places}                   type="place"     setRoute={setRoute}/>}
-        {ev && <Section title="🌐 נושאי רוחב"          items={ev.related_breadth}          type="breadth"   setRoute={setRoute}/>}
-        {ev && <Section title="🔁 פריטים חוזרים"       items={ev.related_recurring_items}  type="recurring" setRoute={setRoute}/>}
-
-        {bookRefs.length > 0 && (
-          <section className="card rounded-xl p-4">
-            <h3 className="text-xs font-bold text-on-parchment mb-2">📚 מקורות בספר מלכים</h3>
-            <ul className="text-sm text-on-parchment-muted hebrew" style={{columnCount:2,columnGap:18,listStyle:'none',padding:0,margin:0}}>
-              {bookRefs.map((r,i)=><li key={i} style={{breakInside:'avoid',marginBottom:4}}>• {r}</li>)}
-            </ul>
-          </section>
-        )}
-
-        {hasData && (
-          <button onClick={onPractice} className="gold-btn w-full py-3 rounded-xl text-base font-bold">
-            ⚔️ תרגל על אירוע זה
-          </button>
-        )}
+        </main>
       </div>
     );
   }

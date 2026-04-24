@@ -1,381 +1,306 @@
 /* =========================================================================
-   CharacterPage — full-page view for a biblical character/king/prophet.
-   Reachable via route {page:'character', id}. Uses window.__ENTITY_INDEX__
-   when available; falls back to KingsUtils fallback tables (prophets, kings
-   from MELAKHIM_DATA.timeline). NO emoji status — relies on color classes.
+   CharacterPage — /character/:id · full-screen rich view
+   ---------------------------------------------------------------------------
+   Structure:
+     STICKY HEADER: back button + breadcrumb (ראשי › דמויות › {name})
+     HERO:         name_niqqud · role/kingdom/era · breadth-topic chips
+     BODY:         תקציר · תפקיד · ציטוטים · קשרים · מקורות
+   Data:           window.CHARACTERS_DATA (union with kings.js via
+                   alias resolver + slug-swap in components/EntityLink.js).
+   No "יוצג בקרוב" fallback: unresolved ids show alias suggestions.
    Exposes: window.CharacterPageComponent
    ========================================================================= */
 (function(){
   const { useMemo } = React;
 
-  const stripTokens = (t) => {
-    if (window.KingsUtils && window.KingsUtils.stripTokens) return window.KingsUtils.stripTokens(t);
-    if (typeof t !== 'string') return t || '';
-    return t.replace(/\{\{[a-zA-Zא-ת_]+:[^|}]+\|([^}]+)\}\}/g, '$1');
-  };
-
-  // If index.html has exposed window.parseTokens (bridged from its Babel app
-  // block), use it so {{type:id|Display}} tokens in bios render as clickable
-  // EntityChips. Otherwise fall back to plain unwrapped text.
-  const renderText = (t) => {
-    if (typeof t !== 'string' || !t) return t || '';
-    if (t.indexOf('{{') < 0) return t;
-    if (typeof window.parseTokens === 'function') {
-      try { return window.parseTokens(t); } catch(e) {}
-    }
-    return stripTokens(t);
-  };
-
-  function findKingByName(name){
-    try{
-      const tl = (typeof MELAKHIM_DATA !== 'undefined') ? (MELAKHIM_DATA.timeline||[]) : [];
-      const i = tl.findIndex(k => k.name === name);
-      if (i < 0) return null;
-      const k = tl[i];
-      return { id:'tl-'+i+'-'+k.name.replace(/\s/g,'-'), name:k.name, dynasty:k.dynasty, good:k.good, years:k.years, period:k.period, notes:k.notes };
-    }catch(e){ return null; }
+  // ---- shared utilities ---------------------------------------------------
+  function slug(s){
+    if (!s || typeof s !== "string") return "";
+    return s.trim().toLowerCase().replace(/[\s_]+/g, "-").replace(/[^֐-׿a-z0-9-]/g, "");
   }
 
-  function allKings(){
-    const idx = (window.__ENTITY_INDEX__ || {});
-    const live = idx.king ? Object.values(idx.king) : [];
-    if (live.length) return live.map(k => ({
-      id:k.id, name:k.name||k.heading||k.id,
-      dynasty: k.kingdom==='israel' ? 'ישראל' : (k.kingdom==='judah' ? 'יהודה' : (k.dynasty||'יהודה')),
-      good: k.assessment==='righteous' ? true : (k.assessment==='wicked' ? false : !!k.good),
-      years:k.reign_years||k.years||'', period:k.period||'', notes:k.summary||k.notes||''
-    }));
-    const tl = (typeof MELAKHIM_DATA !== 'undefined') ? (MELAKHIM_DATA.timeline||[]) : [];
-    return tl.map((k,i)=>({ id:'tl-'+i+'-'+k.name.replace(/\s/g,'-'), ...k }));
-  }
-
-  function resolveCharacter(id){
-    // Primary source: window.CHARACTERS_DATA (data/characters.js v2)
-    const cd = Array.isArray(window.CHARACTERS_DATA) ? window.CHARACTERS_DATA : [];
-    const fromData = cd.find(x => x && x.id === id);
-    if (fromData) return fromData;
-    const KU = window.KingsUtils;
-    if (KU && KU.getCharacter){
-      const c = KU.getCharacter(id);
-      if (c) return c;
+  function resolveEntry(id){
+    if (!id) return null;
+    const cd = (window.CHARACTERS_DATA || []);
+    const ks = (window.KINGS_DATA || (window.kings /* legacy */) || []);
+    const pool = [...cd, ...(Array.isArray(ks)?ks:[])];
+    const direct = pool.find(x => x && x.id === id);
+    if (direct) return direct;
+    // alias map (same strategy as EntityLink resolver)
+    const aliases = (window.__ENTITY_ALIASES__ || {});
+    const maps = [aliases.character, aliases.king].filter(Boolean);
+    for (const m of maps) {
+      if (Object.prototype.hasOwnProperty.call(m, id)) {
+        const aliased = m[id];
+        if (aliased === null) return { id, __stub: true };
+        if (typeof aliased === "string") {
+          const hit = pool.find(x => x && x.id === aliased);
+          if (hit) return hit;
+        }
+      }
     }
-    // fallback: kings timeline by id
-    const k = allKings().find(k => k.id === id);
-    if (k) return { id:k.id, name:k.name, role:'מלך', kingdom:k.dynasty, era:k.years ? (k.years+' שנות מלוכה') : '', bio:'', _king:k };
+    // underscore↔dash swap
+    const swapped = id.indexOf("_")>=0 ? id.replace(/_/g,"-") : id.replace(/-/g,"_");
+    const swap = pool.find(x => x && x.id === swapped);
+    if (swap) return swap;
     return null;
   }
 
-  function KingAssess({k}){
-    const KU = window.KingsUtils;
-    const col = (KU && KU.assessmentColor) ? KU.assessmentColor(k) : {cls:'assess-mixed',hex:'#8b6d2d'};
-    const lbl = col.cls==='assess-tzadik'?'צדיק':col.cls==='assess-rasha'?'רשע':'מעורב';
-    return <span className={"kt-assess-pill " + col.cls} style={{marginInlineStart:8}}>{lbl}</span>;
-  }
-
-  const ROLE_LABEL = {
-    'נביא':'נביא', 'prophet':'נביא', 'queen':'מלכה', 'אשה':'אשה',
-    'king':'מלך', 'מלך':'מלך', 'פקיד':'פקיד', 'עם':'זר/עם',
-  };
-  function RoleBadge({role}){
-    if (!role) return null;
-    const label = ROLE_LABEL[role] || role;
-    return <span className="kt-assess-pill assess-mixed" style={{marginInlineStart:8,background:'rgba(139,111,31,.18)',color:'#3a2a0d'}}>{label}</span>;
-  }
-  function EraBadge({era}){
-    if (era == null || era === '') return null;
-    const n = typeof era === 'number' ? era : parseInt(era,10);
-    const label = Number.isFinite(n) ? ('יחידה ' + n) : ('יחידה ' + era);
-    return <span className="kt-assess-pill assess-mixed" style={{marginInlineStart:6,background:'rgba(200,155,60,.22)',color:'#5a3d0d'}}>{label}</span>;
-  }
-
-  function Chip({label, onClick, tone}){
-    const cls = tone ? ('kt-chip kt-chip-'+tone) : 'kt-chip';
-    return <button className={cls} onClick={onClick}>{label}</button>;
-  }
-
-  // Entity-index-driven chip. Uses window.EntityLinkComponent (PR #34) when
-  // the id resolves against window.__ENTITY_INDEX__[type]; otherwise falls
-  // back to a disabled span with "(אין דף עדיין)" tooltip.
-  function renderEntity(type, id, label, className, setRoute, key){
-    const idx    = (typeof window !== 'undefined' && window.__ENTITY_INDEX__) || {};
-    const bucket = idx[type] || (type === 'king' ? (idx.king || idx.character) : null);
-    const exists = !!(bucket && id && bucket[id]);
-    const EL     = typeof window !== 'undefined' ? window.EntityLinkComponent : null;
-    const k      = key != null ? key : (type + ':' + id);
-    if (exists && EL) {
-      return <EL key={k} type={type} id={id} label={label} setRoute={setRoute} className={className}/>;
-    }
-    return <span key={k} className={(className||'kt-chip')+' kt-chip-missing'} title="(אין דף עדיין)" aria-label={(label||id)+' — (אין דף עדיין)'}>{label || id}</span>;
-  }
-
-  function Section({title, children}){
-    if (!children || (Array.isArray(children) && children.every(x=>!x))) return null;
-    return <div className="kt-sect"><div className="kt-sect-h">{title}</div>{children}</div>;
-  }
-
-  function CharacterPage({ id, setRoute }){
-    const c = useMemo(() => resolveCharacter(id), [id]);
-    const KU = window.KingsUtils;
-    const kings = useMemo(() => allKings(), [id]);
-
-    if (!c){
-      return (
-        <div className="max-w-3xl mx-auto space-y-4">
-          <button onClick={()=>setRoute({page:'timeline'})} className="text-on-parchment-accent text-sm">→ חזרה לציר המלכים</button>
-          <div className="parchment rounded-2xl p-6 text-center">
-            <div style={{fontSize:42,marginBottom:6}}>📜</div>
-            <div className="font-bold text-amber-900">דמות לא נמצאה</div>
-            <div className="text-amber-800 text-sm mt-2">מזהה: <code>{id||'—'}</code></div>
-          </div>
-        </div>
-      );
-    }
-
-    const isKing = !!c._kingsData || !!c._king || /מלך|king/i.test(c.role||'');
-    // Real king row from kings.js — the character IS the king, so pass `c` itself.
-    const k = c._kingsData ? c : (c._king || (kings.find(x => x.id === c.id) || null));
-
-    const prophets = (k && KU && KU.prophets_by_reign) ? KU.prophets_by_reign(Object.values((window.__ENTITY_INDEX__||{}).character||{}), k) : [];
-    const foreign  = (k && KU && KU.foreign_event_for) ? KU.foreign_event_for(k) : null;
-    const killedBy = (k && KU) ? KU.killed_by(kings, k.id) : [];
-    const killedOf = (k && KU) ? KU.killed(kings, k.id)    : [];
-
-    const dyn = (k && KU && KU.dynastyBadge) ? KU.dynastyBadge(k) : null;
-    const bioRaw = c.short_summary || c.bio || c.summary || c.description || '';
-    const bio = stripTokens(bioRaw);
-    const assessmentQuote = c.assessment_quote || '';
-    const succession = c.succession_type || '';
-    const bookPage = c.book_page || null;
-    const reignYears = (c.reign_years != null) ? c.reign_years : null;
-    const quotesBy = c.quotes_by || c.quotes || [];
-    const quotesTo = c.quotes_to || [];
-    // related_prophets/places/events may be arrays of string IDs (kings.js)
-    // or arrays of {id,label} (legacy). Normalize to {id,label}.
-    const idx = (window.__ENTITY_INDEX__ || {});
-    const labelForId = (id, bucket) => {
-      const b = idx[bucket] || {};
-      const entry = b[id];
-      if (!entry) return id;
-      return entry.name_niqqud || entry.heading || entry.name || entry.title || id;
-    };
-    const toChips = (raw, bucket) => (raw || []).map(v => {
-      if (v && typeof v === 'object') return { id: v.id || v.label, label: v.label || v.name || v.id };
-      return { id: v, label: labelForId(v, bucket) };
+  function nearestSuggestions(id){
+    const pool = [...(window.CHARACTERS_DATA || []), ...(Array.isArray(window.KINGS_DATA)?window.KINGS_DATA:[])];
+    if (!id || !pool.length) return pool.slice(0, 5);
+    const s = slug(id);
+    const scored = pool.map(x => {
+      const xs = slug(x.id || "");
+      let score = 0;
+      if (xs.startsWith(s) || s.startsWith(xs)) score += 50;
+      if (xs.includes(s) || s.includes(xs)) score += 30;
+      const common = [...new Set(s.split("-"))].filter(p => p && xs.includes(p)).length;
+      score += common * 10;
+      return { x, score };
     });
-    const prophetChips = toChips(c.related_prophets || [], 'character');
-    const placeChips   = toChips(c.related_places   || c.places || [], 'archaeology');
-    const eventChips   = toChips(c.related_events   || c.events || [], 'story');
-    const labelForKing = (kid) => {
-      const row = kings.find(x => x.id === kid);
-      return row ? (row.name_niqqud || row.name || kid) : kid;
-    };
-    const kingChips = (c.related_kings || []).map(v =>
-      (v && typeof v==='object') ? {id:v.id||v.label, label:v.label||v.name||v.id} : {id:v, label:labelForKing(v)}
-    );
-    const charChips = toChips(c.related_characters || [], 'character');
-    const keyQuotes = c.key_quotes || [];
-    const bookRefs  = c.book_refs  || [];
-    const significance = c.significance || '';
-    const breadth  = c.breadth_topics || c.breadth || [];
-    const units    = c.units || (c.unit ? [c.unit] : []);
+    return scored.sort((a,b)=>b.score-a.score).slice(0, 6).map(o=>o.x);
+  }
 
-    const goChar  = (cid) => setRoute({page:'character', id:cid});
-    const goPlace = (pid) => setRoute({page:'place',     id:pid});
-    const goEvent = (eid) => setRoute({page:'event',     id:eid});
-    const firePractice = () => {
-      try{ window.dispatchEvent(new CustomEvent('practice-entity', {detail:{type:(isKing?'king':'character'), id:c.id}})); }catch(e){}
-    };
+  // ---- book_ref → /#/book/:chapter link ----------------------------------
+  // Accepts forms like "מלכים א ג ט" / "מל״א ג׳ ט" / "2Kings 21:13".
+  function bookRefSlug(ref){
+    if (!ref || typeof ref !== "string") return null;
+    // Extract book marker (א/ב) and chapter number (Hebrew letters or digits).
+    const r = ref.replace(/[״׳]/g, "").trim();
+    // "מלכים א ג ט" or "מל״א ג׳ ט" → melachim-a-3 (or keep Hebrew: melachim-א-ג)
+    const m = r.match(/^(?:מלכים|מל)\s*(א|ב)\s+([א-ת0-9א-ת]+)/);
+    if (!m) return null;
+    return `melachim-${m[1]}-${m[2]}`;
+  }
 
+  function BookRefLink({ ref }){
+    const h = bookRefSlug(ref);
+    if (!h) return <span>{ref}</span>;
     return (
-      <div className="max-w-3xl mx-auto space-y-4">
-        <button onClick={()=>setRoute({page:'timeline'})} className="text-on-parchment-accent text-sm">→ חזרה לציר המלכים</button>
+      <a href={`#/book/${h}`}
+         className="text-on-parchment-accent underline hover:opacity-80"
+         title={`פתח ${ref} בתנ״ך`}>
+        {ref}
+      </a>
+    );
+  }
 
-        <div className="parchment rounded-2xl p-5 md:p-6">
-          <div className="flex items-start justify-between flex-wrap gap-2">
-            <div>
-              <h1 className="font-display text-2xl md:text-3xl font-black text-amber-900 hebrew">
-                {c.name_niqqud || c.name || c.heading || c.id}
-                {isKing && k && <KingAssess k={k}/>}
-                {!isKing && <RoleBadge role={c.role}/>}
-                <EraBadge era={c.era}/>
-              </h1>
-              <div className="text-amber-800 text-sm mt-1">
-                {c.kingdom && <span>{c.kingdom}</span>}
-                {reignYears != null && <span> · {reignYears} שנות מלוכה</span>}
-                {dyn && dyn.name && <span> · {dyn.name}</span>}
-                {succession && <span> · {succession}</span>}
-                {bookPage != null && <span> · עמוד {bookPage}</span>}
-              </div>
-              {units && units.length>0 && <div className="text-xs text-amber-700 mt-1">יחידות: {units.join(', ')}</div>}
-            </div>
-            <button onClick={firePractice} className="gold-btn px-4 py-2 rounded-xl font-bold">⚔️ תרגל על דמות זו</button>
+  // ---- EntityLink chip wrapper ------------------------------------------
+  function Chip({ type, id, label, setRoute }){
+    const EL = window.EntityLinkComponent;
+    if (!EL) return <span className="kt-chip">{label || id}</span>;
+    return <EL type={type} id={id} label={label} setRoute={setRoute}/>;
+  }
+  function ChipList({ ids, type, setRoute }){
+    if (!Array.isArray(ids) || !ids.length) return null;
+    return (
+      <div className="flex flex-wrap gap-0">
+        {ids.map((raw,i)=>{
+          const id = typeof raw==="string" ? raw : (raw && raw.id);
+          if (!id) return null;
+          const label = typeof raw==="object" ? (raw.label||raw.name||raw.name_niqqud) : null;
+          return <Chip key={i+":"+id} type={type} id={id} label={label} setRoute={setRoute}/>;
+        })}
+      </div>
+    );
+  }
+
+  // ---- Section ----------------------------------------------------------
+  function Section({ title, children, tone }){
+    const cls = tone === "parchment"
+      ? "parchment rounded-2xl p-5 md:p-6"
+      : "card rounded-2xl p-4 md:p-5";
+    return (
+      <section className={cls}>
+        {title && <h2 className="font-display text-base md:text-lg font-bold text-on-parchment-accent mb-3 hebrew">{title}</h2>}
+        {children}
+      </section>
+    );
+  }
+
+  // ---- Sticky header ----------------------------------------------------
+  function StickyHeader({ crumb, setRoute }){
+    const goBack = () => {
+      try { if (window.history.length > 1) return window.history.back(); } catch {}
+      if (setRoute) setRoute({ page: "home" });
+    };
+    return (
+      <div className="sticky top-0 z-30 backdrop-blur bg-[var(--bg-surface,#0A1628)]/85 border-b border-amber-500/20 px-3 py-2 flex items-center justify-between">
+        <nav className="text-xs md:text-sm hebrew text-on-parchment-muted truncate">
+          <a href="#/home" className="hover:text-on-parchment-accent">ראשי</a>
+          <span className="mx-2 opacity-60">›</span>
+          <a href="#/study" className="hover:text-on-parchment-accent">{crumb.section}</a>
+          <span className="mx-2 opacity-60">›</span>
+          <span className="text-on-parchment-accent font-bold">{crumb.leaf}</span>
+        </nav>
+        <button onClick={goBack}
+          className="shrink-0 px-3 py-1.5 rounded-lg border border-amber-500/40 text-on-parchment-accent text-sm font-bold hover:bg-amber-500/10">
+          ← חזור
+        </button>
+      </div>
+    );
+  }
+
+  // ---- Hero ------------------------------------------------------------
+  function Hero({ name_niqqud, subtitle, breadthIds, setRoute }){
+    return (
+      <header className="px-4 md:px-6 pt-5 pb-4">
+        <h1 className="font-display text-3xl md:text-5xl font-black text-on-parchment-accent hebrew leading-tight"
+            style={{textShadow:"0 2px 8px rgba(200,155,60,.15)"}}>
+          {name_niqqud}
+        </h1>
+        {subtitle && <div className="text-sm md:text-base text-on-parchment mt-2 hebrew">{subtitle}</div>}
+        {Array.isArray(breadthIds) && breadthIds.length>0 && (
+          <div className="mt-3">
+            <ChipList ids={breadthIds} type="breadth" setRoute={setRoute}/>
           </div>
+        )}
+      </header>
+    );
+  }
 
-          {assessmentQuote && (
-            <blockquote
-              className="hebrew"
-              style={{
-                marginTop:14, marginBottom:0,
-                padding:'10px 14px',
-                borderInlineStart:'4px solid #8B6F1F',
-                background:'rgba(212,165,116,.18)',
-                borderRadius:8,
-                fontFamily:"'Frank Ruhl Libre', serif",
-                fontSize:15, lineHeight:1.7,
-                color:'#3a2a0d'
-              }}
-            >
-              {assessmentQuote}
-            </blockquote>
-          )}
-        </div>
-
-        <div className="kt-expanded rounded-2xl" style={{border:'1px solid rgba(212,165,116,.25)'}}>
-          {bioRaw && (
-            <Section title="📖 ביוגרפיה">
-              <p className="kt-bio hebrew">{renderText(bioRaw)}</p>
+  // ---- Not-found state with suggestions -------------------------------
+  function NotFound({ id, setRoute }){
+    const suggestions = useMemo(()=>nearestSuggestions(id), [id]);
+    return (
+      <div className="min-h-screen flex flex-col">
+        <StickyHeader crumb={{section:"דמויות", leaf:"לא נמצא"}} setRoute={setRoute}/>
+        <div className="max-w-3xl mx-auto w-full px-4 py-8 space-y-6">
+          <div className="parchment rounded-2xl p-6 text-center">
+            <div className="text-5xl mb-3">🔎</div>
+            <h2 className="font-display text-xl text-amber-900 font-bold mb-2">דמות לא נמצאה</h2>
+            <div className="text-sm text-amber-800">מזהה שחיפשת: <code className="px-2 py-0.5 bg-black/5 rounded">{id||"—"}</code></div>
+          </div>
+          {suggestions.length>0 && (
+            <Section title="💡 דמויות דומות">
+              <ChipList ids={suggestions.map(s=>s.id)} type="character" setRoute={setRoute}/>
             </Section>
           )}
-          {k && k.notes && !bioRaw && <Section title="📖 תקציר"><p className="kt-bio hebrew">{renderText(k.notes)}</p></Section>}
-
-          {c.key_actions && c.key_actions.length>0 && (
-            <Section title="⚡ מעשים מרכזיים">
-              <ul className="kt-actions">{c.key_actions.map((a,i)=><li key={i}>{renderText(a)}</li>)}</ul>
-            </Section>
-          )}
-
-          {prophets.length>0 && (
-            <Section title="🔮 נביאים בעת מלכותו">
-              <div className="kt-chips">{prophets.map(p => renderEntity('character', p.id, p.name, 'kt-chip kt-chip-prophet', setRoute))}</div>
-            </Section>
-          )}
-
-          {foreign && (
-            <Section title="🌍 מעצמות זרות">
-              <div className="kt-foreign-chip">{foreign.name} ({foreign.empire}) — {foreign.event} · {foreign.book_ref}</div>
-            </Section>
-          )}
-
-          {(killedBy.length>0 || killedOf.length>0) && (
-            <Section title="⚔️ קשרי רצח">
-              {killedBy.length>0 && (
-                <div className="kt-kill-row">
-                  <span className="kt-kill-row-label">נהרג על ידי:</span>
-                  {killedBy.map((p,i)=>(
-                    <span key={i} className="kt-kill-chip" onClick={()=>p.killer_id && goChar(p.killer_id)}>
-                      {p.killer_name}{p.note?` (${p.note})`:''}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {killedOf.length>0 && (
-                <div className="kt-kill-row">
-                  <span className="kt-kill-row-label">הרג את:</span>
-                  {killedOf.map((p,i)=>(
-                    <span key={i} className="kt-kill-chip" onClick={()=>goChar(p.victim_id)}>{p.victim_name}</span>
-                  ))}
-                </div>
-              )}
-            </Section>
-          )}
-
-          {keyQuotes.length>0 && (
-            <Section title="💬 ציטוטים מרכזיים (מי אמר למי)">
-              <div style={{display:'flex',flexDirection:'column',gap:8}}>
-                {keyQuotes.map((q,i)=>(
-                  <blockquote key={i} className="hebrew" style={{margin:0,padding:'10px 14px',borderInlineStart:'3px solid #8B6F1F',background:'rgba(212,165,116,.15)',borderRadius:6,fontFamily:"'Frank Ruhl Libre', serif",fontSize:15,lineHeight:1.75,color:'#3a2a0d'}}>
-                    {typeof q === 'string' ? q : (q.text || q.ref || '')}
-                  </blockquote>
-                ))}
-              </div>
-            </Section>
-          )}
-
-          {quotesBy.length>0 && (
-            <Section title="💬 ציטוטים שאמר/ה">
-              <div style={{display:'flex',flexDirection:'column',gap:6}}>
-                {quotesBy.map((q,i)=>(
-                  <div key={i} className="kt-quote-cite">
-                    <div>„{renderText(q.text || q)}"</div>
-                    {q.ref && <div style={{fontSize:11,opacity:.7,marginTop:3}}>{q.ref}</div>}
-                  </div>
-                ))}
-              </div>
-            </Section>
-          )}
-
-          {quotesTo.length>0 && (
-            <Section title="💬 ציטוטים שנאמרו אליו/אליה">
-              <div style={{display:'flex',flexDirection:'column',gap:6}}>
-                {quotesTo.map((q,i)=>(
-                  <div key={i} className="kt-quote-cite">
-                    <div>„{renderText(q.text || q)}"</div>
-                    {q.ref && <div style={{fontSize:11,opacity:.7,marginTop:3}}>{q.ref}</div>}
-                  </div>
-                ))}
-              </div>
-            </Section>
-          )}
-
-          {prophetChips.length>0 && prophets.length===0 && (
-            <Section title="🔮 נביאים בעת מלכותו">
-              <div className="kt-chips">{prophetChips.map(p => renderEntity('character', p.id, p.label, 'kt-chip kt-chip-prophet', setRoute))}</div>
-            </Section>
-          )}
-
-          {kingChips.length>0 && (
-            <Section title="👑 מלכים קשורים">
-              <div className="kt-chips">{kingChips.map(p => renderEntity('king', p.id, p.label, 'kt-chip kt-chip-amber', setRoute))}</div>
-            </Section>
-          )}
-
-          {charChips.length>0 && (
-            <Section title="👥 דמויות קשורות">
-              <div className="kt-chips">{charChips.map(p => renderEntity('character', p.id, p.label, 'kt-chip kt-chip-cream', setRoute))}</div>
-            </Section>
-          )}
-
-          {placeChips.length>0 && (
-            <Section title="📍 מקומות">
-              <div className="kt-chips">{placeChips.map(p => renderEntity('place', p.id, p.label, 'kt-chip kt-chip-place', setRoute))}</div>
-            </Section>
-          )}
-
-          {eventChips.length>0 && (
-            <Section title="📜 אירועים">
-              <div className="kt-chips">{eventChips.map(p => renderEntity('event', p.id, p.label, 'kt-chip kt-chip-event', setRoute))}</div>
-            </Section>
-          )}
-
-          {bookRefs.length>0 && (
-            <Section title="📚 מקורות בספר מלכים">
-              <ul className="kt-actions" style={{columnCount:2,columnGap:18}}>
-                {bookRefs.map((r,i)=><li key={i} style={{breakInside:'avoid'}}>{r}</li>)}
-              </ul>
-            </Section>
-          )}
-
-          {breadth.length>0 && (
-            <Section title="🌐 נושאי רוחב">
-              <div className="kt-chips">{breadth.map((p,i)=><Chip key={i} label={p.label||p.name||p}/>)}</div>
-            </Section>
-          )}
-
-          {c.tags && c.tags.length>0 && (
-            <Section title="🏷 תגיות">
-              <div className="kt-chips">{c.tags.map((t,i)=><Chip key={i} label={t}/>)}</div>
-            </Section>
-          )}
-
-          {significance && (
-            <Section title="✨ משמעות לספר מלכים">
-              <p className="kt-bio hebrew" style={{fontStyle:'italic',color:'#4a3612'}}>{renderText(significance)}</p>
-            </Section>
-          )}
+          <button onClick={()=>setRoute && setRoute({page:"home"})}
+            className="w-full gold-btn py-3 rounded-xl font-bold">חזרה לדף הראשי</button>
         </div>
       </div>
     );
   }
 
-  window.CharacterPageComponent = CharacterPage;
+  // ---- Main component -------------------------------------------------
+  function CharacterPage({ id, setRoute }){
+    const c = useMemo(()=>resolveEntry(id), [id]);
+    if (!c || c.__stub) return <NotFound id={id} setRoute={setRoute}/>;
+
+    const isKing = /king|מלך/.test(c.role || "") || !!c.kingdom && c.reign_years != null;
+    const name = c.name_niqqud || c.name || c.id;
+
+    const subtitleBits = [
+      c.role,
+      c.kingdom,
+      c.era != null ? `יחידה ${c.era}` : null,
+      c.reign_years != null ? `${c.reign_years} שנות מלוכה` : null,
+      c.dynasty || null,
+    ].filter(Boolean);
+
+    const keyQuotes = Array.isArray(c.key_quotes) ? c.key_quotes : [];
+    const assessQuote = c.assessment_quote || null;
+
+    const relatedChars = c.related_characters || c.related_prophets || [];
+    const relatedKings = c.related_kings || [];
+    const relatedPlaces = c.related_places || [];
+    const relatedEvents = c.related_events || [];
+    const relatedBreadth = c.related_breadth || c.themes || [];
+    const relatedRecurring = c.related_recurring_items || c.recurring_items || [];
+    const bookRefs = c.book_refs || [];
+
+    const bio = c.bio || c.short_summary || c.summary || "";
+    const significance = c.significance || "";
+
+    const onPractice = () => {
+      try { window.dispatchEvent(new CustomEvent("practice-entity", {detail:{type:(isKing?"king":"character"), id:c.id}})); } catch {}
+      setRoute && setRoute({page:"quiz"});
+    };
+
+    return (
+      <div className="min-h-screen flex flex-col">
+        <StickyHeader crumb={{section:"דמויות", leaf:name}} setRoute={setRoute}/>
+
+        <main className="max-w-3xl mx-auto w-full pb-24">
+          <Hero name_niqqud={name} subtitle={subtitleBits.join(" · ")} breadthIds={relatedBreadth} setRoute={setRoute}/>
+
+          <div className="px-4 md:px-6 space-y-4">
+            {significance && (
+              <Section title="✨ משמעות" tone="parchment">
+                <p className="hebrew text-amber-950 leading-relaxed">{significance}</p>
+              </Section>
+            )}
+
+            {bio && (
+              <Section title="📖 תקציר ותפקיד">
+                <p className="hebrew text-on-parchment leading-relaxed whitespace-pre-line">{bio}</p>
+              </Section>
+            )}
+
+            {assessQuote && (
+              <Section title="🏛 פסוק הערכה">
+                <blockquote className="hebrew text-amber-100/90 border-r-4 border-amber-500/60 pr-4 py-1 text-base leading-relaxed">
+                  {assessQuote}
+                </blockquote>
+              </Section>
+            )}
+
+            {keyQuotes.length>0 && (
+              <Section title="💬 ציטוטים חשובים">
+                <div className="space-y-3">
+                  {keyQuotes.slice(0,5).map((q,i)=>{
+                    const text = typeof q === "string" ? q : (q.text || q.text_niqqud || "");
+                    const ref  = typeof q === "object" ? (q.ref || q.book_ref) : null;
+                    return (
+                      <blockquote key={i}
+                        className="hebrew text-on-parchment border-r-4 border-amber-500/50 pr-4 py-1 leading-relaxed"
+                        style={{background:"rgba(212,165,116,.08)", borderRadius:6, padding:"10px 14px"}}>
+                        <div>{text}</div>
+                        {ref && <div className="text-xs text-on-parchment-muted mt-1"><BookRefLink ref={ref}/></div>}
+                      </blockquote>
+                    );
+                  })}
+                </div>
+              </Section>
+            )}
+
+            {c.key_actions && c.key_actions.length>0 && (
+              <Section title="⚡ מעשים מרכזיים">
+                <ul className="list-disc pr-5 space-y-1 text-sm hebrew text-on-parchment">
+                  {c.key_actions.map((a,i)=><li key={i}>{a}</li>)}
+                </ul>
+              </Section>
+            )}
+
+            {(relatedChars.length>0 || relatedKings.length>0 || relatedPlaces.length>0 || relatedEvents.length>0 || relatedRecurring.length>0) && (
+              <Section title="🔗 קשרים">
+                {relatedKings.length>0 && <div className="mb-2"><div className="text-xs text-on-parchment-muted mb-1">👑 מלכים</div><ChipList ids={relatedKings} type="king" setRoute={setRoute}/></div>}
+                {relatedChars.length>0 && <div className="mb-2"><div className="text-xs text-on-parchment-muted mb-1">👤 דמויות</div><ChipList ids={relatedChars} type="character" setRoute={setRoute}/></div>}
+                {relatedPlaces.length>0 && <div className="mb-2"><div className="text-xs text-on-parchment-muted mb-1">📍 מקומות</div><ChipList ids={relatedPlaces} type="place" setRoute={setRoute}/></div>}
+                {relatedEvents.length>0 && <div className="mb-2"><div className="text-xs text-on-parchment-muted mb-1">⚔️ אירועים</div><ChipList ids={relatedEvents} type="event" setRoute={setRoute}/></div>}
+                {relatedRecurring.length>0 && <div className="mb-2"><div className="text-xs text-on-parchment-muted mb-1">🔁 פריטים חוזרים</div><ChipList ids={relatedRecurring} type="recurring" setRoute={setRoute}/></div>}
+              </Section>
+            )}
+
+            {bookRefs.length>0 && (
+              <Section title="📚 מקורות בספר מלכים">
+                <ul className="text-sm hebrew text-on-parchment-muted" style={{columnCount:2, columnGap:20, listStyle:"none", padding:0, margin:0}}>
+                  {bookRefs.map((r,i)=><li key={i} style={{breakInside:"avoid", marginBottom:4}}>• <BookRefLink ref={r}/></li>)}
+                </ul>
+              </Section>
+            )}
+
+            <button onClick={onPractice}
+              className="w-full gold-btn py-3 rounded-xl text-base font-bold mt-4">
+              ⚔️ תרגל על דמות זו
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (typeof window !== "undefined") window.CharacterPageComponent = CharacterPage;
 })();
