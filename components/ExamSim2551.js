@@ -621,8 +621,8 @@
     const visibleQs = activeTab === "A" ? partAQs : activeTab === "B" ? partBQs : partCQs;
 
     return (
-      <div className="max-w-3xl mx-auto space-y-4">
-        <div className="sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between">
+      <div className="max-w-3xl mx-auto space-y-4 exam-run-wrap">
+        <div className="sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between exam-run-timer">
           <div className="text-sm text-on-parchment">
             נענו: <span dir="ltr" className="font-bold">{Object.keys(answers).filter(k=>answers[k]&&answers[k].trim()).length}/{partAQs.length+partBCQs.length}</span>
           </div>
@@ -632,7 +632,7 @@
           <button onClick={finish} className="px-3 py-1.5 rounded-lg bg-red-700 text-white text-xs font-bold">הגשה</button>
         </div>
 
-        <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30">
+        <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30 exam-run-tabs">
           {tabs.map(t => {
             const active = activeTab === t.id;
             const cls = active

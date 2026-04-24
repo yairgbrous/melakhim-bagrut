@@ -90,6 +90,22 @@
         html[data-theme='light'] .kt-tl-head > div:first-child{background:rgba(247,241,225,.98)}
         .kt-tl-head > div{font-size:12px; padding:6px 4px}
       }
+      /* ---- mobile kingdom tabs ---- */
+      .kt-kingdom-tabs{display:none}
+      @media (max-width:640px){
+        .kt-kingdom-tabs{display:flex;gap:6px;padding:4px;background:rgba(10,22,40,.6);border:1px solid rgba(212,165,116,.3);border-radius:12px;margin-bottom:2px}
+        html[data-theme='light'] .kt-kingdom-tabs{background:rgba(247,241,225,.7)}
+        .kt-kingdom-tab{flex:1;padding:10px 12px;border-radius:10px;border:none;background:transparent;color:inherit;font-weight:800;font-size:14px;cursor:pointer;transition:all .18s;font-family:'Frank Ruhl Libre',serif}
+        .kt-kingdom-tab.active{background:linear-gradient(135deg,#D4A574,#8B6F47);color:#1A1611;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+        /* Collapse table to the selected kingdom: hide the opposite column + its header. */
+        .kt-wrap[data-kingdom-tab="judah"]  .kt-col-israel{display:none!important}
+        .kt-wrap[data-kingdom-tab="judah"]  .kt-tl-head > div:nth-child(4){visibility:hidden}
+        .kt-wrap[data-kingdom-tab="israel"] .kt-col-judah{display:none!important}
+        .kt-wrap[data-kingdom-tab="israel"] .kt-tl-head > div:nth-child(2){visibility:hidden}
+        /* Keep the grid vertical-scroll only; year column stays sticky on right (RTL). */
+        .kt-tl-head, .kt-tl{min-width:auto}
+        .kt-tl-wrap{overflow-x:hidden}
+      }
     `;
     document.head.appendChild(s);
   })();
@@ -481,6 +497,7 @@
     const [expanded, setExpand] = useState(null);
     const [showChain, setShowChain] = useState(false);
     const [chainLines, setChainLines] = useState([]);
+    const [kingdomTab, setKingdomTab] = useState('judah'); // mobile-only: 'judah' | 'israel'
     const tableWrapRef = useRef(null);
 
     const all = useMemo(() => pickKingsData(), [ready]);
@@ -546,12 +563,29 @@
     }
 
     return (
-      <div className="kt-wrap">
+      <div className="kt-wrap" data-kingdom-tab={kingdomTab}>
         <div className="kt-header">
           <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">📜 ציר המלכים</h1>
           <p className="text-on-parchment-muted text-sm mt-1">
             טבלה אותנטית בעקבות חוברת מלכים — מלכי יהודה מימין, מלכי ישראל משמאל, מעצמות האזור בקצה.
           </p>
+        </div>
+
+        <div className="kt-kingdom-tabs" role="tablist" aria-label="בחירת ממלכה להצגה">
+          <button
+            role="tab"
+            aria-selected={kingdomTab==='judah'}
+            onClick={()=>setKingdomTab('judah')}
+            className={'kt-kingdom-tab ' + (kingdomTab==='judah' ? 'active' : '')}>
+            🕎 יהודה
+          </button>
+          <button
+            role="tab"
+            aria-selected={kingdomTab==='israel'}
+            onClick={()=>setKingdomTab('israel')}
+            className={'kt-kingdom-tab ' + (kingdomTab==='israel' ? 'active' : '')}>
+            ⚔️ ישראל
+          </button>
         </div>
 
         <div className="kt-filters">
@@ -642,7 +676,8 @@
                     <div
                       key={k.id}
                       data-kid={k.id}
-                      className={'kt-tl-king ' + ci.cls + (short?' kt-tl-short':'') + (expanded===k.id?' kt-tl-king-selected':'')}
+                      data-kingdom={isJudah ? 'judah' : 'israel'}
+                      className={'kt-tl-king ' + (isJudah?'kt-col-judah ':'kt-col-israel ') + ci.cls + (short?' kt-tl-short':'') + (expanded===k.id?' kt-tl-king-selected':'')}
                       style={{
                         gridColumn: col,
                         gridRow: `${startR} / ${startR + span}`,

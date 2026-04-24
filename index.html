@@ -184,12 +184,12 @@
 <script type="module" src="./data/past-exams.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1400"></script>
-<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=2200"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=3100"></script>
 <script type="text/babel" data-presets="react" src="./components/EventPage.js?v=2200"></script>
 <script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=2200"></script>
 <script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=2000"></script>
 <script src="./components/KingsUtils.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=3100"></script>
 <script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=2000"></script>
 <script src="./components/BreadthPage.js?v=2000"></script>
@@ -383,6 +383,32 @@ html[data-theme='light'] .hmb{color:#8B6F1F;background:rgba(139,111,71,.15)}
   .mini-stats .ms{ gap:0; padding:2px 4px; border-radius:8px; background:rgba(212,165,116,.10); }
   .rank-chip{ font-size:10px; padding:2px 6px; }
 }
+/* ---- Mobile ExamSim: fullscreen + sticky timer + sticky nav tabs ---- */
+@media (max-width:640px){
+  .exam-run-wrap{position:fixed;inset:0;z-index:45;padding:10px 10px calc(72px + env(safe-area-inset-bottom));margin:0;max-width:none;background:linear-gradient(180deg,#0A1628 0%,#0F1F3A 100%);overflow-y:auto;-webkit-overflow-scrolling:touch}
+  html[data-theme='light'] .exam-run-wrap{background:linear-gradient(180deg,#F7F1E1 0%,#EEE2C4 100%)}
+  .exam-run-wrap > *{max-width:680px;margin-inline:auto}
+  .exam-run-timer{top:0!important;position:sticky}
+  .exam-run-tabs{position:sticky;bottom:0;z-index:30;background:rgba(10,22,40,.95);backdrop-filter:blur(10px);margin:0 -10px;padding:8px;border-radius:0;border-top:1px solid rgba(212,165,116,.35)}
+  html[data-theme='light'] .exam-run-tabs{background:rgba(247,241,225,.95)}
+}
+
+/* ---- PWA offline banner + install prompt ---- */
+.pwa-offline-banner{position:fixed;top:0;inset-inline:0;z-index:55;padding:10px 14px;background:linear-gradient(135deg,#A83240,#6B1F2B);color:#FDEEEE;font-size:13px;font-weight:800;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.4);transform:translateY(-100%);transition:transform .25s ease}
+.pwa-offline-banner.visible{transform:translateY(0)}
+.pwa-install-card{position:fixed;inset-inline:16px;bottom:calc(80px + env(safe-area-inset-bottom));z-index:44;max-width:480px;margin-inline:auto;padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,#F7F1E1 0%,#EEE2C4 100%);color:#1A1611;border:2px solid #D4A574;box-shadow:0 12px 40px rgba(0,0,0,.55);display:flex;align-items:center;gap:12px;animation:fadeUp .3s ease}
+.pwa-install-card .pwa-icon{font-size:32px;flex-shrink:0}
+.pwa-install-card .pwa-body{flex:1;min-width:0}
+.pwa-install-card .pwa-title{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:15px;line-height:1.2}
+.pwa-install-card .pwa-sub{font-size:12px;color:#4A3829;margin-top:2px;line-height:1.3}
+.pwa-install-card .pwa-btns{display:flex;gap:6px;flex-shrink:0}
+.pwa-install-card .pwa-btn{padding:8px 14px;border-radius:10px;font-size:13px;font-weight:800;border:none;cursor:pointer;background:linear-gradient(135deg,#D4A574,#8B6F47);color:#1A1611}
+.pwa-install-card .pwa-btn-ghost{background:transparent;border:1px solid rgba(139,111,31,.5);color:#8B6F1F}
+
+/* ---- Share button on entity pages ---- */
+.mb-share-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:12px;background:rgba(212,165,116,.15);border:1px solid rgba(212,165,116,.45);color:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s}
+.mb-share-btn:hover{background:rgba(212,165,116,.3);transform:translateY(-1px)}
+
 /* Service worker update toast already uses .toast */
 
 /* ---- Entity chips + drawer (integrate-clickables) ---- */
@@ -2581,32 +2607,68 @@ function App(){
       </header>
 
       {drawerOpen && (()=>{
-        const primaryNavs = [
-          {p:"home",     l:"ראשי",        i:"🏠"},
-          {p:"study",    l:"מרכז למידה",   i:"📚"},
-          {p:"timeline", l:"ציר מלכים",    i:"📜"},
-          {p:"maps",     l:"מפות",        i:"🗺️"},
-          {p:"exam-sim", l:"אזור בחינה",   i:"✍️"}
-        ];
+        const unitNavs = (typeof MELAKHIM_DATA !== 'undefined' && MELAKHIM_DATA.units)
+          ? MELAKHIM_DATA.units.map(u => ({ id:u.id, num:u.num, title:u.title, icon:u.icon || '📖' }))
+          : [];
+        const goUnit = (unitId) => { setRoute({page:'unit', unitId}); setDrawerOpen(false); };
+        const openSearch = () => {
+          setDrawerOpen(false);
+          if (typeof window !== 'undefined' && typeof window.openInstantSearch === 'function') window.openInstantSearch();
+        };
         return (
         <>
           <div className="drawer-overlay" onClick={()=>setDrawerOpen(false)} aria-hidden="true"/>
-          <aside className="drawer" role="dialog" aria-label="תפריט ניווט">
+          <aside className="drawer drawer-wide" role="dialog" aria-label="תפריט ניווט">
             <div className="flex items-center justify-between mb-4">
               <div className="font-display text-lg font-bold text-amber-300">📖 תפריט</div>
               <button onClick={()=>setDrawerOpen(false)} className="hmb" aria-label="סגור תפריט">✕</button>
             </div>
             <div className="space-y-1">
-              {primaryNavs.map(n => (
-                <button key={n.p} onClick={()=>go(n.p)} className={`drawer-link ${route.page===n.p?"active":""}`}>
-                  <span className="dico">{n.i}</span><span>{n.l}</span>
-                </button>
-              ))}
+              <button onClick={()=>go("home")} className={`drawer-link ${route.page==="home"?"active":""}`}>
+                <span className="dico">🏠</span><span>ראשי</span>
+              </button>
+
+              {unitNavs.length > 0 && (
+                <>
+                  <div className="text-[11px] font-bold text-amber-200/80 px-3 mt-2 mb-1">📚 יחידות</div>
+                  {unitNavs.map(u => (
+                    <button key={'u'+u.id} onClick={()=>goUnit(u.id)}
+                      className={`drawer-link ${route.page==="unit" && route.unitId===u.id?"active":""}`}>
+                      <span className="dico">{u.icon}</span>
+                      <span>יחידה {u.num} · {u.title}</span>
+                    </button>
+                  ))}
+                </>
+              )}
+
+              <div className="text-[11px] font-bold text-amber-200/80 px-3 mt-2 mb-1">🧭 ניווט</div>
+              <button onClick={()=>go("timeline")} className={`drawer-link ${route.page==="timeline"?"active":""}`}>
+                <span className="dico">👑</span><span>טבלת מלכים</span>
+              </button>
+              <button onClick={openSearch} className="drawer-link">
+                <span className="dico">👥</span><span>דמויות (חיפוש)</span>
+              </button>
+              <button onClick={()=>go("maps")} className={`drawer-link ${route.page==="maps"?"active":""}`}>
+                <span className="dico">🗺️</span><span>מפות</span>
+              </button>
+              <button onClick={()=>go("themes")} className={`drawer-link ${route.page==="themes"?"active":""}`}>
+                <span className="dico">🌐</span><span>נושאי רוחב</span>
+              </button>
+              <button onClick={()=>go("timeline")} className={`drawer-link ${route.page==="timeline"?"active":""}`}>
+                <span className="dico">📜</span><span>ציר זמן</span>
+              </button>
+              <button onClick={()=>go("exam-sim")} className={`drawer-link ${route.page==="exam-sim"?"active":""}`}>
+                <span className="dico">✍️</span><span>בחינה</span>
+              </button>
+              <button onClick={()=>go("flashcards")} className={`drawer-link ${route.page==="flashcards"?"active":""}`}>
+                <span className="dico">🃏</span><span>קלפים</span>
+              </button>
+              <button onClick={()=>go("profile")} className={`drawer-link ${route.page==="profile"?"active":""}`}>
+                <span className="dico">👤</span><span>פרופיל</span>
+              </button>
+
               <div className="divider my-2"/>
               <div className="text-[11px] font-bold text-amber-200/80 px-3 mb-1">⚙ הגדרות</div>
-              <button onClick={()=>go("profile")} className={`drawer-link ${route.page==="profile"?"active":""}`}>
-                <span className="dico">👤</span><span>הפרופיל שלי</span>
-              </button>
               <button onClick={toggleSound} className="drawer-link" aria-pressed={soundOn}>
                 <span className="dico">{soundOn?"🔊":"🔇"}</span><span>צלילים: {soundOn?"מופעל":"כבוי"}</span>
               </button>
