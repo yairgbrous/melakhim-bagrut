@@ -1,42 +1,121 @@
 /* =========================================================================
-   Home — homepage, mounts as window.HomeComponent.
-   Sections (added incrementally): HERO → PROGRESS → QUICK ACTIONS → TODAY'S FOCUS → STATS.
-   Props: S (session/user), setRoute, level, nextLv.
-   Uses globals: MELAKHIM_DATA, EXAM_DATE, daysTo, QUESTIONS (all defined in index.html).
+   Home — clean landing page. Mounts as window.HomeComponent.
+   Layout (top→bottom):
+     1. Header strip   — title + countdown + XP badge + search
+     2. Hero card      — parchment + gold border + primary/secondary CTA
+     3. 6-unit grid    — unit cards with progress bar
+     4. Quick actions  — 7 horizontal tiles (scroll on mobile)
+     5. Daily strip    — today's challenge teaser
+     6. Recent         — last 3 items from localStorage "mb.recent"
+   Reads: window.MELAKHIM_DATA, window.KINGS_DATA, window.EVENTS_DATA,
+          window.__ENTITY_INDEX__, localStorage (progress + recent).
    ========================================================================= */
 (function(){
   const { useState, useEffect, useMemo } = React;
 
-  function heDays(d){ return d===0?'היום':d===1?'יום אחד':d===2?'יומיים':(d+' ימים'); }
+  // ---- helpers -----------------------------------------------------------
+  function heDays(d){
+    if (d === 0) return 'היום';
+    if (d === 1) return 'יום אחד';
+    if (d === 2) return 'יומיים';
+    return d + ' ימים';
+  }
 
-  // ---- HERO SECTION ------------------------------------------------------
-  function Hero({S, setRoute, dExam, currentUnit}){
+  function readUnitProgress(unitId){
+    try {
+      const raw = localStorage.getItem('jarvis.melakhim.progress.unit' + unitId);
+      const n = parseInt(raw, 10);
+      if (isFinite(n)) return Math.max(0, Math.min(100, n));
+    } catch(e){}
+    return 0;
+  }
+
+  function readRecent(){
+    try {
+      const raw = localStorage.getItem('mb.recent');
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch(e){ return []; }
+  }
+
+  // Deterministic daily entity pick — mirrors DailyChallenge.pickForDate.
+  function ilDay(t){
+    return new Date(t || Date.now()).toLocaleDateString('en-CA', { timeZone:'Asia/Jerusalem' });
+  }
+  function hashStr(s){
+    let h = 2166136261;
+    for (let i=0; i<s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return h >>> 0;
+  }
+  function pickDailyPreview(date){
+    const idx = (typeof window !== 'undefined' && window.__ENTITY_INDEX__) || {};
+    const pool = [];
+    const push = (bucket, type) => {
+      if (!bucket) return;
+      for (const id of Object.keys(bucket)){
+        const e = bucket[id];
+        if (e && (e.heading || e.name || e.name_niqqud)) pool.push({ type, id, entry: e });
+      }
+    };
+    push(idx.king, 'king');
+    push(idx.character, 'character');
+    if (!pool.length) return null;
+    return pool[hashStr(date + ':melakhim-daily:v1') % pool.length];
+  }
+
+  // ---- 1. HEADER STRIP ---------------------------------------------------
+  function HeaderStrip({dExam}){
+    const openSearch = () => {
+      if (typeof window !== 'undefined' && typeof window.openInstantSearch === 'function'){
+        window.openInstantSearch();
+      }
+    };
+    const XpBadge = (typeof window !== 'undefined') ? window.XpBadgeComponent : null;
     return (
-      <section className="relative overflow-hidden rounded-3xl parchment p-5 md:p-8 hero-parchment">
-        <div className="absolute top-0 left-0 text-[160px] opacity-[.05] select-none pointer-events-none leading-none">📜</div>
-        <div className="relative text-center md:text-right md:flex md:items-center md:gap-6">
-          <div className="flex-1">
-            <div className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-3 hero-countdown">
-              ⏰ נותרו {heDays(dExam)} לבגרות · 30.4.2026
-            </div>
-            <h1 className="font-display text-2xl md:text-4xl font-black leading-tight text-on-parchment">
-              שלום {S.name || 'יאיר'} {S.avatar || '👑'}
-            </h1>
-            <p className="text-on-parchment-muted text-sm md:text-base mt-1.5 font-medium">
-              בגרות 2551 · ספר מלכים · י״א 5 יח״ל
-            </p>
-            {currentUnit && (
-              <p className="text-on-parchment-muted text-xs md:text-sm mt-1 opacity-90">
-                היחידה הנוכחית: <strong className="text-on-parchment">יחידה {currentUnit.num} · {currentUnit.title}</strong>
-              </p>
-            )}
+      <header className="mb-home-header">
+        <div className="mb-home-header-title">
+          <h1 className="font-display">ספר מלכים · בגרות 2551</h1>
+          <div className="mb-home-countdown">
+            ⏰ {heDays(dExam)} עד הבחינה · 30.4.2026
           </div>
-          <div className="mt-4 md:mt-0 md:shrink-0">
+        </div>
+        <div className="mb-home-header-right">
+          {XpBadge ? <XpBadge compact/> : null}
+          <button
+            type="button"
+            onClick={openSearch}
+            className="mb-home-search-btn"
+            aria-label="חיפוש מהיר">
+            🔍
+          </button>
+        </div>
+      </header>
+    );
+  }
+
+  // ---- 2. HERO CARD ------------------------------------------------------
+  function HeroCard({setRoute}){
+    return (
+      <section className="mb-home-hero parchment hero-parchment">
+        <div className="mb-home-hero-inner">
+          <h2 className="font-display">המבחן שלך, המידע שלך</h2>
+          <p className="mb-home-hero-sub">
+            מסלול למידה שלם לבגרות 2551 · יחידות, דמויות, מפות, חידונים ומתכונות
+          </p>
+          <div className="mb-home-hero-ctas">
             <button
-              onClick={()=>setRoute({page:"unit", unitId: (currentUnit && currentUnit.id) || 1})}
-              className="gold-btn w-full md:w-auto md:px-10 py-4 rounded-2xl text-lg md:text-xl glow font-bold"
-              aria-label="המשך מסלול">
-              🗺 המשך מסלול ←
+              type="button"
+              onClick={()=>setRoute({page:'study'})}
+              className="gold-btn mb-home-hero-cta-primary"
+              aria-label="התחל ללמוד">
+              🎓 התחל ללמוד ←
+            </button>
+            <button
+              type="button"
+              onClick={()=>setRoute({page:'exam-sim'})}
+              className="mb-home-hero-cta-secondary"
+              aria-label="תרגל מתכונת">
+              📝 תרגל מתכונת
             </button>
           </div>
         </div>
@@ -44,38 +123,167 @@
     );
   }
 
-  // ---- PROGRESS STRIP ----------------------------------------------------
-  function ProgressStrip({units, S, setRoute, currentUnit}){
-    if (!units || !units.length) return null;
-    const pctFor = (u) => {
-      const score = (S.quizScores||{})[u.id];
-      if (typeof score === 'number') return Math.max(5, Math.min(100, score));
-      return (u.id === (currentUnit && currentUnit.id)) ? 45 : 0;
-    };
-    const overallDone = units.filter(u => (S.quizScores||{})[u.id]).length;
-    const overallPct = Math.round((overallDone / units.length) * 100);
+  // ---- 3. 6-UNIT GRID ----------------------------------------------------
+  function UnitCard({unit, progress, onClick}){
+    const title = unit.title_niqqud || unit.title;
     return (
-      <section className="progress-strip-wrap">
-        <div className="flex items-center justify-between mb-2 px-1">
-          <h2 className="font-display text-base md:text-lg font-bold text-on-parchment">🧭 התקדמות במסלול</h2>
-          <span className="text-xs md:text-sm text-on-parchment-muted font-semibold">
-            יחידה {currentUnit ? currentUnit.num : 'א'} · {overallPct}% סה״כ
-          </span>
+      <button
+        type="button"
+        onClick={onClick}
+        className="mb-home-unit-card parchment"
+        aria-label={'יחידה ' + unit.num + ' · ' + title}>
+        <div className="mb-home-unit-head">
+          <span className="mb-home-unit-num font-display">{unit.num}</span>
+          <span className="mb-home-unit-icon" aria-hidden="true">{unit.icon}</span>
         </div>
-        <div className="progress-strip-rail">
-          {units.map(u => {
-            const p = pctFor(u);
-            const isCurrent = currentUnit && u.id === currentUnit.id;
-            const done = p >= 100;
+        <h3 className="mb-home-unit-title font-display">{title}</h3>
+        <div className="mb-home-unit-range">{unit.range}</div>
+        <div className="mb-home-progress" aria-label={'התקדמות ' + progress + ' אחוז'}>
+          <div className="mb-home-progress-fill" style={{width: progress + '%'}} aria-hidden="true"/>
+        </div>
+        <div className="mb-home-unit-pct">
+          <span>{progress}%</span>
+          <span className="mb-home-unit-arrow" aria-hidden="true">←</span>
+        </div>
+      </button>
+    );
+  }
+
+  function UnitGrid({units, setRoute}){
+    if (!units || !units.length) return null;
+    return (
+      <section className="mb-home-section">
+        <h2 className="mb-home-section-title font-display">📚 יחידות הלימוד</h2>
+        <div className="mb-home-unit-grid">
+          {units.map(u => (
+            <UnitCard
+              key={u.id}
+              unit={u}
+              progress={readUnitProgress(u.id)}
+              onClick={()=>setRoute({page:'unit', unitId:u.id})}
+            />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  // ---- 4. QUICK ACTIONS ROW ----------------------------------------------
+  function QuickActions({setRoute}){
+    const openSearch = () => {
+      if (typeof window !== 'undefined' && typeof window.openInstantSearch === 'function'){
+        window.openInstantSearch();
+      }
+    };
+    const tiles = [
+      { icon:'👑', label:'טבלת מלכים', onClick:()=>setRoute({page:'timeline'}) },
+      { icon:'🗺', label:'מפות',        onClick:()=>setRoute({page:'maps'}) },
+      { icon:'👥', label:'דמויות',      onClick:openSearch },
+      { icon:'🌐', label:'נושאי רוחב',  onClick:()=>setRoute({page:'themes'}) },
+      { icon:'📜', label:'ציר זמן',     onClick:()=>setRoute({page:'timeline'}) },
+      { icon:'🃏', label:'פלאשקארדס',   onClick:()=>setRoute({page:'flashcards'}) },
+      { icon:'📝', label:'אזור בחינה',  onClick:()=>setRoute({page:'exam-sim'}) }
+    ];
+    return (
+      <section className="mb-home-section">
+        <h2 className="mb-home-section-title font-display">⚡ פעולות מהירות</h2>
+        <div className="mb-home-quick-scroll">
+          {tiles.map((t, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={t.onClick}
+              className="mb-home-quick-tile parchment"
+              aria-label={t.label}>
+              <span className="mb-home-quick-icon" aria-hidden="true">{t.icon}</span>
+              <span className="mb-home-quick-label">{t.label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  // ---- 5. DAILY CHALLENGE STRIP ------------------------------------------
+  function DailyStrip({setRoute}){
+    const today = useMemo(() => ilDay(), []);
+    const [pick, setPick] = useState(() => pickDailyPreview(today));
+    useEffect(() => {
+      if (pick) return;
+      const retry = () => setPick(pickDailyPreview(today));
+      window.addEventListener('entity-index-ready', retry);
+      const t = setTimeout(retry, 600);
+      return () => {
+        window.removeEventListener('entity-index-ready', retry);
+        clearTimeout(t);
+      };
+    }, [today, pick]);
+
+    const heading = pick && pick.entry
+      ? (pick.entry.heading || pick.entry.name_niqqud || pick.entry.name || pick.id)
+      : null;
+    const teaser = heading
+      ? 'שאלה על ' + heading + ' · 5 שאלות'
+      : '5 שאלות על ישות אחת · קבוע לפי התאריך';
+
+    return (
+      <section className="mb-home-section">
+        <div className="mb-home-daily parchment">
+          <div className="mb-home-daily-body">
+            <div className="mb-home-daily-label">☀️ אתגר היום</div>
+            <div className="mb-home-daily-teaser">{teaser}</div>
+            <div className="mb-home-daily-date" dir="ltr">{today}</div>
+          </div>
+          <button
+            type="button"
+            onClick={()=>setRoute({page:'daily'})}
+            className="gold-btn mb-home-daily-cta"
+            aria-label="התחל את האתגר">
+            התחל ←
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  // ---- 6. RECENT ACTIVITY ------------------------------------------------
+  function RecentActivity({setRoute}){
+    const [items, setItems] = useState(() => readRecent());
+    useEffect(() => {
+      const refresh = () => setItems(readRecent());
+      window.addEventListener('focus', refresh);
+      window.addEventListener('storage', refresh);
+      return () => {
+        window.removeEventListener('focus', refresh);
+        window.removeEventListener('storage', refresh);
+      };
+    }, []);
+
+    const last3 = items.slice(-3).reverse();
+    if (!last3.length) return null;
+
+    const EntityLink = (typeof window !== 'undefined') ? window.EntityLinkComponent : null;
+
+    return (
+      <section className="mb-home-section">
+        <h2 className="mb-home-section-title font-display">🕘 פריטים אחרונים</h2>
+        <div className="mb-home-recent-list">
+          {last3.map((it, i) => {
+            if (!it || !it.type || !it.id) return null;
+            if (EntityLink){
+              return (
+                <div key={i} className="mb-home-recent-row parchment">
+                  <EntityLink type={it.type} id={it.id} label={it.label} setRoute={setRoute}/>
+                </div>
+              );
+            }
             return (
-              <button key={u.id}
-                onClick={()=>setRoute({page:'unit', unitId:u.id})}
-                className={'progress-strip-node ' + (isCurrent?'current ':'') + (done?'done':'')}
-                aria-label={'יחידה ' + u.num + ' · ' + u.title}>
-                <span className="progress-strip-fill" style={{width: p+'%'}} aria-hidden="true"/>
-                <span className="progress-strip-num">{u.num}</span>
-                <span className="progress-strip-title">{u.title}</span>
-                <span className="progress-strip-pct">{p}%</span>
+              <button
+                key={i}
+                type="button"
+                onClick={()=>setRoute({page:it.type, id:it.id})}
+                className="mb-home-recent-row parchment">
+                {it.label || it.id}
               </button>
             );
           })}
@@ -84,229 +292,123 @@
     );
   }
 
-  // ---- QUICK ACTIONS ROW -------------------------------------------------
-  function QuickAction({icon, title, subtitle, onClick, accent}){
-    return (
-      <button type="button" onClick={onClick}
-        className={'quick-action-card ' + (accent || '')}
-        aria-label={title}>
-        <div className="quick-action-icon" aria-hidden="true">{icon}</div>
-        <div className="quick-action-title">{title}</div>
-        <div className="quick-action-sub">{subtitle}</div>
-      </button>
-    );
-  }
-
-  // Count SM-2-due flashcards via the API exposed by FlashcardDrill.js.
-  // Re-runs on every Home render so the count stays fresh after a drill session.
-  function useDueCount(){
-    const [n, setN] = useState(() => {
-      try { return (window.FlashcardSM2 && window.FlashcardSM2.countDue()) || 0; } catch(e){ return 0; }
-    });
+  // ---- MAIN --------------------------------------------------------------
+  function Home({S, setRoute}){
+    const [, setTick] = useState(0);
     useEffect(() => {
-      const recount = () => {
-        try { setN((window.FlashcardSM2 && window.FlashcardSM2.countDue()) || 0); } catch(e){}
-      };
-      recount();
-      // Update when the entity index finishes loading OR when the drill updates a card.
-      window.addEventListener('entity-index-ready', recount);
-      window.addEventListener('focus', recount);
-      window.addEventListener('storage', recount);
-      return () => {
-        window.removeEventListener('entity-index-ready', recount);
-        window.removeEventListener('focus', recount);
-        window.removeEventListener('storage', recount);
-      };
+      const id = setInterval(() => setTick(t => t + 1), 60000);
+      return () => clearInterval(id);
     }, []);
-    return n;
-  }
-
-  function QuickActions({setRoute}){
-    const openBook = () => {
-      const pool = (typeof window !== 'undefined' && window.__ENTITY_INDEX__ && window.__ENTITY_INDEX__.quote) || {};
-      const quotes = Object.values(pool);
-      if (quotes.length){
-        const q = quotes[Math.floor(Math.random() * quotes.length)];
-        setRoute({page:'quotes', focusId: q.id});
-      } else {
-        setRoute({page:'quotes'});
-      }
-    };
-    const dueCount = useDueCount();
-    const dueSubtitle = dueCount > 0
-      ? (dueCount + ' קלפים לחזור היום')
-      : 'אין קלפים לחזור היום — עבור להוסיף ידע חדש';
-    return (
-      <section className="quick-actions-wrap">
-        <h2 className="font-display text-base md:text-lg font-bold text-on-parchment mb-2 px-1">⚡ פעולות מהירות</h2>
-        <div className="quick-actions-grid">
-          <QuickAction icon="⚡" title="חידון מהיר" subtitle="10 שאלות אקראיות"
-            onClick={()=>setRoute({page:'quizPlay', mode:'quick'})} accent="qa-gold"/>
-          <QuickAction icon="🃏" title={dueCount > 0 ? ('🔔 ' + dueCount + ' קלפים לחזור היום') : 'כרטיסיות זיכרון'}
-            subtitle={dueSubtitle}
-            onClick={()=>setRoute({page:'flashcards'})} accent="qa-indigo"/>
-          <QuickAction icon="📝" title="סימולציה מלאה" subtitle="שעתיים · 101 נקודות"
-            onClick={()=>setRoute({page:'exam'})} accent="qa-crimson"/>
-          <QuickAction icon="☀️" title="אתגר היום" subtitle="שאלה אחת · פעם ביום"
-            onClick={()=>setRoute({page:'quizPlay', mode:'daily'})} accent="qa-purple"/>
-          <QuickAction icon="📖" title="פתיחת ספר" subtitle="ציטוט אקראי מהספר"
-            onClick={openBook} accent="qa-emerald"/>
-        </div>
-      </section>
-    );
-  }
-
-  // ---- TODAY'S FOCUS -----------------------------------------------------
-  // Pulls weak areas from jarvis.quiz.* keys in localStorage.
-  // Key convention: jarvis.quiz.miss.<entityType>.<entityId> → numeric miss count.
-  function readWeakAreas(){
-    const out = [];
-    try{
-      if (typeof localStorage === 'undefined') return out;
-      for (let i = 0; i < localStorage.length; i++){
-        const k = localStorage.key(i);
-        if (!k || !k.startsWith('jarvis.quiz.miss.')) continue;
-        const parts = k.split('.');
-        if (parts.length < 5) continue;
-        const type = parts[3];
-        const id = parts.slice(4).join('.');
-        const count = parseInt(localStorage.getItem(k), 10) || 0;
-        if (count > 0) out.push({type, id, count});
-      }
-    } catch(e){}
-    return out.sort((a,b)=>b.count - a.count);
-  }
-
-  function resolveEntityName(type, id){
-    const idx = (typeof window !== 'undefined' && window.__ENTITY_INDEX__) || {};
-    const bucket = idx[type] || {};
-    const ent = bucket[id];
-    if (ent && (ent.name || ent.title)) return ent.name || ent.title;
-    // Fallback heuristic: humanize id
-    return (id || '').replace(/_/g, ' ');
-  }
-
-  function routeForEntity(type, id){
-    if (type === 'character' || type === 'char' || type === 'king') return {page:'character', id};
-    if (type === 'event') return {page:'event', id};
-    if (type === 'place') return {page:'place', id};
-    if (type === 'theme') return {page:'themes', focusId:id};
-    return {page:'quiz'};
-  }
-
-  function TodayFocus({setRoute}){
-    const weak = useMemo(() => readWeakAreas().slice(0, 3), []);
-
-    const fallback = [
-      {type:'character', id:'chizkiyahu', label:'עליך לחזור על חזקיהו', sub:'מלך יהודה · מרכזי בבגרות'},
-      {type:'event',     id:'imut_karmel', label:'אירוע חסר ידע: מעמד הר הכרמל', sub:'אליהו מול נביאי הבעל'},
-      {type:'theme',     id:'melech_navi', label:'נושא רוחב חלש: מלך ונביא', sub:'יחסי מלך־נביא לאורך הספר'}
-    ];
-
-    const items = weak.length
-      ? weak.map(w => ({
-          type: w.type, id: w.id,
-          label: 'עליך לחזור על ' + resolveEntityName(w.type, w.id),
-          sub: w.count + ' טעויות בחידונים · לחץ למידע מלא'
-        }))
-      : fallback;
-
-    return (
-      <section className="today-focus-wrap">
-        <div className="flex items-center justify-between mb-2 px-1">
-          <h2 className="font-display text-base md:text-lg font-bold text-on-parchment">🎯 מיקוד להיום</h2>
-          <span className="text-xs text-on-parchment-muted">
-            {weak.length ? 'מבוסס על טעויות בחידונים' : 'המלצה כללית'}
-          </span>
-        </div>
-        <div className="today-focus-list">
-          {items.map((it, i) => (
-            <button key={i} type="button"
-              onClick={()=>setRoute(routeForEntity(it.type, it.id))}
-              className="today-focus-card">
-              <div className="today-focus-rank" aria-hidden="true">{i+1}</div>
-              <div className="today-focus-body">
-                <div className="today-focus-title">{it.label}</div>
-                <div className="today-focus-sub">{it.sub}</div>
-              </div>
-              <div className="today-focus-arrow" aria-hidden="true">←</div>
-            </button>
-          ))}
-        </div>
-      </section>
-    );
-  }
-
-  // ---- STATS STRIP -------------------------------------------------------
-  function readStats(S){
-    const streakDays = (S && typeof S.streak === 'number') ? S.streak : 0;
-    let total = 0, correct = 0;
-    if (S && typeof S.quizTotal === 'number') total = S.quizTotal;
-    if (S && typeof S.quizCorrect === 'number') correct = S.quizCorrect;
-
-    if (!total){
-      try {
-        if (typeof localStorage !== 'undefined'){
-          const t = parseInt(localStorage.getItem('jarvis.quiz.total'), 10) || 0;
-          const c = parseInt(localStorage.getItem('jarvis.quiz.correct'), 10) || 0;
-          total = t; correct = c;
-        }
-      } catch(e){}
-    }
-    const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
-    return { streakDays, total, accuracy };
-  }
-
-  function StatCell({icon, value, label, accent}){
-    return (
-      <div className={'stats-cell ' + (accent || '')}>
-        <div className="stats-icon" aria-hidden="true">{icon}</div>
-        <div className="stats-value">{value}</div>
-        <div className="stats-label">{label}</div>
-      </div>
-    );
-  }
-
-  function StatsStrip({S}){
-    const { streakDays, total, accuracy } = readStats(S);
-    return (
-      <section className="stats-strip-wrap">
-        <div className="stats-strip-grid">
-          <StatCell icon="🔥" value={streakDays} label="ימים ברצף" accent="stats-streak"/>
-          <StatCell icon="📊" value={total} label="שאלות שנענו" accent="stats-total"/>
-          <StatCell icon="🎯" value={accuracy + '%'} label="דיוק ממוצע" accent="stats-accuracy"/>
-        </div>
-      </section>
-    );
-  }
-
-  // ---- MAIN ---------------------------------------------------------------
-  function Home({S, setRoute, level, nextLv}){
-    const [tick, setTick] = useState(0);
-    useEffect(()=>{ const id=setInterval(()=>setTick(t=>t+1),60000); return ()=>clearInterval(id); },[]);
 
     const dExam = (typeof daysTo === 'function' && typeof EXAM_DATE !== 'undefined') ? daysTo(EXAM_DATE) : 0;
     const units = (typeof MELAKHIM_DATA !== 'undefined' && MELAKHIM_DATA.units) ? MELAKHIM_DATA.units : [];
-    const currentUnit = units.find(u => !(S.quizScores||{})[u.id]) || units[0];
 
     return (
-      <div className="space-y-5">
-        <Hero S={S} setRoute={setRoute} dExam={dExam} currentUnit={currentUnit}/>
-        <ProgressStrip units={units} S={S} setRoute={setRoute} currentUnit={currentUnit}/>
+      <div className="mb-home-root">
+        <HeaderStrip dExam={dExam}/>
+        <HeroCard setRoute={setRoute}/>
+        <UnitGrid units={units} setRoute={setRoute}/>
         <QuickActions setRoute={setRoute}/>
-        <TodayFocus setRoute={setRoute}/>
-        <StatsStrip S={S}/>
-        {typeof window!=="undefined" && window.XpStatsComponent ? (
-          <section className="mt-2"><window.XpStatsComponent/></section>
-        ) : null}
-        {/* QUICK ACTIONS — added in commit 3 */}
-        {/* TODAY'S FOCUS — added in commit 4 */}
-        {/* STATS STRIP — added in commit 5 */}
+        <DailyStrip setRoute={setRoute}/>
+        <RecentActivity setRoute={setRoute}/>
       </div>
     );
   }
 
+  // ---- styles (scoped) ---------------------------------------------------
+  // Injected once on load. Kept here so the redesign is self-contained.
+  function ensureStyles(){
+    if (typeof document === 'undefined') return;
+    if (document.getElementById('mb-home-styles')) return;
+    const css = `
+.mb-home-root{display:flex;flex-direction:column;gap:20px;direction:rtl}
+.mb-home-root *{box-sizing:border-box}
+
+/* 1. Header strip */
+.mb-home-header{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 4px}
+.mb-home-header-title h1{font-size:20px;line-height:1.2;font-weight:900;color:#F4D58D;margin:0}
+.mb-home-countdown{display:inline-block;margin-top:4px;padding:2px 10px;border-radius:999px;background:linear-gradient(135deg,#D4A574,#8B6F47);color:#1A1611;font-size:11px;font-weight:800}
+.mb-home-header-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.mb-home-search-btn{width:40px;height:40px;border-radius:999px;border:1px solid rgba(212,165,116,.55);background:rgba(247,241,225,.06);color:#F4D58D;font-size:18px;cursor:pointer;transition:all .18s}
+.mb-home-search-btn:hover{background:rgba(212,165,116,.18);transform:scale(1.05)}
+@media (min-width:640px){
+  .mb-home-header-title h1{font-size:24px}
+  .mb-home-countdown{font-size:12px}
+}
+
+/* 2. Hero card */
+.mb-home-hero{border-radius:22px;padding:22px 20px;border:2px solid #D4A574;position:relative;overflow:hidden}
+.mb-home-hero::before{content:"📜";position:absolute;top:-20px;inset-inline-start:-20px;font-size:160px;opacity:.05;pointer-events:none;line-height:1}
+.mb-home-hero-inner{position:relative;text-align:center}
+.mb-home-hero h2{font-size:26px;font-weight:900;line-height:1.2;margin:0 0 8px;color:#1A1611}
+.mb-home-hero-sub{font-size:13px;color:#4A3829;margin:0 0 16px;font-weight:500}
+.mb-home-hero-ctas{display:flex;flex-direction:column;gap:10px;align-items:stretch}
+.mb-home-hero-cta-primary{padding:14px 20px;border-radius:16px;font-size:16px;font-weight:800;cursor:pointer}
+.mb-home-hero-cta-secondary{padding:12px 20px;border-radius:16px;font-size:15px;font-weight:700;cursor:pointer;background:transparent;border:1.5px solid #8B6F1F;color:#8B6F1F;transition:all .18s}
+.mb-home-hero-cta-secondary:hover{background:rgba(212,165,116,.12)}
+@media (min-width:640px){
+  .mb-home-hero{padding:32px 28px}
+  .mb-home-hero h2{font-size:32px}
+  .mb-home-hero-sub{font-size:14px}
+  .mb-home-hero-ctas{flex-direction:row;justify-content:center;gap:12px}
+  .mb-home-hero-cta-primary,.mb-home-hero-cta-secondary{padding:14px 28px;min-width:200px}
+}
+
+/* Section */
+.mb-home-section{display:flex;flex-direction:column;gap:10px}
+.mb-home-section-title{font-size:16px;font-weight:800;color:#F4D58D;margin:0;padding:0 4px}
+@media (min-width:640px){ .mb-home-section-title{font-size:18px} }
+
+/* 3. Unit grid — 1 col mobile, 2 col md, 3 col lg */
+.mb-home-unit-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:640px){ .mb-home-unit-grid{grid-template-columns:repeat(2,1fr);gap:14px} }
+@media (min-width:1024px){ .mb-home-unit-grid{grid-template-columns:repeat(3,1fr)} }
+.mb-home-unit-card{display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:18px;text-align:start;cursor:pointer;transition:all .18s;border:1px solid rgba(212,165,116,.5)}
+.mb-home-unit-card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.45);border-color:#D4A574}
+.mb-home-unit-head{display:flex;align-items:center;justify-content:space-between}
+.mb-home-unit-num{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#F5D670,#8B6F1F);color:#1A1611;font-weight:900;font-size:20px;border:2px solid #C89B3C;box-shadow:inset 0 0 6px rgba(255,255,255,.3)}
+.mb-home-unit-icon{font-size:28px;line-height:1}
+.mb-home-unit-title{font-size:18px;font-weight:900;color:#1A1611;margin:0;line-height:1.3}
+.mb-home-unit-range{font-size:12px;color:#6B5639;font-weight:500}
+.mb-home-progress{height:8px;border-radius:999px;background:rgba(139,111,31,.18);overflow:hidden;margin-top:4px}
+.mb-home-progress-fill{height:100%;background:linear-gradient(90deg,#8B6F1F,#D4A574);transition:width .4s ease}
+.mb-home-unit-pct{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#4A3829;font-weight:700}
+.mb-home-unit-arrow{color:#8B6F1F;font-weight:900}
+
+/* 4. Quick actions — horizontal scroll on mobile, wrap on larger */
+.mb-home-quick-scroll{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.mb-home-quick-scroll::-webkit-scrollbar{height:4px}
+.mb-home-quick-scroll::-webkit-scrollbar-thumb{background:rgba(212,165,116,.4);border-radius:2px}
+.mb-home-quick-tile{flex:0 0 110px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 10px;border-radius:16px;cursor:pointer;transition:all .18s;border:1px solid rgba(212,165,116,.45);min-height:88px}
+.mb-home-quick-tile:hover{transform:translateY(-2px);border-color:#D4A574;box-shadow:0 8px 18px rgba(0,0,0,.3)}
+.mb-home-quick-icon{font-size:26px;line-height:1}
+.mb-home-quick-label{font-size:12px;font-weight:800;color:#1A1611;text-align:center;line-height:1.2}
+@media (min-width:640px){
+  .mb-home-quick-scroll{flex-wrap:wrap;overflow-x:visible;gap:12px}
+  .mb-home-quick-tile{flex:1 1 calc((100% - 72px)/7);min-width:110px}
+}
+
+/* 5. Daily strip */
+.mb-home-daily{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-radius:18px;border:1px solid rgba(212,165,116,.5)}
+.mb-home-daily-body{flex:1;min-width:0}
+.mb-home-daily-label{font-size:13px;font-weight:900;color:#8B6F1F;margin-bottom:4px}
+.mb-home-daily-teaser{font-size:15px;font-weight:700;color:#1A1611;line-height:1.3}
+.mb-home-daily-date{font-size:11px;color:#6B5639;margin-top:4px}
+.mb-home-daily-cta{padding:10px 18px;border-radius:14px;font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap}
+
+/* 6. Recent */
+.mb-home-recent-list{display:flex;flex-direction:column;gap:8px}
+.mb-home-recent-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;border:1px solid rgba(212,165,116,.4);color:#1A1611;text-align:start;cursor:pointer}
+.mb-home-recent-row:hover{border-color:#D4A574}
+`;
+    const style = document.createElement('style');
+    style.id = 'mb-home-styles';
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+
   if (typeof window !== 'undefined'){
+    ensureStyles();
     window.HomeComponent = Home;
   }
 })();
