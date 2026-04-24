@@ -202,6 +202,10 @@
           </section>
         )}
 
+        {hasData && window.RelatedSectionComponent && (
+          <window.RelatedSectionComponent type="place" id={pl.id} setRoute={setRoute}/>
+        )}
+
         {hasData && (
           <button onClick={onFindOnMap} className="gold-btn w-full py-3 rounded-xl text-base font-bold">
             📍 מצא במפה{primaryMapNum!=null ? ` (#${primaryMapNum})` : ""}

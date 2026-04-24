@@ -113,6 +113,10 @@
           </section>
         )}
 
+        {hasData && window.RelatedSectionComponent && (
+          <window.RelatedSectionComponent type="event" id={ev.id} setRoute={setRoute}/>
+        )}
+
         {hasData && (
           <button onClick={onPractice} className="gold-btn w-full py-3 rounded-xl text-base font-bold">
             ⚔️ תרגל על אירוע זה

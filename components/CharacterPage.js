@@ -373,6 +373,9 @@
             </Section>
           )}
         </div>
+        {window.RelatedSectionComponent && c && c.id && (
+          <window.RelatedSectionComponent type={isKing ? 'king' : 'character'} id={c.id} setRoute={setRoute}/>
+        )}
       </div>
     );
   }
