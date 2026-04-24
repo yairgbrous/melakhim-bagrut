@@ -51,6 +51,13 @@
       html[data-theme='light'] .kt2-card.kt2-good{background:linear-gradient(135deg,#d4f5d4,#a8e6a1);color:#1a4d1a}
       html[data-theme='light'] .kt2-card.kt2-bad {background:linear-gradient(135deg,#fad4d4,#e6a1a1);color:#4d1a1a}
       html[data-theme='light'] .kt2-card.kt2-mix {background:linear-gradient(135deg,#f5e8b8,#e6d184);color:#4d3e1a}
+      /* Prophet chip row under each king card. */
+      .kt2-prophets{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+      .kt2-prophet-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;background:rgba(107,91,149,.22);color:#C9B8E0;border:1px solid rgba(107,91,149,.55);cursor:pointer;text-decoration:none}
+      .kt2-prophet-chip:hover{background:rgba(107,91,149,.42);border-color:#9884c2}
+      html[data-theme='light'] .kt2-prophet-chip{background:rgba(107,91,149,.18);color:#4a3c7a;border-color:rgba(107,91,149,.45)}
+      .kt2-prophet-chip .kt2-prophet-icon{font-size:10px;opacity:.75}
+      .kt2-prophets-label{font-size:10.5px;opacity:.7;margin-inline-end:4px;align-self:center}
       .kt2-card-name{font-family:'Frank Ruhl Libre',serif;font-size:17px;font-weight:900;line-height:1.15}
       .kt2-card-meta{font-size:11.5px;opacity:.8;margin-top:2px}
       .kt2-kingdom-badge{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap}
@@ -129,6 +136,51 @@
     return 'מעורב';
   }
 
+  // Prophet lookup: prefer KingsUtils.prophets_by_reign. Falls back to
+  // king.related_prophets (array of ids) with names resolved via the
+  // character entity index.
+  function prophetsForKing(king){
+    if (!king) return [];
+    const KU = (typeof window !== 'undefined') && window.KingsUtils;
+    const charIdx = (window.__ENTITY_INDEX__ && window.__ENTITY_INDEX__.character) || {};
+    if (KU && typeof KU.prophets_by_reign === 'function'){
+      try {
+        const list = KU.prophets_by_reign(Object.values(charIdx), king) || [];
+        if (list.length) return list.slice(0, 6);
+      } catch(e){}
+    }
+    // Fallback to king.related_prophets ids.
+    const ids = Array.isArray(king.related_prophets) ? king.related_prophets : [];
+    return ids.slice(0, 6).map(id => {
+      const c = charIdx[id];
+      const name = (c && (c.name_niqqud || c.heading || c.name)) || id;
+      return { id, name };
+    });
+  }
+
+  function ProphetChips({ king, setRoute }){
+    const prophets = prophetsForKing(king);
+    if (!prophets.length) return null;
+    const go = (id) => { if (!id) return; goToCharacter(setRoute, id); };
+    return (
+      <div className="kt2-prophets" onClick={(e) => e.stopPropagation()}>
+        <span className="kt2-prophets-label" aria-hidden="true">נביאים:</span>
+        {prophets.map(p => (
+          <button
+            key={p.id}
+            type="button"
+            className="kt2-prophet-chip"
+            onClick={() => go(p.id)}
+            aria-label={'פתח דף נביא — ' + p.name}
+          >
+            <span className="kt2-prophet-icon" aria-hidden="true">🕊</span>
+            <span>{p.name}</span>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   // ---------- Error boundary (minimal) -------------------------------------
   function SafeCard({ children }){
     try { return children; } catch(e){ return null; }
@@ -173,6 +225,7 @@
             </div>
             {bce ? <div className="kt2-card-meta" style={{ marginTop: 1 }}>{bce}</div> : null}
             <div className="kt2-card-meta" style={{ marginTop: 3, opacity: .8 }}>{role}</div>
+            <ProphetChips king={king} setRoute={setRoute}/>
           </div>
           <span style={{ fontSize: 18, opacity: .5, alignSelf: 'center' }}>←</span>
         </li>
