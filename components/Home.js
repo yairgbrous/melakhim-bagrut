@@ -31,12 +31,18 @@
               </p>
             )}
           </div>
-          <div className="mt-4 md:mt-0 md:shrink-0">
+          <div className="mt-4 md:mt-0 md:shrink-0 flex flex-col gap-2 md:w-auto">
             <button
               onClick={()=>setRoute({page:"unit", unitId: (currentUnit && currentUnit.id) || 1})}
               className="gold-btn w-full md:w-auto md:px-10 py-4 rounded-2xl text-lg md:text-xl glow font-bold"
               aria-label="המשך מסלול">
               🗺 המשך מסלול ←
+            </button>
+            <button
+              onClick={()=>setRoute({page:"quizUnit", unit: (currentUnit && currentUnit.id) || 1})}
+              className="w-full md:w-auto md:px-10 py-2.5 rounded-xl text-sm border-2 border-amber-500/40 text-on-parchment font-bold hover:bg-amber-500/10 transition"
+              aria-label="תרגל את היחידה">
+              ⚔️ תרגל את היחידה
             </button>
           </div>
         </div>
