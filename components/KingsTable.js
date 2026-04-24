@@ -33,9 +33,24 @@
       .kt2-spinner{font-size:40px;animation:kt2Spin 2.2s linear infinite}
       @keyframes kt2Spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
       .kt2-flat{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:8px}
-      .kt2-card{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:1px solid rgba(212,165,116,.35);background:rgba(22,40,74,.55);color:var(--on-parchment,#F5E6C8);cursor:pointer;transition:transform .12s ease,border-color .12s ease}
+      /* Two-column RTL layout: יהודה on visual right, ישראל on visual left.
+         In RTL, grid column 1 renders on the right, column 2 on the left. */
+      .kt2-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+      .kt2-col-header{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:12px;font-family:'Frank Ruhl Libre',serif;font-size:18px;font-weight:900;position:sticky;top:0;z-index:3;backdrop-filter:blur(8px);border:1px solid rgba(212,165,116,.35)}
+      .kt2-col-judah  { color:#C89B3C; background:rgba(139,111,31,.18)}
+      .kt2-col-israel { color:#7db5df; background:rgba(30,77,122,.18)}
+      .kt2-col-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+      .kt2-card{display:flex;align-items:stretch;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid rgba(212,165,116,.35);background:rgba(22,40,74,.55);color:var(--on-parchment,#F5E6C8);cursor:pointer;transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease;border-inline-start-width:5px}
       html[data-theme='light'] .kt2-card{background:rgba(247,241,225,.78);color:#3a2a0d}
-      .kt2-card:hover{transform:translateX(-2px);border-color:#C89B3C}
+      .kt2-card:hover{transform:translateX(-2px);border-color:#C89B3C;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+      .kt2-card:focus-visible{outline:3px solid #C89B3C;outline-offset:2px}
+      /* Assessment color coding: good=emerald, bad=ruby, mixed=amber */
+      .kt2-card.kt2-good{ background:linear-gradient(135deg,rgba(45,122,45,.35),rgba(45,122,45,.15)); border-inline-start-color:#4CAF50}
+      .kt2-card.kt2-bad { background:linear-gradient(135deg,rgba(139,45,45,.35),rgba(139,45,45,.15)); border-inline-start-color:#d94444}
+      .kt2-card.kt2-mix { background:linear-gradient(135deg,rgba(200,155,60,.30),rgba(200,155,60,.12)); border-inline-start-color:#C89B3C}
+      html[data-theme='light'] .kt2-card.kt2-good{background:linear-gradient(135deg,#d4f5d4,#a8e6a1);color:#1a4d1a}
+      html[data-theme='light'] .kt2-card.kt2-bad {background:linear-gradient(135deg,#fad4d4,#e6a1a1);color:#4d1a1a}
+      html[data-theme='light'] .kt2-card.kt2-mix {background:linear-gradient(135deg,#f5e8b8,#e6d184);color:#4d3e1a}
       .kt2-card-name{font-family:'Frank Ruhl Libre',serif;font-size:17px;font-weight:900;line-height:1.15}
       .kt2-card-meta{font-size:11.5px;opacity:.8;margin-top:2px}
       .kt2-kingdom-badge{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap}
@@ -90,6 +105,30 @@
   const KINGDOM_LABEL = { judah: 'יהודה', israel: 'ישראל', united: 'מאוחדת' };
   const KINGDOM_ICON  = { judah: '👑', israel: '⚔️', united: '✨' };
 
+  // Assessment → CSS color class. Prefers KingsUtils.assessmentKind so the
+  // same rules that power the character page apply here.
+  function assessKind(king){
+    const KU = (typeof window !== 'undefined') && window.KingsUtils;
+    if (KU && typeof KU.assessmentKind === 'function'){
+      try { return KU.assessmentKind(king); } catch(e){}
+    }
+    const raw = (king && king.assessment) || '';
+    if (raw === 'צדיק')  return 'tzadik';
+    if (raw === 'רשע')   return 'rasha';
+    if (raw === 'מעורב') return 'mixed';
+    return king && king.good === true ? 'tzadik' : (king && king.good === false ? 'rasha' : 'mixed');
+  }
+  function kindToClass(kind){
+    if (kind === 'tzadik') return 'kt2-good';
+    if (kind === 'rasha')  return 'kt2-bad';
+    return 'kt2-mix';
+  }
+  function kindLabel(kind){
+    if (kind === 'tzadik') return 'צדיק';
+    if (kind === 'rasha')  return 'רשע';
+    return 'מעורב';
+  }
+
   // ---------- Error boundary (minimal) -------------------------------------
   function SafeCard({ children }){
     try { return children; } catch(e){ return null; }
@@ -115,27 +154,27 @@
     const role = king.short_summary
       ? king.short_summary.split('.')[0].slice(0, 90) + '…'
       : (king.assessment ? ('מלך ' + KINGDOM_LABEL[kingdom] + ' · ' + king.assessment) : ('מלך ' + KINGDOM_LABEL[kingdom]));
+    const kind = assessKind(king);
+    const colorCls = kindToClass(kind);
     return (
       <SafeCard>
         <li
-          className="kt2-card"
+          className={'kt2-card ' + colorCls}
           role="button" tabIndex={0}
-          aria-label={name + ' · ' + KINGDOM_LABEL[kingdom] + ' · ' + years}
+          aria-label={name + ' · ' + KINGDOM_LABEL[kingdom] + ' · ' + kindLabel(kind) + ' · ' + years}
           onClick={() => goToCharacter(setRoute, king.id)}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); goToCharacter(setRoute, king.id); } }}
         >
-          <span className={'kt2-kingdom-badge kt2-kingdom-' + kingdom}>
-            {KINGDOM_ICON[kingdom]} {KINGDOM_LABEL[kingdom]}
-          </span>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="kt2-card-name hebrew">{name}</div>
             <div className="kt2-card-meta">
-              {years}
-              {bce ? <span style={{ marginInlineStart: 6, opacity: .7 }}>· {bce}</span> : null}
+              <span>{KINGDOM_ICON[kingdom]} {kindLabel(kind)}</span>
+              {years ? <span style={{ marginInlineStart: 8 }}>· {years}</span> : null}
             </div>
-            <div className="kt2-card-meta" style={{ marginTop: 2, opacity: .75 }}>{role}</div>
+            {bce ? <div className="kt2-card-meta" style={{ marginTop: 1 }}>{bce}</div> : null}
+            <div className="kt2-card-meta" style={{ marginTop: 3, opacity: .8 }}>{role}</div>
           </div>
-          <span style={{ fontSize: 18, opacity: .5 }}>←</span>
+          <span style={{ fontSize: 18, opacity: .5, alignSelf: 'center' }}>←</span>
         </li>
       </SafeCard>
     );
@@ -199,17 +238,33 @@
       );
     }
 
+    // Split by kingdom for two-column layout. 'united' (Solomon) goes in the
+    // Judah column since he's the father of the Davidic line.
+    const judah  = kings.filter(k => normKingdom(k) !== 'israel');
+    const israel = kings.filter(k => normKingdom(k) === 'israel');
+
     return (
       <div className="kt2-wrap">
         <header className="kt2-header">
           <h1>📜 ציר המלכים</h1>
-          <p>כל {kings.length} מלכי יהודה וישראל בסדר כרונולוגי · לחץ על מלך לפתיחת הדף המלא</p>
+          <p>כל {kings.length} מלכי יהודה וישראל · ירוק = צדיק · אדום = רשע · ענבר = מעורב · לחץ על מלך לפתיחת הדף המלא</p>
         </header>
-        <ul className="kt2-flat" aria-label="רשימת מלכים">
-          {kings.map(king => (
-            <KingCard key={king.id} king={king} setRoute={setRoute}/>
-          ))}
-        </ul>
+        <div className="kt2-two-col">
+          {/* Judah column — visual RIGHT in RTL (grid column 1) */}
+          <section aria-label="מלכי יהודה">
+            <div className="kt2-col-header kt2-col-judah">👑 מלכי יהודה <span style={{ fontSize: 12, opacity: .7 }}>({judah.length})</span></div>
+            <ul className="kt2-col-list">
+              {judah.map(king => <KingCard key={king.id} king={king} setRoute={setRoute}/>)}
+            </ul>
+          </section>
+          {/* Israel column — visual LEFT in RTL (grid column 2) */}
+          <section aria-label="מלכי ישראל">
+            <div className="kt2-col-header kt2-col-israel">⚔️ מלכי ישראל <span style={{ fontSize: 12, opacity: .7 }}>({israel.length})</span></div>
+            <ul className="kt2-col-list">
+              {israel.map(king => <KingCard key={king.id} king={king} setRoute={setRoute}/>)}
+            </ul>
+          </section>
+        </div>
       </div>
     );
   }
