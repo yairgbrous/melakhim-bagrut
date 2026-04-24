@@ -95,13 +95,17 @@
     evalFile('./data/hebrew-dates.js', []),
     evalFile('./data/_id-aliases.js?v=1400', []),
   ]);
-  const [chars, stories, flashcards, keyConcepts, kingsMod] = await Promise.all([
+  const [chars, stories, flashcards, keyConcepts, kingsMod, unitDeepMod] = await Promise.all([
     importModule('./data/characters.js'),
     importModule('./data/stories.js'),
     importModule('./data/flashcards.js'),
     importModule('./data/key-concepts.js'),
-    importModule('./data/kings.js')
+    importModule('./data/kings.js'),
+    importModule('./data/unit-deep-summaries.js?v=3100')
   ]);
+  if (unitDeepMod) {
+    window.UNIT_DEEP_SUMMARIES = unitDeepMod.default || unitDeepMod.unitDeepSummaries || [];
+  }
   const idx = window.__ENTITY_INDEX__;
   (window.motifs||[]).forEach(m => {
     idx.motif[m.id] = Object.assign({}, m, {
@@ -198,6 +202,9 @@
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/Toast.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/Home.js?v=1400"></script>
+<script src="./data/review-questions.js?v=3100"></script>
+<script type="text/babel" data-presets="react" src="./components/Timeline.js?v=3100"></script>
+<script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=3100"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -2628,7 +2635,15 @@ function App(){
           ? React.createElement(window.HomeComponent, {S, setRoute, level, nextLv})
           : <div className="text-amber-200 text-center py-8">טוען דף בית...</div>)}
         {route.page==="path" && <UnitsPath S={S} setRoute={setRoute}/>}
-        {route.page==="unit" && <UnitDetail unitId={route.unitId} S={S} setRoute={setRoute} awardXP={awardXP} update={update}/>}
+        {route.page==="unit" && (()=>{
+          // New full-screen UnitPage when unitId is numeric 1-6 and UnitPageComponent is loaded.
+          const n = typeof route.unitId === "number" ? route.unitId : parseInt(route.unitId, 10);
+          const UP = window.UnitPageComponent;
+          if (UP && Number.isFinite(n) && n>=1 && n<=6) {
+            return <UP n={n} setRoute={setRoute}/>;
+          }
+          return <UnitDetail unitId={route.unitId} S={S} setRoute={setRoute} awardXP={awardXP} update={update}/>;
+        })()}
         {route.page==="lesson" && <Lesson unitId={route.unitId} mode={route.mode} setRoute={setRoute} S={S} awardXP={awardXP} update={update}/>}
         {route.page==="quiz" && <QuizLobby S={S} setRoute={setRoute}/>}
         {route.page==="quizUnit" && (()=>{ const X=window.QuizEngineComponent; return X ? <X mode={"unit-"+route.unit} unit={route.unit} S={S} update={update} setRoute={setRoute} onComplete={()=>setRoute({page:"path"})}/> : <div className="text-amber-200 text-center py-8">טוען תרגול יחידה...</div>; })()}
@@ -2641,7 +2656,9 @@ function App(){
         {route.page==="quizResult" && <QuizResult {...route} S={S} setRoute={setRoute}/>}
         {route.page==="themes" && (window.BreadthPage ? React.createElement(window.BreadthPage, {setRoute}) : <Themes S={S} update={update}/>)}
         {route.page==="quotes" && <QuotesBrowser S={S} update={update} awardXP={awardXP}/>}
-        {route.page==="timeline" && <Timeline/>}
+        {route.page==="timeline" && (window.TimelineComponent
+          ? React.createElement(window.TimelineComponent, {setRoute})
+          : <Timeline/>)}
         {route.page==="maps" && <MapsPage S={S} update={update} awardXP={awardXP}/>}
         {route.page==="exam" && <ExamSim S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/>}
         {route.page==="class" && <ClassBoard S={S} update={update} setRoute={setRoute}/>}
