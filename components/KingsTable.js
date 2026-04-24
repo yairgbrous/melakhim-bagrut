@@ -58,6 +58,24 @@
       html[data-theme='light'] .kt2-prophet-chip{background:rgba(107,91,149,.18);color:#4a3c7a;border-color:rgba(107,91,149,.45)}
       .kt2-prophet-chip .kt2-prophet-icon{font-size:10px;opacity:.75}
       .kt2-prophets-label{font-size:10.5px;opacity:.7;margin-inline-end:4px;align-self:center}
+      /* Era timeline bar — horizontal strip showing era 1..6 spans. */
+      .kt2-era-bar{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding:6px 4px;border-radius:10px;background:rgba(0,0,0,.18);border:1px solid rgba(212,165,116,.25)}
+      html[data-theme='light'] .kt2-era-bar{background:rgba(247,241,225,.55)}
+      .kt2-era-seg{padding:8px 6px;border-radius:8px;text-align:center;font-size:11px;font-weight:800;cursor:pointer;transition:transform .1s ease,box-shadow .1s ease}
+      .kt2-era-seg:hover{transform:translateY(-1px)}
+      .kt2-era-seg.active{outline:2px solid #C89B3C;box-shadow:0 0 0 2px rgba(200,155,60,.3)}
+      .kt2-era-seg-num{display:block;font-size:9px;opacity:.8;margin-bottom:2px}
+      /* Mobile: single column with kingdom toggle tabs. */
+      .kt2-mobile-toggle{display:none;grid-template-columns:1fr 1fr;gap:6px;padding:4px;border-radius:12px;background:rgba(0,0,0,.15);border:1px solid rgba(212,165,116,.25)}
+      .kt2-mobile-toggle button{padding:8px 10px;border-radius:10px;border:none;background:transparent;color:var(--on-parchment,#F5E6C8);font-weight:800;cursor:pointer;font-size:13.5px}
+      html[data-theme='light'] .kt2-mobile-toggle button{color:#3a2a0d}
+      .kt2-mobile-toggle button.active{background:#C89B3C;color:#1A1611}
+      @media (max-width:640px){
+        .kt2-two-col{grid-template-columns:1fr}
+        .kt2-mobile-toggle{display:grid}
+        .kt2-two-col > section[data-kingdom-panel].kt2-hide-mobile{display:none}
+        .kt2-col-header{font-size:15px}
+      }
       .kt2-card-name{font-family:'Frank Ruhl Libre',serif;font-size:17px;font-weight:900;line-height:1.15}
       .kt2-card-meta{font-size:11.5px;opacity:.8;margin-top:2px}
       .kt2-kingdom-badge{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap}
@@ -233,12 +251,46 @@
     );
   }
 
+  // ---------- Era timeline bar ---------------------------------------------
+  // Each era gets: name, color, approx BCE span. Click → scroll the column to
+  // the first king of that era. Also highlights the currently-visible era.
+  const ERAS = [
+    { id: 1, name: 'שלמה',            color: '#D4A574', span: '970–931' },
+    { id: 2, name: 'פילוג',            color: '#A83240', span: '931–874' },
+    { id: 3, name: 'אליהו ואחאב',     color: '#3E8E7E', span: '874–841' },
+    { id: 4, name: 'מהפכות',          color: '#6B5B95', span: '841–740' },
+    { id: 5, name: 'אשור',             color: '#8B4513', span: '740–686' },
+    { id: 6, name: 'בבל',              color: '#2C3E50', span: '686–586' }
+  ];
+  function EraBar({ activeEra, onPick }){
+    return (
+      <div className="kt2-era-bar" role="tablist" aria-label="תקופות">
+        {ERAS.map(e => (
+          <button
+            key={e.id}
+            role="tab"
+            aria-selected={activeEra === e.id}
+            className={'kt2-era-seg ' + (activeEra === e.id ? 'active' : '')}
+            style={{ background: e.color + '30', color: e.color }}
+            onClick={() => onPick && onPick(e.id)}
+            title={'תקופה ' + e.id + ' · ' + e.name + ' · ' + e.span + ' לפנה״ס'}
+          >
+            <span className="kt2-era-seg-num">תקופה {e.id}</span>
+            {e.name}
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   // ---------- Main component -----------------------------------------------
   function KingsTable(props){
     const setRoute = props && props.setRoute;
     const [ready, setReady] = useState(() => isReady());
     const [error, setError] = useState(null);
     const [bumper, setBumper] = useState(0);  // force re-sort after ready
+    const [kingdomTab, setKingdomTab] = useState('judah'); // mobile only: 'judah' | 'israel'
+    const [activeEra, setActiveEra] = useState(null);
 
     useEffect(() => {
       if (ready) return;
@@ -291,10 +343,12 @@
       );
     }
 
+    // Filter by era when the user clicked an era segment. `null` = show all.
+    const inEra = (k) => !activeEra || k.era === activeEra;
     // Split by kingdom for two-column layout. 'united' (Solomon) goes in the
     // Judah column since he's the father of the Davidic line.
-    const judah  = kings.filter(k => normKingdom(k) !== 'israel');
-    const israel = kings.filter(k => normKingdom(k) === 'israel');
+    const judah  = kings.filter(k => normKingdom(k) !== 'israel').filter(inEra);
+    const israel = kings.filter(k => normKingdom(k) === 'israel').filter(inEra);
 
     return (
       <div className="kt2-wrap">
@@ -302,19 +356,47 @@
           <h1>📜 ציר המלכים</h1>
           <p>כל {kings.length} מלכי יהודה וישראל · ירוק = צדיק · אדום = רשע · ענבר = מעורב · לחץ על מלך לפתיחת הדף המלא</p>
         </header>
+
+        {/* Era timeline bar (horizontal strip) */}
+        <EraBar activeEra={activeEra} onPick={(id) => setActiveEra(activeEra === id ? null : id)}/>
+        {activeEra && (
+          <div style={{ fontSize: 12, textAlign: 'center', opacity: .75 }}>
+            מסנן תקופה {activeEra}.{' '}
+            <button onClick={() => setActiveEra(null)} style={{ textDecoration: 'underline', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}>
+              הצג את כל התקופות
+            </button>
+          </div>
+        )}
+
+        {/* Mobile: kingdom toggle (hidden on desktop via CSS) */}
+        <div className="kt2-mobile-toggle" role="tablist" aria-label="בחר ממלכה">
+          <button role="tab" aria-selected={kingdomTab === 'judah'}  className={kingdomTab === 'judah'  ? 'active' : ''} onClick={() => setKingdomTab('judah')}>👑 יהודה ({judah.length})</button>
+          <button role="tab" aria-selected={kingdomTab === 'israel'} className={kingdomTab === 'israel' ? 'active' : ''} onClick={() => setKingdomTab('israel')}>⚔️ ישראל ({israel.length})</button>
+        </div>
+
         <div className="kt2-two-col">
           {/* Judah column — visual RIGHT in RTL (grid column 1) */}
-          <section aria-label="מלכי יהודה">
+          <section
+            data-kingdom-panel="judah"
+            aria-label="מלכי יהודה"
+            className={kingdomTab === 'judah' ? '' : 'kt2-hide-mobile'}
+          >
             <div className="kt2-col-header kt2-col-judah">👑 מלכי יהודה <span style={{ fontSize: 12, opacity: .7 }}>({judah.length})</span></div>
             <ul className="kt2-col-list">
               {judah.map(king => <KingCard key={king.id} king={king} setRoute={setRoute}/>)}
+              {judah.length === 0 && <li style={{ opacity: .55, textAlign: 'center', fontSize: 12, padding: 12 }}>אין מלכים בתקופה זו</li>}
             </ul>
           </section>
           {/* Israel column — visual LEFT in RTL (grid column 2) */}
-          <section aria-label="מלכי ישראל">
+          <section
+            data-kingdom-panel="israel"
+            aria-label="מלכי ישראל"
+            className={kingdomTab === 'israel' ? '' : 'kt2-hide-mobile'}
+          >
             <div className="kt2-col-header kt2-col-israel">⚔️ מלכי ישראל <span style={{ fontSize: 12, opacity: .7 }}>({israel.length})</span></div>
             <ul className="kt2-col-list">
               {israel.map(king => <KingCard key={king.id} king={king} setRoute={setRoute}/>)}
+              {israel.length === 0 && <li style={{ opacity: .55, textAlign: 'center', fontSize: 12, padding: 12 }}>אין מלכים בתקופה זו</li>}
             </ul>
           </section>
         </div>
