@@ -72,6 +72,24 @@
       .kt-tl-decade-line{grid-column:1 / -1;height:0;border-top:1px solid rgba(212,165,116,.22);z-index:0;pointer-events:none}
       .kt-tl-era-sep{grid-column:1 / -1;height:0;border-top:2px solid rgba(212,165,116,.45);z-index:0;pointer-events:none}
       .kt-tl-king-selected{box-shadow:0 0 0 3px #C89B3C, 0 0 16px rgba(200,155,60,.55)}
+      /* ---- mobile: horizontal scroll with sticky year axis ---- */
+      @media (max-width:768px){
+        .kt-tl-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px}
+        .kt-tl-wrap::-webkit-scrollbar{height:6px}
+        .kt-tl-wrap::-webkit-scrollbar-thumb{background:rgba(212,165,116,.45);border-radius:3px}
+        .kt-tl-head, .kt-tl{min-width:720px}
+        /* Year column (first grid col) sticks to the inline-start edge.
+           In RTL that pins it to the right, so the user always sees the
+           year while swiping through the wider king/prophet columns. */
+        .kt-tl-year{position:sticky; inset-inline-start:0; z-index:2;
+          background:rgba(10,22,40,.92); backdrop-filter:blur(4px);
+          box-shadow:1px 0 0 rgba(212,165,116,.25)}
+        html[data-theme='light'] .kt-tl-year{background:rgba(247,241,225,.96)}
+        .kt-tl-head > div:first-child{position:sticky; inset-inline-start:0; z-index:4;
+          background:rgba(10,22,40,.95)}
+        html[data-theme='light'] .kt-tl-head > div:first-child{background:rgba(247,241,225,.98)}
+        .kt-tl-head > div{font-size:12px; padding:6px 4px}
+      }
     `;
     document.head.appendChild(s);
   })();
