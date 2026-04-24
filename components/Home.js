@@ -97,6 +97,30 @@
     );
   }
 
+  // Count SM-2-due flashcards via the API exposed by FlashcardDrill.js.
+  // Re-runs on every Home render so the count stays fresh after a drill session.
+  function useDueCount(){
+    const [n, setN] = useState(() => {
+      try { return (window.FlashcardSM2 && window.FlashcardSM2.countDue()) || 0; } catch(e){ return 0; }
+    });
+    useEffect(() => {
+      const recount = () => {
+        try { setN((window.FlashcardSM2 && window.FlashcardSM2.countDue()) || 0); } catch(e){}
+      };
+      recount();
+      // Update when the entity index finishes loading OR when the drill updates a card.
+      window.addEventListener('entity-index-ready', recount);
+      window.addEventListener('focus', recount);
+      window.addEventListener('storage', recount);
+      return () => {
+        window.removeEventListener('entity-index-ready', recount);
+        window.removeEventListener('focus', recount);
+        window.removeEventListener('storage', recount);
+      };
+    }, []);
+    return n;
+  }
+
   function QuickActions({setRoute}){
     const openBook = () => {
       const pool = (typeof window !== 'undefined' && window.__ENTITY_INDEX__ && window.__ENTITY_INDEX__.quote) || {};
@@ -108,13 +132,20 @@
         setRoute({page:'quotes'});
       }
     };
+    const dueCount = useDueCount();
+    const dueSubtitle = dueCount > 0
+      ? (dueCount + ' קלפים לחזור היום')
+      : 'אין קלפים לחזור היום — עבור להוסיף ידע חדש';
     return (
       <section className="quick-actions-wrap">
         <h2 className="font-display text-base md:text-lg font-bold text-on-parchment mb-2 px-1">⚡ פעולות מהירות</h2>
         <div className="quick-actions-grid">
           <QuickAction icon="⚡" title="חידון מהיר" subtitle="10 שאלות אקראיות"
             onClick={()=>setRoute({page:'quizPlay', mode:'quick'})} accent="qa-gold"/>
-          <QuickAction icon="📝" title="סימולציה מלאה" subtitle="שעתיים · 100 נקודות"
+          <QuickAction icon="🃏" title={dueCount > 0 ? ('🔔 ' + dueCount + ' קלפים לחזור היום') : 'כרטיסיות זיכרון'}
+            subtitle={dueSubtitle}
+            onClick={()=>setRoute({page:'flashcards'})} accent="qa-indigo"/>
+          <QuickAction icon="📝" title="סימולציה מלאה" subtitle="שעתיים · 101 נקודות"
             onClick={()=>setRoute({page:'exam'})} accent="qa-crimson"/>
           <QuickAction icon="☀️" title="אתגר היום" subtitle="שאלה אחת · פעם ביום"
             onClick={()=>setRoute({page:'quizPlay', mode:'daily'})} accent="qa-purple"/>
