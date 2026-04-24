@@ -49,60 +49,75 @@
   function EventPage(props){
     const id = props && props.id;
     const setRoute = props && props.setRoute;
-    const ev = (window.EVENTS_DATA || []).find(x => x.id === id) || { title: id };
-    const hasData = !!ev && !!(ev.summary || ev.significance || ev.participants || ev.places);
+    const ev = (window.EVENTS_DATA || []).find(x => x.id === id) || null;
+    const hasData = !!ev;
 
     const go = (page, extra) => setRoute && setRoute({ page, ...(extra||{}) });
 
     const onPractice = () => {
-      const detail = { type: "event", id: ev.id || id };
+      const detail = { type: "event", id: (ev && ev.id) || id };
       try { window.dispatchEvent(new CustomEvent("practice-entity", { detail })); } catch {}
       go("quiz");
     };
+
+    const headingLabel = (ev && (ev.title_niqqud || ev.title || ev.name_hebrew)) || id || "אירוע";
+    const bookRefs = (ev && Array.isArray(ev.book_refs)) ? ev.book_refs : [];
 
     return (
       <div className="max-w-2xl mx-auto space-y-4 p-2">
         <button onClick={()=>go("study")} className="text-on-parchment-accent text-sm">→ חזרה לאזור הלימוד</button>
 
         <header className="card rounded-2xl p-5">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">
-            ⚔️ {ev.title || ev.name_hebrew || id}
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent hebrew">
+            ⚔️ {headingLabel}
           </h1>
           <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
-            {ev.unit && <span className="px-2 py-0.5 rounded-full bg-amber-700 text-on-parchment-muted font-bold">יחידה {ev.unit}</span>}
-            {ev.chapters && <span className="text-on-parchment">{ev.chapters}</span>}
+            {ev && ev.unit != null && <span className="px-2 py-0.5 rounded-full bg-amber-700 text-on-parchment-muted font-bold">יחידה {ev.unit}</span>}
+            {ev && (ev.chapter_ref || ev.chapters) && <span className="text-on-parchment">{ev.chapter_ref || ev.chapters}</span>}
+            {ev && ev.date_bce != null && <span className="text-on-parchment-muted">~{ev.date_bce} לפנה״ס</span>}
           </div>
         </header>
 
         {!hasData && (
           <div className="card rounded-xl p-4 text-on-parchment-muted text-sm">
-            יוצג בקרוב · נתוני האירוע טרם הוזנו ל-<code>window.EVENTS_DATA</code>.
+            יוצג בקרוב · האירוע <code>{id}</code> טרם הוזן ל-<code>window.EVENTS_DATA</code>.
           </div>
         )}
 
-        {ev.summary && (
+        {ev && ev.summary && (
           <section className="parchment rounded-2xl p-5">
             <h2 className="font-display text-base font-bold text-amber-900 mb-2">תקציר</h2>
             <p className="hebrew text-amber-950 leading-relaxed">{ev.summary}</p>
           </section>
         )}
 
-        {ev.significance && (
+        {ev && ev.significance && (
           <section className="card rounded-xl p-4">
             <h2 className="font-display text-base font-bold text-on-parchment mb-2">משמעות</h2>
             <p className="hebrew text-on-parchment-muted leading-relaxed">{ev.significance}</p>
           </section>
         )}
 
-        <Section title="👤 דמויות באירוע"       items={ev.participants}             type="character" setRoute={setRoute}/>
-        <Section title="👤 דמויות קשורות"       items={ev.related_characters}       type="character" setRoute={setRoute}/>
-        <Section title="📍 מקומות"              items={ev.places}                   type="place"     setRoute={setRoute}/>
-        <Section title="🌐 נושאי רוחב"          items={ev.related_breadth}          type="breadth"   setRoute={setRoute}/>
-        <Section title="🔁 פריטים חוזרים"       items={ev.related_recurring_items}  type="recurring" setRoute={setRoute}/>
+        {ev && <Section title="👤 דמויות באירוע"       items={ev.participants}             type="character" setRoute={setRoute}/>}
+        {ev && <Section title="👤 דמויות קשורות"       items={ev.related_characters}       type="character" setRoute={setRoute}/>}
+        {ev && <Section title="📍 מקומות"              items={ev.places}                   type="place"     setRoute={setRoute}/>}
+        {ev && <Section title="🌐 נושאי רוחב"          items={ev.related_breadth}          type="breadth"   setRoute={setRoute}/>}
+        {ev && <Section title="🔁 פריטים חוזרים"       items={ev.related_recurring_items}  type="recurring" setRoute={setRoute}/>}
 
-        <button onClick={onPractice} className="gold-btn w-full py-3 rounded-xl text-base font-bold">
-          ⚔️ תרגל על אירוע זה
-        </button>
+        {bookRefs.length > 0 && (
+          <section className="card rounded-xl p-4">
+            <h3 className="text-xs font-bold text-on-parchment mb-2">📚 מקורות בספר מלכים</h3>
+            <ul className="text-sm text-on-parchment-muted hebrew" style={{columnCount:2,columnGap:18,listStyle:'none',padding:0,margin:0}}>
+              {bookRefs.map((r,i)=><li key={i} style={{breakInside:'avoid',marginBottom:4}}>• {r}</li>)}
+            </ul>
+          </section>
+        )}
+
+        {hasData && (
+          <button onClick={onPractice} className="gold-btn w-full py-3 rounded-xl text-base font-bold">
+            ⚔️ תרגל על אירוע זה
+          </button>
+        )}
       </div>
     );
   }

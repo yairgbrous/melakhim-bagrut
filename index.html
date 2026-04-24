@@ -183,10 +183,10 @@
 <script src="./data/_entity-index.js?v=2000"></script>
 <script type="module" src="./data/past-exams.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=2200"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=2200"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=2200"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=2200"></script>
 <script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=2000"></script>
 <script src="./components/KingsUtils.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=2000"></script>
@@ -2641,16 +2641,11 @@ function App(){
         {route.page==="profile" && <MeTab S={S} update={update} setRoute={setRoute}/>}
         {route.page==="study" && <StudyHub setRoute={setRoute}/>}
         {route.page==="character" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף דמות...</div>; })()}
-        {route.page==="exam-sim" && (()=>{ const X=window.ExamSim2551; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/> : <div className="text-amber-200 text-center py-8">טוען מתכונת...</div>; })()}
-        {route.page==="event" && (()=>{ const X=window.EventPage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אירוע...</div>; })()}
-        {route.page==="place" && (()=>{ const X=window.PlacePage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען מקום...</div>; })()}
         </>;
           return RouteEB
             ? React.createElement(RouteEB, { onHome: onHomeReset, key: route.page }, routeContent)
             : routeContent;
         })()}
-        {route.page==="daily" && (()=>{ const X=window.DailyChallenge; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אתגר יומי...</div>; })()}
-        </>}
       </main>
       {typeof window!=="undefined" && window.InstantSearchComponent ? <window.InstantSearchComponent setRoute={setRoute}/> : null}
 
