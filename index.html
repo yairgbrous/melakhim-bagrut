@@ -37,7 +37,6 @@
    (legacy profile blob). Everything else is pass-through.
    AuthProvider listens to these events; when signed-in + feature flag on,
    it debounces 2s then pushes a diff to RTDB users/{uid}/progress.
-   ========================================================================= */
 (function(){
   if (typeof window === "undefined" || !window.localStorage) return;
   const PREFIXES = ["jarvis.", "melakhim_pro_"];
@@ -69,7 +68,6 @@
    Fails gracefully per-file. Dispatches 'entity-index-ready' when done.
    Non-module files (motifs.js, archaeology.js, hebrew-dates.js) are eval'd
    in a Function scope; module files via dynamic import.
-   ========================================================================= */
 (async function bootEntityIndex(){
   window.__ENTITY_INDEX__ = {
     motif:{}, date:{}, archaeology:{}, character:{},
@@ -182,7 +180,6 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <!-- Cross-entity connectivity: load BEFORE pages so window.__ENTITY_INDEX__
      has all buckets + window.EntityLinkComponent is available at render. -->
-<<<<<<< claude/audit-fix-id-aliases
 <script src="./data/_entity-index.js?v=1100"></script>
 <script type="module" src="./data/past-exams.js?v=1200"></script>
 <script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=1400"></script>
@@ -205,7 +202,6 @@
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=1340"></script>
 <script type="text/babel" data-presets="react" src="./components/Toast.js?v=1340"></script>
 <script type="text/babel" data-presets="react" src="./components/Home.js?v=1100"></script>
-=======
 <script src="./data/_entity-index.js?v=2000"></script>
 <script type="module" src="./data/past-exams.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=2000"></script>
@@ -224,7 +220,6 @@
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/Toast.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/Home.js?v=2000"></script>
->>>>>>> main
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -749,7 +744,6 @@ html[data-theme='light'] .study-card{
 /* =========================================================================
    CONTRAST TOKENS — WCAG AA enforcement on parchment backgrounds.
    Primary ink #1A1611, secondary #4A3829, accent #8B6F1F, muted meta #6B5639.
-   ========================================================================= */
 .text-on-parchment{ color:#1A1611 !important; }
 .text-on-parchment-muted{ color:#4A3829 !important; font-weight:500; }
 .text-on-parchment-meta{ color:#6B5639 !important; }
@@ -767,7 +761,6 @@ html[data-theme='light'] .study-card{
 
 /* =========================================================================
    HOME HERO
-   ========================================================================= */
 .hero-parchment{ border:1px solid rgba(139,111,31,.35); }
 .hero-countdown{
   background:#7B1A1A; color:#FFF7ED;
@@ -777,7 +770,6 @@ html[data-theme='light'] .study-card{
 
 /* =========================================================================
    HOME PROGRESS STRIP
-   ========================================================================= */
 .progress-strip-wrap{ padding:4px 2px; }
 .progress-strip-rail{
   display:grid; grid-template-columns:repeat(6,1fr); gap:8px;
@@ -832,7 +824,6 @@ html[data-theme='light'] .study-card{
 
 /* =========================================================================
    HOME QUICK ACTIONS
-   ========================================================================= */
 .quick-actions-wrap{ padding:2px; }
 .quick-actions-grid{
   display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
@@ -866,7 +857,6 @@ html[data-theme='light'] .study-card{
 
 /* =========================================================================
    HOME TODAY'S FOCUS
-   ========================================================================= */
 .today-focus-wrap{ padding:2px; }
 .today-focus-list{ display:flex; flex-direction:column; gap:8px; }
 .today-focus-card{
@@ -900,7 +890,6 @@ html[data-theme='light'] .study-card{
 
 /* =========================================================================
    HOME STATS STRIP
-   ========================================================================= */
 .stats-strip-wrap{ padding:2px; }
 .stats-strip-grid{
   display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
