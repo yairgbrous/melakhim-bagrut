@@ -198,6 +198,7 @@
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/Toast.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/PwaShell.js?v=3100"></script>
+<script type="text/babel" data-presets="react" src="./components/NotFound.js?v=3100"></script>
 <script type="text/babel" data-presets="react" src="./components/Home.js?v=1400"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
@@ -2485,7 +2486,9 @@ function App(){
         return {page:'quizUnit', unit: isNaN(+u) ? u : +u};
       }
       const page = PAGE_FROM_SLUG[slug];
-      return page ? {page} : null;
+      if (page) return {page};
+      // Unrecognised hash → render 404 page instead of silently falling back.
+      return {page:'notFound', attempted: raw};
     };
     const buildHash = (r) => {
       if (!r || !r.page) return '';
@@ -2711,6 +2714,13 @@ function App(){
         {route.page==="profile" && <MeTab S={S} update={update} setRoute={setRoute}/>}
         {route.page==="study" && <StudyHub setRoute={setRoute}/>}
         {route.page==="character" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף דמות...</div>; })()}
+        {(() => {
+          const known = new Set(["home","path","unit","lesson","quiz","quizUnit","flashcards","exam-sim","event","place","daily","quizPlay","quizResult","themes","quotes","timeline","maps","exam","class","profile","study","character"]);
+          if (known.has(route.page)) return null;
+          const NF = window.NotFoundComponent;
+          const attempted = route.attempted || (typeof window !== 'undefined' ? (window.location.hash || '') : '');
+          return NF ? <NF setRoute={setRoute} attemptedRoute={attempted}/> : <div className="text-amber-200 text-center py-8">הדף לא נמצא</div>;
+        })()}
         </>;
           return RouteEB
             ? React.createElement(RouteEB, { onHome: onHomeReset, key: route.page }, routeContent)
