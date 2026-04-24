@@ -365,7 +365,7 @@
   }
 
   function QuizEngine(props){
-    const { questions:rawQuestions, mode = "fast", duration, S = {}, update, setRoute, onComplete } = props || {};
+    const { questions:rawQuestions, mode = "fast", duration, unit, S = {}, update, setRoute, onComplete } = props || {};
     const [entityFilter, setEntityFilter] = useState(null);
 
     // practice-entity bridge
@@ -377,14 +377,27 @@
       return () => window.removeEventListener("practice-entity", handler);
     }, []);
 
+    // If no explicit question list given, auto-resolve from window.REVIEW_QUESTIONS
+    // using the optional `unit` prop. Caps at 20 questions per unit (shuffled).
     const pool = useMemo(() => {
-      const base = Array.isArray(rawQuestions) ? rawQuestions.slice() : [];
+      let base;
+      if (Array.isArray(rawQuestions) && rawQuestions.length) {
+        base = rawQuestions.slice();
+      } else if (unit != null) {
+        const all = (typeof window !== "undefined" && Array.isArray(window.REVIEW_QUESTIONS))
+          ? window.REVIEW_QUESTIONS : [];
+        const u = typeof unit === "string" ? parseInt(unit, 10) : unit;
+        const unitMatches = all.filter(q => q && q.unit === u);
+        base = fy(unitMatches).slice(0, 20);
+      } else {
+        base = [];
+      }
       if (entityFilter){
         const filtered = base.filter(q => matchesEntity(q, entityFilter));
-        return filtered.length >= 3 ? filtered : base; // fallback to full pool if too narrow
+        return filtered.length >= 3 ? filtered : base;
       }
       return base;
-    }, [rawQuestions, entityFilter]);
+    }, [rawQuestions, unit, entityFilter]);
 
     const [seed] = useState(()=>Date.now());
     const questions = useMemo(()=>fy(pool), [pool, seed]);
