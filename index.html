@@ -193,6 +193,8 @@
 <script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=2000"></script>
 <script src="./components/BreadthPage.js?v=2000"></script>
+<script src="./data/tanakh-excerpts.js?v=2200"></script>
+<script type="text/babel" data-presets="react" src="./components/BookChapter.js?v=2200"></script>
 <script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
@@ -2452,6 +2454,7 @@ function App(){
       if (slug === 'place' && id)     return {page:'place', id};
       if (slug === 'unit' && id)      return {page:'unit', unitId: isNaN(+id) ? id : +id};
       if (slug === 'lesson' && id)    return {page:'lesson', unitId: isNaN(+id) ? id : +id, mode: parts[2] || 'summary'};
+      if (slug === 'book' && id)      return {page:'book', chapter: id};
       const page = PAGE_FROM_SLUG[slug];
       return page ? {page} : null;
     };
@@ -2461,6 +2464,7 @@ function App(){
       if (r.page === 'character' && r.id) return '#/character/' + encodeURIComponent(r.id);
       if (r.page === 'event' && r.id)     return '#/event/' + encodeURIComponent(r.id);
       if (r.page === 'place' && r.id)     return '#/place/' + encodeURIComponent(r.id);
+      if (r.page === 'book' && r.chapter) return '#/book/' + encodeURIComponent(r.chapter);
       if (r.page === 'unit' && r.unitId != null)   return '#/unit/' + encodeURIComponent(r.unitId);
       if (r.page === 'lesson' && r.unitId != null) return '#/lesson/' + encodeURIComponent(r.unitId) + '/' + encodeURIComponent(r.mode || 'summary');
       return '#/' + slug;
@@ -2629,6 +2633,7 @@ function App(){
         {route.page==="exam-sim" && (()=>{ const X=window.ExamSim2551; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/> : <div className="text-amber-200 text-center py-8">טוען מתכונת...</div>; })()}
         {route.page==="event" && (()=>{ const X=window.EventPage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אירוע...</div>; })()}
         {route.page==="place" && (()=>{ const X=window.PlacePage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען מקום...</div>; })()}
+        {route.page==="book" && (()=>{ const X=window.BookChapter; return X ? <X chapter={route.chapter} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען פרק...</div>; })()}
         {route.page==="daily" && (()=>{ const X=window.DailyChallenge; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אתגר יומי...</div>; })()}
         {route.page==="quizPlay" && <QuizRun params={route} S={S} setRoute={setRoute} awardXP={awardXP} update={update} publishActivity={publishActivity} soundOn={soundOn}/>}
         {route.page==="quizResult" && <QuizResult {...route} S={S} setRoute={setRoute}/>}
