@@ -123,14 +123,20 @@
 
   function QuickActions({setRoute}){
     const openBook = () => {
-      const pool = (typeof window !== 'undefined' && window.__ENTITY_INDEX__ && window.__ENTITY_INDEX__.quote) || {};
-      const quotes = Object.values(pool);
-      if (quotes.length){
-        const q = quotes[Math.floor(Math.random() * quotes.length)];
-        setRoute({page:'quotes', focusId: q.id});
-      } else {
-        setRoute({page:'quotes'});
-      }
+      // Deterministic "chapter of the day": same key every day until midnight,
+      // so users returning during the day land on the same chapter — good for
+      // study continuity and share-a-link. Pool prefers live TANAKH_EXCERPTS;
+      // falls back to a curated list of exam-critical chapter keys.
+      const fallbackPool = [
+        'K1-3','K1-8','K1-11','K1-12','K1-17','K1-18','K1-19','K1-21','K1-22',
+        'K2-2','K2-9','K2-17','K2-18','K2-19','K2-22','K2-23','K2-24','K2-25'
+      ];
+      const excerpts = (typeof window !== 'undefined' && window.TANAKH_EXCERPTS) || {};
+      const live = Object.keys(excerpts);
+      const pool = live.length ? live : fallbackPool;
+      const day  = Math.floor(Date.now() / 86400000);
+      const key  = pool[day % pool.length];
+      setRoute({page:'book', chapter: key});
     };
     const dueCount = useDueCount();
     const dueSubtitle = dueCount > 0
