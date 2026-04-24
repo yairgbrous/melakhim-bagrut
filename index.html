@@ -183,7 +183,7 @@
 <script src="./data/_entity-index.js?v=2000"></script>
 <script type="module" src="./data/past-exams.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=2200"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1400"></script>
 <script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=2200"></script>
 <script type="text/babel" data-presets="react" src="./components/EventPage.js?v=2200"></script>
 <script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=2200"></script>
@@ -197,7 +197,7 @@
 <script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/Toast.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/Home.js?v=2200"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=1400"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -2452,6 +2452,11 @@ function App(){
       if (slug === 'place' && id)     return {page:'place', id};
       if (slug === 'unit' && id)      return {page:'unit', unitId: isNaN(+id) ? id : +id};
       if (slug === 'lesson' && id)    return {page:'lesson', unitId: isNaN(+id) ? id : +id, mode: parts[2] || 'summary'};
+      // #/quiz/unit/:N  →  unit-filtered practice (20 questions from review-questions.js)
+      if (slug === 'quiz' && parts[1] === 'unit' && parts[2]) {
+        const u = parts[2];
+        return {page:'quizUnit', unit: isNaN(+u) ? u : +u};
+      }
       const page = PAGE_FROM_SLUG[slug];
       return page ? {page} : null;
     };
@@ -2463,6 +2468,7 @@ function App(){
       if (r.page === 'place' && r.id)     return '#/place/' + encodeURIComponent(r.id);
       if (r.page === 'unit' && r.unitId != null)   return '#/unit/' + encodeURIComponent(r.unitId);
       if (r.page === 'lesson' && r.unitId != null) return '#/lesson/' + encodeURIComponent(r.unitId) + '/' + encodeURIComponent(r.mode || 'summary');
+      if (r.page === 'quizUnit' && r.unit != null) return '#/quiz/unit/' + encodeURIComponent(r.unit);
       return '#/' + slug;
     };
 
@@ -2474,7 +2480,7 @@ function App(){
       const next = parseHash();
       if (!next) return;
       setRoute(prev => {
-        if (prev && prev.page === next.page && prev.id === next.id && prev.unitId === next.unitId) return prev;
+        if (prev && prev.page === next.page && prev.id === next.id && prev.unitId === next.unitId && prev.unit === next.unit) return prev;
         return next;
       });
     };
@@ -2625,6 +2631,7 @@ function App(){
         {route.page==="unit" && <UnitDetail unitId={route.unitId} S={S} setRoute={setRoute} awardXP={awardXP} update={update}/>}
         {route.page==="lesson" && <Lesson unitId={route.unitId} mode={route.mode} setRoute={setRoute} S={S} awardXP={awardXP} update={update}/>}
         {route.page==="quiz" && <QuizLobby S={S} setRoute={setRoute}/>}
+        {route.page==="quizUnit" && (()=>{ const X=window.QuizEngineComponent; return X ? <X mode={"unit-"+route.unit} unit={route.unit} S={S} update={update} setRoute={setRoute} onComplete={()=>setRoute({page:"path"})}/> : <div className="text-amber-200 text-center py-8">טוען תרגול יחידה...</div>; })()}
         {route.page==="flashcards" && (()=>{ const X=window.FlashcardDrillComponent; return X ? <X S={S} update={update} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען כרטיסיות...</div>; })()}
         {route.page==="exam-sim" && (()=>{ const X=window.ExamSim2551; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/> : <div className="text-amber-200 text-center py-8">טוען מתכונת...</div>; })()}
         {route.page==="event" && (()=>{ const X=window.EventPage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אירוע...</div>; })()}
@@ -2920,20 +2927,28 @@ function UnitsPath({S,setRoute}){
       </div>
       <div className="space-y-3">
         {MELAKHIM_DATA.units.map(u => (
-          <button key={u.id} onClick={()=>setRoute({page:"unit",unitId:u.id})}
-            className="w-full text-right card rounded-2xl p-4 flex items-center gap-4 hover:bg-white/5 transition">
+          <div key={u.id} className="card rounded-2xl p-4 flex items-center gap-4">
             <div className="text-5xl">{u.icon}</div>
             <div className="flex-1 text-right">
               <div className="text-xs text-amber-200/60">יחידה {u.num}</div>
               <h2 className="font-display text-xl font-bold text-amber-100">{u.title}</h2>
               <p className="text-sm text-amber-100/70">{u.subtitle}</p>
               <p className="text-[11px] text-amber-100/40 font-mono mt-0.5">{u.range}</p>
+              <div className="flex gap-2 mt-2 flex-wrap">
+                <button onClick={()=>setRoute({page:"unit",unitId:u.id})}
+                  className="text-xs px-3 py-1.5 rounded-lg border border-amber-500/40 text-amber-200 hover:bg-amber-500/10">
+                  📖 ללימוד
+                </button>
+                <button onClick={()=>setRoute({page:"quizUnit", unit:u.id})}
+                  className="text-xs px-3 py-1.5 rounded-lg gold-btn font-bold">
+                  ⚔️ תרגל את היחידה
+                </button>
+              </div>
             </div>
             <div className="flex flex-col items-end gap-1">
               {S.quizScores[u.id]>0 && <span className="text-emerald-400 text-sm font-bold">🎯 {S.quizScores[u.id]}%</span>}
-              <span className="text-amber-300">←</span>
             </div>
-          </button>
+          </div>
         ))}
       </div>
     </div>
