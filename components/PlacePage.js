@@ -58,17 +58,20 @@
   function PlacePage(props){
     const id = props && props.id;
     const setRoute = props && props.setRoute;
-    const pl = (window.PLACES_DATA || []).find(x => x.id === id) || { name_niqqud: id };
-    const hasData = !!(pl && (pl.significance || pl.related_events || pl.related_characters || pl.map_numbers));
+    const pl = (window.PLACES_DATA || []).find(x => x.id === id) || null;
+    const hasData = !!pl;
 
     const go = (page, extra) => setRoute && setRoute({ page, ...(extra||{}) });
 
-    const primaryMapNum = Array.isArray(pl.map_numbers) && pl.map_numbers.length > 0 ? pl.map_numbers[0] : null;
+    const primaryMapNum = (pl && Array.isArray(pl.map_numbers) && pl.map_numbers.length > 0) ? pl.map_numbers[0] : null;
 
     const onFindOnMap = () => {
       if (primaryMapNum != null) go("maps", { hash: String(primaryMapNum) });
       else go("maps");
     };
+
+    const headingLabel = (pl && (pl.name_niqqud || pl.name)) || id || "מקום";
+    const bookRefs = (pl && Array.isArray(pl.book_refs)) ? pl.book_refs : [];
 
     return (
       <div className="max-w-2xl mx-auto space-y-4 p-2">
@@ -76,43 +79,51 @@
 
         <header className="card rounded-2xl p-5">
           <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent hebrew">
-            📍 {pl.name_niqqud || pl.name || id}
+            📍 {headingLabel}
           </h1>
           <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
-            {pl.type && <span className="px-2 py-0.5 rounded-full bg-emerald-700 text-emerald-100 font-bold">{pl.type}</span>}
-            {pl.required_for_exam && (
+            {pl && pl.type && <span className="px-2 py-0.5 rounded-full bg-emerald-700 text-emerald-100 font-bold">{pl.type}</span>}
+            {pl && pl.required_for_exam && (
               <span className="px-2 py-0.5 rounded-full bg-red-700 text-red-100 font-bold">⭐ נדרש למבחן</span>
             )}
-            {pl.unit && <span className="text-on-parchment">יחידה {pl.unit}</span>}
+            {pl && pl.kingdom && <span className="text-on-parchment">ממלכה: {pl.kingdom}</span>}
+            {pl && pl.region && <span className="text-on-parchment-muted">אזור: {pl.region}</span>}
+            {pl && pl.unit && <span className="text-on-parchment">יחידה {pl.unit}</span>}
           </div>
         </header>
 
         {!hasData && (
           <div className="card rounded-xl p-4 text-on-parchment-muted text-sm">
-            יוצג בקרוב · נתוני המקום טרם הוזנו ל-<code>window.PLACES_DATA</code>.
+            יוצג בקרוב · המקום <code>{id}</code> טרם הוזן ל-<code>window.PLACES_DATA</code>.
           </div>
         )}
 
-        {pl.significance && (
+        {pl && pl.significance && (
           <section className="parchment rounded-2xl p-5">
             <h2 className="font-display text-base font-bold text-amber-900 mb-2">משמעות</h2>
             <p className="hebrew text-amber-950 leading-relaxed">{pl.significance}</p>
           </section>
         )}
 
-        {Array.isArray(pl.related_events) && pl.related_events.length > 0 && (
+        {pl && Array.isArray(pl.related_events) && pl.related_events.length > 0 && (
           <Section title="⚔️ אירועים קשורים">
             <EntityList items={pl.related_events} type="event" setRoute={setRoute}/>
           </Section>
         )}
 
-        {Array.isArray(pl.related_characters) && pl.related_characters.length > 0 && (
+        {pl && Array.isArray(pl.related_characters) && pl.related_characters.length > 0 && (
           <Section title="👤 דמויות קשורות">
             <EntityList items={pl.related_characters} type="character" setRoute={setRoute}/>
           </Section>
         )}
 
-        {Array.isArray(pl.map_numbers) && pl.map_numbers.length > 0 && (
+        {pl && Array.isArray(pl.recurring_items) && pl.recurring_items.length > 0 && (
+          <Section title="🔁 פריטים חוזרים">
+            <EntityList items={pl.recurring_items} type="recurring" setRoute={setRoute}/>
+          </Section>
+        )}
+
+        {pl && Array.isArray(pl.map_numbers) && pl.map_numbers.length > 0 && (
           <Section title="🗺 סימון במפה">
             <div className="flex flex-wrap gap-0">
               {pl.map_numbers.map(n => (
@@ -122,9 +133,20 @@
           </Section>
         )}
 
-        <button onClick={onFindOnMap} className="gold-btn w-full py-3 rounded-xl text-base font-bold">
-          📍 מצא במפה{primaryMapNum!=null ? ` (#${primaryMapNum})` : ""}
-        </button>
+        {bookRefs.length > 0 && (
+          <section className="card rounded-xl p-4">
+            <h3 className="text-xs font-bold text-on-parchment mb-2">📚 מקורות בספר מלכים</h3>
+            <ul className="text-sm text-on-parchment-muted hebrew" style={{columnCount:2,columnGap:18,listStyle:'none',padding:0,margin:0}}>
+              {bookRefs.map((r,i)=><li key={i} style={{breakInside:'avoid',marginBottom:4}}>• {r}</li>)}
+            </ul>
+          </section>
+        )}
+
+        {hasData && (
+          <button onClick={onFindOnMap} className="gold-btn w-full py-3 rounded-xl text-base font-bold">
+            📍 מצא במפה{primaryMapNum!=null ? ` (#${primaryMapNum})` : ""}
+          </button>
+        )}
       </div>
     );
   }
