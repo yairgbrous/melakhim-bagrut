@@ -265,6 +265,9 @@
         <QuickActions setRoute={setRoute}/>
         <TodayFocus setRoute={setRoute}/>
         <StatsStrip S={S}/>
+        {typeof window!=="undefined" && window.XpStatsComponent ? (
+          <section className="mt-2"><window.XpStatsComponent/></section>
+        ) : null}
         {/* QUICK ACTIONS — added in commit 3 */}
         {/* TODAY'S FOCUS — added in commit 4 */}
         {/* STATS STRIP — added in commit 5 */}

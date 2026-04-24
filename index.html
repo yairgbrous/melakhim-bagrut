@@ -2558,6 +2558,13 @@ function App(){
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
+            {typeof window!=="undefined" && window.XpBadgeComponent ? <window.XpBadgeComponent compact/> : null}
+            <button
+              onClick={()=>{ if(typeof window!=="undefined" && typeof window.openInstantSearch==="function") window.openInstantSearch(); }}
+              aria-label="חיפוש מהיר (Ctrl+K)"
+              title="חיפוש מהיר · Ctrl+K"
+              className="theme-tog"
+            >🔍</button>
             {typeof window!=="undefined" && window.AuthButtonComponent ? <window.AuthButtonComponent/> : null}
             {typeof window!=="undefined" && window.ThemeToggleComponent
               ? React.createElement(window.ThemeToggleComponent)
@@ -2645,6 +2652,7 @@ function App(){
         {route.page==="daily" && (()=>{ const X=window.DailyChallenge; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אתגר יומי...</div>; })()}
         </>}
       </main>
+      {typeof window!=="undefined" && window.InstantSearchComponent ? <window.InstantSearchComponent setRoute={setRoute}/> : null}
 
       {!isTeacher && (
         <nav className="bottom-nav" role="navigation" aria-label="ניווט תחתון">
