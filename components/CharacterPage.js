@@ -106,6 +106,28 @@
     );
   }
 
+  // Up to 5 quotes for this character: union of CHARACTERS_DATA.key_quotes (the
+  // entity's own list) and QUOTES_DATA where speaker_id or addressee_id matches.
+  // Deduped by text_niqqud / text. Order: own list first, fallback after.
+  function quotesForCharacter(c){
+    const own = Array.isArray(c.key_quotes) ? c.key_quotes : [];
+    const ownNorm = own.map(q => typeof q === "string"
+      ? { text_niqqud: q }
+      : { text_niqqud: q.text_niqqud || q.text || "", book_ref: q.ref || q.book_ref });
+    const pool = (window.QUOTES_DATA || []);
+    const fb = pool.filter(q => q && (q.speaker_id === c.id || q.addressee_id === c.id));
+    const seen = new Set(ownNorm.map(q => (q.text_niqqud||"").trim()).filter(Boolean));
+    const merged = ownNorm.slice();
+    for (const q of fb) {
+      const key = (q.text_niqqud || q.text || "").trim();
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      merged.push(q);
+      if (merged.length >= 5) break;
+    }
+    return merged.slice(0, 5);
+  }
+
   // ---- Section ----------------------------------------------------------
   function Section({ title, children, tone }){
     const cls = tone === "parchment"
@@ -200,7 +222,7 @@
       c.dynasty || null,
     ].filter(Boolean);
 
-    const keyQuotes = Array.isArray(c.key_quotes) ? c.key_quotes : [];
+    const keyQuotes = useMemo(()=>quotesForCharacter(c), [c.id]);
     const assessQuote = c.assessment_quote || null;
 
     const relatedChars = c.related_characters || c.related_prophets || [];
@@ -250,15 +272,21 @@
             {keyQuotes.length>0 && (
               <Section title="💬 ציטוטים חשובים">
                 <div className="space-y-3">
-                  {keyQuotes.slice(0,5).map((q,i)=>{
-                    const text = typeof q === "string" ? q : (q.text || q.text_niqqud || "");
-                    const ref  = typeof q === "object" ? (q.ref || q.book_ref) : null;
+                  {keyQuotes.map((q,i)=>{
+                    const text = q.text_niqqud || q.text || "";
+                    const ref  = q.book_ref || null;
+                    const speaker   = q.speaker_id;
+                    const addressee = q.addressee_id;
                     return (
-                      <blockquote key={i}
+                      <blockquote key={q.id||i}
                         className="hebrew text-on-parchment border-r-4 border-amber-500/50 pr-4 py-1 leading-relaxed"
                         style={{background:"rgba(212,165,116,.08)", borderRadius:6, padding:"10px 14px"}}>
                         <div>{text}</div>
-                        {ref && <div className="text-xs text-on-parchment-muted mt-1"><BookRefLink ref={ref}/></div>}
+                        <div className="flex flex-wrap items-center gap-2 mt-2 text-xs text-on-parchment-muted">
+                          {speaker && <Chip type="character" id={speaker} setRoute={setRoute}/>}
+                          {addressee && (<><span aria-hidden="true">→</span><Chip type="character" id={addressee} setRoute={setRoute}/></>)}
+                          {ref && <span className="ml-auto"><BookRefLink ref={ref}/></span>}
+                        </div>
                       </blockquote>
                     );
                   })}
