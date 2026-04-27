@@ -2692,7 +2692,11 @@ function App(){
         {route.page==="map" && <MapsPage S={S} update={update} awardXP={awardXP} focusMapId={route.id} setRoute={setRoute}/>}
         {route.page==="book" && <BookChapterPage chapter={route.chapter} setRoute={setRoute}/>}
         {route.page==="quotes" && <QuotesBrowser S={S} update={update} awardXP={awardXP}/>}
-        {route.page==="timeline" && <Timeline/>}
+        {route.page==="timeline" && (window.KingsTableComponent
+          ? React.createElement(window.KingsTableComponent, {setRoute})
+          : (window.TimelineComponent
+              ? React.createElement(window.TimelineComponent, {setRoute})
+              : <Timeline/>))}
         {route.page==="chronology" && (window.TimelineComponent
           ? React.createElement(window.TimelineComponent, {setRoute})
           : <div className="text-amber-300 text-center py-8">טוען ציר כרונולוגי...</div>)}

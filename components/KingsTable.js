@@ -1,832 +1,435 @@
 /* =========================================================================
-   KingsTable — authentic book-style kings table (מלכי יהודה | מלכי ישראל | מעצמות)
-   Book layout reference: חוברת_מלכים.pdf pp. 66 / 142 / 178.
-   RTL: [יחידה] [מלכי יהודה right] [מלכי ישראל left] [מעצמות האזור leftmost]
+   KingsTable — kings register sourced from window.KINGS_DATA
+   ---------------------------------------------------------------------------
+   Steps so far:
+     (a) data wiring + loading state + ErrorBoundary
+     (b) two-column RTL layout (יהודה ימין · ישראל שמאל) + horizontal
+         era timeline + per-card color coding (good=emerald, bad=ruby,
+         mixed=amber).
+     (c) prophet chips under each king card, sourced via
+         KingsUtils.prophets_by_reign with the FALLBACK_PROPHETS table.
+         Clicking a chip navigates to the prophet's CharacterPage; broken
+         IDs are rerouted through window.__ENTITY_ALIASES__ so they still
+         resolve via _id-aliases.js.
+     (d) mobile (≤768px): collapses to a single column with a kingdom
+         toggle tab (יהודה / ישראל). Desktop keeps the two columns.
 
-   Data sources (in order of preference):
-     1. window.__ENTITY_INDEX__.king   (from data/kings.js — Tab A)
-     2. MELAKHIM_DATA.timeline         (fallback, already in index.html)
+   Click a king card → setRoute({page:'character', id:king.id}). Falls back
+   to window.__appSetRoute__ / mb-navigate event when the prop isn't passed.
 
    Exposes: window.KingsTableComponent
    ========================================================================= */
 (function(){
-  const { useState, useEffect, useMemo, useRef } = React;
+  const { useState, useEffect, useMemo } = React;
 
-  // ---------- Inject assess-* palette + extra KT styles (idempotent) --------
-  (function injectStyles(){
+  // ---- Color palette per assessment (good=emerald, bad=ruby, mixed=amber) --
+  const ASSESS_TONE = {
+    good:  { bg:'linear-gradient(135deg,#10b981 0%,#047857 100%)',
+             ring:'#34d399', fg:'#ecfdf5', label:'צדיק' },
+    bad:   { bg:'linear-gradient(135deg,#f43f5e 0%,#9f1239 100%)',
+             ring:'#fb7185', fg:'#fff1f2', label:'רשע'  },
+    mixed: { bg:'linear-gradient(135deg,#f59e0b 0%,#b45309 100%)',
+             ring:'#fbbf24', fg:'#fef3c7', label:'מעורב' }
+  };
+
+  function assessKey(k){
+    const KU = window.KingsUtils;
+    if (KU && KU.assessmentKind) {
+      const v = KU.assessmentKind(k);
+      if (v === 'tzadik') return 'good';
+      if (v === 'rasha')  return 'bad';
+      return 'mixed';
+    }
+    if (k.assessment === 'צדיק' || k.good === true)  return 'good';
+    if (k.assessment === 'רשע'  || k.good === false) return 'bad';
+    return 'mixed';
+  }
+
+  // Era → label + span (BCE), used by horizontal era bar.
+  const ERA_BANDS = [
+    { id:1, name:'תור הזהב',     start:970, end:931 },
+    { id:2, name:'הפילוג',        start:931, end:874 },
+    { id:3, name:'אליהו ואחאב',   start:874, end:842 },
+    { id:4, name:'מהפכת יהוא',   start:842, end:782 },
+    { id:5, name:'עליית אשור',   start:782, end:716 },
+    { id:6, name:'יהודה לבדה',   start:716, end:586 }
+  ];
+
+  function injectStyles(){
     if (typeof document === 'undefined') return;
-    if (document.getElementById('kt-assess-styles')) return;
+    if (document.getElementById('kt2-styles')) return;
     const s = document.createElement('style');
-    s.id = 'kt-assess-styles';
+    s.id = 'kt2-styles';
     s.textContent = `
-      .kt-king.assess-tzadik{background:linear-gradient(135deg,#d4f5d4,#a8e6a1);border-color:#2d7a2d;color:#1a4d1a}
-      .kt-king.assess-rasha {background:linear-gradient(135deg,#fad4d4,#e6a1a1);border-color:#8b2d2d;color:#4d1a1a}
-      .kt-king.assess-mixed {background:linear-gradient(135deg,#f5e8b8,#e6d184);border-color:#8b6d2d;color:#4d3e1a}
-      .kt-king.assess-tzadik .kt-king-name,.kt-king.assess-rasha .kt-king-name,.kt-king.assess-mixed .kt-king-name{color:inherit}
-      .kt-king-dyn{font-size:11px;font-weight:700;opacity:.85;line-height:1.1;margin-top:-2px}
-      .kt-assess-pill{display:inline-block;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.02em}
-      .kt-assess-pill.assess-tzadik{background:#2d7a2d;color:#d4f5d4}
-      .kt-assess-pill.assess-rasha {background:#8b2d2d;color:#fad4d4}
-      .kt-assess-pill.assess-mixed {background:#8b6d2d;color:#f5e8b8}
-      .kt-th-prophets{width:160px}
-      .kt-td-prophets{text-align:center;font-size:12px;padding:6px;border-inline-start:1px solid rgba(212,165,116,.15);border-inline-end:1px solid rgba(212,165,116,.15)}
-      .kt-td-prophets .kt-chip{display:inline-block;margin:2px 2px}
-      .kt-foreign-chip{display:inline-block;margin:2px 0;padding:3px 8px;border-radius:999px;background:rgba(168,50,64,.25);color:#F1B5BE;border:1px solid rgba(168,50,64,.5);font-size:11px;font-weight:700;cursor:default}
-      .kt-foreign-chip + .kt-foreign-chip{margin-top:3px}
-      html[data-theme='light'] .kt-td-prophets{color:#3a2a0d}
-      .kt-kill-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;background:rgba(139,45,45,.25);color:#ffd6d6;border:1px solid rgba(139,45,45,.55);font-size:11px;font-weight:700;cursor:pointer}
-      .kt-kill-chip:hover{background:rgba(139,45,45,.4)}
-      .kt-kill-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 2px}
-      .kt-kill-row-label{font-size:12px;font-weight:800;color:#C89B3C}
-      .kt-full-link{display:inline-block;margin-inline-start:8px;padding:8px 14px;border-radius:12px;background:rgba(107,91,149,.25);color:#C9B8E0;border:1px solid #6B5B95;font-weight:800;text-decoration:none;cursor:pointer}
-      .kt-full-link:hover{background:rgba(107,91,149,.45)}
-      .kt-chain-toggle{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(139,45,45,.2);border:1px solid rgba(139,45,45,.6);color:#ffd6d6;font-size:12px;font-weight:800;cursor:pointer}
-      .kt-chain-toggle.on{background:rgba(139,45,45,.6);color:#fff}
-      .kt-chain-svg{position:absolute;inset:0;pointer-events:none;z-index:4}
-      .kt-table-rel{position:relative}
-      .kt-quote-cite{font-family:'Frank Ruhl Libre',serif;font-size:13.5px;line-height:1.55;padding:6px 10px;border-inline-start:3px solid #C89B3C;background:rgba(212,165,116,.08);border-radius:6px;color:inherit}
-      /* ---- two-column RTL cards view ---- */
-      .kt-cards-wrap{margin-top:14px}
-      .kt-cards-grid{display:grid;direction:rtl;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
-      .kt-col-h{position:sticky;top:0;z-index:2;padding:8px 12px;font-family:'Frank Ruhl Libre',serif;font-size:16px;font-weight:900;color:#F5D670;background:rgba(10,22,40,.92);backdrop-filter:blur(6px);border-bottom:2px solid rgba(212,165,116,.45);border-radius:8px 8px 0 0}
-      html[data-theme='light'] .kt-col-h{color:#5A4517;background:rgba(247,241,225,.95)}
-      .kt-col[data-side='judah'] .kt-col-h{border-inline-start:5px solid #4A6B47}
-      .kt-col[data-side='israel'] .kt-col-h{border-inline-end:5px solid #1E4D7A}
-      .kt-col-cards{display:flex;flex-direction:column;gap:8px;padding:10px;background:rgba(10,22,40,.4);border:1px solid rgba(212,165,116,.2);border-radius:0 0 12px 12px}
-      html[data-theme='light'] .kt-col-cards{background:rgba(247,241,225,.45)}
-      .kt-col-empty{padding:18px;text-align:center;color:rgba(245,214,112,.5);font-size:13px}
-      .kt-card{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:10px;border:2px solid;cursor:pointer;text-align:right;font-family:inherit;transition:transform .08s,box-shadow .12s;position:relative;direction:rtl}
-      .kt-card:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.18)}
-      .kt-card:focus-visible{outline:2px solid #F5D670;outline-offset:2px}
-      .kt-card.assess-tzadik{background:linear-gradient(135deg,#0e3d2e,#125d3f);color:#d6f5d4}
-      .kt-card.assess-rasha {background:linear-gradient(135deg,#3a0d18,#5a1626);color:#fadcd6}
-      .kt-card.assess-mixed {background:linear-gradient(135deg,#3a2a08,#5a3f10);color:#f5e8b8}
-      html[data-theme='light'] .kt-card.assess-tzadik{background:linear-gradient(135deg,#d4f5d4,#a8e6a1);color:#1a4d1a}
-      html[data-theme='light'] .kt-card.assess-rasha {background:linear-gradient(135deg,#fad4d4,#e6a1a1);color:#4d1a1a}
-      html[data-theme='light'] .kt-card.assess-mixed {background:linear-gradient(135deg,#f5e8b8,#e6d184);color:#4d3e1a}
-      .kt-card-name{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:16px;line-height:1.2}
-      .kt-card-meta{display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
-      .kt-card-yrs{font-size:11px;font-weight:700;opacity:.8;font-variant-numeric:tabular-nums;direction:ltr}
-      .kt-card-pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:10px;font-weight:800}
-      .kt-card-pill.assess-tzadik{background:#10b981;color:#022c1d}
-      .kt-card-pill.assess-rasha {background:#f43f5e;color:#3a0610}
-      .kt-card-pill.assess-mixed {background:#d97706;color:#3a1f06}
-      .kt-card-dyn{font-size:11px;font-weight:700;opacity:.85}
-      /* ---- mobile kingdom toggle (<640px) ---- */
-      .kt-mobile-tabs{display:flex;gap:6px;direction:rtl;margin-bottom:10px;padding:4px;background:rgba(10,22,40,.7);border:1px solid rgba(212,165,116,.25);border-radius:999px}
-      html[data-theme='light'] .kt-mobile-tabs{background:rgba(247,241,225,.65)}
-      .kt-mobile-tab{flex:1;padding:8px 10px;border:none;background:transparent;color:#F5D670;font-family:inherit;font-size:13px;font-weight:800;border-radius:999px;cursor:pointer}
-      html[data-theme='light'] .kt-mobile-tab{color:#5A4517}
-      .kt-mobile-tab.active{background:linear-gradient(135deg,#d97706,#f59e0b);color:#3a1f06}
-      .kt-cards-grid--mobile{grid-template-columns:1fr !important}
-      /* ---- timeline grid ---- */
-      .kt-tl{position:relative;display:grid;direction:rtl;gap:0;padding:12px 8px;background:rgba(10,22,40,.6);border:1px solid rgba(212,165,116,.25);border-radius:14px;overflow:hidden}
-      html[data-theme='light'] .kt-tl{background:rgba(247,241,225,.55)}
-      .kt-tl-head{position:sticky;top:0;z-index:3;display:grid;background:rgba(10,22,40,.92);backdrop-filter:blur(6px);border-bottom:1px solid rgba(212,165,116,.4);font-weight:800;color:#F5D670}
-      html[data-theme='light'] .kt-tl-head{background:rgba(247,241,225,.95);color:#5A4517}
-      .kt-tl-head > div{padding:8px 6px;text-align:center;font-size:13px;border-inline-start:1px solid rgba(212,165,116,.25)}
-      .kt-tl-head > div:first-child{border-inline-start:none}
-      .kt-tl-year{display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:rgba(245,214,112,.75);position:relative;border-inline-start:1px dashed rgba(212,165,116,.18)}
-      .kt-tl-year::after{content:'';position:absolute;inset-inline:-2000px 0;top:50%;border-top:1px dashed rgba(212,165,116,.12);z-index:0}
-      html[data-theme='light'] .kt-tl-year{color:#8B6F1F}
-      .kt-tl-king{margin:1px 3px;display:flex;flex-direction:column;justify-content:flex-start;padding:6px 8px;border-radius:8px;border:1px solid rgba(212,165,116,.4);overflow:hidden;cursor:pointer;min-width:0;position:relative;z-index:1}
-      .kt-tl-king .kt-king-name{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:15px;line-height:1.15;color:inherit}
-      .kt-tl-king .kt-king-dyn{font-size:10.5px;font-weight:700;opacity:.82;margin-top:1px}
-      .kt-tl-king .kt-king-yrs{font-size:10px;opacity:.75;margin-top:2px;font-variant-numeric:tabular-nums;direction:ltr;display:inline-block}
-      .kt-tl-king .kt-assess-pill{align-self:flex-start;margin-top:3px;font-size:9.5px;padding:0 6px}
-      .kt-tl-king.kt-tl-short{padding:3px 6px}
-      .kt-tl-king.kt-tl-short .kt-king-name{font-size:11.5px}
-      .kt-tl-king.kt-tl-short .kt-king-dyn,.kt-tl-king.kt-tl-short .kt-king-yrs,.kt-tl-king.kt-tl-short .kt-assess-pill{display:none}
-      .kt-tl-empty{border:1px dashed rgba(212,165,116,.18);border-radius:6px;margin:2px 4px;background:rgba(0,0,0,.06);opacity:.55;display:flex;align-items:center;justify-content:center;color:rgba(245,214,112,.35);font-size:11px;z-index:0}
-      html[data-theme='light'] .kt-tl-empty{color:rgba(90,69,23,.4);background:rgba(255,255,255,.25)}
-      .kt-tl-prophet-group{margin:2px 4px;display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;padding:3px 4px;border-radius:6px;background:rgba(107,91,149,.10);border:1px dashed rgba(107,91,149,.35);overflow:hidden;z-index:1}
-      .kt-tl-prophet-group .kt-chip{font-size:10.5px;padding:2px 7px}
-      .kt-tl-foreign-group{margin:2px 4px;display:flex;flex-direction:column;gap:3px;padding:3px 5px;border-radius:6px;background:rgba(168,50,64,.10);border:1px dashed rgba(168,50,64,.35);overflow:hidden;z-index:1}
-      .kt-tl-foreign-group .kt-foreign-chip{font-size:10.5px;padding:2px 7px}
-      .kt-tl-decade-line{grid-column:1 / -1;height:0;border-top:1px solid rgba(212,165,116,.22);z-index:0;pointer-events:none}
-      .kt-tl-era-sep{grid-column:1 / -1;height:0;border-top:2px solid rgba(212,165,116,.45);z-index:0;pointer-events:none}
-      .kt-tl-king-selected{box-shadow:0 0 0 3px #C89B3C, 0 0 16px rgba(200,155,60,.55)}
-      /* ---- mobile: horizontal scroll with sticky year axis ---- */
+      .kt2-wrap{direction:rtl;display:flex;flex-direction:column;gap:14px;padding:8px}
+      .kt2-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px}
+      .kt2-title{font-family:'Frank Ruhl Libre',serif;font-size:24px;font-weight:900;color:#F4D58D}
+      html[data-theme='light'] .kt2-title{color:#5A4517}
+      .kt2-sub{font-size:13px;opacity:.78}
+
+      .kt2-era-bar{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;direction:rtl;
+        background:rgba(10,22,40,.55);border:1px solid rgba(212,165,116,.3);border-radius:12px;padding:6px}
+      html[data-theme='light'] .kt2-era-bar{background:rgba(247,241,225,.55)}
+      .kt2-era{padding:8px 6px;border-radius:8px;text-align:center;font-size:12px;font-weight:800;
+        background:rgba(212,165,116,.14);color:#F5D670;border:1px solid rgba(212,165,116,.3);cursor:pointer;transition:transform .12s}
+      .kt2-era:hover{transform:translateY(-1px);background:rgba(212,165,116,.22)}
+      .kt2-era.on{background:linear-gradient(135deg,#D4A574,#8B6F47);color:#1A1611;border-color:#F4D58D}
+      .kt2-era-yrs{display:block;font-size:10px;font-weight:600;opacity:.78;margin-top:2px;direction:ltr}
+      html[data-theme='light'] .kt2-era{color:#5A4517;background:rgba(212,165,116,.18)}
+
+      .kt2-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;direction:rtl}
+      .kt2-col{display:flex;flex-direction:column;gap:10px;min-width:0}
+      .kt2-col-head{position:sticky;top:0;z-index:2;backdrop-filter:blur(4px);
+        background:rgba(10,22,40,.85);padding:8px 12px;border-radius:10px;
+        border:1px solid rgba(212,165,116,.3);font-weight:900;font-size:16px;
+        color:#F5D670;text-align:center;font-family:'Frank Ruhl Libre',serif}
+      html[data-theme='light'] .kt2-col-head{background:rgba(247,241,225,.92);color:#5A4517}
+      .kt2-col-head .kt2-col-icon{margin-inline-end:6px}
+      .kt2-col-head-count{font-size:11px;opacity:.78;font-weight:600;margin-inline-start:6px}
+
+      .kt2-king{position:relative;border-radius:14px;padding:12px 14px;cursor:pointer;
+        transition:transform .12s,box-shadow .15s;border:1px solid transparent;
+        box-shadow:0 4px 14px -6px rgba(0,0,0,.45);min-width:0}
+      .kt2-king:hover{transform:translateY(-2px);box-shadow:0 8px 22px -8px rgba(0,0,0,.55)}
+      .kt2-king:focus-visible{outline:3px solid #C89B3C;outline-offset:2px}
+      .kt2-king-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+      .kt2-king-name{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:22px;line-height:1.15;letter-spacing:.01em}
+      .kt2-king-meta{display:flex;align-items:center;gap:6px;font-size:12px;opacity:.92;flex-wrap:wrap}
+      .kt2-king-yrs{font-variant-numeric:tabular-nums;direction:ltr;display:inline-block;
+        background:rgba(0,0,0,.18);padding:2px 8px;border-radius:999px;font-weight:700;font-size:11px}
+      .kt2-king-icon{font-size:13px;opacity:.85}
+      .kt2-king-role{margin-top:6px;font-size:13px;line-height:1.35;opacity:.95;
+        display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+      .kt2-pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:10px;
+        font-weight:800;letter-spacing:.02em;background:rgba(0,0,0,.25)}
+
+      .kt2-prophets{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+      .kt2-prophet-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;
+        border-radius:999px;background:rgba(124,58,237,.28);color:#e9d5ff;
+        border:1px solid rgba(124,58,237,.55);font-size:11px;font-weight:700;cursor:pointer;
+        transition:transform .1s,background .15s}
+      .kt2-prophet-chip:hover{background:rgba(124,58,237,.5);transform:scale(1.04)}
+      .kt2-prophet-chip[disabled]{opacity:.55;cursor:not-allowed}
+      html[data-theme='light'] .kt2-prophet-chip{background:rgba(124,58,237,.18);color:#4c1d95;border-color:rgba(124,58,237,.45)}
+
+      .kt2-toggle{display:none;direction:rtl;background:rgba(10,22,40,.6);
+        border:1px solid rgba(212,165,116,.3);border-radius:999px;padding:4px;gap:4px}
+      html[data-theme='light'] .kt2-toggle{background:rgba(247,241,225,.7)}
+      .kt2-toggle button{flex:1;padding:8px 14px;border-radius:999px;border:none;
+        background:transparent;color:#F5D670;font-weight:800;font-size:14px;cursor:pointer}
+      html[data-theme='light'] .kt2-toggle button{color:#5A4517}
+      .kt2-toggle button.on{background:linear-gradient(135deg,#D4A574,#8B6F47);color:#1A1611}
+
+      .kt2-loading,.kt2-error,.kt2-empty{padding:40px 18px;text-align:center;
+        border-radius:14px;border:1px solid rgba(212,165,116,.3);
+        background:rgba(10,22,40,.45);color:#F5D670;font-weight:600}
+      html[data-theme='light'] .kt2-loading,html[data-theme='light'] .kt2-error,html[data-theme='light'] .kt2-empty{background:rgba(247,241,225,.55);color:#5A4517}
+      .kt2-loading-dot{display:inline-block;width:10px;height:10px;border-radius:50%;
+        background:#F4D58D;margin:0 3px;animation:kt2pulse 1.2s infinite ease-in-out}
+      .kt2-loading-dot:nth-child(2){animation-delay:.2s}
+      .kt2-loading-dot:nth-child(3){animation-delay:.4s}
+      @keyframes kt2pulse{0%,100%{opacity:.3;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}}
+
       @media (max-width:768px){
-        .kt-tl-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px}
-        .kt-tl-wrap::-webkit-scrollbar{height:6px}
-        .kt-tl-wrap::-webkit-scrollbar-thumb{background:rgba(212,165,116,.45);border-radius:3px}
-        .kt-tl-head, .kt-tl{min-width:720px}
-        /* Year column (first grid col) sticks to the inline-start edge.
-           In RTL that pins it to the right, so the user always sees the
-           year while swiping through the wider king/prophet columns. */
-        .kt-tl-year{position:sticky; inset-inline-start:0; z-index:2;
-          background:rgba(10,22,40,.92); backdrop-filter:blur(4px);
-          box-shadow:1px 0 0 rgba(212,165,116,.25)}
-        html[data-theme='light'] .kt-tl-year{background:rgba(247,241,225,.96)}
-        .kt-tl-head > div:first-child{position:sticky; inset-inline-start:0; z-index:4;
-          background:rgba(10,22,40,.95)}
-        html[data-theme='light'] .kt-tl-head > div:first-child{background:rgba(247,241,225,.98)}
-        .kt-tl-head > div{font-size:12px; padding:6px 4px}
+        .kt2-grid{grid-template-columns:1fr}
+        .kt2-col.kt2-hidden{display:none}
+        .kt2-toggle{display:flex}
+        .kt2-era-bar{grid-template-columns:repeat(3,1fr)}
+        .kt2-king-name{font-size:20px}
       }
     `;
     document.head.appendChild(s);
-  })();
+  }
 
-  // Unit → theme color + empire label for מעצמות column
-  const UNIT_META = {
-    1: {name:"שלמה",              color:"#D4A574", empire:"מצרים"},
-    2: {name:"פילוג",              color:"#A83240", empire:"מצרים · ארם"},
-    3: {name:"אליהו ואחאב",        color:"#3E8E7E", empire:"ארם"},
-    4: {name:"מהפכות",             color:"#6B5B95", empire:"ארם · אשור עולה"},
-    5: {name:"אשור",               color:"#8B4513", empire:"אשור"},
-    6: {name:"בבל",                color:"#2C3E50", empire:"בבל"}
-  };
+  function resolveKingId(id){
+    if (!id) return id;
+    const aliases = (window.__ENTITY_ALIASES__ || {});
+    const m = aliases.king || aliases.character || {};
+    if (Object.prototype.hasOwnProperty.call(m, id)) {
+      const v = m[id];
+      if (typeof v === 'string') return v;
+    }
+    return id;
+  }
 
-  // timeline.period → unit id
-  const PERIOD_TO_UNIT = {
-    "תור הזהב":     1,
-    "פילוג":        2,
-    "אליהו":        3,
-    "מהפכות":       4,
-    "שלפני אשור":   4,
-    "אשור":         5,
-    "בבל":          6
-  };
+  function navTo(setRoute, page, id){
+    const r = { page, id: resolveKingId(id) };
+    if (typeof setRoute === 'function') { setRoute(r); return; }
+    if (window.__appSetRoute__) { try { window.__appSetRoute__(r); return; } catch(e){} }
+    try { window.dispatchEvent(new CustomEvent('mb-navigate', { detail:r })); } catch(e){}
+    try { window.location.hash = '#' + page + '-' + encodeURIComponent(id); } catch(e){}
+  }
 
-  // Dynasty markers for Judah / Israel rows (coarse groupings, colored stripe)
-  const ISRAEL_DYN = [
-    {id:"yarov",   name:"בית ירבעם",    color:"#7A1F2A", kings:["ירבעם בן נבט","נדב"]},
-    {id:"bashaa",  name:"בית בעשא",     color:"#4A2C6F", kings:["בעשא","אלה"]},
-    {id:"zimri",   name:"זמרי",         color:"#5C1010", kings:["זמרי"]},
-    {id:"omri",    name:"בית עמרי",     color:"#1E4D7A", kings:["עמרי","אחאב","אחזיה בן אחאב","יורם בן אחאב"]},
-    {id:"yehu",    name:"בית יהוא",     color:"#4E6B2E", kings:["יהוא","יהואחז","יואש (ישראל)","ירבעם השני","זכריה בן ירבעם"]},
-    {id:"shalom",  name:"שלום בן יבש",  color:"#5C1010", kings:["שלום בן יבש"]},
-    {id:"menahem", name:"בית מנחם",     color:"#5C3A1F", kings:["מנחם בן גדי","פקחיה"]},
-    {id:"pekah",   name:"פקח בן רמליהו",color:"#5C1010", kings:["פקח בן רמליהו"]},
-    {id:"hoshea",  name:"הושע בן אלה",  color:"#5C1010", kings:["הושע בן אלה"]}
-  ];
-  const JUDAH_DYN = {name:"בית דוד", color:"#8B6F1F"};
+  // Resolve a prophet id to a display label, preferring the live entity index
+  // (data/characters.js) and falling back to KingsUtils.FALLBACK_PROPHETS.
+  function prophetLabel(pid){
+    const idx = (window.__ENTITY_INDEX__ || {}).character || {};
+    const c = idx[pid];
+    if (c) return c.name_niqqud || c.name || c.heading || pid;
+    const KU = window.KingsUtils;
+    if (KU && KU.FALLBACK_PROPHETS) {
+      const f = KU.FALLBACK_PROPHETS.find(p => p.id === pid);
+      if (f) return f.name;
+    }
+    return pid;
+  }
 
-  // Assessment → class + hex color (NO EMOJIS). Delegates to KingsUtils when
-  // present so the same rule applies across table + character pages.
-  const assessmentClass = (k) => {
-    const KU = (typeof window!=='undefined') && window.KingsUtils;
-    if (KU && KU.assessmentColor) return KU.assessmentColor(k);
-    const v = (k.assessment || '').toLowerCase();
-    if (k.good === true  || v === 'righteous' || v === 'good')
-      return { hex:'#2d7a2d', cls:'assess-tzadik' };
-    if (k.good === false || v === 'wicked'    || v === 'bad')
-      return { hex:'#8b2d2d', cls:'assess-rasha' };
-    return { hex:'#8b6d2d', cls:'assess-mixed' };
-  };
+  // Does the prophet id resolve through the entity index *or* the alias map?
+  // Used to distinguish broken refs (rendered disabled) from live links.
+  function prophetExists(pid){
+    const idx = (window.__ENTITY_INDEX__ || {}).character || {};
+    if (idx[pid]) return true;
+    const aliases = (window.__ENTITY_ALIASES__ || {}).character || {};
+    if (Object.prototype.hasOwnProperty.call(aliases, pid)) return true;
+    const KU = window.KingsUtils;
+    if (KU && KU.FALLBACK_PROPHETS && KU.FALLBACK_PROPHETS.some(p => p.id === pid)) return true;
+    return false;
+  }
 
-  const dynastyOf = (dyn, name) => {
-    if (dyn === "יהודה") return JUDAH_DYN;
-    const d = ISRAEL_DYN.find(d => d.kings.includes(name));
-    return d || {name:"ישראל", color:"#5C3A1F"};
-  };
-
-  // Resolve related entities from the live entity index.
-  function gatherRelated(kingEntry){
-    const idx = (typeof window!=='undefined' && window.__ENTITY_INDEX__) || {};
-    const name = kingEntry.name;
-    const match = (arr) => (arr||[]).filter(x => {
-      const ids = [].concat(x.related_kings||[], x.kings||[], x.associated_kings||[]);
-      if (ids.some(v => v===name || v===kingEntry.id)) return true;
-      const s = (x.summary||'') + ' ' + (x.heading||'') + ' ' + (x.description_hebrew||'') + ' ' + (x.bio||'');
-      return s.includes(name);
-    });
-    const prophets = match(Object.values(idx.character||{})).filter(c =>
-      /נביא|הרואה|איש האלוקים/.test((c.role||'') + ' ' + (c.tags||[]).join(' '))
+  function ProphetChip({pid, label, setRoute}){
+    const exists  = prophetExists(pid);
+    const display = label || prophetLabel(pid);
+    const onClick = (e) => {
+      e.stopPropagation();
+      if (!exists) return;
+      navTo(setRoute, 'character', pid);
+    };
+    return (
+      <button
+        type="button"
+        className="kt2-prophet-chip"
+        onClick={onClick}
+        disabled={!exists}
+        title={exists ? ('דף הנביא ' + display) : (display + ' (אין דף עדיין)')}
+        aria-label={'דף הנביא ' + display}
+      >
+        🔮 {display}
+      </button>
     );
-    const places   = match(Object.values(idx.archaeology||{}));
-    const events   = match(Object.values(idx.story||{}));
-    return {prophets, places, events};
   }
 
-  // Normalize kingdom strings from either 'judah/israel/united' or Hebrew.
-  function normKingdom(kk){
-    const v = (kk.kingdom || '').toLowerCase();
-    if (v === 'judah' || kk.kingdom === 'יהודה') return 'יהודה';
-    if (v === 'israel' || kk.kingdom === 'ישראל') return 'ישראל';
-    if (v === 'united' || kk.kingdom === 'מאוחדת') return 'יהודה'; // Solomon renders in Judah column
-    return kk.kingdom || 'יהודה';
-  }
-  function assessmentToGood(a){
-    if (a === 'צדיק' || a === 'righteous' || a === 'good') return true;
-    if (a === 'רשע'  || a === 'wicked'    || a === 'bad')  return false;
-    return null; // מעורב / mixed
-  }
-  // era 1..6 → MELAKHIM_DATA.units.id is 1..6, so unitId = era directly.
-  function pickKingsData(){
-    const raw = (typeof window!=='undefined' && window.KINGS_DATA) || [];
-    if (raw.length > 0){
-      return raw.map(k => ({
-        id: k.id,
-        name: k.name_niqqud || k.name || k.id,
-        name_niqqud: k.name_niqqud || '',
-        dynasty: normKingdom(k),              // 'יהודה' | 'ישראל'
-        house:   k.dynasty || '',             // 'בית דוד' | 'בית עמרי' | …
-        good: assessmentToGood(k.assessment),
-        assessment: k.assessment,
-        assessment_quote: k.assessment_quote || '',
-        years: k.reign_years != null ? (k.reign_years + ' שנ׳') : '',
-        period: '',                           // period label not used when era present
-        unitId: k.era || 1,
-        era: k.era || 1,
-        notes: (k.short_summary || '').split('.').slice(0,1).join('.') + '.',
-        bio: k.short_summary || '',
-        short_summary: k.short_summary || '',
-        key_actions: [],
-        related_prophets: k.related_prophets || [],
-        related_places:   k.related_places   || [],
-        related_events:   k.related_events   || [],
-        killed:    k.killed || [],
-        killed_by: k.killed_by || null,
-        succession_type: k.succession_type || '',
-        book_page: k.book_page || null,
-        reign_start_bce: k.reign_start_bce,
-        reign_end_bce:   k.reign_end_bce,
-        reign_years:     k.reign_years
-      }));
+  function gatherProphets(k){
+    const KU = window.KingsUtils;
+    if (KU && KU.prophets_by_reign){
+      const chars = Object.values(((window.__ENTITY_INDEX__||{}).character)||{});
+      const list = KU.prophets_by_reign(chars, k) || [];
+      if (list.length) return list;
     }
-    // Legacy fallback: __ENTITY_INDEX__.king (if kings.js not yet loaded)
-    const idx = (typeof window!=='undefined' && window.__ENTITY_INDEX__) || {};
-    const live = idx.king ? Object.values(idx.king) : [];
-    if (live.length > 0){
-      return live.map(k => ({
-        id: k.id,
-        name: k.name || k.heading || k.id,
-        dynasty: normKingdom(k),
-        house: k.dynasty || '',
-        good: assessmentToGood(k.assessment),
-        assessment: k.assessment,
-        assessment_quote: k.assessment_quote || '',
-        years: k.reign_years || k.years || '',
-        period: k.period || '',
-        unitId: k.era || k.unit || PERIOD_TO_UNIT[k.period] || 1,
-        era: k.era || 1,
-        notes: k.summary || k.heading_note || k.notes || '',
-        bio: k.short_summary || k.bio || '',
-        short_summary: k.short_summary || '',
-        key_actions: k.key_actions || [],
-        related_prophets: k.related_prophets || [],
-        related_places:   k.related_places   || [],
-        related_events:   k.related_events   || [],
-        killed:    k.killed || [],
-        killed_by: k.killed_by || null
-      }));
-    }
-    // Last-resort fallback: MELAKHIM_DATA.timeline (pre-kings.js shape).
-    const tl = (typeof MELAKHIM_DATA !== 'undefined' && MELAKHIM_DATA.timeline) || [];
-    return tl.map((k,i) => ({
-      id: 'tl-' + i + '-' + k.name.replace(/\s/g,'-'),
-      name: k.name, dynasty: k.dynasty, good: !!k.good,
-      years: k.years, period: k.period, unitId: PERIOD_TO_UNIT[k.period] || 1,
-      era: PERIOD_TO_UNIT[k.period] || 1, notes: k.notes,
-      bio: '', key_actions: [], related_prophets: [], related_places: [], related_events: [],
-      killed: [], killed_by: null
-    }));
+    return (k.related_prophets || []).map(pid => ({ id:pid, name:prophetLabel(pid) }));
   }
 
-  // Build rows by ERA. kings.js lists all 20 Judah kings first and then all
-  // 19 Israel kings, so the old "pair-adjacent" heuristic never paired anything
-  // and the Israel column appeared empty next to Judah kings. Instead: for each
-  // era (1..6), bucket kings by kingdom, then emit max(|judah|,|israel|) rows
-  // pairing by positional index (רחבעם #0 ↔ ירבעם #0, אביה #1 ↔ נדב #1, …).
-  // After era 5 Israel is gone so only Judah cells remain.
-  function buildRows(kings){
-    const byEra = new Map();
-    kings.forEach(k => {
-      const e = k.unitId || k.era || 1;
-      if (!byEra.has(e)) byEra.set(e, {judah:[], israel:[]});
-      const b = byEra.get(e);
-      if (k.dynasty === 'ישראל') b.israel.push(k);
-      else b.judah.push(k);   // Judah + united (Solomon) render in Judah column.
-    });
-    const eras = [...byEra.keys()].sort((a,b)=>a-b);
-    const out = [];
-    eras.forEach(era => {
-      const {judah, israel} = byEra.get(era);
-      const n = Math.max(judah.length, israel.length, 1);
-      for (let i = 0; i < n; i++){
-        const j = judah[i]  || null;
-        const s = israel[i] || null;
-        const primary = j || s;
-        if (!primary) continue;
-        out.push({ ...primary, unitId: era, era, _j: j, _s: s, _paired: !!(j && s) });
-      }
-    });
-    // Rowspan for the יחידה column per era run (rows are already era-sorted).
-    const unitSpans = {};
-    let runStart = 0;
-    for (let i = 1; i <= out.length; i++){
-      if (i === out.length || out[i].unitId !== out[runStart].unitId){
-        unitSpans[runStart] = i - runStart;
-        runStart = i;
-      }
-    }
-    return out.map((r,i)=>({...r, _unitSpan: unitSpans[i] || 0}));
-  }
+  function KingCard({k, setRoute}){
+    const ak   = assessKey(k);
+    const tone = ASSESS_TONE[ak];
+    const isJudah = (k.kingdom === 'יהודה' || k.kingdom === 'מאוחדת');
+    const icon = isJudah ? '👑' : '⚔️';
+    const role = (k.kingdom === 'מאוחדת')
+      ? 'מלך הממלכה המאוחדת'
+      : (isJudah ? 'מלך יהודה · ' + (k.dynasty || 'בית דוד')
+                 : 'מלך ישראל · ' + (k.dynasty || ''));
+    const yrs = (k.reign_start_bce && k.reign_end_bce)
+      ? (k.reign_start_bce + '–' + k.reign_end_bce)
+      : (k.reign_years ? (k.reign_years + ' שנ׳') : '');
 
-  function navigateToStudyTab(tab, focusId){
-    try{
-      window.dispatchEvent(new CustomEvent('navigate-study', {detail:{tab, focusId}}));
-    }catch(e){}
-    // Best-effort: also set hash to let other listeners pick it up.
-    try{ window.location.hash = '#study-' + tab + (focusId?('-'+focusId):''); }catch(e){}
-  }
+    const onCardClick = () => navTo(setRoute, 'character', k.id);
+    const onKey = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onCardClick(); } };
 
-  function firePractice(kingId){
-    try{
-      window.dispatchEvent(new CustomEvent('practice-entity', {detail:{type:'king', id:kingId}}));
-    }catch(e){}
-  }
-
-  function KingCell({k, side}){
-    const KU = (typeof window!=='undefined') && window.KingsUtils;
-    const dyn = (KU && KU.dynastyBadge) ? KU.dynastyBadge(k) : dynastyOf(k.dynasty, k.name);
-    const col = assessmentClass(k);
-    const borderSide = side === 'judah' ? {borderRightWidth:'5px'} : {borderLeftWidth:'5px'};
-    const kindLabel = col.cls==='assess-tzadik' ? 'צדיק' : col.cls==='assess-rasha' ? 'רשע' : 'מעורב';
     return (
       <div
-        className={"kt-king " + col.cls}
-        data-kid={k.id}
-        style={{...borderSide, borderColor: dyn.color}}
-        title={dyn.name + ' · ' + kindLabel}
-        aria-label={k.name + ' · ' + kindLabel}
+        className="kt2-king"
+        role="button"
+        tabIndex={0}
+        onClick={onCardClick}
+        onKeyDown={onKey}
+        aria-label={k.name_niqqud + ' · ' + tone.label + ' · ' + role}
+        title={role + (yrs ? ' · ' + yrs + ' לפנה״ס' : '')}
+        style={{ background: tone.bg, color: tone.fg, borderColor: tone.ring }}
       >
-        <div className="kt-king-name hebrew">{k.name}</div>
-        <div className="kt-king-dyn" style={{color:dyn.color}}>{dyn.name}</div>
-        <div className="kt-king-meta">
-          <span className="kt-badge" title="שנות מלכות">{k.years}</span>
-          <span className={"kt-assess-pill " + col.cls}>{kindLabel}</span>
+        <div className="kt2-king-row">
+          <div className="kt2-king-name hebrew">
+            <span className="kt2-king-icon" aria-hidden="true">{icon}</span> {k.name_niqqud || k.id}
+          </div>
+          <div className="kt2-king-meta">
+            {yrs && <span className="kt2-king-yrs">{yrs}</span>}
+            <span className="kt2-pill">{tone.label}</span>
+          </div>
         </div>
-        {k.notes && <div className="kt-king-note">{k.notes}</div>}
+        <div className="kt2-king-role">{role}</div>
+        {(() => {
+          const prophets = gatherProphets(k);
+          if (!prophets.length) return null;
+          return (
+            <div className="kt2-prophets" onClick={(e)=>e.stopPropagation()}>
+              {prophets.slice(0, 6).map(p => (
+                <ProphetChip key={p.id} pid={p.id} label={p.name} setRoute={setRoute}/>
+              ))}
+            </div>
+          );
+        })()}
       </div>
     );
   }
 
-  function ExpandedRow({k, onPractice, allKings}){
-    const KU = window.KingsUtils;
-    const killedBy = useMemo(()=> (KU && allKings) ? KU.killed_by(allKings, k.id) : [], [k.id, allKings]);
-    const killedOf = useMemo(()=> (KU && allKings) ? KU.killed(allKings, k.id)    : [], [k.id, allKings]);
-    const foreign  = useMemo(()=> (KU ? KU.foreign_event_for(k) : null), [k.id]);
-    const openFull = () => { if (KU) KU.navigateToCharacter(k.id); };
-    const goKing = (id) => { if (id && KU) KU.navigateToCharacter(id); };
-    const rel = useMemo(() => gatherRelated(k), [k.id, k.name]);
-    const chipsProphets = (k.related_prophets.length ? k.related_prophets.map(p => ({id:p, label:p})) : rel.prophets.map(c => ({id:c.id, label:c.heading||c.name}))).slice(0, 12);
-    const chipsPlaces   = (k.related_places.length ? k.related_places.map(p => ({id:p, label:p})) : rel.places.map(c => ({id:c.id, label:c.heading||c.name_hebrew||c.id}))).slice(0, 12);
-    const chipsEvents   = (k.related_events.length ? k.related_events.map(p => ({id:p, label:p})) : rel.events.map(c => ({id:c.id, label:c.heading||c.title||c.id}))).slice(0, 12);
+  function KingsTableInner({setRoute}){
+    useEffect(injectStyles, []);
 
-    return (
-      <div className="kt-expanded">
-        {k.bio && (
-          <div className="kt-sect">
-            <div className="kt-sect-h">📖 ביוגרפיה</div>
-            <p className="kt-bio">{k.bio}</p>
-          </div>
-        )}
-        {!k.bio && k.notes && (
-          <div className="kt-sect">
-            <div className="kt-sect-h">📖 תקציר</div>
-            <p className="kt-bio">{k.notes}</p>
-          </div>
-        )}
-        {k.key_actions && k.key_actions.length > 0 && (
-          <div className="kt-sect">
-            <div className="kt-sect-h">⚡ מעשים מרכזיים</div>
-            <ul className="kt-actions">{k.key_actions.map((a,i) => <li key={i}>{a}</li>)}</ul>
-          </div>
-        )}
-        {chipsProphets.length > 0 && (
-          <div className="kt-sect">
-            <div className="kt-sect-h">🔮 נביאים בעת מלכותו</div>
-            <div className="kt-chips">{chipsProphets.map(c =>
-              <button key={c.id} className="kt-chip kt-chip-prophet" onClick={()=>{ const KU=window.KingsUtils; if(KU) KU.navigateToCharacter(c.id); else navigateToStudyTab('character', c.id); }}>{c.label}</button>
-            )}</div>
-          </div>
-        )}
-        {chipsPlaces.length > 0 && (
-          <div className="kt-sect">
-            <div className="kt-sect-h">📍 מקומות</div>
-            <div className="kt-chips">{chipsPlaces.map(c =>
-              <button key={c.id} className="kt-chip kt-chip-place" onClick={()=>navigateToStudyTab('place', c.id)}>{c.label}</button>
-            )}</div>
-          </div>
-        )}
-        {chipsEvents.length > 0 && (
-          <div className="kt-sect">
-            <div className="kt-sect-h">📜 אירועים</div>
-            <div className="kt-chips">{chipsEvents.map(c =>
-              <button key={c.id} className="kt-chip kt-chip-event" onClick={()=>navigateToStudyTab('event', c.id)}>{c.label}</button>
-            )}</div>
-          </div>
-        )}
-        {(killedBy.length>0 || killedOf.length>0) && (
-          <div className="kt-sect">
-            <div className="kt-sect-h">⚔️ שרשרת רצח / ירושה בכוח</div>
-            {killedBy.length>0 && (
-              <div className="kt-kill-row">
-                <span className="kt-kill-row-label">נהרג על ידי:</span>
-                {killedBy.map((p,i)=>(
-                  <span key={i} className="kt-kill-chip" onClick={(e)=>{e.stopPropagation(); goKing(p.killer_id);}}>
-                    {p.killer_name}{p.note?` · ${p.note}`:''}
-                  </span>
-                ))}
-              </div>
-            )}
-            {killedOf.length>0 && (
-              <div className="kt-kill-row">
-                <span className="kt-kill-row-label">הרג את:</span>
-                {killedOf.map((p,i)=>(
-                  <span key={i} className="kt-kill-chip" onClick={(e)=>{e.stopPropagation(); goKing(p.victim_id);}}>
-                    {p.victim_name}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-        {foreign && (
-          <div className="kt-sect">
-            <div className="kt-sect-h">🌍 מעצמה זרה</div>
-            <div className="kt-foreign-chip" style={{display:'inline-block'}}>
-              <strong>{foreign.name}</strong> ({foreign.empire}) — {foreign.event}
-              {foreign.book_ref && <span style={{opacity:.7}}> · {foreign.book_ref}</span>}
+    const [loading, setLoading] = useState(!Array.isArray(window.KINGS_DATA) || window.KINGS_DATA.length === 0);
+    const [kings,   setKings]   = useState(Array.isArray(window.KINGS_DATA) ? window.KINGS_DATA : []);
+    const [error,   setError]   = useState(null);
+    const [activeEra, setActiveEra] = useState(null);
+    const [mobileSide, setMobileSide] = useState('judah'); // 'judah' | 'israel'
+
+    useEffect(() => {
+      if (!loading) return;
+      let cancelled = false;
+      const tryLoad = () => {
+        const data = window.KINGS_DATA;
+        if (Array.isArray(data) && data.length > 0 && !cancelled){
+          setKings(data); setLoading(false);
+          return true;
+        }
+        return false;
+      };
+      if (tryLoad()) return;
+      const onReady = () => tryLoad();
+      window.addEventListener('entity-index-ready', onReady);
+      const tick = setInterval(() => { if (tryLoad()) clearInterval(tick); }, 200);
+      const bail = setTimeout(() => {
+        if (!tryLoad() && !cancelled){
+          setError('כשל בטעינת נתוני המלכים. רענן את העמוד או נסה שוב.');
+          setLoading(false);
+        }
+        clearInterval(tick);
+      }, 6000);
+      return () => {
+        cancelled = true;
+        window.removeEventListener('entity-index-ready', onReady);
+        clearInterval(tick);
+        clearTimeout(bail);
+      };
+    }, [loading]);
+
+    const judah = useMemo(() => {
+      return kings
+        .filter(k => k.kingdom === 'יהודה' || k.kingdom === 'מאוחדת')
+        .filter(k => activeEra == null || k.era === activeEra)
+        .sort((a,b) => (b.reign_start_bce||0) - (a.reign_start_bce||0));
+    }, [kings, activeEra]);
+
+    const israel = useMemo(() => {
+      return kings
+        .filter(k => k.kingdom === 'ישראל')
+        .filter(k => activeEra == null || k.era === activeEra)
+        .sort((a,b) => (b.reign_start_bce||0) - (a.reign_start_bce||0));
+    }, [kings, activeEra]);
+
+    if (loading) {
+      return (
+        <div className="kt2-wrap">
+          <div className="kt2-loading">
+            <div style={{fontSize:48,marginBottom:8}}>📜</div>
+            <div>טוען טבלת מלכים…</div>
+            <div style={{marginTop:10}}>
+              <span className="kt2-loading-dot"/><span className="kt2-loading-dot"/><span className="kt2-loading-dot"/>
             </div>
           </div>
-        )}
-        <div className="kt-actions-row" style={{flexWrap:'wrap',gap:10}}>
-          <button className="gold-btn kt-practice-btn" onClick={(e)=>{e.stopPropagation(); onPractice(k.id);}}>
-            ⚔️ תרגל על מלך זה
-          </button>
-          <button className="kt-full-link" onClick={(e)=>{e.stopPropagation(); openFull();}}>
-            📖 פתח דף מלא
-          </button>
         </div>
-      </div>
-    );
-  }
-
-  function ProphetsCell({k}){
-    const KU = window.KingsUtils;
-    if (!KU || !KU.prophets_by_reign) return <span className="kt-empty-cell">·</span>;
-    const chars = Object.values(((window.__ENTITY_INDEX__||{}).character)||{});
-    const list = KU.prophets_by_reign(chars, k);
-    if (!list.length) return <span className="kt-empty-cell" aria-hidden="true">·</span>;
-    const go = (id) => { try { KU.navigateToCharacter(id); } catch(e){} };
-    return (
-      <div onClick={e=>e.stopPropagation()}>
-        {list.slice(0,6).map(p => (
-          <button key={p.id} className="kt-chip kt-chip-prophet" onClick={()=>go(p.id)}>{p.name}</button>
-        ))}
-      </div>
-    );
-  }
-
-  function ForeignCell({k}){
-    const KU = window.KingsUtils;
-    if (!KU || !KU.foreign_event_for) return null;
-    const f = KU.foreign_event_for(k);
-    if (!f) return null;
-    return (
-      <div className="kt-foreign-chip" title={f.book_ref}>
-        <div style={{fontWeight:800}}>{f.name} <span style={{opacity:.8,fontWeight:600}}>({f.empire})</span></div>
-        <div style={{fontSize:10.5,lineHeight:1.3,marginTop:2}}>{f.event}</div>
-        {f.book_ref && <div style={{fontSize:10,opacity:.7,marginTop:2}}>{f.book_ref}</div>}
-      </div>
-    );
-  }
-
-  function KingsTable(){
-    const [ready, setReady] = useState(!!window.__ENTITY_INDEX_READY__);
-    useEffect(()=>{
-      if (ready) return;
-      const onReady = ()=>setReady(true);
-      window.addEventListener('entity-index-ready', onReady);
-      const id = setInterval(()=>{ if (window.__ENTITY_INDEX_READY__) setReady(true); }, 250);
-      const bail = setTimeout(()=>setReady(true), 2500); // never block past 2.5s — we have fallback data
-      return ()=>{
-        window.removeEventListener('entity-index-ready', onReady);
-        clearInterval(id); clearTimeout(bail);
-      };
-    }, [ready]);
-
-    const [filter, setFilter]   = useState('all');
-    const [onlyGood, setOnly]   = useState(false);
-    const [expanded, setExpand] = useState(null);
-    const [showChain, setShowChain] = useState(false);
-    const [chainLines, setChainLines] = useState([]);
-    const [mobileTab, setMobileTab] = useState('judah'); // mobile-only kingdom toggle
-    const [isNarrow, setIsNarrow] = useState(() => typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(max-width: 640px)').matches : false);
-    useEffect(() => {
-      if (typeof window === 'undefined' || !window.matchMedia) return;
-      const mq = window.matchMedia('(max-width: 640px)');
-      const onChange = e => setIsNarrow(e.matches);
-      try { mq.addEventListener('change', onChange); } catch { mq.addListener(onChange); }
-      return () => { try { mq.removeEventListener('change', onChange); } catch { mq.removeListener(onChange); } };
-    }, []);
-    const tableWrapRef = useRef(null);
-
-    const all = useMemo(() => pickKingsData(), [ready]);
-
-    const filtered = useMemo(() => {
-      let list = all;
-      if (filter === 'united')       list = list.filter(k => k.unitId === 1);
-      else if (filter === 'split')   list = list.filter(k => k.unitId >= 2);
-      else if (filter === 'preisr')  list = list.filter(k => k.unitId >= 2 && k.unitId <= 5);
-      else if (filter === 'prejud')  list = list.filter(k => k.unitId >= 2 && k.unitId <= 6);
-      if (onlyGood) list = list.filter(k => k.good);
-      return list;
-    }, [all, filter, onlyGood]);
-
-    const rows = useMemo(() => buildRows(filtered), [filtered]);
-
-    useEffect(() => {
-      if (!showChain) { setChainLines([]); return; }
-      const KU = window.KingsUtils;
-      if (!KU) return;
-      const recompute = () => {
-        const wrap = tableWrapRef.current;
-        if (!wrap) return;
-        const wbox = wrap.getBoundingClientRect();
-        const byId = {};
-        wrap.querySelectorAll('[data-kid]').forEach(el => { byId[el.getAttribute('data-kid')] = el; });
-        const chain = KU.succession_chain(all).filter(p => p.killer_id && p.killer_id !== p.victim_id);
-        const lines = chain.map(p => {
-          const v = byId[p.victim_id], k = byId[p.killer_id];
-          if (!v || !k) return null;
-          const vb = v.getBoundingClientRect(), kb = k.getBoundingClientRect();
-          return {
-            id: p.victim_id+'>'+p.killer_id,
-            x1: vb.left + vb.width/2 - wbox.left,
-            y1: vb.top  + vb.height/2 - wbox.top,
-            x2: kb.left + kb.width/2 - wbox.left,
-            y2: kb.top  + kb.height/2 - wbox.top,
-            label: p.killer_name + ' ← ' + p.victim_name
-          };
-        }).filter(Boolean);
-        setChainLines(lines);
-      };
-      recompute();
-      const onR = () => recompute();
-      window.addEventListener('resize', onR);
-      const wrap = tableWrapRef.current;
-      wrap && wrap.addEventListener('scroll', onR, {passive:true});
-      return () => {
-        window.removeEventListener('resize', onR);
-        wrap && wrap.removeEventListener('scroll', onR);
-      };
-    }, [showChain, rows, expanded, all]);
-
-    if (rows.length === 0){
+      );
+    }
+    if (error) {
       return (
-        <div className="kt-wrap">
-          <div className="kt-empty">
-            <div style={{fontSize:48, marginBottom:8}}>📜</div>
-            <div>לא נמצאו מלכים בסינון זה. נסה להרחיב את הסינון.</div>
+        <div className="kt2-wrap">
+          <div className="kt2-error">
+            <div style={{fontSize:48,marginBottom:8}}>⚠️</div>
+            <div>{error}</div>
+          </div>
+        </div>
+      );
+    }
+    if (!kings.length) {
+      return (
+        <div className="kt2-wrap">
+          <div className="kt2-empty">
+            <div style={{fontSize:48,marginBottom:8}}>📜</div>
+            <div>לא נמצאו מלכים. בדוק את data/kings.js.</div>
           </div>
         </div>
       );
     }
 
     return (
-      <div className="kt-wrap">
-        <div className="kt-header">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">📜 ציר המלכים</h1>
-          <p className="text-on-parchment-muted text-sm mt-1">
-            טבלה אותנטית בעקבות חוברת מלכים — מלכי יהודה מימין, מלכי ישראל משמאל, מעצמות האזור בקצה.
-          </p>
+      <div className="kt2-wrap">
+        <div className="kt2-head">
+          <div>
+            <h1 className="kt2-title">📜 ציר המלכים</h1>
+            <p className="kt2-sub">מלכי יהודה מימין · מלכי ישראל משמאל · {kings.length} מלכים בסך הכול</p>
+          </div>
         </div>
 
-        <div className="kt-filters">
-          {[
-            {v:'all',    l:'הכל'},
-            {v:'united', l:'ממלכה מאוחדת'},
-            {v:'split',  l:'אחרי הפילוג'},
-            {v:'preisr', l:'עד חורבן ישראל'},
-            {v:'prejud', l:'עד חורבן יהודה'}
-          ].map(f => (
-            <button key={f.v} onClick={()=>setFilter(f.v)}
-              className={'kt-filter-chip ' + (filter===f.v?'active':'')}>{f.l}</button>
+        <div className="kt2-era-bar" role="tablist" aria-label="תקופות">
+          {ERA_BANDS.map(b => (
+            <button
+              key={b.id}
+              role="tab"
+              aria-selected={activeEra === b.id}
+              className={'kt2-era ' + (activeEra === b.id ? 'on' : '')}
+              onClick={() => setActiveEra(activeEra === b.id ? null : b.id)}
+              title={'יחידה ' + b.id + ' · ' + b.start + '–' + b.end + ' לפנה״ס'}
+            >
+              <span>יח׳ {b.id} · {b.name}</span>
+              <span className="kt2-era-yrs">{b.start}–{b.end}</span>
+            </button>
           ))}
-          <label className="kt-toggle">
-            <input type="checkbox" checked={onlyGood} onChange={e=>setOnly(e.target.checked)}/>
-            <span>הצג רק צדיקים</span>
-          </label>
-          <button
-            onClick={()=>setShowChain(v=>!v)}
-            className={"kt-chain-toggle " + (showChain?'on':'')}
-            aria-pressed={showChain}
-            title="הצג קווי רצח בין מלכים"
-          >
-            {showChain ? '✕ הסתר שרשרת רצח' : '⚔️ הצג שרשרת הרצח'}
-          </button>
         </div>
 
-        {/* -------- Two-column cards view (Judah right, Israel left) -------- */}
-        {(() => {
-          const KU = window.KingsUtils;
-          const judah  = filtered.filter(k => k.dynasty === 'יהודה').sort((a,b) =>
-            (b.reign_start_bce||0) - (a.reign_start_bce||0));
-          const israel = filtered.filter(k => k.dynasty === 'ישראל').sort((a,b) =>
-            (b.reign_start_bce||0) - (a.reign_start_bce||0));
+        <div className="kt2-toggle" role="tablist" aria-label="בחר ממלכה">
+          <button
+            role="tab"
+            aria-selected={mobileSide === 'judah'}
+            className={mobileSide === 'judah' ? 'on' : ''}
+            onClick={() => setMobileSide('judah')}
+          >👑 יהודה ({judah.length})</button>
+          <button
+            role="tab"
+            aria-selected={mobileSide === 'israel'}
+            className={mobileSide === 'israel' ? 'on' : ''}
+            onClick={() => setMobileSide('israel')}
+          >⚔️ ישראל ({israel.length})</button>
+        </div>
 
-          const navTo = (id) => {
-            const setRoute = window.__appSetRoute__;
-            if (setRoute) { setRoute({page:'character', id}); return; }
-            try { window.dispatchEvent(new CustomEvent('mb-navigate', {detail:{page:'character', id}})); } catch {}
-          };
-
-          const renderColumn = (list, side, title) => (
-            <div className="kt-col" data-side={side}>
-              <div className="kt-col-h">{title} · <span style={{opacity:.7,fontWeight:500}}>{list.length}</span></div>
-              <div className="kt-col-cards">
-                {list.length === 0 && <div className="kt-col-empty hebrew">אין מלכים בסינון זה</div>}
-                {list.map(k => {
-                  const ci = KU ? KU.assessmentColor(k) : assessmentClass(k);
-                  const dyn = (KU && KU.dynastyBadge) ? KU.dynastyBadge(k) : dynastyOf(k.dynasty, k.name);
-                  const lbl = ci.cls === 'assess-tzadik' ? 'צדיק' : ci.cls === 'assess-rasha' ? 'רשע' : 'מעורב';
-                  const yrs = (k.reign_start_bce && k.reign_end_bce)
-                    ? `${k.reign_start_bce}–${k.reign_end_bce}`
-                    : (k.years || `${k.reign_years||'?'} שנ׳`);
-                  return (
-                    <button key={k.id} className={'kt-card ' + ci.cls}
-                      data-kid={k.id}
-                      onClick={()=>navTo(k.id)}
-                      title={`${k.name} · ${dyn.name} · ${lbl} · ${yrs}`}
-                      style={{borderColor: dyn.color}}>
-                      <div className="kt-card-name hebrew">{k.name}</div>
-                      <div className="kt-card-meta">
-                        <span className="kt-card-yrs" dir="ltr">{yrs}</span>
-                        <span className={'kt-card-pill ' + ci.cls}>{lbl}</span>
-                      </div>
-                      {dyn && dyn.name && <div className="kt-card-dyn" style={{color: dyn.color}}>{dyn.name}</div>}
-                    </button>
-                  );
-                })}
-              </div>
+        <div className="kt2-grid">
+          <div className={'kt2-col' + (mobileSide === 'judah' ? '' : ' kt2-hidden')}>
+            <div className="kt2-col-head">
+              <span className="kt2-col-icon" aria-hidden="true">👑</span>
+              מלכי יהודה
+              <span className="kt2-col-head-count">({judah.length})</span>
             </div>
-          );
+            {judah.map(k => <KingCard key={k.id} k={k} setRoute={setRoute}/>)}
+            {judah.length === 0 && (
+              <div className="kt2-empty">אין מלכי יהודה בתקופה זו.</div>
+            )}
+          </div>
 
-          return (
-            <div className="kt-cards-wrap" ref={tableWrapRef}>
-              {isNarrow && (
-                <div className="kt-mobile-tabs" role="tablist" aria-label="ממלכה">
-                  <button role="tab" aria-selected={mobileTab==='judah'}
-                    className={'kt-mobile-tab ' + (mobileTab==='judah'?'active':'')}
-                    onClick={()=>setMobileTab('judah')}>מלכי יהודה <span style={{opacity:.7}}>({judah.length})</span></button>
-                  <button role="tab" aria-selected={mobileTab==='israel'}
-                    className={'kt-mobile-tab ' + (mobileTab==='israel'?'active':'')}
-                    onClick={()=>setMobileTab('israel')}>מלכי ישראל <span style={{opacity:.7}}>({israel.length})</span></button>
-                </div>
-              )}
-              <div className={'kt-cards-grid' + (isNarrow ? ' kt-cards-grid--mobile' : '')}>
-                {(!isNarrow || mobileTab==='judah')  && renderColumn(judah,  'judah',  'מלכי יהודה')}
-                {(!isNarrow || mobileTab==='israel') && renderColumn(israel, 'israel', 'מלכי ישראל')}
-              </div>
+          <div className={'kt2-col' + (mobileSide === 'israel' ? '' : ' kt2-hidden')}>
+            <div className="kt2-col-head">
+              <span className="kt2-col-icon" aria-hidden="true">⚔️</span>
+              מלכי ישראל
+              <span className="kt2-col-head-count">({israel.length})</span>
             </div>
-          );
-        })()}
-
-        {/* -------- (legacy) timeline grid view, hidden by default -------- */}
-        {false && (() => {
-          // ---------- Timeline view (proportional reign heights) ----------
-          const kingsWithDates = filtered.filter(k => k.reign_start_bce != null && k.reign_end_bce != null);
-          if (kingsWithDates.length === 0) return null;
-          const topY = Math.max(...kingsWithDates.map(k => k.reign_start_bce));
-          const botY = Math.min(...kingsWithDates.map(k => k.reign_end_bce));
-          const PX  = 14;                                          // px per year
-          const rowOf = (y) => topY - y + 1;                        // BCE → grid row
-          const totalRows = topY - botY + 1;
-          const GRID_COLS = '55px 1fr 160px 1fr 130px';
-          const KU = window.KingsUtils;
-          const decades = [];
-          for (let y = Math.floor(topY/10)*10; y >= botY; y -= 10) if (y <= topY) decades.push(y);
-          const chars = Object.values(((window.__ENTITY_INDEX__||{}).character)||{});
-          const toggle = (id) => setExpand(expanded === id ? null : id);
-
-          return (
-            <div className="kt-tl-wrap" ref={tableWrapRef} style={{position:'relative'}}>
-              {showChain && chainLines.length > 0 && (
-                <svg className="kt-chain-svg" width="100%" height="100%"
-                     style={{position:'absolute',inset:0,overflow:'visible',pointerEvents:'none',zIndex:5}}>
-                  <defs>
-                    <marker id="kt-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                      <path d="M 0 0 L 10 5 L 0 10 z" fill="#d94444"/>
-                    </marker>
-                  </defs>
-                  {chainLines.map(L => (
-                    <line key={L.id} x1={L.x1} y1={L.y1} x2={L.x2} y2={L.y2}
-                          stroke="#d94444" strokeWidth="2.5" strokeDasharray="6 4"
-                          markerEnd="url(#kt-arrow)" opacity="0.9">
-                      <title>{L.label}</title>
-                    </line>
-                  ))}
-                </svg>
-              )}
-              <div className="kt-tl-head" style={{gridTemplateColumns:GRID_COLS}}>
-                <div>שנה לפנה״ס</div>
-                <div>מלכי יהודה</div>
-                <div>נביאים</div>
-                <div>מלכי ישראל</div>
-                <div>מעצמות</div>
-              </div>
-              <div className="kt-tl" style={{gridTemplateColumns:GRID_COLS, gridTemplateRows:`repeat(${totalRows}, ${PX}px)`}}>
-                {decades.map(y => (
-                  <div key={'yr'+y} className="kt-tl-year"
-                       style={{gridColumn:1, gridRow:`${rowOf(y)} / ${rowOf(y)+1}`}}>
-                    {y}
-                  </div>
-                ))}
-                {kingsWithDates.map(k => {
-                  const isJudah = k.dynasty === 'יהודה';
-                  const startR  = rowOf(k.reign_start_bce);
-                  const endR    = rowOf(k.reign_end_bce) + 1;
-                  const span    = Math.max(1, endR - startR);
-                  const short   = span < 3;
-                  const col     = isJudah ? 2 : 4;
-                  const ci      = KU ? KU.assessmentColor(k) : {cls:'assess-mixed', hex:'#8b6d2d'};
-                  const dyn     = KU ? KU.dynastyBadge(k) : null;
-                  const lbl     = ci.cls==='assess-tzadik' ? 'צדיק' : ci.cls==='assess-rasha' ? 'רשע' : 'מעורב';
-                  return (
-                    <div
-                      key={k.id}
-                      data-kid={k.id}
-                      className={'kt-tl-king ' + ci.cls + (short?' kt-tl-short':'') + (expanded===k.id?' kt-tl-king-selected':'')}
-                      style={{
-                        gridColumn: col,
-                        gridRow: `${startR} / ${startR + span}`,
-                        borderInlineEndWidth: isJudah ? '5px' : '1px',
-                        borderInlineStartWidth: isJudah ? '1px' : '5px',
-                        borderColor: (dyn && dyn.color) || ci.hex
-                      }}
-                      onClick={()=>toggle(k.id)}
-                      title={k.name + ' · ' + lbl + ' · ' + k.reign_start_bce + '–' + k.reign_end_bce + ' לפנה״ס · ' + (k.reign_years||'?') + ' שנים'}
-                    >
-                      <div className="kt-king-name hebrew">{k.name}</div>
-                      {!short && dyn && <div className="kt-king-dyn" style={{color:dyn.color}}>{dyn.name}</div>}
-                      {!short && <div className="kt-king-yrs">{k.reign_start_bce}–{k.reign_end_bce} · {k.reign_years||'?'} שנ׳</div>}
-                      {!short && <span className={'kt-assess-pill ' + ci.cls}>{lbl}</span>}
-                    </div>
-                  );
-                })}
-                {kingsWithDates.map(k => {
-                  const list = KU ? KU.prophets_by_reign(chars, k) : [];
-                  if (!list.length) return null;
-                  const startR = rowOf(k.reign_start_bce);
-                  const endR   = rowOf(k.reign_end_bce) + 1;
-                  return (
-                    <div key={'p-'+k.id} className="kt-tl-prophet-group"
-                         style={{gridColumn:3, gridRow:`${startR} / ${Math.max(startR+1,endR)}`}}
-                         onClick={e=>e.stopPropagation()}>
-                      {list.slice(0,6).map(p => (
-                        <button key={p.id} className="kt-chip kt-chip-prophet"
-                                onClick={()=>{ if(KU) KU.navigateToCharacter(p.id); }}>
-                          {p.name}
-                        </button>
-                      ))}
-                    </div>
-                  );
-                })}
-                {kingsWithDates.map(k => {
-                  const f = KU ? KU.foreign_event_for(k) : null;
-                  if (!f) return null;
-                  const startR = rowOf(k.reign_start_bce);
-                  const endR   = rowOf(k.reign_end_bce) + 1;
-                  return (
-                    <div key={'f-'+k.id} className="kt-tl-foreign-group"
-                         style={{gridColumn:5, gridRow:`${startR} / ${Math.max(startR+1,endR)}`}}>
-                      <div className="kt-foreign-chip" title={f.book_ref||''}>
-                        <strong>{f.name}</strong>
-                        <div style={{fontSize:10,opacity:.85}}>{f.empire}</div>
-                        <div style={{fontSize:10,opacity:.7,lineHeight:1.25,marginTop:2}}>{f.event}</div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              {expanded && (() => {
-                const ek = kingsWithDates.find(x => x.id === expanded);
-                if (!ek) return null;
-                return (
-                  <div className="kt-row-detail" style={{marginTop:8,borderRadius:14,overflow:'hidden',border:'1px solid rgba(212,165,116,.35)'}}>
-                    <ExpandedRow k={ek} onPractice={firePractice} allKings={all}/>
-                  </div>
-                );
-              })()}
-            </div>
-          );
-        })()}
-
-        <div className="kt-legend">
-          <span><span className="kt-leg-dot" style={{background:"#2d7a2d"}}/> צדיק</span>
-          <span><span className="kt-leg-dot" style={{background:"#8b2d2d"}}/> רשע</span>
-          <span><span className="kt-leg-dot" style={{background:"#8b6d2d"}}/> מעורב / מעשיו דו־משמעיים</span>
-          <span><span className="kt-leg-dot" style={{background:JUDAH_DYN.color}}/> בית דוד</span>
-          <span><span className="kt-leg-dot" style={{background:"#1E4D7A"}}/> בית עמרי</span>
-          <span><span className="kt-leg-dot" style={{background:"#4E6B2E"}}/> בית יהוא</span>
+            {israel.map(k => <KingCard key={k.id} k={k} setRoute={setRoute}/>)}
+            {israel.length === 0 && (
+              <div className="kt2-empty">אין מלכי ישראל בתקופה זו.</div>
+            )}
+          </div>
         </div>
       </div>
     );
+  }
+
+  function KingsTable(props){
+    const EB = (typeof window !== 'undefined') && window.ErrorBoundaryComponent;
+    const inner = React.createElement(KingsTableInner, props);
+    return EB ? React.createElement(EB, {}, inner) : inner;
   }
 
   window.KingsTableComponent = KingsTable;
