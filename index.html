@@ -193,12 +193,12 @@
 <script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=3100"></script>
 <script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=2200"></script>
 <script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=2200"></script>
-<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=3000"></script>
-<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=3000"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=4000"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=2000"></script>
 <script src="./components/KingsUtils.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=4000"></script>
-<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=3000"></script>
+<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=3000"></script>
 <script src="./components/BreadthPage.js?v=3000"></script>
 <script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=2000"></script>
@@ -1059,6 +1059,80 @@ html[data-theme='light'] .kt-chip{
 html[data-theme='light'] .kt-chip:hover{
   transform:translateY(-1px);
   box-shadow:0 4px 12px rgba(200,155,60,.35);
+}
+
+/* ---------------- 3/8  CharacterPage / EventPage / PlacePage  ------------- */
+/* Headings, dividers, blockquote treatment, EntityLink chip language. */
+html[data-theme='light'] .parchment{
+  background:linear-gradient(135deg,#FFFDF4 0%,#EEE2C4 100%);
+  border:1px solid #D4A574;
+  box-shadow:0 6px 22px rgba(139,111,71,.12);
+}
+/* Hero name (3xl gold) — applies wherever pages render a top-level
+   font-display heading inside .parchment. EntityPage pages use
+   text-on-parchment-accent already; we boost weight + family for demo. */
+html[data-theme='light'] .parchment h1.font-display,
+html[data-theme='light'] .parchment .font-display.text-2xl,
+html[data-theme='light'] .parchment .font-display.text-3xl{
+  color:#5A4517;
+  font-family:'Frank Ruhl Libre', serif;
+  font-weight:900;
+  letter-spacing:.005em;
+}
+/* Section divider lines under each section heading on entity pages */
+html[data-theme='light'] .parchment h2.font-display{
+  position:relative; padding-bottom:6px;
+}
+html[data-theme='light'] .parchment h2.font-display::after{
+  content:''; position:absolute; right:0; left:0; bottom:0; height:2px;
+  background:linear-gradient(90deg, transparent, #C89B3C, transparent);
+  opacity:.85;
+}
+
+/* Dark-card sections used by EventPage/PlacePage (".card.rounded-xl/2xl p-4")
+   gain matching divider on h2/h3 inside */
+html[data-theme='light'] .card .font-display{ color:#5A4517; }
+html[data-theme='light'] .card{
+  background:linear-gradient(135deg,#FFFDF4 0%,#F5E8C8 100%);
+  border:1px solid rgba(212,165,116,.55);
+  color:#3a2a0d;
+}
+html[data-theme='light'] .card h3.font-display{
+  border-bottom:1px solid rgba(200,155,60,.35);
+  padding-bottom:6px; margin-bottom:10px;
+}
+
+/* blockquote-ish quote cards: parchment, gold left border */
+html[data-theme='light'] blockquote.hebrew{
+  background:linear-gradient(135deg,#FFF6D6,#F1E1B4);
+  border-inline-start:4px solid #8B6F1F !important;
+  border-radius:10px;
+  color:#3a2a0d;
+  font-family:'Frank Ruhl Libre', serif;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
+}
+
+/* EntityLink chips: rounded-full, gold gradient bg, gold border, soft hover */
+html[data-theme='light'] [data-entity-type]{
+  border-radius:999px;
+  font-family:'Heebo', sans-serif;
+  font-weight:700;
+}
+html[data-theme='light'] button[data-entity-type]:not(:disabled){
+  background:linear-gradient(135deg,#FFE9B0,#E6C879) !important;
+  border-color:#C89B3C !important;
+  color:#3a2a0d !important;
+  transition:transform .1s ease, box-shadow .15s ease, filter .15s ease;
+}
+html[data-theme='light'] button[data-entity-type]:not(:disabled):hover{
+  transform:translateY(-1px);
+  box-shadow:0 6px 14px rgba(200,155,60,.35);
+  filter:brightness(1.03);
+}
+html[data-theme='light'] button[data-entity-type]:disabled{
+  background:rgba(212,165,116,.18) !important;
+  border-color:rgba(139,111,31,.35) !important;
+  color:rgba(58,42,13,.55) !important;
 }
 </style>
 </head>
