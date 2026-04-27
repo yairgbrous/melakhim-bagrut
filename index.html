@@ -190,6 +190,7 @@
 <script type="module" src="./data/past-exams.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=3000"></script>
 <script type="text/babel" data-presets="react" src="./components/RelatedSection.js?v=3000"></script>
+<script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=3100"></script>
 <script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=2200"></script>
 <script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=2200"></script>
 <script type="text/babel" data-presets="react" src="./components/EventPage.js?v=3000"></script>
@@ -2653,7 +2654,9 @@ function App(){
           ? React.createElement(window.HomeComponent, {S, setRoute, level, nextLv})
           : <div className="text-amber-200 text-center py-8">טוען דף בית...</div>)}
         {route.page==="path" && <UnitsPath S={S} setRoute={setRoute}/>}
-        {route.page==="unit" && <UnitDetail unitId={route.unitId} S={S} setRoute={setRoute} awardXP={awardXP} update={update}/>}
+        {route.page==="unit" && (window.UnitPageComponent
+          ? React.createElement(window.UnitPageComponent, {unitId: route.unitId, setRoute, S, awardXP, update})
+          : <UnitDetail unitId={route.unitId} S={S} setRoute={setRoute} awardXP={awardXP} update={update}/>)}
         {route.page==="lesson" && <Lesson unitId={route.unitId} mode={route.mode} setRoute={setRoute} S={S} awardXP={awardXP} update={update}/>}
         {route.page==="quiz" && <QuizLobby S={S} setRoute={setRoute}/>}
         {route.page==="flashcards" && (()=>{ const X=window.FlashcardDrillComponent; return X ? <X S={S} update={update} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען כרטיסיות...</div>; })()}
