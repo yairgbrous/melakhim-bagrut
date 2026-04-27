@@ -72,6 +72,13 @@
       .kt-card-pill.assess-rasha {background:#f43f5e;color:#3a0610}
       .kt-card-pill.assess-mixed {background:#d97706;color:#3a1f06}
       .kt-card-dyn{font-size:11px;font-weight:700;opacity:.85}
+      /* ---- mobile kingdom toggle (<640px) ---- */
+      .kt-mobile-tabs{display:flex;gap:6px;direction:rtl;margin-bottom:10px;padding:4px;background:rgba(10,22,40,.7);border:1px solid rgba(212,165,116,.25);border-radius:999px}
+      html[data-theme='light'] .kt-mobile-tabs{background:rgba(247,241,225,.65)}
+      .kt-mobile-tab{flex:1;padding:8px 10px;border:none;background:transparent;color:#F5D670;font-family:inherit;font-size:13px;font-weight:800;border-radius:999px;cursor:pointer}
+      html[data-theme='light'] .kt-mobile-tab{color:#5A4517}
+      .kt-mobile-tab.active{background:linear-gradient(135deg,#d97706,#f59e0b);color:#3a1f06}
+      .kt-cards-grid--mobile{grid-template-columns:1fr !important}
       /* ---- timeline grid ---- */
       .kt-tl{position:relative;display:grid;direction:rtl;gap:0;padding:12px 8px;background:rgba(10,22,40,.6);border:1px solid rgba(212,165,116,.25);border-radius:14px;overflow:hidden}
       html[data-theme='light'] .kt-tl{background:rgba(247,241,225,.55)}
@@ -508,6 +515,15 @@
     const [expanded, setExpand] = useState(null);
     const [showChain, setShowChain] = useState(false);
     const [chainLines, setChainLines] = useState([]);
+    const [mobileTab, setMobileTab] = useState('judah'); // mobile-only kingdom toggle
+    const [isNarrow, setIsNarrow] = useState(() => typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(max-width: 640px)').matches : false);
+    useEffect(() => {
+      if (typeof window === 'undefined' || !window.matchMedia) return;
+      const mq = window.matchMedia('(max-width: 640px)');
+      const onChange = e => setIsNarrow(e.matches);
+      try { mq.addEventListener('change', onChange); } catch { mq.addListener(onChange); }
+      return () => { try { mq.removeEventListener('change', onChange); } catch { mq.removeListener(onChange); } };
+    }, []);
     const tableWrapRef = useRef(null);
 
     const all = useMemo(() => pickKingsData(), [ready]);
@@ -653,9 +669,19 @@
 
           return (
             <div className="kt-cards-wrap" ref={tableWrapRef}>
-              <div className="kt-cards-grid">
-                {renderColumn(judah,  'judah',  'מלכי יהודה')}
-                {renderColumn(israel, 'israel', 'מלכי ישראל')}
+              {isNarrow && (
+                <div className="kt-mobile-tabs" role="tablist" aria-label="ממלכה">
+                  <button role="tab" aria-selected={mobileTab==='judah'}
+                    className={'kt-mobile-tab ' + (mobileTab==='judah'?'active':'')}
+                    onClick={()=>setMobileTab('judah')}>מלכי יהודה <span style={{opacity:.7}}>({judah.length})</span></button>
+                  <button role="tab" aria-selected={mobileTab==='israel'}
+                    className={'kt-mobile-tab ' + (mobileTab==='israel'?'active':'')}
+                    onClick={()=>setMobileTab('israel')}>מלכי ישראל <span style={{opacity:.7}}>({israel.length})</span></button>
+                </div>
+              )}
+              <div className={'kt-cards-grid' + (isNarrow ? ' kt-cards-grid--mobile' : '')}>
+                {(!isNarrow || mobileTab==='judah')  && renderColumn(judah,  'judah',  'מלכי יהודה')}
+                {(!isNarrow || mobileTab==='israel') && renderColumn(israel, 'israel', 'מלכי ישראל')}
               </div>
             </div>
           );
