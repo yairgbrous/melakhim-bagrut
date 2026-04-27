@@ -194,7 +194,7 @@
 <script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=3000"></script>
 <script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=2000"></script>
 <script src="./components/KingsUtils.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=3000"></script>
 <script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=3000"></script>
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=2000"></script>
 <script src="./components/BreadthPage.js?v=2000"></script>
@@ -2657,9 +2657,11 @@ function App(){
         {route.page==="quizResult" && <QuizResult {...route} S={S} setRoute={setRoute}/>}
         {route.page==="themes" && (window.BreadthPage ? React.createElement(window.BreadthPage, {setRoute}) : <Themes S={S} update={update}/>)}
         {route.page==="quotes" && <QuotesBrowser S={S} update={update} awardXP={awardXP}/>}
-        {route.page==="timeline" && (window.TimelineComponent
-          ? React.createElement(window.TimelineComponent, {setRoute})
-          : <Timeline/>)}
+        {route.page==="timeline" && (window.KingsTableComponent
+          ? React.createElement(window.KingsTableComponent, {setRoute})
+          : (window.TimelineComponent
+              ? React.createElement(window.TimelineComponent, {setRoute})
+              : <Timeline/>))}
         {route.page==="maps" && <MapsPage S={S} update={update} awardXP={awardXP}/>}
         {route.page==="exam" && <ExamSim S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/>}
         {route.page==="class" && <ClassBoard S={S} update={update} setRoute={setRoute}/>}
