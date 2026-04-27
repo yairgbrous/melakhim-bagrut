@@ -621,12 +621,12 @@
     const visibleQs = activeTab === "A" ? partAQs : activeTab === "B" ? partBQs : partCQs;
 
     return (
-      <div className="max-w-3xl mx-auto space-y-4">
-        <div className="sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between">
+      <div className="max-w-3xl mx-auto space-y-4 exam-fullscreen">
+        <div className="sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between exam-sticky-bar">
           <div className="text-sm text-on-parchment">
             נענו: <span dir="ltr" className="font-bold">{Object.keys(answers).filter(k=>answers[k]&&answers[k].trim()).length}/{partAQs.length+partBCQs.length}</span>
           </div>
-          <div className={`font-mono font-bold text-lg ${timeLeft<300?"text-red-400":"text-on-parchment"}`}>
+          <div className={`font-mono font-bold text-lg exam-timer ${timeLeft<1800?"danger":""}`}>
             ⏱ <span dir="ltr">{String(Math.floor(mins/60)).padStart(1,"0")}:{String(mins%60).padStart(2,"0")}:{String(secs).padStart(2,"0")}</span>
           </div>
           <button onClick={finish} className="px-3 py-1.5 rounded-lg bg-red-700 text-white text-xs font-bold">הגשה</button>

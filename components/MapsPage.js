@@ -598,7 +598,7 @@
     }
 
     return (
-      <div className="mp-wrap">
+      <div className="mp-wrap maps-polish">
         <div className="mp-header">
           <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">🗺️ 19 מפות הבגרות</h1>
           <p className="text-on-parchment-muted text-sm mt-1">

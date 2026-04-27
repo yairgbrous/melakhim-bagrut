@@ -72,10 +72,10 @@
     };
     const XpBadge = (typeof window !== 'undefined') ? window.XpBadgeComponent : null;
     return (
-      <header className="mb-home-header">
+      <header className="mb-home-header ui-hero">
         <div className="mb-home-header-title">
           <h1 className="font-display">ספר מלכים · בגרות 2551</h1>
-          <div className="mb-home-countdown">
+          <div className="mb-home-countdown hero-countdown">
             ⏰ {heDays(dExam)} עד הבחינה · 30.4.2026
           </div>
         </div>
@@ -310,7 +310,7 @@
     const units = (typeof MELAKHIM_DATA !== 'undefined' && MELAKHIM_DATA.units) ? MELAKHIM_DATA.units : [];
 
     return (
-      <div className="mb-home-root">
+      <div className="mb-home-root home-polish">
         <HeaderStrip dExam={dExam}/>
         <HeroCard setRoute={setRoute}/>
         <UnitGrid units={units} setRoute={setRoute}/>

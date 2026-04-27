@@ -358,7 +358,7 @@
     }
 
     return (
-      <div className="kt2-wrap">
+      <div className="kt2-wrap kingstable-polish">
         <div className="kt2-head">
           <div>
             <h1 className="kt2-title">📜 ציר המלכים</h1>

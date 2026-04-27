@@ -260,7 +260,7 @@
     const EL = window.EntityLinkComponent;
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 unit-page-polish">
         <div className="flex items-center justify-between text-xs text-on-parchment-muted">
           <span>שאלה <span dir="ltr">{i + 1}</span> מתוך <span dir="ltr">{all.length}</span></span>
           <span>נצפו: <span dir="ltr">{seenCount}</span> ({pct}%)</span>
