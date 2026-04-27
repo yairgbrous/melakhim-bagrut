@@ -1404,6 +1404,41 @@ html[data-theme='dark'] .exam-timer-bar{
   .exam-timer-bar + .grid{ gap:0; padding:0; border-radius:0; border-inline:0; }
   .exam-timer-bar + .grid > button{ border-radius:0; padding:.85rem .5rem; min-height:48px; }
 }
+
+/* ---------------- 7/8  Bottom nav  --------------------------------------- */
+.bottom-nav{
+  grid-template-columns:repeat(4,1fr) !important;
+  gap:0;
+  padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+}
+html[data-theme='light'] .bottom-nav{
+  background:linear-gradient(180deg, rgba(255,253,244,.96), rgba(238,226,196,.96)) !important;
+  border-top:1px solid #C89B3C !important;
+  box-shadow:0 -6px 18px rgba(139,111,71,.12) !important;
+}
+.bn-item{
+  position:relative;
+  min-height:60px;
+  padding:6px 4px 10px !important;
+  font-size:11px !important;
+  font-weight:800 !important;
+}
+.bn-item .bn-ico{ font-size:24px !important; line-height:1; }
+.bn-item.active{ background:transparent !important; }
+.bn-item.active::after{
+  content:''; position:absolute; left:50%; bottom:4px;
+  transform:translateX(-50%);
+  width:8px; height:8px; border-radius:50%;
+  background:linear-gradient(135deg,#F5D670,#8B6F1F);
+  box-shadow:0 0 0 2px rgba(245,214,112,.45);
+}
+html[data-theme='light'] .bn-item{ color:#5A4517 !important; }
+html[data-theme='light'] .bn-item.active{ color:#3a2a0d !important; }
+html[data-theme='light'] .bn-item.active .bn-ico{
+  filter:drop-shadow(0 0 4px rgba(200,155,60,.55));
+  text-shadow:0 0 8px rgba(245,214,112,.45);
+}
+/* Tap target on mobile ≥44px (already 60 here). Equal width is the grid. */
 </style>
 </head>
 <body>
