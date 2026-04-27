@@ -717,6 +717,11 @@
       if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
         window.showToast('💾 הבחינה נשמרה בהיסטוריה · ציון ' + (Math.round(total*10)/10) + '/101', 'success');
       }
+      try {
+        if (typeof window !== 'undefined' && window.MelakhimAuth && window.MelakhimAuth.publishLeaderboard){
+          window.MelakhimAuth.publishLeaderboard({ exam_avg: rec.total });
+        }
+      } catch {}
     };
 
     return (
@@ -803,7 +808,19 @@
                 </ul>
               </div>
             )}
-            <button onClick={onDone} className="gold-btn w-full py-2 rounded-lg font-bold mt-2">המשך</button>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <button
+                onClick={() => {
+                  if (typeof window !== 'undefined' && window.MelakhimAuth && window.MelakhimAuth.shareApp){
+                    window.MelakhimAuth.shareApp();
+                  }
+                }}
+                className="card py-2 rounded-lg font-bold text-on-parchment hover:bg-amber-500/10"
+                aria-label="שתף עם השכבה">
+                📤 שתף עם השכבה
+              </button>
+              <button onClick={onDone} className="gold-btn py-2 rounded-lg font-bold">המשך</button>
+            </div>
           </div>
         )}
       </div>
