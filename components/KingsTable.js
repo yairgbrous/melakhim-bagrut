@@ -11,6 +11,8 @@
          Clicking a chip navigates to the prophet's CharacterPage; broken
          IDs are rerouted through window.__ENTITY_ALIASES__ so they still
          resolve via _id-aliases.js.
+     (d) mobile (≤768px): collapses to a single column with a kingdom
+         toggle tab (יהודה / ישראל). Desktop keeps the two columns.
 
    Click a king card → setRoute({page:'character', id:king.id}). Falls back
    to window.__appSetRoute__ / mb-navigate event when the prop isn't passed.
@@ -110,6 +112,14 @@
       .kt2-prophet-chip[disabled]{opacity:.55;cursor:not-allowed}
       html[data-theme='light'] .kt2-prophet-chip{background:rgba(124,58,237,.18);color:#4c1d95;border-color:rgba(124,58,237,.45)}
 
+      .kt2-toggle{display:none;direction:rtl;background:rgba(10,22,40,.6);
+        border:1px solid rgba(212,165,116,.3);border-radius:999px;padding:4px;gap:4px}
+      html[data-theme='light'] .kt2-toggle{background:rgba(247,241,225,.7)}
+      .kt2-toggle button{flex:1;padding:8px 14px;border-radius:999px;border:none;
+        background:transparent;color:#F5D670;font-weight:800;font-size:14px;cursor:pointer}
+      html[data-theme='light'] .kt2-toggle button{color:#5A4517}
+      .kt2-toggle button.on{background:linear-gradient(135deg,#D4A574,#8B6F47);color:#1A1611}
+
       .kt2-loading,.kt2-error,.kt2-empty{padding:40px 18px;text-align:center;
         border-radius:14px;border:1px solid rgba(212,165,116,.3);
         background:rgba(10,22,40,.45);color:#F5D670;font-weight:600}
@@ -122,6 +132,8 @@
 
       @media (max-width:768px){
         .kt2-grid{grid-template-columns:1fr}
+        .kt2-col.kt2-hidden{display:none}
+        .kt2-toggle{display:flex}
         .kt2-era-bar{grid-template-columns:repeat(3,1fr)}
         .kt2-king-name{font-size:20px}
       }
@@ -265,6 +277,7 @@
     const [kings,   setKings]   = useState(Array.isArray(window.KINGS_DATA) ? window.KINGS_DATA : []);
     const [error,   setError]   = useState(null);
     const [activeEra, setActiveEra] = useState(null);
+    const [mobileSide, setMobileSide] = useState('judah'); // 'judah' | 'israel'
 
     useEffect(() => {
       if (!loading) return;
@@ -369,8 +382,23 @@
           ))}
         </div>
 
+        <div className="kt2-toggle" role="tablist" aria-label="בחר ממלכה">
+          <button
+            role="tab"
+            aria-selected={mobileSide === 'judah'}
+            className={mobileSide === 'judah' ? 'on' : ''}
+            onClick={() => setMobileSide('judah')}
+          >👑 יהודה ({judah.length})</button>
+          <button
+            role="tab"
+            aria-selected={mobileSide === 'israel'}
+            className={mobileSide === 'israel' ? 'on' : ''}
+            onClick={() => setMobileSide('israel')}
+          >⚔️ ישראל ({israel.length})</button>
+        </div>
+
         <div className="kt2-grid">
-          <div className="kt2-col">
+          <div className={'kt2-col' + (mobileSide === 'judah' ? '' : ' kt2-hidden')}>
             <div className="kt2-col-head">
               <span className="kt2-col-icon" aria-hidden="true">👑</span>
               מלכי יהודה
@@ -382,7 +410,7 @@
             )}
           </div>
 
-          <div className="kt2-col">
+          <div className={'kt2-col' + (mobileSide === 'israel' ? '' : ' kt2-hidden')}>
             <div className="kt2-col-head">
               <span className="kt2-col-icon" aria-hidden="true">⚔️</span>
               מלכי ישראל
