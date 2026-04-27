@@ -45,6 +45,33 @@
       .kt-chain-svg{position:absolute;inset:0;pointer-events:none;z-index:4}
       .kt-table-rel{position:relative}
       .kt-quote-cite{font-family:'Frank Ruhl Libre',serif;font-size:13.5px;line-height:1.55;padding:6px 10px;border-inline-start:3px solid #C89B3C;background:rgba(212,165,116,.08);border-radius:6px;color:inherit}
+      /* ---- two-column RTL cards view ---- */
+      .kt-cards-wrap{margin-top:14px}
+      .kt-cards-grid{display:grid;direction:rtl;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+      .kt-col-h{position:sticky;top:0;z-index:2;padding:8px 12px;font-family:'Frank Ruhl Libre',serif;font-size:16px;font-weight:900;color:#F5D670;background:rgba(10,22,40,.92);backdrop-filter:blur(6px);border-bottom:2px solid rgba(212,165,116,.45);border-radius:8px 8px 0 0}
+      html[data-theme='light'] .kt-col-h{color:#5A4517;background:rgba(247,241,225,.95)}
+      .kt-col[data-side='judah'] .kt-col-h{border-inline-start:5px solid #4A6B47}
+      .kt-col[data-side='israel'] .kt-col-h{border-inline-end:5px solid #1E4D7A}
+      .kt-col-cards{display:flex;flex-direction:column;gap:8px;padding:10px;background:rgba(10,22,40,.4);border:1px solid rgba(212,165,116,.2);border-radius:0 0 12px 12px}
+      html[data-theme='light'] .kt-col-cards{background:rgba(247,241,225,.45)}
+      .kt-col-empty{padding:18px;text-align:center;color:rgba(245,214,112,.5);font-size:13px}
+      .kt-card{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:10px;border:2px solid;cursor:pointer;text-align:right;font-family:inherit;transition:transform .08s,box-shadow .12s;position:relative;direction:rtl}
+      .kt-card:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.18)}
+      .kt-card:focus-visible{outline:2px solid #F5D670;outline-offset:2px}
+      .kt-card.assess-tzadik{background:linear-gradient(135deg,#0e3d2e,#125d3f);color:#d6f5d4}
+      .kt-card.assess-rasha {background:linear-gradient(135deg,#3a0d18,#5a1626);color:#fadcd6}
+      .kt-card.assess-mixed {background:linear-gradient(135deg,#3a2a08,#5a3f10);color:#f5e8b8}
+      html[data-theme='light'] .kt-card.assess-tzadik{background:linear-gradient(135deg,#d4f5d4,#a8e6a1);color:#1a4d1a}
+      html[data-theme='light'] .kt-card.assess-rasha {background:linear-gradient(135deg,#fad4d4,#e6a1a1);color:#4d1a1a}
+      html[data-theme='light'] .kt-card.assess-mixed {background:linear-gradient(135deg,#f5e8b8,#e6d184);color:#4d3e1a}
+      .kt-card-name{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:16px;line-height:1.2}
+      .kt-card-meta{display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
+      .kt-card-yrs{font-size:11px;font-weight:700;opacity:.8;font-variant-numeric:tabular-nums;direction:ltr}
+      .kt-card-pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:10px;font-weight:800}
+      .kt-card-pill.assess-tzadik{background:#10b981;color:#022c1d}
+      .kt-card-pill.assess-rasha {background:#f43f5e;color:#3a0610}
+      .kt-card-pill.assess-mixed {background:#d97706;color:#3a1f06}
+      .kt-card-dyn{font-size:11px;font-weight:700;opacity:.85}
       /* ---- timeline grid ---- */
       .kt-tl{position:relative;display:grid;direction:rtl;gap:0;padding:12px 8px;background:rgba(10,22,40,.6);border:1px solid rgba(212,165,116,.25);border-radius:14px;overflow:hidden}
       html[data-theme='light'] .kt-tl{background:rgba(247,241,225,.55)}
@@ -579,7 +606,63 @@
           </button>
         </div>
 
+        {/* -------- Two-column cards view (Judah right, Israel left) -------- */}
         {(() => {
+          const KU = window.KingsUtils;
+          const judah  = filtered.filter(k => k.dynasty === 'יהודה').sort((a,b) =>
+            (b.reign_start_bce||0) - (a.reign_start_bce||0));
+          const israel = filtered.filter(k => k.dynasty === 'ישראל').sort((a,b) =>
+            (b.reign_start_bce||0) - (a.reign_start_bce||0));
+
+          const navTo = (id) => {
+            const setRoute = window.__appSetRoute__;
+            if (setRoute) { setRoute({page:'character', id}); return; }
+            try { window.dispatchEvent(new CustomEvent('mb-navigate', {detail:{page:'character', id}})); } catch {}
+          };
+
+          const renderColumn = (list, side, title) => (
+            <div className="kt-col" data-side={side}>
+              <div className="kt-col-h">{title} · <span style={{opacity:.7,fontWeight:500}}>{list.length}</span></div>
+              <div className="kt-col-cards">
+                {list.length === 0 && <div className="kt-col-empty hebrew">אין מלכים בסינון זה</div>}
+                {list.map(k => {
+                  const ci = KU ? KU.assessmentColor(k) : assessmentClass(k);
+                  const dyn = (KU && KU.dynastyBadge) ? KU.dynastyBadge(k) : dynastyOf(k.dynasty, k.name);
+                  const lbl = ci.cls === 'assess-tzadik' ? 'צדיק' : ci.cls === 'assess-rasha' ? 'רשע' : 'מעורב';
+                  const yrs = (k.reign_start_bce && k.reign_end_bce)
+                    ? `${k.reign_start_bce}–${k.reign_end_bce}`
+                    : (k.years || `${k.reign_years||'?'} שנ׳`);
+                  return (
+                    <button key={k.id} className={'kt-card ' + ci.cls}
+                      data-kid={k.id}
+                      onClick={()=>navTo(k.id)}
+                      title={`${k.name} · ${dyn.name} · ${lbl} · ${yrs}`}
+                      style={{borderColor: dyn.color}}>
+                      <div className="kt-card-name hebrew">{k.name}</div>
+                      <div className="kt-card-meta">
+                        <span className="kt-card-yrs" dir="ltr">{yrs}</span>
+                        <span className={'kt-card-pill ' + ci.cls}>{lbl}</span>
+                      </div>
+                      {dyn && dyn.name && <div className="kt-card-dyn" style={{color: dyn.color}}>{dyn.name}</div>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+
+          return (
+            <div className="kt-cards-wrap" ref={tableWrapRef}>
+              <div className="kt-cards-grid">
+                {renderColumn(judah,  'judah',  'מלכי יהודה')}
+                {renderColumn(israel, 'israel', 'מלכי ישראל')}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* -------- (legacy) timeline grid view, hidden by default -------- */}
+        {false && (() => {
           // ---------- Timeline view (proportional reign heights) ----------
           const kingsWithDates = filtered.filter(k => k.reign_start_bce != null && k.reign_end_bce != null);
           if (kingsWithDates.length === 0) return null;
