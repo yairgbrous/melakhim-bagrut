@@ -94,6 +94,7 @@
     evalFile('./data/archaeology.js', ['archaeologyFinds']),
     evalFile('./data/hebrew-dates.js', []),
     evalFile('./data/_id-aliases.js?v=1400', []),
+    evalFile('./data/breadth.js?v=3100', []),
   ]);
   const [chars, stories, flashcards, keyConcepts, kingsMod, unitDeepMod] = await Promise.all([
     importModule('./data/characters.js'),
