@@ -6,6 +6,11 @@
      (b) two-column RTL layout (יהודה ימין · ישראל שמאל) + horizontal
          era timeline + per-card color coding (good=emerald, bad=ruby,
          mixed=amber).
+     (c) prophet chips under each king card, sourced via
+         KingsUtils.prophets_by_reign with the FALLBACK_PROPHETS table.
+         Clicking a chip navigates to the prophet's CharacterPage; broken
+         IDs are rerouted through window.__ENTITY_ALIASES__ so they still
+         resolve via _id-aliases.js.
 
    Click a king card → setRoute({page:'character', id:king.id}). Falls back
    to window.__appSetRoute__ / mb-navigate event when the prop isn't passed.
@@ -96,6 +101,15 @@
       .kt2-pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:10px;
         font-weight:800;letter-spacing:.02em;background:rgba(0,0,0,.25)}
 
+      .kt2-prophets{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+      .kt2-prophet-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;
+        border-radius:999px;background:rgba(124,58,237,.28);color:#e9d5ff;
+        border:1px solid rgba(124,58,237,.55);font-size:11px;font-weight:700;cursor:pointer;
+        transition:transform .1s,background .15s}
+      .kt2-prophet-chip:hover{background:rgba(124,58,237,.5);transform:scale(1.04)}
+      .kt2-prophet-chip[disabled]{opacity:.55;cursor:not-allowed}
+      html[data-theme='light'] .kt2-prophet-chip{background:rgba(124,58,237,.18);color:#4c1d95;border-color:rgba(124,58,237,.45)}
+
       .kt2-loading,.kt2-error,.kt2-empty{padding:40px 18px;text-align:center;
         border-radius:14px;border:1px solid rgba(212,165,116,.3);
         background:rgba(10,22,40,.45);color:#F5D670;font-weight:600}
@@ -132,6 +146,64 @@
     if (window.__appSetRoute__) { try { window.__appSetRoute__(r); return; } catch(e){} }
     try { window.dispatchEvent(new CustomEvent('mb-navigate', { detail:r })); } catch(e){}
     try { window.location.hash = '#' + page + '-' + encodeURIComponent(id); } catch(e){}
+  }
+
+  // Resolve a prophet id to a display label, preferring the live entity index
+  // (data/characters.js) and falling back to KingsUtils.FALLBACK_PROPHETS.
+  function prophetLabel(pid){
+    const idx = (window.__ENTITY_INDEX__ || {}).character || {};
+    const c = idx[pid];
+    if (c) return c.name_niqqud || c.name || c.heading || pid;
+    const KU = window.KingsUtils;
+    if (KU && KU.FALLBACK_PROPHETS) {
+      const f = KU.FALLBACK_PROPHETS.find(p => p.id === pid);
+      if (f) return f.name;
+    }
+    return pid;
+  }
+
+  // Does the prophet id resolve through the entity index *or* the alias map?
+  // Used to distinguish broken refs (rendered disabled) from live links.
+  function prophetExists(pid){
+    const idx = (window.__ENTITY_INDEX__ || {}).character || {};
+    if (idx[pid]) return true;
+    const aliases = (window.__ENTITY_ALIASES__ || {}).character || {};
+    if (Object.prototype.hasOwnProperty.call(aliases, pid)) return true;
+    const KU = window.KingsUtils;
+    if (KU && KU.FALLBACK_PROPHETS && KU.FALLBACK_PROPHETS.some(p => p.id === pid)) return true;
+    return false;
+  }
+
+  function ProphetChip({pid, label, setRoute}){
+    const exists  = prophetExists(pid);
+    const display = label || prophetLabel(pid);
+    const onClick = (e) => {
+      e.stopPropagation();
+      if (!exists) return;
+      navTo(setRoute, 'character', pid);
+    };
+    return (
+      <button
+        type="button"
+        className="kt2-prophet-chip"
+        onClick={onClick}
+        disabled={!exists}
+        title={exists ? ('דף הנביא ' + display) : (display + ' (אין דף עדיין)')}
+        aria-label={'דף הנביא ' + display}
+      >
+        🔮 {display}
+      </button>
+    );
+  }
+
+  function gatherProphets(k){
+    const KU = window.KingsUtils;
+    if (KU && KU.prophets_by_reign){
+      const chars = Object.values(((window.__ENTITY_INDEX__||{}).character)||{});
+      const list = KU.prophets_by_reign(chars, k) || [];
+      if (list.length) return list;
+    }
+    return (k.related_prophets || []).map(pid => ({ id:pid, name:prophetLabel(pid) }));
   }
 
   function KingCard({k, setRoute}){
@@ -171,6 +243,17 @@
           </div>
         </div>
         <div className="kt2-king-role">{role}</div>
+        {(() => {
+          const prophets = gatherProphets(k);
+          if (!prophets.length) return null;
+          return (
+            <div className="kt2-prophets" onClick={(e)=>e.stopPropagation()}>
+              {prophets.slice(0, 6).map(p => (
+                <ProphetChip key={p.id} pid={p.id} label={p.name} setRoute={setRoute}/>
+              ))}
+            </div>
+          );
+        })()}
       </div>
     );
   }
