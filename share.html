@@ -199,6 +199,27 @@
         document.documentElement.dataset.source = 'whatsapp';
       }
     } catch (e) {}
+
+    // Per-route share preview (human-facing only; scrapers read the static
+    // og:* tags above). Accepts ?t=<type>&id=<id>&label=<label> and rewrites
+    // the heading + deep-links the CTA into the SPA.
+    try {
+      const p = new URLSearchParams(window.location.search);
+      const t = p.get('t') || '';
+      const id = p.get('id') || '';
+      const label = p.get('label') || '';
+      if (t && id) {
+        const map = { character:'דמות', king:'מלך', event:'אירוע', place:'מקום' };
+        const typeLabel = map[t] || t;
+        const h1 = document.querySelector('h1');
+        const tagline = document.querySelector('.tagline');
+        if (h1 && label) h1.textContent = label;
+        if (tagline) tagline.textContent = typeLabel + ' מספר מלכים · לחץ כדי לקרוא את הדף המלא';
+        const cta = document.querySelector('a.cta');
+        if (cta) cta.href = './index.html#/' + t + '/' + encodeURIComponent(id);
+        document.title = (label || 'מלכים') + ' · בגרות 2551';
+      }
+    } catch (e) {}
   </script>
 </body>
 </html>

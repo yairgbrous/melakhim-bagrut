@@ -13,6 +13,19 @@
     return s.trim().toLowerCase().replace(/[\s_]+/g, "-").replace(/[^֐-׿a-z0-9-]/g, "");
   }
 
+  function shareEntity(type, id, label){
+    const base = (window.location.origin || '') + window.location.pathname.replace(/[^/]*$/, '');
+    const url = base + '#/' + type + '/' + encodeURIComponent(id);
+    const text = (label || '') + ' · ספר מלכים · בגרות 2551';
+    const data = { title: label || 'ספר מלכים', text, url };
+    if (navigator.share){ navigator.share(data).catch(()=>{}); return; }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(() => {
+        if (typeof window.showToast === 'function') window.showToast('📋 הקישור הועתק ללוח', 'success');
+      }).catch(()=>{});
+    } else { window.prompt('העתק את הקישור:', url); }
+  }
+
   function findMapForPlace(placeId){
     const maps = (typeof window !== "undefined" && Array.isArray(window.MAPS_19)) ? window.MAPS_19 : [];
     for (const m of maps) {
@@ -312,6 +325,11 @@
         <main className="max-w-3xl mx-auto w-full pb-24">
           <Hero name={name} subtitle={subtitleBits.join(" · ")} breadthIds={relatedBreadth} setRoute={setRoute}/>
 
+          <div className="px-4 md:px-6 -mt-2 mb-2 flex justify-end">
+            <button onClick={()=>shareEntity('place', pl.id, name)} className="mb-share-btn" aria-label="שתף">
+              <span aria-hidden="true">🔗</span><span>שתף</span>
+            </button>
+          </div>
           <div className="px-4 md:px-6 space-y-4">
             {pl.significance && (
               <Section title="✨ משמעות" tone="parchment">
