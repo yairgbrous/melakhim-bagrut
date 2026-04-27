@@ -400,6 +400,12 @@ html[data-theme='light'] .hmb{color:#8B6F1F;background:rgba(139,111,71,.15)}
   .mini-stats .ms{ gap:0; padding:2px 4px; border-radius:8px; background:rgba(212,165,116,.10); }
   .rank-chip{ font-size:10px; padding:2px 6px; }
 }
+/* ---- ExamSim 2551 timer color states ---- */
+.exam-timer-normal{color:#F4D58D}
+.exam-timer-warn{color:#FBBF24;background:rgba(180,83,9,.18);padding:4px 10px;border-radius:8px}
+.exam-timer-crit{color:#FCA5A5;background:rgba(127,29,29,.35);padding:4px 10px;border-radius:8px;animation:examTimerPulse 1s ease-in-out infinite}
+@keyframes examTimerPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(1.05)}}
+
 /* ---- Mobile ExamSim: fullscreen + sticky timer + sticky nav tabs ---- */
 @media (max-width:640px){
   .exam-run-wrap{position:fixed;inset:0;z-index:45;padding:10px 10px calc(72px + env(safe-area-inset-bottom));margin:0;max-width:none;background:linear-gradient(180deg,#0A1628 0%,#0F1F3A 100%);overflow-y:auto;-webkit-overflow-scrolling:touch}

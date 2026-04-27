@@ -604,7 +604,14 @@
     const partBQs  = partBCList().filter(q => selectedBC.includes(q.id) && q.part === "B");
     const partCQs  = partBCList().filter(q => selectedBC.includes(q.id) && q.part === "C");
     const partBCQs = [...partBQs, ...partCQs];
-    const mins = Math.floor(timeLeft/60), secs = timeLeft%60;
+
+    // Three-stage timer color: normal / amber-warn (≤30:00) / red-pulse (≤5:00).
+    const timerStage = timeLeft <= 5*60 ? "crit" : timeLeft <= 30*60 ? "warn" : "normal";
+    const timerCls   = `exam-timer-${timerStage}`;
+    const hh = Math.floor(timeLeft/3600);
+    const mm = Math.floor((timeLeft%3600)/60);
+    const ss = timeLeft%60;
+    const timerText = `${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
 
     const setAns = (id, v) => setAnswers(a => ({...a, [id]: v}));
     const activeTab = tab || "A";
@@ -644,8 +651,10 @@
           <div className="text-sm text-on-parchment">
             נענו: <span dir="ltr" className="font-bold">{Object.keys(answers).filter(k=>answers[k]&&answers[k].trim()).length}/{partAQs.length+partBCQs.length}</span>
           </div>
-          <div className={`font-mono font-bold text-lg exam-timer ${timeLeft<1800?"danger":""}`}>
-            ⏱ <span dir="ltr">{String(Math.floor(mins/60)).padStart(1,"0")}:{String(mins%60).padStart(2,"0")}:{String(secs).padStart(2,"0")}</span>
+          <div className={`font-mono font-bold text-xl exam-timer ${timerCls}`}>
+            ⏱ <span dir="ltr">{timerText}</span>
+            {timerStage === "warn" && <span className="text-xs font-normal mr-2 hebrew">· פחות מחצי שעה</span>}
+            {timerStage === "crit" && <span className="text-xs font-normal mr-2 hebrew">· הגשה קרבה!</span>}
           </div>
           <button onClick={finish} className="px-3 py-1.5 rounded-lg bg-red-700 text-white text-xs font-bold">הגשה</button>
         </div>
