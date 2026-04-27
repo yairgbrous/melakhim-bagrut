@@ -294,17 +294,40 @@
       const onReady = () => tryLoad();
       window.addEventListener('entity-index-ready', onReady);
       const tick = setInterval(() => { if (tryLoad()) clearInterval(tick); }, 200);
+
+      // Hard fallback at 4s: dynamically import data/kings.js ourselves.
+      // Covers the case where the entity-boot IIFE failed silently or is
+      // still pending due to a slow/cached module fetch.
+      const hardFallback = setTimeout(() => {
+        if (cancelled || tryLoad()) return;
+        try {
+          // Dynamic import in a classic (babel) script resolves relative to
+          // the document URL, so use the same './data/kings.js' the boot uses.
+          import('./data/kings.js').then(mod => {
+            if (cancelled) return;
+            const arr = (mod && (mod.default || mod.kings)) || [];
+            if (Array.isArray(arr) && arr.length > 0) {
+              if (!Array.isArray(window.KINGS_DATA) || window.KINGS_DATA.length === 0) {
+                window.KINGS_DATA = arr;
+              }
+              setKings(arr); setLoading(false);
+            }
+          }).catch(() => {});
+        } catch(e) { /* dynamic import unsupported — fall through to bail */ }
+      }, 4000);
+
       const bail = setTimeout(() => {
         if (!tryLoad() && !cancelled){
           setError('כשל בטעינת נתוני המלכים. רענן את העמוד או נסה שוב.');
           setLoading(false);
         }
         clearInterval(tick);
-      }, 6000);
+      }, 12000);
       return () => {
         cancelled = true;
         window.removeEventListener('entity-index-ready', onReady);
         clearInterval(tick);
+        clearTimeout(hardFallback);
         clearTimeout(bail);
       };
     }, [loading]);
