@@ -199,7 +199,7 @@
 <script src="./components/KingsUtils.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=4000"></script>
-<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=3000"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=4000"></script>
 <script src="./components/BreadthPage.js?v=3000"></script>
 <script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=2000"></script>
@@ -1185,6 +1185,177 @@ html[data-theme='light'] section.card.rounded-2xl > h3.font-display{
   margin-bottom:10px;
   color:#5A4517;
 }
+
+/* ---------------- 5/8  MapsPage  ---------------------------------------- */
+/* The map components used .mp-* classes that had no CSS rules anywhere,
+   so the maps grid + full view rendered raw. Provide a baseline +
+   parchment-and-gold theming, with the legend pinned bottom-right on
+   wide viewports. */
+.mp-wrap{ max-width:1200px; margin:0 auto; padding:8px; }
+.mp-header{ margin-bottom:14px; }
+.mp-tip{ margin-top:10px; padding:14px 16px; }
+.mp-filters{
+  display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px;
+  margin:14px 0; padding:10px 12px;
+  background:linear-gradient(135deg,#FFFDF4,#EEE2C4);
+  border:1px solid rgba(212,165,116,.5); border-radius:14px;
+}
+.mp-filters-row{ display:flex; flex-wrap:wrap; gap:6px; }
+.mp-filter-chip{
+  padding:6px 14px; border-radius:999px; font-size:12px; font-weight:800;
+  background:#fff; border:1px solid rgba(212,165,116,.55); color:#3a2a0d;
+  transition:transform .1s ease, box-shadow .15s ease, background .15s ease;
+}
+.mp-filter-chip:hover{ transform:translateY(-1px); box-shadow:0 4px 10px rgba(200,155,60,.25); }
+.mp-filter-chip.active{ background:linear-gradient(135deg,#F5D670,#C89B3C); color:#1A1611; border-color:#8B6F1F; }
+.mp-toggle{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:12px; font-weight:700; color:#3a2a0d; cursor:pointer;
+}
+.mp-section{ margin:24px 0 18px; }
+.mp-section-h{
+  display:flex; align-items:center; gap:10px;
+  font-family:'Frank Ruhl Libre', serif; font-weight:900; font-size:18px;
+  margin-bottom:10px;
+}
+.mp-section-bar{ display:inline-block; width:6px; height:24px; border-radius:3px; }
+.mp-section-count{
+  margin-inline-start:auto; padding:2px 10px; border-radius:999px;
+  background:rgba(212,165,116,.22); border:1px solid rgba(200,155,60,.45);
+  color:#5A4517; font-size:11px; font-weight:800;
+}
+.mp-grid{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px;
+}
+.mp-card{
+  display:block; text-align:right; cursor:pointer;
+  background:linear-gradient(135deg,#FFFDF4 0%,#EEE2C4 100%);
+  border:1px solid rgba(212,165,116,.55); border-radius:16px;
+  overflow:hidden; box-shadow:0 4px 14px rgba(139,111,71,.10);
+  transition:transform .12s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.mp-card:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(139,111,71,.18); border-color:#8B6F1F; }
+.mp-card-band{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 12px; color:#fff; font-weight:800;
+}
+.mp-card-num{ font-family:'Frank Ruhl Libre', serif; font-size:18px; }
+.mp-card-unit{ font-size:11px; opacity:.92; }
+.mp-card-body{ padding:12px 14px; color:#3a2a0d; }
+.mp-card-title{ font-size:16px; font-weight:900; margin:0 0 4px; color:#3a2a0d; }
+.mp-card-sub{ font-size:12.5px; line-height:1.5; opacity:.85; margin:6px 0; }
+.mp-card-places{ display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.mp-place-chip{
+  font-size:11px; padding:2px 9px; border-radius:999px;
+  background:#FFF6D6; border:1px solid #C89B3C; color:#3a2a0d; font-weight:700;
+}
+.mp-place-more{ background:rgba(212,165,116,.2); }
+.mp-card-note{
+  margin-top:8px; padding:6px 10px; border-radius:8px;
+  background:rgba(212,165,116,.15); color:#5A4517; font-size:11.5px; font-weight:600;
+}
+.mp-card-page{ margin-top:6px; font-size:11px; color:#8B6F1F; font-weight:700; }
+.mp-empty{
+  text-align:center; padding:36px 16px; color:#5A4517;
+  background:linear-gradient(135deg,#FFFDF4,#EEE2C4);
+  border:1px dashed rgba(212,165,116,.5); border-radius:14px;
+}
+.mp-total{ text-align:center; margin:16px 0; color:#8B6F1F; font-size:12px; font-weight:700; }
+
+/* full-view: map fills width, legend shows below on mobile + right-side
+   pinned card on desktop (≥1024px). */
+.mp-full{ position:relative; max-width:1200px; margin:0 auto; padding:8px; }
+.mp-full-head{
+  position:relative; padding:18px 18px; border-radius:18px 18px 0 0;
+  color:#fff; box-shadow:0 4px 12px rgba(0,0,0,.12);
+}
+.mp-back{
+  position:absolute; top:14px; right:14px; padding:6px 12px;
+  background:rgba(255,255,255,.92); color:#3a2a0d; border-radius:8px;
+  font-weight:800; font-size:13px; border:0; cursor:pointer;
+}
+.mp-full-title-wrap{ padding:0 90px 0 0; }
+.mp-full-num{ font-size:13px; font-weight:800; opacity:.92; }
+.mp-full-title{ font-size:22px; font-weight:900; margin:2px 0; }
+.mp-full-sub{ font-size:13px; line-height:1.5; opacity:.92; margin-top:6px; }
+.mp-canvas-wrap{
+  position:relative; width:100%; padding-top:62%;
+  background:linear-gradient(135deg,#FFFDF4,#EEE2C4);
+  border-inline:1px solid rgba(212,165,116,.5);
+  border-bottom:1px solid rgba(212,165,116,.5);
+}
+.mp-canvas{ position:absolute; inset:0; width:100%; height:100%; }
+.mp-pin{
+  position:absolute; transform:translate(-50%,-50%); cursor:pointer;
+  display:inline-flex; align-items:center; gap:4px;
+  background:#fff; border:2px solid currentColor; border-radius:999px;
+  padding:2px 8px 2px 4px; font-weight:700; font-size:11px;
+  box-shadow:0 2px 6px rgba(0,0,0,.18);
+  transition:transform .1s ease, box-shadow .12s ease;
+}
+.mp-pin:hover{ transform:translate(-50%,-50%) scale(1.06); box-shadow:0 6px 14px rgba(0,0,0,.25); }
+.mp-pin-label{ color:#3a2a0d; }
+
+.mp-full-list{
+  background:linear-gradient(135deg,#FFFDF4,#EEE2C4);
+  border:1px solid rgba(212,165,116,.55);
+  border-radius:0 0 18px 18px;
+  padding:14px 16px;
+  margin-top:-1px;
+}
+.mp-full-list-h{
+  font-family:'Frank Ruhl Libre', serif; font-weight:900;
+  color:#5A4517; font-size:16px; margin:0 0 8px;
+}
+.mp-full-list-grid{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:8px;
+}
+.mp-place-pill{
+  text-align:right; padding:8px 12px; border-radius:10px;
+  background:#fff; border:1px solid #C89B3C; color:#3a2a0d;
+  font-weight:700; font-size:13px; cursor:pointer;
+  transition:transform .1s ease, box-shadow .15s ease, background .15s ease;
+}
+.mp-place-pill:hover{ background:#FFF6D6; transform:translateY(-1px); box-shadow:0 4px 12px rgba(200,155,60,.3); }
+.mp-place-name{ display:block; }
+.mp-place-desc{ display:block; font-size:11px; opacity:.75; margin-top:2px; font-weight:500; }
+.mp-notes{ margin-top:12px; }
+.mp-note-callout{
+  padding:8px 12px; margin:6px 0; border-radius:10px;
+  background:rgba(212,165,116,.18); border-inline-start:3px solid #8B6F1F;
+  color:#5A4517; font-size:12.5px; font-weight:600;
+}
+.mp-book-ref{
+  margin-top:10px; padding:6px 12px; border-radius:10px; display:inline-block;
+  background:rgba(139,111,31,.12); color:#5A4517; font-size:12px; font-weight:700;
+}
+
+/* Desktop ≥1024px: legend pinned bottom-right inside the canvas wrap. */
+@media (min-width:1024px){
+  .mp-full{ padding-bottom:8px; }
+  .mp-canvas-wrap{ border-radius:0 0 18px 18px; padding-top:48%; }
+  .mp-full-list{
+    position:absolute; right:24px; bottom:24px; width:320px; max-height:55%;
+    overflow:auto; border-radius:14px; border:1px solid #8B6F1F;
+    box-shadow:0 12px 30px rgba(0,0,0,.18);
+    background:linear-gradient(135deg,#FFFDF4F0,#EEE2C4F0);
+    backdrop-filter:blur(4px);
+  }
+  .mp-full-list-grid{ grid-template-columns:1fr; }
+}
+
+/* dark theme keeps mp-* visible — soften card surfaces */
+html[data-theme='dark'] .mp-card{
+  background:linear-gradient(135deg,rgba(22,40,74,.85),rgba(15,31,58,.85));
+  color:#F5E6C8; border-color:rgba(212,165,116,.35);
+}
+html[data-theme='dark'] .mp-card-title{ color:#F5E6C8; }
+html[data-theme='dark'] .mp-card-body{ color:#F5E6C8; }
+html[data-theme='dark'] .mp-canvas-wrap{ background:rgba(15,31,58,.65); }
+html[data-theme='dark'] .mp-full-list{ background:rgba(15,31,58,.92); color:#F5E6C8; border-color:rgba(212,165,116,.35); }
+html[data-theme='dark'] .mp-place-pill{ background:rgba(22,40,74,.9); color:#F5E6C8; }
+html[data-theme='dark'] .mp-filter-chip{ background:rgba(22,40,74,.5); color:#F4D58D; }
+html[data-theme='dark'] .mp-filter-chip.active{ color:#1A1611; }
 </style>
 </head>
 <body>
