@@ -12,7 +12,7 @@
   // ---- HERO SECTION ------------------------------------------------------
   function Hero({S, setRoute, dExam, currentUnit}){
     return (
-      <section className="relative overflow-hidden rounded-3xl parchment p-5 md:p-8 hero-parchment">
+      <section className="relative overflow-hidden rounded-3xl parchment p-5 md:p-8 hero-parchment ui-hero">
         <div className="absolute top-0 left-0 text-[160px] opacity-[.05] select-none pointer-events-none leading-none">📜</div>
         <div className="relative text-center md:text-right md:flex md:items-center md:gap-6">
           <div className="flex-1">
@@ -296,7 +296,7 @@
     const currentUnit = units.find(u => !(S.quizScores||{})[u.id]) || units[0];
 
     return (
-      <div className="space-y-5">
+      <div className="space-y-6 home-polish">
         <Hero S={S} setRoute={setRoute} dExam={dExam} currentUnit={currentUnit}/>
         <ProgressStrip units={units} S={S} setRoute={setRoute} currentUnit={currentUnit}/>
         <QuickActions setRoute={setRoute}/>
