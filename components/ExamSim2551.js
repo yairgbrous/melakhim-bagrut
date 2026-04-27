@@ -765,6 +765,26 @@
     try { localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(list)); } catch {}
   }
 
+  function gradeBand(score){
+    if (score >= 90) return { label:"מעולה",    color:"#16a34a", emoji:"🏆" };
+    if (score >= 80) return { label:"טוב מאוד", color:"#65a30d", emoji:"✨" };
+    if (score >= 70) return { label:"טוב",      color:"#d97706", emoji:"👍" };
+    if (score >= 60) return { label:"מספיק",    color:"#b45309", emoji:"⚖" };
+    return { label:"נכשל", color:"#b91c1c", emoji:"⚠" };
+  }
+
+  function RubricList({ q }){
+    const points = Array.isArray(q.expected_points) ? q.expected_points : [];
+    if (points.length === 0) return (
+      <div className="text-[11px] text-amber-800 hebrew italic">אין רובריקה זמינה לסעיף זה.</div>
+    );
+    return (
+      <ul className="list-disc pr-5 text-xs text-emerald-950 hebrew leading-relaxed space-y-1">
+        {points.map((p,i)=><li key={i}>{p}</li>)}
+      </ul>
+    );
+  }
+
   function ExamGrade({ selectedA, selectedBC, answers, elapsedSec, accommodation, onDone }){
     const partAQs  = partAList().filter(q => selectedA.includes(q.id));
     const partBCQs = partBCList().filter(q => selectedBC.includes(q.id));
@@ -772,50 +792,64 @@
 
     const [editAnswers, setEditAnswers] = useState(() => ({...answers}));
     const [grades, setGrades] = useState({});
+    const [openRubrics, setOpenRubrics] = useState({});
     const [saved, setSaved] = useState(false);
 
     const setGrade = (id, g) => setGrades(prev => ({...prev, [id]: g}));
     const setAns   = (id, v) => setEditAnswers(prev => ({...prev, [id]: v}));
+    const toggleRubric = (id) => setOpenRubrics(prev => ({...prev, [id]: !prev[id]}));
 
-    const partAScore = partAQs.reduce((s,q) => s + scoreForGrade(grades[q.id], q.points||9), 0);
+    const partAScore  = partAQs.reduce((s,q)  => s + scoreForGrade(grades[q.id], q.points||9), 0);
     const partBCScore = partBCQs.reduce((s,q) => s + scoreForGrade(grades[q.id], q.points||8), 0);
     const total = partAScore + partBCScore;
+    const totalRound = Math.round(total*10)/10;
     const allGraded = allQs.every(q => grades[q.id]);
+    const band = gradeBand(totalRound);
 
     const weakTopics = allQs.filter(q => grades[q.id] === "dont").map(q => q.title);
 
     const submit = () => {
+      const ts = Date.now();
       const rec = {
-        date: new Date().toISOString(),
-        total: Math.round(total*10)/10,
+        ts,
+        date: new Date(ts).toISOString(),
+        total: totalRound,
         partA: Math.round(partAScore*10)/10,
         partBC: Math.round(partBCScore*10)/10,
+        band: band.label,
         accommodation,
         elapsedSec,
         weakTopics,
         grades,
+        answers: editAnswers,
         selectedA, selectedBC
       };
       pushAttempt(rec);
+      try { localStorage.setItem(`jarvis.melakhim.exams.${ts}`, JSON.stringify(rec)); } catch {}
       setSaved(true);
       if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
-        window.showToast('💾 הבחינה נשמרה בהיסטוריה · ציון ' + (Math.round(total*10)/10) + '/101', 'success');
+        window.showToast(`💾 הבחינה נשמרה · ${totalRound}/101 (${band.label})`, 'success');
       }
     };
 
     return (
       <div className="max-w-3xl mx-auto space-y-4">
-        <div className="card rounded-xl p-4 flex items-center justify-between flex-wrap gap-2">
+        <div className="card rounded-2xl p-5 flex items-center justify-between flex-wrap gap-3"
+          style={{borderTop:`4px solid ${band.color}`}}>
           <div>
-            <h2 className="font-display text-xl font-bold text-on-parchment-accent">📝 דירוג עצמי מול תשובות מצופות</h2>
+            <h2 className="font-display text-xl font-bold text-on-parchment-accent">📝 ציון מלא · מתכונת 2551 תשפ"ו</h2>
             <div className="text-xs text-on-parchment">
               זמן שלקח: <span dir="ltr">{fmtHMS(elapsedSec)}</span> · מצב התאמה: {accommodation?"פעיל":"רגיל"}
             </div>
           </div>
           <div className="text-left">
-            <div className="text-xs text-on-parchment">ציון נוכחי</div>
-            <div className="font-mono font-bold text-on-parchment-accent text-2xl" dir="ltr">
-              {Math.round(total*10)/10}/101
+            <div className="font-mono font-extrabold text-5xl md:text-6xl"
+              dir="ltr"
+              style={{color:"#F4D58D", textShadow:"0 2px 12px rgba(0,0,0,.45)"}}>
+              {totalRound}<span className="text-2xl opacity-70">/101</span>
+            </div>
+            <div className="font-bold text-base mt-1" style={{color:band.color}}>
+              {band.emoji} {band.label}
             </div>
             <div className="text-[10px] text-on-parchment-meta">
               א: <span dir="ltr">{Math.round(partAScore*10)/10}/45</span> · ב+ג: <span dir="ltr">{Math.round(partBCScore*10)/10}/56</span>
@@ -825,16 +859,23 @@
 
         {allQs.map(q => {
           const g = grades[q.id];
+          const gainedPts = scoreForGrade(g, q.points || (q.part==="A"?9:8));
+          const open = !!openRubrics[q.id];
           return (
             <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
-              <div className="flex items-center gap-2 text-xs">
+              <div className="flex items-center gap-2 text-xs flex-wrap">
                 <span className={`px-2 py-0.5 rounded-full text-white font-bold ${q.part==="A"?"bg-amber-700":"bg-purple-700"}`}>
                   {q.part==="A" ? `שאלה ${q.n}` : `סעיף ${q.n}`}
                 </span>
-                <span className="text-amber-800">{q.points} נק׳</span>
-                <span className="text-amber-900 font-bold mr-auto">
+                <span className="text-amber-800 font-bold">{q.points} נק׳</span>
+                <span className="text-amber-900 font-bold">
                   {q.part==="A" ? q.title : `פרק ${q.part} · ${q.title}`}
                 </span>
+                {g && (
+                  <span className="mr-auto px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 font-mono text-[11px]" dir="ltr">
+                    +{gainedPts}/{q.points}
+                  </span>
+                )}
               </div>
               {Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0 && (
                 <VerbatimQuotes quotes={q.verbatim_quotes}/>
@@ -844,22 +885,23 @@
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
                   <div className="text-[10px] font-bold text-amber-800 mb-1">התשובה שלך:</div>
-                  <textarea value={editAnswers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)} rows={4}
-                    className="w-full px-2 py-1.5 rounded-lg bg-white/80 border border-amber-700/40 text-amber-950 hebrew text-sm leading-relaxed"/>
+                  <textarea value={editAnswers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)} rows={5}
+                    placeholder="(לא נכתבה תשובה)"
+                    className="w-full px-2 py-1.5 rounded-lg bg-white/85 border border-amber-700/40 text-amber-950 hebrew text-sm leading-relaxed"/>
                 </div>
                 <div>
                   <div className="text-[10px] font-bold text-emerald-800 mb-1">תשובה מצופה (מהספר):</div>
-                  <ul className="list-disc pr-5 text-xs text-emerald-950 hebrew leading-relaxed space-y-1 bg-emerald-50/60 rounded-lg p-2">
-                    {(q.expected_points||[]).map((p,i)=><li key={i}>{p}</li>)}
-                  </ul>
+                  <div className="bg-emerald-50/70 rounded-lg p-2">
+                    <RubricList q={q}/>
+                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-2 pt-2">
                 {[
-                  {g:"know",    label:"✅ יודע",   cls:g==="know"   ?"bg-emerald-600 text-white":"bg-white/60 text-emerald-900"},
-                  {g:"partial", label:"⚠ חלקי",   cls:g==="partial"?"bg-amber-600 text-white":"bg-white/60 text-amber-900"},
-                  {g:"dont",    label:"❌ לא יודע", cls:g==="dont"   ?"bg-red-700 text-white":"bg-white/60 text-red-900"}
+                  {g:"know",    label:`✅ יודע (+${q.points})`,  cls:g==="know"   ?"bg-emerald-600 text-white":"bg-white/60 text-emerald-900"},
+                  {g:"partial", label:`⚠ חלקי (+${q.points/2})`, cls:g==="partial"?"bg-amber-600 text-white":"bg-white/60 text-amber-900"},
+                  {g:"dont",    label:"❌ לא יודע (+0)",          cls:g==="dont"   ?"bg-red-700 text-white":"bg-white/60 text-red-900"}
                 ].map(b => (
                   <button key={b.g} onClick={()=>setGrade(q.id, b.g)}
                     className={`rounded-lg py-2 text-sm font-bold transition ${b.cls}`}>
@@ -867,6 +909,22 @@
                   </button>
                 ))}
               </div>
+
+              <button type="button" onClick={()=>toggleRubric(q.id)}
+                className="w-full text-right text-xs px-2 py-1 rounded-lg bg-amber-50 text-amber-900 font-bold hover:bg-amber-100 transition">
+                {open ? "▼ סגור רובריקה מלאה" : "▶ פתח רובריקה מלאה"}
+              </button>
+              {open && (
+                <div className="rounded-lg bg-white/50 p-3 space-y-1 border border-amber-700/20">
+                  <div className="text-[11px] font-bold text-amber-900">קריטריוני ניקוד:</div>
+                  <RubricList q={q}/>
+                  {Array.isArray(q.book_refs) && q.book_refs.length > 0 && (
+                    <div className="text-[10px] text-amber-800 pt-1">
+                      📖 הפניות: {q.book_refs.join(" · ")}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}
@@ -874,7 +932,7 @@
         {!saved ? (
           <button onClick={submit} disabled={!allGraded}
             className={`w-full py-3 rounded-xl text-base font-bold ${allGraded?"gold-btn":"bg-slate-700 text-slate-400 cursor-not-allowed"}`}>
-            {allGraded ? `💾 שמור ציון ${Math.round(total*10)/10}/101 בהיסטוריה` : "דרג את כל הסעיפים כדי לשמור"}
+            {allGraded ? `💾 שמור ציון ${totalRound}/101 (${band.label}) בהיסטוריה` : "דרג את כל הסעיפים כדי לשמור"}
           </button>
         ) : (
           <div className="card rounded-xl p-4 space-y-2">
