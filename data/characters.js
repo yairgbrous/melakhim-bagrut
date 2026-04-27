@@ -1837,3 +1837,29 @@ window.CHARACTERS_DATA = [
     significance: "איות חלופי לאליהו — הנביא המכונן את המאבק לעיקרון ייחוד ה׳, ואשר המסורת עושה אותו מבשר הגאולה.",
   },
 ];
+
+// =========================================================================
+// Field aliasing (additive, mechanical) — no prose generation, no fabrication.
+// Exposes existing prose under the names some consumers expect:
+//   bio              → bio_full
+//   key_quotes       → signature_quotes
+//   related_breadth  → related_breadth_topics
+// Skipped where the source field is missing — never invents content.
+// Visible to runtime AND scripts/audit-entity-links.js (mutates the array
+// in this file's evaluation scope).
+// =========================================================================
+;(function(){
+  if (typeof window === "undefined") return;
+  var arr = window.CHARACTERS_DATA;
+  if (!Array.isArray(arr)) return;
+  arr.forEach(function(c){
+    if (!c || typeof c !== "object") return;
+    if (c.bio && c.bio_full == null) c.bio_full = c.bio;
+    if (Array.isArray(c.key_quotes) && c.signature_quotes == null) {
+      c.signature_quotes = c.key_quotes.slice();
+    }
+    if (Array.isArray(c.related_breadth) && c.related_breadth_topics == null) {
+      c.related_breadth_topics = c.related_breadth.slice();
+    }
+  });
+})();

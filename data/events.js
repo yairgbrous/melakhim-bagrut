@@ -480,3 +480,67 @@ window.EVENTS_DATA = [
     book_refs: ["שופטים יט–כא"],
   },
 ];
+
+// =========================================================================
+// Field aliasing + mechanical cross-ref derivation. No prose generation.
+//
+// Aliases (only when source field exists):
+//   summary             → narrative_full
+//   places[0]           → location_id          (first place tagged on event)
+//   date_bce            → year_bce
+//   book_refs[0]        → book_ref             (canonical chapter)
+//   related_breadth     → related_breadth_topics
+//
+// Derivations (only intersect existing fields with known IDs):
+//   related_kings = participants ∩ KING_IDS    (kings appearing in event)
+//
+// KING_IDS is mirrored from data/kings.js. If kings.js gains/loses an id,
+// re-run the audit (scripts/audit-entity-links.js) — extra IDs here are
+// harmless (intersection drops them); missing IDs only narrow derivation.
+// =========================================================================
+;(function(){
+  if (typeof window === "undefined") return;
+  var arr = window.EVENTS_DATA;
+  if (!Array.isArray(arr)) return;
+
+  var KING_IDS = {
+    shlomo:1, rehavam:1, aviyam:1, asa:1, yehoshafat:1, yoram_yehuda:1,
+    achaziah_yehuda:1, atalya:1, yehoash_yehuda:1, amatzya:1, uziyahu:1,
+    yotam:1, achaz:1, chizkiyahu:1, menashe:1, amon:1, yoshiyahu:1,
+    yehoachaz_yehuda:1, yehoyakim:1, yehoyachin:1, tzidkiyahu:1,
+    yarovam:1, nadav:1, basha:1, ela:1, zimri:1, omri:1, achav:1,
+    achaziah_yisrael:1, yoram_yisrael:1, yehu:1, yehoachaz_yisrael:1,
+    yoash_yisrael:1, yarovam_beit:1, zacharia:1, shalum:1, menachem:1,
+    pekachya:1, pekach:1, hoshea:1
+  };
+
+  arr.forEach(function(ev){
+    if (!ev || typeof ev !== "object") return;
+
+    // --- aliases ---
+    if (ev.summary && ev.narrative_full == null) ev.narrative_full = ev.summary;
+    if (Array.isArray(ev.places) && ev.places.length && ev.location_id == null) {
+      ev.location_id = ev.places[0];
+    }
+    if (ev.date_bce != null && ev.year_bce == null) ev.year_bce = ev.date_bce;
+    if (Array.isArray(ev.book_refs) && ev.book_refs.length && ev.book_ref == null) {
+      ev.book_ref = ev.book_refs[0];
+    }
+    if (Array.isArray(ev.related_breadth) && ev.related_breadth_topics == null) {
+      ev.related_breadth_topics = ev.related_breadth.slice();
+    }
+
+    // --- derivations (related_kings = participants ∩ kings) ---
+    if (Array.isArray(ev.participants) && !Array.isArray(ev.related_kings)) {
+      var seen = {};
+      var derived = [];
+      ev.participants.forEach(function(p){
+        if (typeof p === "string" && KING_IDS[p] && !seen[p]) {
+          seen[p] = 1;
+          derived.push(p);
+        }
+      });
+      ev.related_kings = derived;
+    }
+  });
+})();
