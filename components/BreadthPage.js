@@ -667,11 +667,20 @@
 
     const gotoUnit = id => { if (setRoute && id) setRoute({page:'unit', unitId:id}); };
 
+    const hasUnverified = (topics||[]).some(t => t && t.status === 'draft_unverified');
+
     return React.createElement('div', {className:'space-y-6 p-2'},
       React.createElement('div', null,
         React.createElement('h1', {className:'font-display text-2xl md:text-3xl font-bold text-on-parchment-accent'}, '🌐 נושאי רוחב במיקוד'),
         React.createElement('p', {className:'text-on-parchment-muted text-sm mt-1'}, '7 נושאי רוחב + חפצים וביטויים חוזרים לאורך ספר מלכים')
       ),
+      hasUnverified ? React.createElement('div', {
+        className:'rounded-xl p-4 border-2 border-amber-500 bg-amber-50 text-amber-900 text-sm leading-relaxed',
+        role:'alert'
+      },
+        React.createElement('div', {className:'font-bold mb-1'}, '⚠️ תוכן טיוטה — דורש אימות מול המיקוד הרשמי'),
+        React.createElement('div', null, 'הנושאים בעמוד זה סומנו status:"draft_unverified". הם מבוססים על דפוסי בגרויות עבר ולא על קובץ המיקוד הרשמי של משרד החינוך 2551 — שטרם הועלה למאגר. הסיכומים והשאלות הם פרשנות של צוות האתר ולא חומר רשמי. אנא אמת מול הספר ומסמך המיקוד לפני שימוש לימודי.')
+      ) : null,
       React.createElement(FilterChips, {filter, setFilter}),
       React.createElement('section', {className:'space-y-3'},
         React.createElement('h2', {className:'font-display text-xl font-bold text-on-parchment'}, '📖 שבעת נושאי הרוחב'),

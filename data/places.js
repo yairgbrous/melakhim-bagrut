@@ -1,3 +1,22 @@
+/* =========================================================================
+   data/places.js — places in ספר מלכים for the bagrut prep site.
+
+   !!! TODO source-needed — APPLIES TO EVERY ENTRY IN THIS FILE !!!
+   ----------------------------------------------------------------------
+   Each entry carries a `book_refs` array pointing to chapter/verse, but
+   the `significance` prose was composed by the site team, NOT quoted
+   from any authoritative source. Treat as DRAFT.
+
+   Niqqud in `name_niqqud` and any quoted strings was NOT cross-checked
+   against an authoritative Tanakh edition. The `book_refs` themselves
+   were composed from memory/derivation; user must spot-check each
+   פרק:פסוק. Geographic identifications ("region", "kingdom") and
+   historical claims (battles, distances, archaeology) were NOT verified
+   against external sources.
+
+   When a real source becomes available, add a `source_ref` field on each
+   entry pointing to the exact citation.
+   ========================================================================= */
 window.PLACES_DATA = [
   {
     id: "beit_el",

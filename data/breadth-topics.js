@@ -4,6 +4,32 @@
    __ENTITY_INDEX__ picks up the breadth + recurring buckets.
    Extracted from components/BreadthPage.js (BREADTH_FALLBACK + RECURRING_FALLBACK)
    so the app has a single source of truth; BreadthPage reads from window.
+   =========================================================================
+
+   !!! TODO: User to provide official 2551 מיקוד source. !!!
+   ----------------------------------------------------------------------
+   No copy of the משרד החינוך מיקוד 2551 document is currently present in
+   this repository (no PDF, no transcript). Until that source is provided
+   and each topic is reconciled against it, every topic below carries
+   status:'draft_unverified' and MUST NOT be presented as authoritative.
+
+   Specifically untrusted in this file:
+     - The selection of topics (which themes are "in" the מיקוד).
+     - Every `intro` and `significance` field — editorial prose written by
+       the site team, NOT quoted from any external source.
+     - Every `questions` array — practice questions composed by the site
+       team in the spirit of past exams, not from a שאלון רשמי.
+
+   Trusted only insofar as a human re-checks them:
+     - `quote_niqqud` strings — standard Tanakh text, but niqqud was NOT
+       cross-checked against an authoritative edition (Aleppo / Leningrad
+       / Mossad HaRav Kook). May contain transcription errors.
+     - `book_ref` values — chapter and verse pointers; user should
+       verify each against the actual פסוקים before relying on them.
+
+   Yair: please attach the מיקוד 2551 PDF/text to the repo (e.g. under
+   /assets/sources/) and replace status with 'official_2551' + add a
+   source_ref:'<filename>:<page/line>' on each topic that survives.
    ========================================================================= */
 (function(){
   if (typeof window === "undefined") return;
@@ -11,6 +37,7 @@
  [
     {
       id:'sibatiyut_kfula',
+      status:'draft_unverified',
       title:'עקרון הסיבתיות הכפולה',
       intro:'כל אירוע מכריע בספר מוצג בשני מישורים: סיבה אלוקית — השגחה וגזרת ה׳ — לצד סיבה היסטורית־אנושית המבוססת על בחירה חופשית. השניים שלובים זה בזה: המלך בוחר, ה׳ מסובב. מעצב התפיסה המקראית שלפיה גלות ישראל ויהודה אינן מקרה אלא תוצאה של חטא מחד וגזרה מאידך.',
       unit_coverage:[1,2,3,5,6],
@@ -44,6 +71,7 @@
     },
     {
       id:'manhig',
+      status:'draft_unverified',
       title:'מנהיג ומנהיגות',
       intro:'הספר בוחן את דמות המלך באמת מידה אחת: "עשה הישר בעיני ה׳" או "עשה הרע". ההערכה איננה מדינית אלא מוסרית־רוחנית. הספר מעמיד זה מול זה מנהיגים צנועים שומעי דבר ה׳ (שלמה בתחילתו, יאשיהו, חזקיהו) מול גאים נכשלים (רחבעם, אחאב), ובוחן את השלכות ההחלטות של היחיד על גורל העם כולו — לטובה ולרעה.',
       unit_coverage:[1,2,3,4,5,6],
@@ -81,6 +109,7 @@
     },
     {
       id:'mikdash',
+      status:'draft_unverified',
       title:'בית המקדש',
       intro:'בית המקדש הוא מסגרת הספר: נבנה בשיא פתיחתו ונחרב בסופו. הוא משמש מדד למצבו הרוחני של העם — כשהמלכות כושלת מוריד המלך אוצרות מבית ה׳ לפייס אויב, או מציב מזבח זר; כשהיא מתעוררת, הוא מחדש ומטהר. המקדש הוא נקודת המפגש הממשית של האומה עם ה׳ — וכשהוא נפגע, נפגעת גם הברית.',
       unit_coverage:[1,2,5,6],
@@ -122,6 +151,7 @@
     },
     {
       id:'melech_navi',
+      status:'draft_unverified',
       title:'מלך ונביא',
       intro:'הנביא הוא "מבקר המדינה" — שלוח ה׳ אל המלך, ללא משוא פנים. הוא ממליך ומדיח, מוכיח ומתפלל. בספר מלכים עולה דגם של יחסים מתוחים: המלך מחזיק בשלטון, הנביא באמת — ועליו לומר את דברו גם אם הוא מוכנס לכלא, נרדף, או מואס. מודלים חיוביים (ישעיה וחזקיהו) ושליליים (אחאב ואליהו) עוברים כחוט השני.',
       unit_coverage:[2,3,4,5,6],
@@ -163,6 +193,7 @@
     },
     {
       id:'israel_goyim',
+      status:'draft_unverified',
       title:'ישראל והעמים',
       intro:'ישראל חי בצומת בין מצרים בדרום לארם, אשור ובבל בצפון. קשרי מסחר, ברית ונישואין עם העמים נשאו פוטנציאל כפול: שגשוג חומרי אך גם אובדן זהות רוחנית. הספר בוחן איך כל קשר חוץ — חיובי כשל שלמה וחירם, הרסני כמו אחאב ואיזבל — מעצב את מצבה הדתי של האומה ואת גורלה ההיסטורי.',
       unit_coverage:[1,2,3,5,6],
@@ -204,6 +235,7 @@
     },
     {
       id:'ahdut_pilug',
+      status:'draft_unverified',
       title:'אחדות ופילוג',
       intro:'הספר פותח בממלכה מאוחדת תחת שלמה ונסגר בגלות שתי ממלכות שנפרדו. הפילוג בשכם איננו רק אירוע פוליטי אלא משבר מוסרי ודתי — פריצת העגלים בבית־אל, מלחמות אחים חוזרות, ועירוב עמים זרים במאבקים פנימיים. האחדות מוצגת כתנאי לשגשוג רוחני וחומרי; הפילוג — כמחלה שמתפשטת עד לחורבן.',
       unit_coverage:[1,2,3,5,6],
@@ -241,6 +273,7 @@
     },
     {
       id:'ruchani_medini',
+      status:'draft_unverified',
       title:'מצב רוחני — מצב מדיני',
       intro:'אמת המידה של הספר למלך היא רוחנית בלבד: "עשה הישר" או "עשה הרע". אך במציאות, המתאם בין מצב רוחני למצב מדיני איננו תמיד ישיר. לעיתים שפל רוחני מלווה בשגשוג מדיני (ירבעם השני), ולעיתים מלך צדיק מת במגידו (יאשיהו). הספר בוחן מתי דווקא הקִרבה לה׳ מבטלת גזרה — ומתי היא רק מאריכה שלווה.',
       unit_coverage:[1,2,3,5,6],
@@ -278,6 +311,7 @@
  [
     {
       id:'atzarot_beit_hashem',
+      status:'draft_unverified',
       name_niqqud:'אוֹצְרוֹת בֵּית ה׳',
       instances:[
         {unit:'א', unitId:1, context:'שלמה אוגר זהב וכלי קודש בחנוכת הבית'},
@@ -300,6 +334,7 @@
     },
     {
       id:'magini_zahav',
+      status:'draft_unverified',
       name_niqqud:'מָגִנֵּי הַזָּהָב',
       instances:[
         {unit:'א', unitId:1, context:'שלמה עושה מאתיים צינה ושלוש מאות מגנים של זהב'},
@@ -314,6 +349,7 @@
     },
     {
       id:'eglei_zahav',
+      status:'draft_unverified',
       name_niqqud:'עֶגְלֵי הַזָּהָב',
       instances:[
         {unit:'ב', unitId:2, context:'ירבעם מקים עגלים בבית־אל ובדן: "הנה אלהיך ישראל"',
@@ -328,6 +364,7 @@
     },
     {
       id:'etzat_hayladim',
+      status:'draft_unverified',
       name_niqqud:'עֲצַת הַיְלָדִים',
       instances:[
         {unit:'ב', unitId:2, context:'רחבעם בשכם דוחה את עצת הזקנים',
@@ -341,6 +378,7 @@
     },
     {
       id:'aseret_kraim',
+      status:'draft_unverified',
       name_niqqud:'עֲשֶׂרֶת הַקְּרָעִים',
       instances:[
         {unit:'א', unitId:1, context:'אחיה השילוני קורע שלמת עצמו לשנים־עשר',
@@ -355,6 +393,7 @@
     },
     {
       id:'chodesh_asher_bada',
+      status:'draft_unverified',
       name_niqqud:'חֹדֶשׁ אֲשֶׁר בָּדָא מִלִּבּוֹ',
       instances:[
         {unit:'ב', unitId:2, context:'ירבעם עושה חג בחודש השמיני "מלבו"',
@@ -368,6 +407,7 @@
     },
     {
       id:'kerem_navot',
+      status:'draft_unverified',
       name_niqqud:'כֶּרֶם נָבוֹת',
       instances:[
         {unit:'ג', unitId:3, context:'אחאב מתאווה לכרם ונבות מסרב: "חלילה לי מה׳"',
@@ -384,6 +424,7 @@
     },
     {
       id:'mizbach_damesek',
+      status:'draft_unverified',
       name_niqqud:'מִזְבַּח דַּמֶּשֶׂק',
       instances:[
         {unit:'ה', unitId:5, context:'אחז רואה מזבח בדמשק ושולח דמותו לאוריה הכהן',
@@ -398,6 +439,7 @@
     },
     {
       id:'nachash_nechoshet',
+      status:'draft_unverified',
       name_niqqud:'נְחַשׁ הַנְּחֹשֶׁת',
       instances:[
         {unit:'ו', unitId:6, context:'חזקיהו מכתת את נחש הנחושת של משה',
@@ -410,6 +452,7 @@
     },
     {
       id:'mishenet_kaneh',
+      status:'draft_unverified',
       name_niqqud:'מִשְׁעֶנֶת הַקָּנֶה הָרָצוּץ',
       instances:[
         {unit:'ה', unitId:5, context:'הושע בן אלה שולח אל סוא מלך מצרים'},
@@ -424,6 +467,7 @@
     },
     {
       id:'kav_shomron',
+      status:'draft_unverified',
       name_niqqud:'קָו שֹׁמְרוֹן וּמִשְׁקֹלֶת בֵּית אַחְאָב',
       instances:[
         {unit:'ו', unitId:6, context:'נבואת ה׳ על ירושלים בימי מנשה'},
@@ -437,6 +481,7 @@
     },
     {
       id:'bedek_habayit',
+      status:'draft_unverified',
       name_niqqud:'בֶּדֶק הַבַּיִת',
       instances:[
         {unit:'ה', unitId:5, context:'יואש מתקן את בית ה׳ בכסף הציבור',
@@ -452,6 +497,7 @@
     },
     {
       id:'sefer_torah',
+      status:'draft_unverified',
       name_niqqud:'סֵפֶר הַתּוֹרָה',
       instances:[
         {unit:'ו', unitId:6, context:'חלקיהו הכהן מוצא "ספר התורה" במקדש',
@@ -471,6 +517,7 @@
     },
     {
       id:'chag_hapesach',
+      status:'draft_unverified',
       name_niqqud:'חַג הַפֶּסַח',
       instances:[
         {unit:'ו', unitId:6, context:'יאשיהו מצווה על העם לעשות פסח',
@@ -484,6 +531,7 @@
     },
     {
       id:'haharsh_vehamasger',
+      status:'draft_unverified',
       name_niqqud:'הֶחָרָשׁ וְהַמַּסְגֵּר',
       instances:[
         {unit:'ו', unitId:6, context:'בגלות יהויכין — נבוכדנצר מגלה עשרת אלפים',
@@ -497,6 +545,7 @@
     },
     {
       id:'ariyot_shomron',
+      status:'draft_unverified',
       name_niqqud:'אֲרָיוֹת שֹׁמְרוֹן',
       instances:[
         {unit:'ה', unitId:5, context:'לאחר גלות עשרת השבטים — ה׳ משלח אריות',
@@ -510,6 +559,7 @@
     },
     {
       id:'tzfachat_hashemen',
+      status:'draft_unverified',
       name_niqqud:'צַפַּחַת הַשֶּׁמֶן',
       instances:[
         {unit:'ג', unitId:3, context:'אליהו בצרפת — צפחת השמן של האלמנה לא כלה',
@@ -523,6 +573,7 @@
     },
     {
       id:'srefat_mifletzet_asherah',
+      status:'draft_unverified',
       name_niqqud:'שְׂרֵפַת מִפְלֶצֶת הָאֲשֵׁרָה',
       instances:[
         {unit:'ב', unitId:2, context:'אסא מעביר את מעכה אמו מגבירה'},

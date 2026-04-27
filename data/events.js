@@ -1,3 +1,21 @@
+/* =========================================================================
+   data/events.js — events in ספר מלכים for the bagrut prep site.
+
+   !!! TODO source-needed — APPLIES TO EVERY ENTRY IN THIS FILE !!!
+   ----------------------------------------------------------------------
+   Each entry carries a `book_refs` array pointing to chapter/verse, but
+   the `summary` and `significance` prose was composed by the site team,
+   NOT quoted from any authoritative source. Treat as DRAFT.
+
+   Niqqud in `title_niqqud` was NOT cross-checked against an authoritative
+   Tanakh edition. The `book_refs` themselves were composed from
+   memory/derivation; user must spot-check each פרק:פסוק before relying.
+   No date_bce value is from a cited source — they are conventional
+   estimates and may differ from the מיקוד's preferred chronology.
+
+   When a real source becomes available, add a `source_ref` field on
+   each entry pointing to the exact citation.
+   ========================================================================= */
 window.EVENTS_DATA = [
   {
     id: "mishpat-shlomo",

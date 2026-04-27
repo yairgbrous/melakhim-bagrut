@@ -1,3 +1,23 @@
+/* =========================================================================
+   data/characters.js — characters in ספר מלכים for the bagrut prep site.
+
+   !!! TODO source-needed — APPLIES TO EVERY ENTRY IN THIS FILE !!!
+   ----------------------------------------------------------------------
+   Each entry carries a `book_refs` array pointing to chapter/verse, but
+   the `bio`, `key_actions`, `significance`, and any free prose were
+   composed by the site team, NOT quoted from any authoritative source.
+   Treat as DRAFT.
+
+   Niqqud in `name_niqqud` and inside any quoted strings was NOT
+   cross-checked against an authoritative Tanakh edition. The `book_refs`
+   themselves were composed from memory/derivation; user must spot-check
+   each פרק:פסוק. Statements about extra-biblical traditions ("מסורת
+   חז״ל…", "לפי זיהוי מסורתי…") were NOT verified against named sources
+   and should be treated with extra suspicion.
+
+   When a real source becomes available, add a `source_ref` field on each
+   entry pointing to the exact citation.
+   ========================================================================= */
 window.CHARACTERS_DATA = [
   {
     id: "achiya_hashiloni",

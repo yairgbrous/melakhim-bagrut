@@ -98,7 +98,7 @@
     evalFile('./data/breadth.js?v=3100', []),
   ]);
   const [chars, stories, flashcards, keyConcepts, kingsMod, unitDeepMod] = await Promise.all([
-    importModule('./data/characters.js'),
+    importModule('./data/characters.js?v=5500'),
     importModule('./data/stories.js'),
     importModule('./data/flashcards.js'),
     importModule('./data/key-concepts.js'),
@@ -186,14 +186,14 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <!-- Cross-entity connectivity: load BEFORE pages so window.__ENTITY_INDEX__
      has all buckets + window.EntityLinkComponent is available at render. -->
-<script src="./data/breadth-topics.js?v=3000"></script>
-<script src="./data/events.js?v=3000"></script>
-<script src="./data/places.js?v=3000"></script>
-<script src="./data/quotes.js?v=3000"></script>
+<script src="./data/breadth-topics.js?v=5500"></script>
+<script src="./data/events.js?v=5500"></script>
+<script src="./data/places.js?v=5500"></script>
+<script src="./data/quotes.js?v=5500"></script>
 <script src="./data/unit-deep-summaries.js?v=3100"></script>
-<script src="./data/review-questions.js?v=3100"></script>
+<script src="./data/review-questions.js?v=5500"></script>
 <script src="./data/_entity-index.js?v=3000"></script>
-<script type="module" src="./data/past-exams.js?v=2000"></script>
+<script type="module" src="./data/past-exams.js?v=5500"></script>
 <script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/RelatedSection.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=4000"></script>
@@ -206,7 +206,7 @@
 <script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=4000"></script>
-<script src="./components/BreadthPage.js?v=3000"></script>
+<script src="./components/BreadthPage.js?v=5500"></script>
 <script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
