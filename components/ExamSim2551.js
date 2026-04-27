@@ -572,10 +572,19 @@
     return null;
   }
 
+  function countWords(s){
+    if (!s) return 0;
+    const trimmed = String(s).trim();
+    if (!trimmed) return 0;
+    return trimmed.split(/\s+/).length;
+  }
+
   function ExamRunning({ selectedA, selectedBC, tab, onTab, durationSec, accommodation, resume, onFinish, onExit }){
     const [timeLeft, setTimeLeft] = useState(() => (resume && typeof resume.timeLeft === "number") ? resume.timeLeft : durationSec);
     const [answers, setAnswers]   = useState(() => (resume && resume.answers) || {});
+    const [flagged, setFlagged]   = useState(() => (resume && resume.flagged) || {});
     const [startTime]             = useState(() => (resume && resume.startTime) || Date.now());
+    const cardRefs                = React.useRef({});
 
     useEffect(() => {
       if (timeLeft <= 0) { onFinish({ answers, elapsedSec: durationSec }); return; }
@@ -587,13 +596,13 @@
     useEffect(() => {
       const iv = setInterval(() => {
         saveInProgress({
-          selectedA, selectedBC, answers,
+          selectedA, selectedBC, answers, flagged,
           startTime, elapsedSec: durationSec - timeLeft,
           timeLeft, durationSec, accommodation, savedAt: Date.now()
         });
       }, 30*1000);
       return () => clearInterval(iv);
-    }, [selectedA, selectedBC, answers, startTime, timeLeft, durationSec, accommodation]);
+    }, [selectedA, selectedBC, answers, flagged, startTime, timeLeft, durationSec, accommodation]);
 
     const finish = () => {
       clearInProgress();
@@ -614,42 +623,91 @@
     const timerText = `${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
 
     const setAns = (id, v) => setAnswers(a => ({...a, [id]: v}));
-    const activeTab = tab || "A";
+    const toggleFlag = (id) => setFlagged(f => ({...f, [id]: !f[id]}));
 
-    function RunningCard({ q }){
+    const allQs = [...partAQs, ...partBCQs];
+    const answeredCount = allQs.filter(q => (answers[q.id]||"").trim()).length;
+
+    const scrollToQ = (id) => {
+      const el = cardRefs.current[id];
+      if (el && typeof el.scrollIntoView === "function") {
+        el.scrollIntoView({behavior:"smooth", block:"start"});
+        const ta = el.querySelector("textarea");
+        if (ta) setTimeout(() => ta.focus(), 350);
+      }
+    };
+    const nextOf = (id) => {
+      const idx = allQs.findIndex(q => q.id === id);
+      if (idx >= 0 && idx < allQs.length-1) scrollToQ(allQs[idx+1].id);
+    };
+
+    function RunningCard({ q, isLast }){
       const isA = q.part === "A";
+      const ans = answers[q.id] || "";
+      const words = countWords(ans);
+      const flag = !!flagged[q.id];
+      const refs = Array.isArray(q.book_refs) ? q.book_refs : [];
       return (
-        <div className="parchment rounded-xl p-4 space-y-3">
-          <div className="flex items-center gap-2 text-xs">
+        <div ref={el => { if (el) cardRefs.current[q.id] = el; }}
+          className={`parchment rounded-xl p-4 space-y-3 ${flag ? "ring-2 ring-amber-400" : ""}`}>
+          <div className="flex items-center gap-2 text-xs flex-wrap">
             <span className={`px-2 py-0.5 rounded-full text-white font-bold ${isA?"bg-amber-700":"bg-purple-700"}`}>
               {isA ? `שאלה ${q.n}` : `סעיף ${q.n}`}
             </span>
-            <span className="text-amber-800">{q.points} נק׳</span>
-            <span className="text-amber-900 font-bold mr-auto">{isA ? q.title : `פרק ${q.part} · ${q.title}`}</span>
+            <span className="text-amber-800 font-bold">{q.points} נק׳</span>
+            <span className="text-amber-900 font-bold">
+              {isA ? q.title : `פרק ${q.part} · ${q.title}`}
+            </span>
+            {refs.map((r, i) => (
+              <span key={i} className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-bold">📖 {r}</span>
+            ))}
+            <button onClick={()=>toggleFlag(q.id)} type="button"
+              className={`mr-auto px-2 py-0.5 rounded-full text-[11px] font-bold ${flag?"bg-amber-500 text-amber-950":"bg-white/60 text-amber-800 hover:bg-amber-200"}`}>
+              {flag ? "🚩 מסומן לחזרה" : "סמן לחזרה"}
+            </button>
           </div>
           {Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0 && (
             <VerbatimQuotes quotes={q.verbatim_quotes}/>
           )}
-          <div className="hebrew text-amber-950 leading-relaxed" style={{fontSize:"1.15rem"}}>{q.prompt}</div>
-          <textarea value={answers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)}
-            rows={5} placeholder="כתוב את תשובתך כאן..."
-            className="w-full px-3 py-2 rounded-lg bg-white/80 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"/>
+          <div className="hebrew text-amber-950 leading-relaxed" style={{fontSize:"1.18rem"}}>{q.prompt}</div>
+          <textarea value={ans} onChange={e=>setAns(q.id, e.target.value)}
+            placeholder="כתוב את תשובתך כאן..."
+            className="w-full px-3 py-2 rounded-lg bg-white/85 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"
+            style={{minHeight:"200px", resize:"vertical"}}/>
+          <div className="flex items-center justify-between text-xs">
+            <div className="text-amber-800" dir="ltr">{words} מילים</div>
+            <button onClick={()=>nextOf(q.id)} type="button" disabled={isLast}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${isLast?"bg-slate-300 text-slate-500 cursor-not-allowed":"bg-amber-700 text-white hover:bg-amber-800"}`}>
+              {isLast ? "השאלה האחרונה" : "💾 שמור והמשך ←"}
+            </button>
+          </div>
         </div>
       );
     }
 
-    const tabs = [
-      { id:"A", label:`חלק א׳ (${partAQs.length})`,   color:"amber"  },
-      { id:"B", label:`חלק ב׳ (${partBQs.length})`,   color:"purple" },
-      { id:"C", label:`חלק ג׳ (${partCQs.length})`,   color:"purple" }
-    ];
-    const visibleQs = activeTab === "A" ? partAQs : activeTab === "B" ? partBQs : partCQs;
+    function NavPill({ q, isA }){
+      const filled = !!(answers[q.id]||"").trim();
+      const flag   = !!flagged[q.id];
+      const base = isA ? "border-amber-600/40" : "border-purple-500/40";
+      const fill = filled
+        ? (isA ? "bg-amber-600 text-white" : "bg-purple-600 text-white")
+        : "bg-white/10 text-on-parchment";
+      const ring = flag ? "ring-2 ring-amber-300" : "";
+      return (
+        <button onClick={()=>scrollToQ(q.id)} type="button"
+          className={`relative w-9 h-9 rounded-lg border ${base} ${fill} ${ring} text-xs font-bold transition hover:opacity-80`}
+          title={q.title}>
+          <span dir="ltr">{q.n}</span>
+          {flag && <span className="absolute -top-1 -right-1 text-[10px]">🚩</span>}
+        </button>
+      );
+    }
 
     return (
       <div className="max-w-3xl mx-auto space-y-4 exam-fullscreen exam-run-wrap">
-        <div className="sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between exam-sticky-bar exam-run-timer">
+        <div className="sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between gap-2 exam-sticky-bar exam-run-timer">
           <div className="text-sm text-on-parchment">
-            נענו: <span dir="ltr" className="font-bold">{Object.keys(answers).filter(k=>answers[k]&&answers[k].trim()).length}/{partAQs.length+partBCQs.length}</span>
+            נענו: <span dir="ltr" className="font-bold">{answeredCount}/{allQs.length}</span>
           </div>
           <div className={`font-mono font-bold text-xl exam-timer ${timerCls}`}>
             ⏱ <span dir="ltr">{timerText}</span>
@@ -659,26 +717,25 @@
           <button onClick={finish} className="px-3 py-1.5 rounded-lg bg-red-700 text-white text-xs font-bold">הגשה</button>
         </div>
 
-        <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30 exam-run-tabs">
-          {tabs.map(t => {
-            const active = activeTab === t.id;
-            const cls = active
-              ? "bg-amber-600 text-white font-bold"
-              : "bg-white/10 text-on-parchment hover:bg-white/20";
-            return (
-              <button key={t.id} onClick={()=>onTab && onTab(t.id)}
-                className={`text-xs md:text-sm px-2 py-2 rounded-lg transition hebrew ${cls}`}>
-                {t.label}
-              </button>
-            );
-          })}
+        <div className="card rounded-xl p-3 space-y-2">
+          <div className="text-[11px] text-on-parchment-meta hebrew">ניווט מהיר · לחץ על שאלה לקפיצה</div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] text-amber-300 font-bold">פרק א:</span>
+            {partAQs.map(q => <NavPill key={q.id} q={q} isA={true}/>)}
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] text-purple-300 font-bold">פרק ב+ג:</span>
+            {partBCQs.map(q => <NavPill key={q.id} q={q} isA={false}/>)}
+          </div>
         </div>
 
-        <section className="space-y-2">
-          {visibleQs.map(q => <RunningCard key={q.id} q={q}/>)}
-          {visibleQs.length === 0 && (
+        <section className="space-y-3">
+          {allQs.map((q, i) => (
+            <RunningCard key={q.id} q={q} isLast={i === allQs.length-1}/>
+          ))}
+          {allQs.length === 0 && (
             <div className="text-center text-on-parchment-meta text-sm py-6 hebrew">
-              אין שאלות שנבחרו עבור חלק זה
+              לא נבחרו שאלות
             </div>
           )}
         </section>
