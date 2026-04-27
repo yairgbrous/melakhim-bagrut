@@ -254,28 +254,23 @@
     );
   }
 
-  function PartTabBar({ tab, onTab, selectedA, selectedBC }){
-    const tabs = [
-      { id: "A", label: "חלק א׳ · בקיאות",      n: selectedA.length,  max: MAX_A },
-      { id: "B", label: "חלק ב׳ · ידע",         n: null,              max: null  },
-      { id: "C", label: "חלק ג׳ · ניתוח/רוחב",  n: null,              max: null  },
-      { id: "BC",label: "ב+ג · מצרפי",           n: selectedBC.length, max: MAX_BC }
+  function PartStepBar({ step, doneA, countA, countBC }){
+    const steps = [
+      { id: "A",  label: "פרק א׳ · בקיאות",        n: countA,  max: MAX_A,  done: doneA },
+      { id: "BC", label: "פרק ב+ג · ידע ורוחב",   n: countBC, max: MAX_BC, done: countBC===MAX_BC }
     ];
     return (
-      <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30">
-        {tabs.map(t => {
-          const active = tab === t.id;
+      <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30">
+        {steps.map(s => {
+          const active = step === s.id;
           const cls = active
             ? "bg-amber-600 text-white font-bold"
-            : "bg-white/10 text-on-parchment hover:bg-white/20";
+            : s.done ? "bg-emerald-700/60 text-white" : "bg-white/10 text-on-parchment";
           return (
-            <button key={t.id} onClick={()=>onTab(t.id)}
-              className={`text-[11px] md:text-xs px-2 py-1.5 rounded-lg transition ${cls}`}>
-              <div className="hebrew leading-tight">{t.label}</div>
-              {t.n !== null && (
-                <div className="text-[10px] opacity-90" dir="ltr">{t.n}/{t.max}</div>
-              )}
-            </button>
+            <div key={s.id} className={`text-xs md:text-sm px-2 py-1.5 rounded-lg ${cls}`}>
+              <div className="hebrew leading-tight">{s.done ? "✓ " : ""}{s.label}</div>
+              <div className="text-[10px] opacity-90" dir="ltr">נבחרו {s.n}/{s.max}</div>
+            </div>
           );
         })}
       </div>
@@ -461,79 +456,84 @@
     }
 
     if (phase === "select") {
-      const ready = selectedA.length === MAX_A && selectedBC.length === MAX_BC;
-      const tab = selectTab;
+      const step = selectTab === "BC" ? "BC" : "A";
       const partB = partBCList().filter(q => q.part === "B");
       const partC = partBCList().filter(q => q.part === "C");
+      const poolA = partAList();
       const fullA  = selectedA.length  >= MAX_A;
       const fullBC = selectedBC.length >= MAX_BC;
+      const aDone  = selectedA.length === MAX_A;
+      const bcDone = selectedBC.length === MAX_BC;
+      const missingA  = Math.max(0, SPEC_A_TOTAL  - poolA.length);
+      const missingBC = Math.max(0, SPEC_BC_TOTAL - (partB.length + partC.length));
+
       return (
         <div className="max-w-2xl mx-auto space-y-4">
-          <div className="card rounded-xl p-3 flex items-center justify-between text-sm">
-            <div className="font-bold text-on-parchment">שלב בחירת שאלות</div>
-            <div className="text-xs text-on-parchment">
-              <span dir="ltr" className="font-bold">{selectedA.length}/{MAX_A}</span> בחלק א · <span dir="ltr" className="font-bold">{selectedBC.length}/{MAX_BC}</span> בחלקים ב+ג
-            </div>
-          </div>
-          <PartTabBar tab={tab} onTab={setSelectTab} selectedA={selectedA} selectedBC={selectedBC}/>
-          {tab === "A" && (
+          <PartStepBar step={step} doneA={aDone} countA={selectedA.length} countBC={selectedBC.length}/>
+
+          {step === "A" && (
             <section className="space-y-2">
-              <div className="text-sm font-bold text-on-parchment-accent hebrew">
-                חלק א׳ — בקיאות · בחר 5 מתוך 9 · <span dir="ltr">{selectedA.length}/{MAX_A} נבחרו</span>
+              <div className={`sticky top-[108px] z-10 rounded-xl p-3 backdrop-blur-sm border flex items-center justify-between ${aDone?"bg-emerald-900/80 border-emerald-500/40":"bg-slate-900/90 border-amber-500/30"}`}>
+                <div className="font-bold text-on-parchment hebrew text-sm">פרק א — בקיאות · בחר 5 מתוך 9</div>
+                <div className={`text-sm font-bold ${aDone?"text-emerald-300":"text-amber-300"}`} dir="ltr">
+                  נבחרו {selectedA.length}/{MAX_A}
+                </div>
               </div>
-              {partAList().map(q => (
+              {missingA > 0 && (
+                <div className="text-[11px] px-2 py-1 rounded bg-red-100 text-red-900 font-mono" dir="ltr">
+                  {`// TODO: need ${missingA} more bekiut question${missingA>1?"s":""} in past-exams.js (have ${poolA.length}/${SPEC_A_TOTAL})`}
+                </div>
+              )}
+              {poolA.map(q => (
                 <SelectionCard key={q.id} q={q} selected={selectedA.includes(q.id)}
                   onToggle={()=>toggleA(q.id)} disabled={fullA}/>
               ))}
+              <button onClick={()=>setSelectTab("BC")} disabled={!aDone}
+                className={`w-full py-3 rounded-2xl text-base font-bold mt-2 ${aDone?"gold-btn glow":"bg-slate-700 text-slate-400 cursor-not-allowed"}`}>
+                {aDone ? "המשך לפרק ב+ג ←" : `בחר עוד ${MAX_A-selectedA.length} שאלות כדי להמשיך`}
+              </button>
             </section>
           )}
-          {tab === "B" && (
+
+          {step === "BC" && (
             <section className="space-y-2">
-              <div className="text-sm font-bold text-purple-200 hebrew">
-                חלק ב׳ — ידע וזיכרון · נספר למכסת ב+ג · <span dir="ltr">{selectedBC.length}/{MAX_BC} נבחרו</span>
+              <div className={`sticky top-[108px] z-10 rounded-xl p-3 backdrop-blur-sm border flex items-center justify-between ${bcDone?"bg-emerald-900/80 border-emerald-500/40":"bg-slate-900/90 border-purple-500/30"}`}>
+                <div className="font-bold text-on-parchment hebrew text-sm">פרק ב+ג — ידע ורוחב · בחר 7 מתוך 14</div>
+                <div className={`text-sm font-bold ${bcDone?"text-emerald-300":"text-purple-300"}`} dir="ltr">
+                  נבחרו {selectedBC.length}/{MAX_BC}
+                </div>
               </div>
-              {partB.map(q => (
-                <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
-                  onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
-              ))}
-            </section>
-          )}
-          {tab === "C" && (
-            <section className="space-y-2">
-              <div className="text-sm font-bold text-purple-200 hebrew">
-                חלק ג׳ — ניתוח ורוחב · נספר למכסת ב+ג · <span dir="ltr">{selectedBC.length}/{MAX_BC} נבחרו</span>
-              </div>
-              {partC.map(q => (
-                <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
-                  onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
-              ))}
-            </section>
-          )}
-          {tab === "BC" && (
-            <section className="space-y-3">
-              <div className="text-sm font-bold text-purple-200 hebrew">
-                בחר 7 מתוך 14 (ב+ג) · <span dir="ltr">{selectedBC.length}/{MAX_BC} נבחרו</span>
-              </div>
-              <div className="text-[10px] text-on-parchment-meta">פרק ב׳</div>
+              {missingBC > 0 && (
+                <div className="text-[11px] px-2 py-1 rounded bg-red-100 text-red-900 font-mono" dir="ltr">
+                  {`// TODO: need ${missingBC} more yeda+rohav question${missingBC>1?"s":""} in past-exams.js`}
+                </div>
+              )}
+              <div className="text-[10px] text-on-parchment-meta mt-2">פרק ב — ידע וזיכרון ({partB.length} סעיפים)</div>
               <div className="space-y-2">
                 {partB.map(q => (
                   <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
                     onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
                 ))}
               </div>
-              <div className="text-[10px] text-on-parchment-meta mt-3">פרק ג׳</div>
+              <div className="text-[10px] text-on-parchment-meta mt-3">פרק ג — ניתוח ונושאי רוחב ({partC.length} סעיפים)</div>
               <div className="space-y-2">
                 {partC.map(q => (
                   <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
                     onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
                 ))}
               </div>
+              <div className="grid grid-cols-2 gap-2 pt-2">
+                <button onClick={()=>setSelectTab("A")}
+                  className="card py-3 rounded-2xl text-on-parchment font-bold">
+                  → חזרה לפרק א
+                </button>
+                <button onClick={()=>setPhase("running")} disabled={!bcDone}
+                  className={`py-3 rounded-2xl text-base font-bold ${bcDone?"gold-btn glow":"bg-slate-700 text-slate-400 cursor-not-allowed"}`}>
+                  {bcDone ? `🏁 התחל · ${fmtHMS(examCfg&&examCfg.durationSec||DURATION_STANDARD)}` : `בחר עוד ${MAX_BC-selectedBC.length}`}
+                </button>
+              </div>
             </section>
           )}
-          <button onClick={()=>setPhase("running")} disabled={!ready}
-            className={`w-full py-4 rounded-2xl text-lg font-bold ${ready?"gold-btn glow":"bg-slate-700 text-slate-400 cursor-not-allowed"}`}>
-            {ready ? `🏁 התחל מבחן · ${fmtHMS(examCfg&&examCfg.durationSec||DURATION_STANDARD)}` : `בחר ${MAX_A-selectedA.length} בפרק א ו-${MAX_BC-selectedBC.length} בפרקים ב+ג`}
-          </button>
         </div>
       );
     }
