@@ -69,6 +69,60 @@
   function partAList(){ const p = getPools().A; return p.length ? p : PART_A_POOL_FALLBACK; }
   function partBCList(){ const p = getPools().BC; return p.length ? p : PART_BC_POOL_FALLBACK; }
 
+  // --- Practice Mode helpers ---
+  // Topic→unit heuristic. Uses word-level keyword match on q.title (topic_he).
+  // Source: unit-deep-summaries.js: 1=שלמה, 2=פילוג, 3=אליהו/אלישע, 4=מהפכות,
+  // 5=אשורי, 6=חורבן.
+  const UNIT_KEYWORDS = {
+    1: ["שלמה","גבעון","מקדש","חכמה","מלכת שבא","חירם","משפט שלמה","חלום","יכין","בועז","ארון"],
+    2: ["פילוג","ירבעם","רחבעם","שכם","עגל","בית־אל","בית-אל","דן","אחיה","נבט","אסא","פנואל"],
+    3: ["אליהו","אלישע","איזבל","כרמל","נבות","חורב","צרפית","שונמית","נעמן","צפחת","בעל"],
+    4: ["יהוא","מהפכ","חזאל","יואש","עתליה","אמציה","דמי יזרעאל"],
+    5: ["חזקיהו","סנחריב","רבשקה","ישעיהו","נקבה","השילוח","אשור","הושע בן אלה","שומרון","תגלת"],
+    6: ["יאשיהו","חולדה","מנשה","ספר התורה","חורבן","צדקיהו","נבוכדנאצר","יהויכין","גלות","יהויקים","חלקיהו","שפן"]
+  };
+  function unitForQuestion(q){
+    const hay = `${q.title||""} ${q.prompt||""}`;
+    for (const u of [1,2,3,4,5,6]) {
+      const kws = UNIT_KEYWORDS[u];
+      for (const k of kws) if (hay.indexOf(k) !== -1) return u;
+    }
+    return null;
+  }
+  // Heuristic difficulty by part: A (recall) = קל, B (knowledge) = בינוני, C (analysis) = קשה.
+  function difficultyForQuestion(q){
+    if (q.part === "A") return 1;
+    if (q.part === "B") return 2;
+    if (q.part === "C") return 3;
+    return 2;
+  }
+  // Practice "type" derived from part: A→bekiut, B→yeda, C→rohav.
+  function typeForQuestion(q){
+    if (q.part === "A") return "bekiut";
+    if (q.part === "B") return "yeda";
+    if (q.part === "C") return "rohav";
+    return "other";
+  }
+  function buildPracticePool(){
+    return [...partAList(), ...partBCList()];
+  }
+  function applyPracticeFilters(pool, filters){
+    return pool.filter(q => {
+      if (filters.difficulty !== "all" && difficultyForQuestion(q) !== filters.difficulty) return false;
+      if (filters.type !== "all" && typeForQuestion(q) !== filters.type) return false;
+      if (filters.unit !== "all" && unitForQuestion(q) !== filters.unit) return false;
+      return true;
+    });
+  }
+  function shuffleSample(arr, n){
+    const a = [...arr];
+    for (let i = a.length-1; i>0; i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a.slice(0, Math.min(n, a.length));
+  }
+
   // --- legacy hardcoded fallback kept only if window.EXAM_2551_DATA is absent ---
   const PART_A_POOL_FALLBACK = [
     {id:"a1", n:1, title:"מלכות שלמה",
@@ -329,9 +383,10 @@
     );
   }
 
-  function ExamIntro({ onStart, setRoute }){
+  function ExamIntro({ onStart, onStartPractice, setRoute }){
     const [shabbat, setShabbat] = useState(() => isInShabbat());
     const [accommodation, setAccommodation] = useState(() => loadAccommodation());
+    const [mode, setMode] = useState("full"); // "full" | "practice"
     useEffect(() => {
       const iv = setInterval(() => setShabbat(isInShabbat()), 60*1000);
       return () => clearInterval(iv);
@@ -345,6 +400,21 @@
       <div className="max-w-2xl mx-auto space-y-4">
         {shabbat && <ShabbatModal onDismiss={()=>setRoute && setRoute({page:"quiz"})}/>}
         <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">📝 מתכונת בגרות · שאלון 2551 · תשפ"ו</h1>
+        <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30">
+          <button onClick={()=>setMode("full")} type="button"
+            className={`text-xs md:text-sm px-3 py-2 rounded-lg transition hebrew ${mode==="full"?"bg-amber-600 text-white font-bold":"bg-white/10 text-on-parchment hover:bg-white/20"}`}>
+            🏛 מתכונת מלאה
+          </button>
+          <button onClick={()=>setMode("practice")} type="button"
+            className={`text-xs md:text-sm px-3 py-2 rounded-lg transition hebrew ${mode==="practice"?"bg-amber-600 text-white font-bold":"bg-white/10 text-on-parchment hover:bg-white/20"}`}>
+            ⚡ תרגול קצר
+          </button>
+        </div>
+        {mode === "practice" && (
+          <PracticeConfig onStart={onStartPractice}/>
+        )}
+        {mode !== "practice" && (
+        <>
         <div className="text-sm md:text-base text-on-parchment hebrew leading-relaxed" style={{background:"rgba(0,0,0,.25)",padding:"0.75rem 1rem",borderRadius:"0.75rem"}}>
           בחינת מתכונת תשפ״ו · בחר 5 מתוך 9 בפרק א · 7 מתוך 14 בפרקים ב+ג · 101 נק׳ · 2:15 (או 2:35 בהתאמת 15%)
         </div>
@@ -384,6 +454,80 @@
           className={`w-full py-4 rounded-2xl text-lg font-bold ${shabbat?"bg-slate-700 text-slate-400 cursor-not-allowed":"gold-btn glow"}`}>
           {shabbat ? "🕯 חסום בשבת" : `🚀 התחל סימולציה · ${fmtHMS(durationSec)}`}
         </button>
+        </>
+        )}
+      </div>
+    );
+  }
+
+  function PracticeConfig({ onStart }){
+    const [difficulty, setDifficulty] = useState("all"); // 1|2|3|"all"
+    const [type, setType]             = useState("all"); // bekiut|yeda|rohav|all
+    const [unit, setUnit]             = useState("all"); // 1..6|all
+    const [count, setCount]           = useState(10);    // 5|10|15|25
+    const filters = { difficulty, type, unit };
+    const pool = applyPracticeFilters(buildPracticePool(), filters);
+    const available = pool.length;
+    const willGet = Math.min(count, available);
+    const opts = (label, val, current, set, vals) => (
+      <div>
+        <div className="text-[11px] text-amber-900 font-bold mb-1 hebrew">{label}</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
+          {vals.map(v => (
+            <button key={String(v.id)} type="button" onClick={()=>set(v.id)}
+              className={`text-xs px-2 py-2 rounded-lg font-bold transition ${current===v.id?"bg-amber-700 text-white":"bg-white/60 text-amber-900 hover:bg-amber-200"}`}>
+              {v.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+    const start = () => {
+      const sample = shuffleSample(pool, count);
+      if (sample.length === 0) return;
+      onStart && onStart({ filters, count: sample.length, questions: sample });
+    };
+    return (
+      <div className="parchment rounded-2xl p-5 md:p-7 space-y-3">
+        <h2 className="font-display text-xl font-bold text-amber-900">⚡ תרגול קצר</h2>
+        <p className="text-xs text-amber-800 hebrew">בחר מסננים ומספר שאלות. אין מגבלת זמן.</p>
+        {opts("רמה", difficulty, difficulty, setDifficulty, [
+          {id:"all", label:"הכל"},
+          {id:1,     label:"קל"},
+          {id:2,     label:"בינוני"},
+          {id:3,     label:"קשה"}
+        ])}
+        {opts("סוג", type, type, setType, [
+          {id:"all",    label:"הכל"},
+          {id:"bekiut", label:"בקיאות"},
+          {id:"yeda",   label:"ידע"},
+          {id:"rohav",  label:"רוחב"}
+        ])}
+        {opts("יחידה", unit, unit, setUnit, [
+          {id:"all", label:"הכל"},
+          {id:1,     label:"1 · שלמה"},
+          {id:2,     label:"2 · פילוג"},
+          {id:3,     label:"3 · אליהו ואלישע"},
+          {id:4,     label:"4 · מהפכות"},
+          {id:5,     label:"5 · אשור"},
+          {id:6,     label:"6 · חורבן"}
+        ])}
+        {opts("מספר שאלות", count, count, setCount, [
+          {id:5,  label:"5"},
+          {id:10, label:"10"},
+          {id:15, label:"15"},
+          {id:25, label:"25"}
+        ])}
+        <div className="text-xs text-amber-900 hebrew">
+          זמינות עם המסננים: <span dir="ltr" className="font-bold">{available}</span> שאלות
+          {willGet < count && available > 0 && (
+            <span className="text-red-700"> · רק {willGet} זמינות</span>
+          )}
+        </div>
+        <button onClick={start} disabled={available === 0}
+          className={`w-full py-3 rounded-2xl text-base font-bold ${available===0?"bg-slate-300 text-slate-500 cursor-not-allowed":"gold-btn glow"}`}>
+          {available === 0 ? "אין שאלות מתאימות" : `▶ התחל תרגול · ${willGet} שאלות`}
+        </button>
       </div>
     );
   }
@@ -420,8 +564,14 @@
     const [draft, setDraft] = useState(() => loadInProgress());
     const [resumeData, setResumeData] = useState(null);
     const [finalRun, setFinalRun] = useState(null);
+    const [practiceCfg, setPracticeCfg] = useState(null);
+    const [practiceFinal, setPracticeFinal] = useState(null);
 
     const startExam = (cfg) => { setExamCfg(cfg); setPhase("select"); };
+    const startPractice = (cfg) => {
+      setPracticeCfg(cfg);
+      setPhase("practice-running");
+    };
 
     const resumeDraft = () => {
       if (!draft) return;
@@ -450,9 +600,33 @@
       return (
         <>
           {draft && <ResumeModal draft={draft} onResume={resumeDraft} onDiscard={discardDraft}/>}
-          <ExamIntro setRoute={setRoute} onStart={startExam}/>
+          <ExamIntro setRoute={setRoute} onStart={startExam} onStartPractice={startPractice}/>
         </>
       );
+    }
+
+    if (phase === "practice-running") {
+      return <PracticeRunning
+        questions={(practiceCfg&&practiceCfg.questions)||[]}
+        filters={(practiceCfg&&practiceCfg.filters)||{}}
+        onFinish={(payload)=>{ setPracticeFinal(payload); setPhase("practice-grade"); }}
+        onExit={()=>{ setPracticeCfg(null); setPracticeFinal(null); setPhase("intro"); }}
+      />;
+    }
+
+    if (phase === "practice-grade") {
+      return <PracticeGrade
+        questions={(practiceCfg&&practiceCfg.questions)||[]}
+        answers={(practiceFinal&&practiceFinal.answers)||{}}
+        onDone={()=>{
+          setPracticeCfg(null); setPracticeFinal(null);
+          setPhase("intro");
+        }}
+        onRetry={()=>{
+          setPracticeCfg(null); setPracticeFinal(null);
+          setPhase("intro");
+        }}
+      />;
     }
 
     if (phase === "select") {
@@ -947,6 +1121,216 @@
             )}
             <button onClick={onDone} className="gold-btn w-full py-2 rounded-lg font-bold mt-2">המשך</button>
           </div>
+        )}
+      </div>
+    );
+  }
+
+  // ===== Practice Mode (no timer, no formal score band) =====
+  function PracticeRunning({ questions, filters, onFinish, onExit }){
+    const [answers, setAnswers] = useState({});
+    const [flagged, setFlagged] = useState({});
+    const cardRefs = React.useRef({});
+
+    const setAns = (id, v) => setAnswers(a => ({...a, [id]: v}));
+    const toggleFlag = (id) => setFlagged(f => ({...f, [id]: !f[id]}));
+    const answeredCount = questions.filter(q => (answers[q.id]||"").trim()).length;
+
+    const scrollToQ = (id) => {
+      const el = cardRefs.current[id];
+      if (el && typeof el.scrollIntoView === "function") {
+        el.scrollIntoView({behavior:"smooth", block:"start"});
+        const ta = el.querySelector("textarea");
+        if (ta) setTimeout(() => ta.focus(), 350);
+      }
+    };
+    const nextOf = (id) => {
+      const idx = questions.findIndex(q => q.id === id);
+      if (idx >= 0 && idx < questions.length-1) scrollToQ(questions[idx+1].id);
+    };
+
+    const submit = () => onFinish({ answers });
+
+    return (
+      <div className="max-w-3xl mx-auto space-y-4 exam-fullscreen exam-run-wrap">
+        <div className="sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between gap-2 exam-sticky-bar exam-run-timer">
+          <div className="text-sm text-on-parchment">
+            ⚡ תרגול · נענו: <span dir="ltr" className="font-bold">{answeredCount}/{questions.length}</span>
+          </div>
+          <div className="text-xs text-on-parchment-meta hebrew">בלי הגבלת זמן</div>
+          <button onClick={submit} className="px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold">סיים</button>
+        </div>
+
+        <div className="card rounded-xl p-3 space-y-1">
+          <div className="text-[11px] text-on-parchment-meta hebrew">ניווט מהיר</div>
+          <div className="flex items-center gap-2 flex-wrap">
+            {questions.map((q, i) => {
+              const filled = !!(answers[q.id]||"").trim();
+              const flag = !!flagged[q.id];
+              return (
+                <button key={q.id} onClick={()=>scrollToQ(q.id)} type="button"
+                  className={`relative w-9 h-9 rounded-lg border border-amber-600/40 text-xs font-bold transition hover:opacity-80 ${filled?"bg-amber-600 text-white":"bg-white/10 text-on-parchment"} ${flag?"ring-2 ring-amber-300":""}`}>
+                  <span dir="ltr">{i+1}</span>
+                  {flag && <span className="absolute -top-1 -right-1 text-[10px]">🚩</span>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <section className="space-y-3">
+          {questions.map((q, i) => {
+            const ans = answers[q.id]||"";
+            const flag = !!flagged[q.id];
+            const refs = Array.isArray(q.book_refs) ? q.book_refs : [];
+            const isLast = i === questions.length-1;
+            const typeLabel = typeForQuestion(q)==="bekiut" ? "בקיאות" : typeForQuestion(q)==="yeda" ? "ידע" : typeForQuestion(q)==="rohav" ? "רוחב" : "כללי";
+            const u = unitForQuestion(q);
+            return (
+              <div key={q.id} ref={el => { if (el) cardRefs.current[q.id] = el; }}
+                className={`parchment rounded-xl p-4 space-y-3 ${flag?"ring-2 ring-amber-400":""}`}>
+                <div className="flex items-center gap-2 text-xs flex-wrap">
+                  <span className="px-2 py-0.5 rounded-full bg-amber-700 text-white font-bold">שאלה {i+1}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold">{typeLabel}</span>
+                  {u && <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-bold">יחידה {u}</span>}
+                  <span className="text-amber-900 font-bold">{q.title}</span>
+                  {refs.map((r, j) => (
+                    <span key={j} className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 text-[11px] font-bold">📖 {r}</span>
+                  ))}
+                  <button onClick={()=>toggleFlag(q.id)} type="button"
+                    className={`mr-auto px-2 py-0.5 rounded-full text-[11px] font-bold ${flag?"bg-amber-500 text-amber-950":"bg-white/60 text-amber-800 hover:bg-amber-200"}`}>
+                    {flag ? "🚩 מסומן" : "סמן לחזרה"}
+                  </button>
+                </div>
+                {Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0 && (
+                  <VerbatimQuotes quotes={q.verbatim_quotes}/>
+                )}
+                <div className="hebrew text-amber-950 leading-relaxed" style={{fontSize:"1.18rem"}}>{q.prompt}</div>
+                <textarea value={ans} onChange={e=>setAns(q.id, e.target.value)}
+                  placeholder="כתוב את תשובתך כאן..."
+                  className="w-full px-3 py-2 rounded-lg bg-white/85 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"
+                  style={{minHeight:"180px", resize:"vertical"}}/>
+                <div className="flex items-center justify-between text-xs">
+                  <div className="text-amber-800" dir="ltr">{countWords(ans)} מילים</div>
+                  <button onClick={()=>nextOf(q.id)} type="button" disabled={isLast}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold ${isLast?"bg-slate-300 text-slate-500 cursor-not-allowed":"bg-amber-700 text-white hover:bg-amber-800"}`}>
+                    {isLast ? "האחרונה" : "המשך ←"}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </section>
+
+        <div className="grid grid-cols-2 gap-2">
+          <button onClick={onExit} className="card py-3 rounded-xl text-on-parchment">← יציאה</button>
+          <button onClick={submit} className="gold-btn py-3 rounded-xl font-bold">📤 בדוק תשובות</button>
+        </div>
+      </div>
+    );
+  }
+
+  function PracticeGrade({ questions, answers, onDone, onRetry }){
+    const [editAnswers, setEditAnswers] = useState(() => ({...answers}));
+    const [grades, setGrades] = useState({});
+    const [openRubrics, setOpenRubrics] = useState({});
+    const setGrade = (id, g) => setGrades(prev => ({...prev, [id]: g}));
+    const setAns   = (id, v) => setEditAnswers(prev => ({...prev, [id]: v}));
+    const toggleRubric = (id) => setOpenRubrics(prev => ({...prev, [id]: !prev[id]}));
+
+    const totalMax = questions.reduce((s,q) => s + (q.points || 8), 0);
+    const totalGain = questions.reduce((s,q) => s + scoreForGrade(grades[q.id], q.points || 8), 0);
+    const pctRound = totalMax === 0 ? 0 : Math.round(totalGain/totalMax*100);
+    const allGraded = questions.every(q => grades[q.id]);
+    const band = gradeBand(pctRound);
+
+    return (
+      <div className="max-w-3xl mx-auto space-y-4">
+        <div className="card rounded-2xl p-5 flex items-center justify-between flex-wrap gap-3"
+          style={{borderTop:`4px solid ${band.color}`}}>
+          <div>
+            <h2 className="font-display text-xl font-bold text-on-parchment-accent">⚡ תרגול קצר · ציון</h2>
+            <div className="text-xs text-on-parchment hebrew">{questions.length} שאלות · ללא מגבלת זמן</div>
+          </div>
+          <div className="text-left">
+            <div className="font-mono font-extrabold text-5xl md:text-6xl"
+              dir="ltr"
+              style={{color:"#F4D58D", textShadow:"0 2px 12px rgba(0,0,0,.45)"}}>
+              {Math.round(totalGain*10)/10}<span className="text-2xl opacity-70">/{totalMax}</span>
+            </div>
+            <div className="font-bold text-base mt-1" style={{color:band.color}}>
+              {band.emoji} {pctRound}% · {band.label}
+            </div>
+          </div>
+        </div>
+
+        {questions.map((q, idx) => {
+          const g = grades[q.id];
+          const open = !!openRubrics[q.id];
+          const points = q.points || 8;
+          const gain = scoreForGrade(g, points);
+          return (
+            <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
+              <div className="flex items-center gap-2 text-xs flex-wrap">
+                <span className="px-2 py-0.5 rounded-full bg-amber-700 text-white font-bold">שאלה {idx+1}</span>
+                <span className="text-amber-900 font-bold">{q.title}</span>
+                {g && (
+                  <span className="mr-auto px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 font-mono text-[11px]" dir="ltr">
+                    +{gain}/{points}
+                  </span>
+                )}
+              </div>
+              {Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0 && (
+                <VerbatimQuotes quotes={q.verbatim_quotes}/>
+              )}
+              <div className="hebrew text-amber-950 leading-relaxed" style={{fontSize:"1.05rem"}}>{q.prompt}</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div>
+                  <div className="text-[10px] font-bold text-amber-800 mb-1">התשובה שלך:</div>
+                  <textarea value={editAnswers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)} rows={5}
+                    placeholder="(לא נכתבה תשובה)"
+                    className="w-full px-2 py-1.5 rounded-lg bg-white/85 border border-amber-700/40 text-amber-950 hebrew text-sm leading-relaxed"/>
+                </div>
+                <div>
+                  <div className="text-[10px] font-bold text-emerald-800 mb-1">תשובה מצופה:</div>
+                  <div className="bg-emerald-50/70 rounded-lg p-2"><RubricList q={q}/></div>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2 pt-2">
+                {[
+                  {g:"know",    label:`✅ יודע (+${points})`,   cls:g==="know"   ?"bg-emerald-600 text-white":"bg-white/60 text-emerald-900"},
+                  {g:"partial", label:`⚠ חלקי (+${points/2})`,  cls:g==="partial"?"bg-amber-600 text-white":"bg-white/60 text-amber-900"},
+                  {g:"dont",    label:"❌ לא יודע (+0)",         cls:g==="dont"   ?"bg-red-700 text-white":"bg-white/60 text-red-900"}
+                ].map(b => (
+                  <button key={b.g} onClick={()=>setGrade(q.id, b.g)}
+                    className={`rounded-lg py-2 text-sm font-bold transition ${b.cls}`}>
+                    {b.label}
+                  </button>
+                ))}
+              </div>
+              <button type="button" onClick={()=>toggleRubric(q.id)}
+                className="w-full text-right text-xs px-2 py-1 rounded-lg bg-amber-50 text-amber-900 font-bold hover:bg-amber-100 transition">
+                {open ? "▼ סגור רובריקה מלאה" : "▶ פתח רובריקה מלאה"}
+              </button>
+              {open && (
+                <div className="rounded-lg bg-white/50 p-3 space-y-1 border border-amber-700/20">
+                  <div className="text-[11px] font-bold text-amber-900">קריטריוני ניקוד:</div>
+                  <RubricList q={q}/>
+                  {Array.isArray(q.book_refs) && q.book_refs.length > 0 && (
+                    <div className="text-[10px] text-amber-800 pt-1">📖 {q.book_refs.join(" · ")}</div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        <div className="grid grid-cols-2 gap-2">
+          <button onClick={onRetry} className="card py-3 rounded-xl text-on-parchment font-bold">⚡ תרגול נוסף</button>
+          <button onClick={onDone} className="gold-btn py-3 rounded-xl font-bold">חזרה למסך הפתיחה</button>
+        </div>
+        {!allGraded && (
+          <div className="text-center text-[11px] text-amber-300 hebrew">דרג את כל הסעיפים לקבלת ציון מלא</div>
         )}
       </div>
     );
