@@ -1,10 +1,12 @@
 /* =========================================================================
    ExamSim2551 — authentic בגרות מתכונת תשפ"ו for ספר מלכים (שאלון 2551).
-   Real structure:
-     Part A (בקיאות)    : 5 of 8     @ 9 pts each → 45
+   Real structure (canonical 2551 תשפ"ו spec):
+     Part A (בקיאות)    : 5 of 9     @ 9 pts each → 45
      Parts B+C          : 7 of 14    @ 8 pts each → 56
      Total                                         = 101
    Duration: 2:15 standard (8100s) / 2:35 with 15% accommodation (≈9315s).
+   NO-INVENTION RULE: questions come from data/past-exams.js EXAM_2551_DATA.
+   If A pool < 9, render what exists + TODO warning. Don't fake.
 
    This commit: selection state + Part A render (5-of-8) with hardcoded pool
    per Yair's uploaded מתכונת. Questions wired to clickable toggle cards with
@@ -152,6 +154,8 @@
 
   const MAX_A = 5;
   const MAX_BC = 7;
+  const SPEC_A_TOTAL = 9;   // canonical 2551 spec (5 of 9)
+  const SPEC_BC_TOTAL = 14; // canonical 2551 spec (7 of 14)
 
   function loadAccommodation(){ try { return localStorage.getItem(ACCOMMODATION_KEY)==="1"; } catch { return false; } }
   function saveAccommodation(v){ try { localStorage.setItem(ACCOMMODATION_KEY, v?"1":"0"); } catch {} }
@@ -338,29 +342,43 @@
       return () => clearInterval(iv);
     }, []);
     const durationSec = accommodation ? DURATION_EXTENDED : DURATION_STANDARD;
+    const poolA  = partAList();
+    const poolBC = partBCList();
+    const missingA  = Math.max(0, SPEC_A_TOTAL  - poolA.length);
+    const missingBC = Math.max(0, SPEC_BC_TOTAL - poolBC.length);
     return (
       <div className="max-w-2xl mx-auto space-y-4">
         {shabbat && <ShabbatModal onDismiss={()=>setRoute && setRoute({page:"quiz"})}/>}
         <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">📝 מתכונת בגרות · שאלון 2551 · תשפ"ו</h1>
         <div className="text-sm md:text-base text-on-parchment hebrew leading-relaxed" style={{background:"rgba(0,0,0,.25)",padding:"0.75rem 1rem",borderRadius:"0.75rem"}}>
-          בחינת מתכונת תשפ״ו · 22 שאלות · בחר 5 מתוך 8 חלק א · 7 מתוך 14 חלקים ב+ג · 101 נק׳ · 2:15 (או 2:35 התאמה)
+          בחינת מתכונת תשפ״ו · בחר 5 מתוך 9 בפרק א · 7 מתוך 14 בפרקים ב+ג · 101 נק׳ · 2:15 (או 2:35 בהתאמת 15%)
         </div>
         <div className="parchment rounded-2xl p-5 md:p-7 space-y-3">
           <h2 className="font-display text-xl font-bold text-amber-900">ספר מלכים · מתכונת מלאה</h2>
           <div className="text-sm text-amber-950 space-y-1.5">
             <div><strong>⏱ זמן מוקצה:</strong> <span dir="ltr">{fmtHMS(durationSec)}</span></div>
-            <div><strong>📊 ניקוד:</strong> 101 נק׳</div>
+            <div><strong>📊 ניקוד מקסימלי:</strong> 101 נק׳</div>
             <div><strong>📖 חומר עזר:</strong> תנ"ך שלם בלי פירושים</div>
           </div>
           <div className="divider"/>
           <div className="space-y-2">
             <div className="bg-white/50 rounded-lg p-3" style={{borderRight:"4px solid #D4A574"}}>
               <div className="font-bold text-amber-950">פרק א — בקיאות</div>
-              <div className="text-xs text-amber-800">ענה על 5 מתוך 8 שאלות · 9 נק׳ לשאלה = 45 נק׳</div>
+              <div className="text-xs text-amber-800">ענה על 5 מתוך 9 שאלות · 9 נק׳ לשאלה × 5 = 45 נק׳</div>
+              {missingA > 0 && (
+                <div className="text-[11px] mt-1 px-2 py-1 rounded bg-red-100 text-red-900 font-mono" dir="ltr">
+                  {`// TODO: need ${missingA} more bekiut question${missingA>1?"s":""} in past-exams.js (have ${poolA.length}/${SPEC_A_TOTAL})`}
+                </div>
+              )}
             </div>
             <div className="bg-white/50 rounded-lg p-3" style={{borderRight:"4px solid #6B5B95"}}>
               <div className="font-bold text-amber-950">פרק ב + ג — ידע ונושאי רוחב</div>
-              <div className="text-xs text-amber-800">ענה על 7 מתוך 14 סעיפים · 8 נק׳ לסעיף = 56 נק׳</div>
+              <div className="text-xs text-amber-800">ענה על 7 מתוך 14 סעיפים · 8 נק׳ לסעיף × 7 = 56 נק׳</div>
+              {missingBC > 0 && (
+                <div className="text-[11px] mt-1 px-2 py-1 rounded bg-red-100 text-red-900 font-mono" dir="ltr">
+                  {`// TODO: need ${missingBC} more yeda+rohav question${missingBC>1?"s":""} in past-exams.js (have ${poolBC.length}/${SPEC_BC_TOTAL})`}
+                </div>
+              )}
             </div>
           </div>
           <div className="pt-2">
@@ -461,7 +479,7 @@
           {tab === "A" && (
             <section className="space-y-2">
               <div className="text-sm font-bold text-on-parchment-accent hebrew">
-                חלק א׳ — בקיאות · בחר 5 מתוך 8 · <span dir="ltr">{selectedA.length}/{MAX_A} נבחרו</span>
+                חלק א׳ — בקיאות · בחר 5 מתוך 9 · <span dir="ltr">{selectedA.length}/{MAX_A} נבחרו</span>
               </div>
               {partAList().map(q => (
                 <SelectionCard key={q.id} q={q} selected={selectedA.includes(q.id)}
