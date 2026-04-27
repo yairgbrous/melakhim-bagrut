@@ -408,10 +408,10 @@
   }
 
   function goToPlace(placeIdOrName){
-    const setRoute = window.__setRoute;
-    if (setRoute && placeIdOrName){ setRoute({page:'place', id:placeIdOrName}); return; }
-    try{ window.dispatchEvent(new CustomEvent('navigate-study', {detail:{tab:'place', focusId:placeIdOrName}})); }catch(e){}
-    try{ window.location.hash = '#study-place-' + encodeURIComponent(placeIdOrName || ''); }catch(e){}
+    if (!placeIdOrName) return;
+    const setRoute = window.__appSetRoute__ || window.__setRoute;
+    if (setRoute){ setRoute({page:'place', id:placeIdOrName}); return; }
+    try { window.location.hash = '#/place/' + encodeURIComponent(placeIdOrName); } catch (e) {}
   }
 
   // Pseudo-random fallback positions (only used when a map has no explicit pins)
@@ -552,7 +552,8 @@
     );
   }
 
-  function MapsPage(){
+  function MapsPage(props){
+    const focusMapId = props && props.focusMapId;
     const [ready, setReady] = useState(!!window.__ENTITY_INDEX_READY__);
     useEffect(()=>{
       if (ready) return;
@@ -571,6 +572,13 @@
     const [openMap, setOpenMap]       = useState(null);
 
     const maps = useMemo(() => pickMapsData(), [ready]);
+
+    // When routed via /#/map/:id, auto-open that map by id or number.
+    useEffect(() => {
+      if (!focusMapId || !maps.length || openMap) return;
+      const target = maps.find(m => m.id === focusMapId || String(m.number) === String(focusMapId));
+      if (target) setOpenMap(target);
+    }, [focusMapId, maps, openMap]);
 
     const filtered = useMemo(() => {
       let list = maps;
@@ -649,4 +657,9 @@
   }
 
   window.MapsPageComponent = MapsPage;
+  // Expose the authoritative 19-map dataset + palette so PlacePage can
+  // render an embedded mini-map for a place's primary pin without
+  // reaching into the component's internals.
+  window.MAPS_19 = MAPS_19;
+  window.MAPS_UNIT_COLOR = UNIT_COLOR;
 })();

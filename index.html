@@ -184,10 +184,18 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <!-- Cross-entity connectivity: load BEFORE pages so window.__ENTITY_INDEX__
      has all buckets + window.EntityLinkComponent is available at render. -->
-<script src="./data/_entity-index.js?v=2000"></script>
+<script src="./data/breadth-topics.js?v=3000"></script>
+<script src="./data/events.js?v=3000"></script>
+<script src="./data/places.js?v=3000"></script>
+<script src="./data/quotes.js?v=3000"></script>
+<script src="./data/unit-deep-summaries.js?v=3100"></script>
+<script src="./data/review-questions.js?v=3100"></script>
+<script src="./data/_entity-index.js?v=3000"></script>
 <script type="module" src="./data/past-exams.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1400"></script>
+<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=3000"></script>
+<script type="text/babel" data-presets="react" src="./components/RelatedSection.js?v=3000"></script>
+<script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=3100"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=2200"></script>
 <script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=2200"></script>
 <script type="text/babel" data-presets="react" src="./components/EventPage.js?v=3000"></script>
 <script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=3000"></script>
@@ -195,8 +203,8 @@
 <script src="./components/KingsUtils.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=3100"></script>
 <script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=3000"></script>
-<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=2000"></script>
-<script src="./components/BreadthPage.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=3000"></script>
+<script src="./components/BreadthPage.js?v=3000"></script>
 <script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
@@ -2432,19 +2440,25 @@ function App(){
 
   // Hash router — deep-link any page via #/path/:id. Bidirectional sync:
   // URL hash change → setRoute; setRoute → window.location.hash.
+  //
+  // Every user-driven route change pushes a new history entry so the
+  // browser's back/forward buttons (and history.back() calls) walk the
+  // user's path through the app. Only the initial-load hash write uses
+  // replaceState so we don't seed an extra entry on boot.
   useEffect(() => {
     const PAGE_FROM_SLUG = {
       home: 'home', learn: 'study', study: 'study',
       timeline: 'timeline', themes: 'themes', maps: 'maps',
       quiz: 'quiz', 'exam-sim': 'exam', exam: 'exam',
       flashcards: 'flashcards', quotes: 'quotes', profile: 'profile', class: 'class',
-      daily: 'daily'
+      daily: 'daily', book: 'book'
     };
     const SLUG_FROM_PAGE = {
       home: 'home', study: 'learn', timeline: 'timeline', themes: 'themes',
       maps: 'maps', quiz: 'quiz', exam: 'exam-sim', flashcards: 'flashcards',
       quotes: 'quotes', profile: 'profile', class: 'class',
       character: 'character', event: 'event', place: 'place', unit: 'unit', lesson: 'lesson',
+      king: 'king', breadth: 'breadth', map: 'map', book: 'book',
       daily: 'daily'
     };
     const parseHash = () => {
@@ -2455,8 +2469,13 @@ function App(){
       const slug = parts[0];
       const id = parts[1] ? decodeURIComponent(parts[1]) : null;
       if (slug === 'character' && id) return {page:'character', id};
+      // Kings render through CharacterPage — keep `page:'king'` so the
+      // URL round-trips, and have the render branch pick CharacterPage.
+      if (slug === 'king' && id)      return {page:'king', id};
       if (slug === 'event' && id)     return {page:'event', id};
       if (slug === 'place' && id)     return {page:'place', id};
+      if (slug === 'breadth' && id)   return {page:'breadth', id};
+      if (slug === 'map' && id)       return {page:'map', id};
       if (slug === 'unit' && id)      return {page:'unit', unitId: isNaN(+id) ? id : +id};
       if (slug === 'lesson' && id)    return {page:'lesson', unitId: isNaN(+id) ? id : +id, mode: parts[2] || 'summary'};
       // #/quiz/unit/:N  →  unit-filtered practice (20 questions from review-questions.js)
@@ -2464,6 +2483,8 @@ function App(){
         const u = parts[2];
         return {page:'quizUnit', unit: isNaN(+u) ? u : +u};
       }
+      // /#/book/:chapter — :chapter is "1" or "2:12" (book:chapter) or free-form.
+      if (slug === 'book' && id)      return {page:'book', chapter: id};
       const page = PAGE_FROM_SLUG[slug];
       return page ? {page} : null;
     };
@@ -2471,11 +2492,15 @@ function App(){
       if (!r || !r.page) return '';
       const slug = SLUG_FROM_PAGE[r.page] || r.page;
       if (r.page === 'character' && r.id) return '#/character/' + encodeURIComponent(r.id);
+      if (r.page === 'king'      && r.id) return '#/king/'      + encodeURIComponent(r.id);
       if (r.page === 'event' && r.id)     return '#/event/' + encodeURIComponent(r.id);
       if (r.page === 'place' && r.id)     return '#/place/' + encodeURIComponent(r.id);
+      if (r.page === 'breadth' && r.id)   return '#/breadth/' + encodeURIComponent(r.id);
+      if (r.page === 'map' && r.id)       return '#/map/' + encodeURIComponent(r.id);
       if (r.page === 'unit' && r.unitId != null)   return '#/unit/' + encodeURIComponent(r.unitId);
       if (r.page === 'lesson' && r.unitId != null) return '#/lesson/' + encodeURIComponent(r.unitId) + '/' + encodeURIComponent(r.mode || 'summary');
       if (r.page === 'quizUnit' && r.unit != null) return '#/quiz/unit/' + encodeURIComponent(r.unit);
+      if (r.page === 'book' && r.chapter != null)  return '#/book/' + encodeURIComponent(r.chapter);
       return '#/' + slug;
     };
 
@@ -2487,7 +2512,7 @@ function App(){
       const next = parseHash();
       if (!next) return;
       setRoute(prev => {
-        if (prev && prev.page === next.page && prev.id === next.id && prev.unitId === next.unitId && prev.unit === next.unit) return prev;
+        if (prev && prev.page === next.page && prev.id === next.id && prev.unitId === next.unitId && prev.unit === next.unit && prev.chapter === next.chapter) return prev;
         return next;
       });
     };
@@ -2499,18 +2524,25 @@ function App(){
     };
   }, []);
 
-  // Keep URL hash in sync with current route (without triggering hashchange loop).
+  // Keep URL hash in sync with current route. We PUSH history entries
+  // for user-driven changes so history.back() walks the user's path,
+  // but REPLACE the very first entry so we don't seed an extra slot
+  // on boot.
+  const __routeInitRef = useRef(true);
   useEffect(() => {
     if (typeof window.__buildHash__ !== 'function') return;
     const want = window.__buildHash__(route);
     if (!want) return;
     const cur = window.location.hash || '';
-    if (cur === want) return;
+    if (cur === want) { __routeInitRef.current = false; return; }
+    const url = window.location.pathname + window.location.search + want;
     try {
-      history.replaceState(null, '', window.location.pathname + window.location.search + want);
+      if (__routeInitRef.current) history.replaceState(null, '', url);
+      else                        history.pushState(null, '', url);
     } catch (e) {
       window.location.hash = want;
     }
+    __routeInitRef.current = false;
   }, [route]);
 
   const update = u => setS(p => typeof u === 'function' ? u(p) : {...p, ...u});
@@ -2640,7 +2672,7 @@ function App(){
           const n = typeof route.unitId === "number" ? route.unitId : parseInt(route.unitId, 10);
           const UP = window.UnitPageComponent;
           if (UP && Number.isFinite(n) && n>=1 && n<=6) {
-            return <UP n={n} setRoute={setRoute}/>;
+            return <UP n={n} unitId={route.unitId} S={S} setRoute={setRoute} awardXP={awardXP} update={update}/>;
           }
           return <UnitDetail unitId={route.unitId} S={S} setRoute={setRoute} awardXP={awardXP} update={update}/>;
         })()}
@@ -2655,6 +2687,10 @@ function App(){
         {route.page==="quizPlay" && <QuizRun params={route} S={S} setRoute={setRoute} awardXP={awardXP} update={update} publishActivity={publishActivity} soundOn={soundOn}/>}
         {route.page==="quizResult" && <QuizResult {...route} S={S} setRoute={setRoute}/>}
         {route.page==="themes" && (window.BreadthPage ? React.createElement(window.BreadthPage, {setRoute}) : <Themes S={S} update={update}/>)}
+        {route.page==="breadth" && (window.BreadthPage ? React.createElement(window.BreadthPage, {setRoute, focusBreadthId: route.id}) : <Themes S={S} update={update}/>)}
+        {route.page==="king" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף מלך...</div>; })()}
+        {route.page==="map" && <MapsPage S={S} update={update} awardXP={awardXP} focusMapId={route.id} setRoute={setRoute}/>}
+        {route.page==="book" && <BookChapterPage chapter={route.chapter} setRoute={setRoute}/>}
         {route.page==="quotes" && <QuotesBrowser S={S} update={update} awardXP={awardXP}/>}
         {route.page==="timeline" && <Timeline/>}
         {route.page==="chronology" && (window.TimelineComponent
@@ -3756,6 +3792,63 @@ function Timeline(){
   return KingsTableImpl
     ? <KingsTableImpl/>
     : <div className="text-amber-300">טוען טבלת מלכים...</div>;
+}
+
+// ============ BOOK CHAPTER ============
+// /#/book/:chapter — lists every event and quote whose book_ref string
+// contains :chapter (so "12", "1:12", "מל״א יב" all match their related
+// material). Purely derived from EVENTS_DATA + QUOTES_DATA; no new data
+// file required.
+function BookChapterPage({chapter, setRoute}){
+  const ch = String(chapter || '').trim();
+  const events = (window.EVENTS_DATA || []).filter(e => {
+    const refs = [].concat(e.book_refs || [], e.chapter_ref || []);
+    return ch && refs.some(r => typeof r === 'string' && r.indexOf(ch) >= 0);
+  });
+  const quotes = (window.QUOTES_DATA || []).filter(q => {
+    const ref = q.book_ref || '';
+    return ch && ref.indexOf(ch) >= 0;
+  });
+  const EL = window.EntityLinkComponent;
+  return (
+    <div className="max-w-2xl mx-auto space-y-4 p-2">
+      <button onClick={()=>setRoute({page:'timeline'})} className="text-on-parchment-accent text-sm">→ חזרה לציר המלכים</button>
+      <header className="card rounded-2xl p-5">
+        <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">
+          📖 ספר מלכים — פרק {ch}
+        </h1>
+        <p className="text-on-parchment-muted text-sm mt-1">
+          {events.length} אירועים · {quotes.length} ציטוטים
+        </p>
+      </header>
+      {events.length > 0 && (
+        <section className="card rounded-xl p-4">
+          <h2 className="font-display text-base font-bold text-on-parchment mb-2">אירועים בפרק</h2>
+          <div className="flex flex-wrap gap-0">
+            {EL ? events.map(e => <EL key={e.id} type="event" id={e.id} setRoute={setRoute}/>) : events.map(e => <span key={e.id}>{e.title || e.id}</span>)}
+          </div>
+        </section>
+      )}
+      {quotes.length > 0 && (
+        <section className="card rounded-xl p-4">
+          <h2 className="font-display text-base font-bold text-on-parchment mb-2">ציטוטים בפרק</h2>
+          <ul className="space-y-2 text-sm">
+            {quotes.map(q => (
+              <li key={q.id} className="hebrew text-on-parchment border-e-4 border-amber-500/50 pe-3 py-1">
+                „{q.text_niqqud || q.text}"
+                <div className="text-xs text-on-parchment-muted mt-1">— {q.book_ref}</div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {events.length === 0 && quotes.length === 0 && (
+        <div className="card rounded-xl p-4 text-on-parchment-muted text-sm">
+          לא נמצא חומר עם הפניה ל־<code>{ch}</code>.
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ============ MAPS ============

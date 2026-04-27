@@ -3,8 +3,12 @@
 // Schema per entry: {unit, title, intro, turning_points: [{fact, participants[],
 // places[], events[]}], significance, breadth_themes[], recurring_items[]}
 // IDs מתאימים ל-data/kings.js, data/characters.js ו-data/events.js.
+//
+// Loaded as a classic <script> from index.html — exposes window.UNIT_DEEP_SUMMARIES.
+// The trailing `export` lines stay so this file can still be imported as an
+// ES module by build tools / tests.
 
-export const unitDeepSummaries = [
+var unitDeepSummaries = [
   {
     unit: 1,
     title: "מלכות שלמה",
@@ -331,4 +335,8 @@ export const unitDeepSummaries = [
   },
 ];
 
-export default unitDeepSummaries;
+if (typeof window !== "undefined") {
+  // Sort by .unit ascending so callers can index by (unit-1) safely.
+  window.UNIT_DEEP_SUMMARIES = unitDeepSummaries.slice().sort((a, b) => a.unit - b.unit);
+}
+if (typeof module !== "undefined" && module.exports) module.exports = unitDeepSummaries;
