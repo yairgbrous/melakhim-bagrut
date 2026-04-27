@@ -622,7 +622,7 @@
 
     return (
       <div className="max-w-3xl mx-auto space-y-4">
-        <div className="sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between">
+        <div className={"exam-timer-bar sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between" + (timeLeft<1800?" exam-timer-warning":"") + (timeLeft<300?" exam-timer-critical":"")}>
           <div className="text-sm text-on-parchment">
             נענו: <span dir="ltr" className="font-bold">{Object.keys(answers).filter(k=>answers[k]&&answers[k].trim()).length}/{partAQs.length+partBCQs.length}</span>
           </div>

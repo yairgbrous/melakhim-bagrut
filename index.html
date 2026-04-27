@@ -192,7 +192,7 @@
 <script type="text/babel" data-presets="react" src="./components/RelatedSection.js?v=3000"></script>
 <script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=2200"></script>
-<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=2200"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/EventPage.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=2000"></script>
@@ -1356,6 +1356,54 @@ html[data-theme='dark'] .mp-full-list{ background:rgba(15,31,58,.92); color:#F5E
 html[data-theme='dark'] .mp-place-pill{ background:rgba(22,40,74,.9); color:#F5E6C8; }
 html[data-theme='dark'] .mp-filter-chip{ background:rgba(22,40,74,.5); color:#F4D58D; }
 html[data-theme='dark'] .mp-filter-chip.active{ color:#1A1611; }
+
+/* ---------------- 6/8  ExamSim2551  -------------------------------------- */
+/* Sticky timer pill with two accent tiers (last 30min = warning, last 5min =
+   critical pulse). Mobile gets an "edge-to-edge" feel — full width canvas,
+   bigger tap targets, top-of-page sticky timer flush to header. */
+.exam-timer-bar{
+  background:linear-gradient(135deg,#FFFDF4,#EEE2C4) !important;
+  border:1px solid rgba(212,165,116,.55) !important;
+  box-shadow:0 4px 14px rgba(139,111,71,.10);
+}
+.exam-timer-bar .text-on-parchment{ color:#3a2a0d; }
+html[data-theme='dark'] .exam-timer-bar{
+  background:linear-gradient(135deg,rgba(22,40,74,.85),rgba(15,31,58,.85)) !important;
+}
+
+/* Last 30 min: warm-amber border + soft glow */
+.exam-timer-warning{
+  border-color:#C89B3C !important;
+  box-shadow:0 0 0 2px rgba(200,155,60,.25), 0 6px 16px rgba(200,155,60,.18);
+}
+.exam-timer-warning .font-mono{ color:#8B6F1F !important; }
+
+/* Last 5 min: red pulse */
+.exam-timer-critical{
+  border-color:#A83240 !important;
+  background:linear-gradient(135deg,#FFEDED,#F7C9CD) !important;
+  animation:exam-pulse 1.4s ease-in-out infinite;
+}
+.exam-timer-critical .font-mono{ color:#A83240 !important; }
+@keyframes exam-pulse{
+  0%,100%{ box-shadow:0 0 0 2px rgba(168,50,64,.35), 0 6px 18px rgba(168,50,64,.25); }
+  50%    { box-shadow:0 0 0 4px rgba(168,50,64,.55), 0 8px 24px rgba(168,50,64,.40); }
+}
+@media (prefers-reduced-motion:reduce){
+  .exam-timer-critical{ animation:none; }
+}
+
+/* Mobile fullscreen feel for the exam screen + bigger tap targets */
+@media (max-width:640px){
+  /* The exam-sim mounts inside <main> with px-3 / max-w-3xl. Push tabs and
+     question cards to edge-to-edge for the "real exam" feel. */
+  .exam-timer-bar{
+    inset-inline:0; border-radius:0 !important; padding:.55rem 1rem !important;
+    top:56px !important;
+  }
+  .exam-timer-bar + .grid{ gap:0; padding:0; border-radius:0; border-inline:0; }
+  .exam-timer-bar + .grid > button{ border-radius:0; padding:.85rem .5rem; min-height:48px; }
+}
 </style>
 </head>
 <body>
