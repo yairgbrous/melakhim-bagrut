@@ -205,7 +205,7 @@
 <script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/Toast.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/Home.js?v=2200"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=4000"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -928,6 +928,68 @@ html[data-theme='dark'] .stats-cell{
   background:linear-gradient(180deg,#FBF6EB 0%,#F0E4C4 100%);
   color:#1A1611;
 }
+</style>
+
+<style id="rabbi-demo-polish">
+/* =========================================================================
+   Rabbi-demo polish — additive only. Scoped via the html.theme attr where it
+   matters; never re-declares JSX. New rules are appended in this file
+   (commit-per-component) so they can be reverted in one slice if needed.
+   Visual identity:
+     parchment cream  #F7F1E1  + gradient layer #EEE2C4
+     gold accents     #D4A574  /  #8B6F1F
+     hebrew display   'Frank Ruhl Libre', serif
+     hebrew body      'Heebo', sans-serif
+   ========================================================================= */
+
+/* shared tokens used by every polish slice below */
+.rd-card-cream{
+  background: linear-gradient(135deg,#FFFDF4 0%,#EEE2C4 100%);
+  border:1px solid rgba(212,165,116,.55);
+  box-shadow:0 2px 12px rgba(139,111,71,.08);
+  transition:box-shadow .2s ease, border-color .2s ease, transform .15s ease;
+}
+.rd-card-cream:hover{ box-shadow:0 12px 28px rgba(139,111,71,.18); border-color:#D4A574; }
+
+/* ---------------- 1/8  Home  ---------------------------------------------- */
+html[data-theme='light'] .hero-parchment{
+  background:linear-gradient(135deg,#FFFDF4 0%,#EEE2C4 100%);
+  border:1px solid #D4A574;
+  border-radius:24px;
+  padding:28px 24px;
+  box-shadow:0 8px 32px rgba(139,111,71,.18);
+}
+@media (min-width:768px){
+  html[data-theme='light'] .hero-parchment{ padding:36px 32px; }
+}
+html[data-theme='light'] .hero-parchment .hero-countdown{
+  background:linear-gradient(135deg,#F5D670,#C89B3C);
+  color:#1A1611;
+  border:1px solid #8B6F1F;
+  font-weight:800;
+  letter-spacing:.02em;
+}
+
+/* 6-unit progress rail — evenly spaced, gold accents */
+.progress-strip-rail{ grid-template-columns:repeat(6,1fr) !important; gap:10px; }
+@media (max-width:768px){ .progress-strip-rail{ grid-template-columns:repeat(3,1fr) !important; gap:8px; } }
+@media (max-width:340px){ .progress-strip-rail{ grid-template-columns:repeat(2,1fr) !important; } }
+html[data-theme='light'] .progress-strip-node{
+  background:linear-gradient(135deg,#FFFDF4 0%,#EEE2C4 100%);
+  border:1px solid rgba(212,165,116,.55);
+}
+html[data-theme='light'] .progress-strip-node:hover{ border-color:#8B6F1F; box-shadow:0 6px 18px rgba(139,111,71,.18); }
+html[data-theme='light'] .progress-strip-node.current{ border-color:#8B6F1F; box-shadow:0 0 0 2px rgba(212,165,116,.35); }
+html[data-theme='light'] .progress-strip-fill{ background:linear-gradient(90deg,#F5D670,#C89B3C); }
+
+/* quick actions grid — even spacing */
+.quick-actions-grid{ gap:12px; }
+@media (max-width:640px){ .quick-actions-grid{ grid-template-columns:repeat(2,1fr) !important; gap:10px; } }
+html[data-theme='light'] .quick-action-card{
+  background:linear-gradient(135deg,#FFFDF4 0%,#EEE2C4 100%);
+  border:1px solid rgba(212,165,116,.55);
+}
+html[data-theme='light'] .quick-action-card:hover{ border-color:#8B6F1F; box-shadow:0 8px 22px rgba(139,111,71,.16); }
 </style>
 </head>
 <body>
