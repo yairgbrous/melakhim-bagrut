@@ -264,7 +264,7 @@
     const onTestAdvance     = v => setProgress(p => ({ ...p, test:     Math.max(p.test, Math.round(v)) }));
 
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col unit-page-polish">
         <StickyHeader n={unitN} setRoute={setRoute}/>
 
         <main className="max-w-5xl mx-auto w-full pb-24 px-3 md:px-5">
