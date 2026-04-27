@@ -134,8 +134,10 @@
 
   function Chip({ type, id, label, setRoute }){
     const EL = window.EntityLinkComponent;
-    if (!EL) return <span className="kt-chip">{label || id}</span>;
-    return <EL type={type} id={id} label={label} setRoute={setRoute}/>;
+    const resolved = (typeof window.resolveDisplayName === "function") ? window.resolveDisplayName(id) : null;
+    const finalLabel = label || resolved || id;
+    if (!EL) return <span className="kt-chip">{finalLabel}</span>;
+    return <EL type={type} id={id} label={finalLabel} setRoute={setRoute}/>;
   }
   function ChipList({ ids, type, setRoute }){
     if (!Array.isArray(ids) || !ids.length) return null;

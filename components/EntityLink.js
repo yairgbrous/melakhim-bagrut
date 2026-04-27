@@ -104,7 +104,8 @@
     const entry   = resolve(type, id);
     const isStub  = !!(entry && entry.__stub);
     const exists  = !!entry && !isStub;
-    const display = label || (entry && (entry.heading || entry.name_niqqud || entry.name || entry.title)) || id || "—";
+    const resolved = (typeof window !== "undefined" && typeof window.resolveDisplayName === "function") ? window.resolveDisplayName(id) : null;
+    const display = label || (entry && (entry.heading || entry.name_niqqud || entry.name || entry.title)) || resolved || id || "—";
     // Stubs are intentional non-entities (collective labels like "his servants")
     // — show plain tooltip, not "(אין דף עדיין)".
     const title   = exists ? (entry.summary || display) : (isStub ? display : "(אין דף עדיין)");
