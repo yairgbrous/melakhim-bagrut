@@ -138,6 +138,38 @@
     );
   }
 
+  // Up to 5 quotes whose context_event_id is one of the place's related_events.
+  function quotesForPlace(pl){
+    const events = (pl && Array.isArray(pl.related_events)) ? pl.related_events.map(e => typeof e==="string"?e:(e&&e.id)).filter(Boolean) : [];
+    if (!events.length) return [];
+    const pool = (window.QUOTES_DATA || []);
+    const eventSet = new Set(events);
+    return pool.filter(q => q && eventSet.has(q.context_event_id)).slice(0, 5);
+  }
+
+  function QuotesSection({ quotes, setRoute }){
+    if (!Array.isArray(quotes) || !quotes.length) return null;
+    return (
+      <Section title="💬 ציטוטים חשובים">
+        <div className="space-y-3">
+          {quotes.map((q,i)=>(
+            <blockquote key={q.id||i}
+              className="hebrew text-on-parchment border-r-4 border-amber-500/50 pr-4 py-2 leading-relaxed"
+              style={{background:"rgba(212,165,116,.08)", borderRadius:6, padding:"10px 14px"}}>
+              <div className="text-base">{q.text_niqqud || q.text || ""}</div>
+              <div className="flex flex-wrap items-center gap-2 mt-2 text-xs text-on-parchment-muted">
+                {q.speaker_id && <Chip type="character" id={q.speaker_id} setRoute={setRoute}/>}
+                {q.addressee_id && (<><span aria-hidden="true">→</span><Chip type="character" id={q.addressee_id} setRoute={setRoute}/></>)}
+                {q.context_event_id && <Chip type="event" id={q.context_event_id} setRoute={setRoute}/>}
+                {q.book_ref && <span className="ml-auto"><BookRefLink ref={q.book_ref}/></span>}
+              </div>
+            </blockquote>
+          ))}
+        </div>
+      </Section>
+    );
+  }
+
   function Section({ title, children, tone }){
     const cls = tone === "parchment" ? "parchment rounded-2xl p-5 md:p-6" : "card rounded-2xl p-4 md:p-5";
     return (
@@ -267,6 +299,7 @@
     const relatedBreadth = pl.related_breadth || pl.themes || [];
     const bookRefs = pl.book_refs || [];
     const mapNumbers = pl.map_numbers || [];
+    const quotes = useMemo(()=>quotesForPlace(pl), [pl.id]);
 
     const onPractice = () => {
       try { window.dispatchEvent(new CustomEvent("practice-entity", {detail:{type:"place", id:pl.id}})); } catch {}
@@ -285,6 +318,8 @@
                 <p className="hebrew text-amber-950 leading-relaxed whitespace-pre-line">{pl.significance}</p>
               </Section>
             )}
+
+            <QuotesSection quotes={quotes} setRoute={setRoute}/>
 
             <MiniMap mapNumbers={mapNumbers} name={name} setRoute={setRoute}/>
 

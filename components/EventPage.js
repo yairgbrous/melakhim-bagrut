@@ -82,6 +82,35 @@
     );
   }
 
+  // Pull up to 5 quotes from window.QUOTES_DATA whose context_event_id matches.
+  function quotesForEvent(eventId){
+    const pool = (window.QUOTES_DATA || []);
+    if (!eventId || !pool.length) return [];
+    return pool.filter(q => q && q.context_event_id === eventId).slice(0, 5);
+  }
+
+  function QuotesSection({ quotes, setRoute }){
+    if (!Array.isArray(quotes) || !quotes.length) return null;
+    return (
+      <Section title="💬 ציטוטים חשובים">
+        <div className="space-y-3">
+          {quotes.map((q,i)=>(
+            <blockquote key={q.id||i}
+              className="hebrew text-on-parchment border-r-4 border-amber-500/50 pr-4 py-2 leading-relaxed"
+              style={{background:"rgba(212,165,116,.08)", borderRadius:6, padding:"10px 14px"}}>
+              <div className="text-base">{q.text_niqqud || q.text || ""}</div>
+              <div className="flex flex-wrap items-center gap-2 mt-2 text-xs text-on-parchment-muted">
+                {q.speaker_id && <Chip type="character" id={q.speaker_id} setRoute={setRoute}/>}
+                {q.addressee_id && (<><span aria-hidden="true">→</span><Chip type="character" id={q.addressee_id} setRoute={setRoute}/></>)}
+                {q.book_ref && <span className="ml-auto"><BookRefLink ref={q.book_ref}/></span>}
+              </div>
+            </blockquote>
+          ))}
+        </div>
+      </Section>
+    );
+  }
+
   function Section({ title, children, tone }){
     const cls = tone === "parchment" ? "parchment rounded-2xl p-5 md:p-6" : "card rounded-2xl p-4 md:p-5";
     return (
@@ -170,6 +199,7 @@
     const relatedBreadth = ev.related_breadth || [];
     const relatedRecurring = ev.related_recurring_items || [];
     const bookRefs = ev.book_refs || [];
+    const quotes = useMemo(()=>quotesForEvent(ev.id), [ev.id]);
 
     const onPractice = () => {
       try { window.dispatchEvent(new CustomEvent("practice-entity", {detail:{type:"event", id:ev.id}})); } catch {}
@@ -194,6 +224,8 @@
                 <p className="hebrew text-on-parchment leading-relaxed">{ev.significance}</p>
               </Section>
             )}
+
+            <QuotesSection quotes={quotes} setRoute={setRoute}/>
 
             {(participants.length>0 || places.length>0 || relatedChars.length>0 || relatedRecurring.length>0) && (
               <Section title="🔗 קשרים">
