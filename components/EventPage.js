@@ -83,7 +83,7 @@
   }
 
   function Section({ title, children, tone }){
-    const cls = tone === "parchment" ? "parchment rounded-2xl p-5 md:p-6" : "card rounded-2xl p-4 md:p-5";
+    const cls = tone === "parchment" ? "parchment rounded-2xl p-5 md:p-6 event-section" : "card rounded-2xl p-4 md:p-5 event-section";
     return (
       <section className={cls}>
         {title && <h2 className="font-display text-base md:text-lg font-bold text-on-parchment-accent mb-3 hebrew">{title}</h2>}
@@ -116,7 +116,7 @@
 
   function Hero({ title, subtitle, breadthIds, setRoute }){
     return (
-      <header className="px-4 md:px-6 pt-5 pb-4">
+      <header className="px-4 md:px-6 pt-5 pb-4 event-hero">
         <div className="text-xs text-on-parchment-muted mb-1">⚔️ אירוע</div>
         <h1 className="font-display text-3xl md:text-5xl font-black text-on-parchment-accent hebrew leading-tight"
             style={{textShadow:"0 2px 8px rgba(200,155,60,.15)"}}>
