@@ -233,9 +233,37 @@
 
   function PracticeTab({ unitId, setRoute, onProgress }){
     const all = useMemo(() => reviewQuestionsForUnit(unitId), [unitId]);
+    const [diffFilter, setDiffFilter] = useState('all');
+    const [typeFilter, setTypeFilter] = useState('all');
     const [i, setI] = useState(0);
     const [revealed, setRevealed] = useState(false);
     const [seen, setSeen] = useState(new Set());
+
+    const TYPE_HEBREW = {
+      short_answer:      "תשובה קצרה",
+      mi_amar_lemi:      "מי אמר למי",
+      be_eize_hekhsher:  "באיזה הקשר",
+      al_mi_neemar:      "על מי נאמר",
+      character_details: "פרטי דמות",
+      place_events:      "אירועים במקום"
+    };
+    const typeLabel = (t) => {
+      if (!t) return "שאלה";
+      const rdn = (typeof window !== "undefined" && typeof window.resolveDisplayName === "function") ? window.resolveDisplayName : null;
+      if (TYPE_HEBREW[t]) return TYPE_HEBREW[t];
+      if (rdn) {
+        const r = rdn(t);
+        if (r && r !== t) return r;
+      }
+      return String(t).replace(/_/g, " ");
+    };
+
+    const filtered = useMemo(() => all.filter(q =>
+      (diffFilter === 'all' || q.difficulty === diffFilter) &&
+      (typeFilter === 'all' || q.type === typeFilter || q.question_type === typeFilter)
+    ), [all, diffFilter, typeFilter]);
+
+    useEffect(() => { setI(0); setRevealed(false); }, [diffFilter, typeFilter]);
 
     if (all.length === 0) {
       return (
@@ -245,12 +273,69 @@
       );
     }
 
-    const q = all[i];
+    const DiffPill = ({value, label}) => (
+      <button type="button"
+        onClick={()=>setDiffFilter(value)}
+        className={"text-xs px-3 py-1.5 rounded-full font-bold border transition " +
+          (diffFilter === value
+            ? "bg-amber-500 text-amber-950 border-amber-600"
+            : "card border-amber-700/30 text-on-parchment hover:scale-[1.02]")
+        }>
+        {label}
+      </button>
+    );
+    const TypePill = ({value, label}) => (
+      <button type="button"
+        onClick={()=>setTypeFilter(value)}
+        className={"text-xs px-3 py-1.5 rounded-full font-bold border transition " +
+          (typeFilter === value
+            ? "bg-amber-500 text-amber-950 border-amber-600"
+            : "card border-amber-700/30 text-on-parchment hover:scale-[1.02]")
+        }>
+        {label}
+      </button>
+    );
+
+    const filterRows = (
+      <div className="space-y-2">
+        <div className="flex flex-wrap gap-1.5 items-center">
+          <span className="text-xs font-bold text-on-parchment-muted ms-1">רמה:</span>
+          <DiffPill value="all"    label="כל הרמות"/>
+          <DiffPill value="קל"     label="קל"/>
+          <DiffPill value="בינוני" label="בינוני"/>
+          <DiffPill value="קשה"    label="קשה"/>
+        </div>
+        <div className="flex flex-wrap gap-1.5 items-center">
+          <span className="text-xs font-bold text-on-parchment-muted ms-1">סוג:</span>
+          <TypePill value="all"     label="כל הסוגים"/>
+          <TypePill value="בקיאות"  label="בקיאות"/>
+          <TypePill value="ידע"     label="ידע"/>
+          <TypePill value="רוחב"    label="רוחב"/>
+        </div>
+        <div className="text-xs text-on-parchment-muted">
+          מציג <span dir="ltr">{filtered.length}</span> שאלות מתוך <span dir="ltr">{all.length}</span>
+        </div>
+      </div>
+    );
+
+    if (filtered.length === 0) {
+      return (
+        <div className="space-y-3 unit-page-polish">
+          {filterRows}
+          <div className="card rounded-xl p-4 text-on-parchment-muted text-sm text-center">
+            אין שאלות לרמה/סוג זה.
+          </div>
+        </div>
+      );
+    }
+
+    const safeI = i % filtered.length;
+    const q = filtered[safeI];
     const goNext = () => {
       const nextSeen = new Set(seen); nextSeen.add(q.id);
       setSeen(nextSeen);
       setRevealed(false);
-      setI((i + 1) % all.length);
+      setI((safeI + 1) % filtered.length);
       const pct = Math.round((nextSeen.size / all.length) * 100);
       onProgress && onProgress(pct, { lastQuestionId: q.id, seen: Array.from(nextSeen) });
     };
@@ -261,13 +346,14 @@
 
     return (
       <div className="space-y-4 unit-page-polish">
+        {filterRows}
         <div className="flex items-center justify-between text-xs text-on-parchment-muted">
-          <span>שאלה <span dir="ltr">{i + 1}</span> מתוך <span dir="ltr">{all.length}</span></span>
+          <span>שאלה <span dir="ltr">{safeI + 1}</span> מתוך <span dir="ltr">{filtered.length}</span></span>
           <span>נצפו: <span dir="ltr">{seenCount}</span> ({pct}%)</span>
         </div>
         <section className="parchment rounded-2xl p-5">
           <div className="flex items-center justify-between gap-2 mb-2">
-            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-700 text-amber-100 font-bold">{q.type || "שאלה"}</span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-700 text-amber-100 font-bold">{typeLabel(q.type)}</span>
             <span className="text-xs text-amber-900 font-bold">{q.difficulty || ""}</span>
           </div>
           <p className="hebrew text-amber-950 leading-loose text-base">{q.prompt_niqqud || q.prompt}</p>
