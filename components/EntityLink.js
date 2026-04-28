@@ -105,7 +105,15 @@
     const isStub  = !!(entry && entry.__stub);
     const exists  = !!entry && !isStub;
     const resolved = (typeof window !== "undefined" && typeof window.resolveDisplayName === "function") ? window.resolveDisplayName(id) : null;
-    const display = label || (entry && (entry.heading || entry.name_niqqud || entry.name || entry.title)) || resolved || id || "—";
+    // Hard override: if the id is in window.__DIRECT_HEBREW_LABELS__ (curated
+    // Hebrew niqqud), it wins over entry.title/.name even when an entry
+    // exists. Lets breadth chips display niqqud version of titles that
+    // entities only carry as plain Hebrew.
+    const direct = (typeof window !== "undefined" && window.__DIRECT_HEBREW_LABELS__) || null;
+    const lower = id ? String(id).toLowerCase() : "";
+    const swap  = lower.indexOf("_") >= 0 ? lower.replace(/_/g, "-") : lower.replace(/-/g, "_");
+    const directHit = direct ? (direct[id] || direct[lower] || direct[swap] || null) : null;
+    const display = label || directHit || (entry && (entry.heading || entry.name_niqqud || entry.name || entry.title)) || resolved || id || "—";
     // Stubs are intentional non-entities (collective labels like "his servants")
     // — show plain tooltip, not "(אין דף עדיין)".
     const title   = exists ? (entry.summary || display) : (isStub ? display : "(אין דף עדיין)");
