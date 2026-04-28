@@ -1197,3 +1197,61 @@ window.PLACES_DATA = [
     recurring_items: [],
   },
 ];
+
+// =========================================================================
+// Field aliasing + mechanical cross-ref derivation. No prose generation.
+//
+// Aliases (mirror existing fields under spec-requested names):
+//   significance        → description_full
+//   related_events      → events_at_location
+//   related_breadth     → related_breadth_topics
+//
+// Derivation (intersect-only, never invents IDs):
+//   related_kings = related_characters ∩ KING_IDS
+//
+// KING_IDS mirrors data/kings.js (40 ids). The derivation only consumes
+// ids already on the place entry — never adds fabricated cross-references.
+// Visible to runtime AND scripts/audit-entity-links.js.
+// =========================================================================
+;(function(){
+  if (typeof window === "undefined") return;
+  var arr = window.PLACES_DATA;
+  if (!Array.isArray(arr)) return;
+
+  var KING_IDS = {
+    shlomo:1, rehavam:1, aviyam:1, asa:1, yehoshafat:1, yoram_yehuda:1,
+    achaziah_yehuda:1, atalya:1, yehoash_yehuda:1, amatzya:1, uziyahu:1,
+    yotam:1, achaz:1, chizkiyahu:1, menashe:1, amon:1, yoshiyahu:1,
+    yehoachaz_yehuda:1, yehoyakim:1, yehoyachin:1, tzidkiyahu:1,
+    yarovam:1, nadav:1, basha:1, ela:1, zimri:1, omri:1, achav:1,
+    achaziah_yisrael:1, yoram_yisrael:1, yehu:1, yehoachaz_yisrael:1,
+    yoash_yisrael:1, yarovam_beit:1, zacharia:1, shalum:1, menachem:1,
+    pekachya:1, pekach:1, hoshea:1
+  };
+
+  arr.forEach(function(p){
+    if (!p || typeof p !== "object") return;
+
+    // --- aliases ---
+    if (p.significance && p.description_full == null) p.description_full = p.significance;
+    if (Array.isArray(p.related_events) && p.events_at_location == null) {
+      p.events_at_location = p.related_events.slice();
+    }
+    if (Array.isArray(p.related_breadth) && p.related_breadth_topics == null) {
+      p.related_breadth_topics = p.related_breadth.slice();
+    }
+
+    // --- derivations (related_kings = related_characters ∩ kings) ---
+    if (Array.isArray(p.related_characters) && !Array.isArray(p.related_kings)) {
+      var seen = {};
+      var derived = [];
+      p.related_characters.forEach(function(c){
+        if (typeof c === "string" && KING_IDS[c] && !seen[c]) {
+          seen[c] = 1;
+          derived.push(c);
+        }
+      });
+      p.related_kings = derived;
+    }
+  });
+})();

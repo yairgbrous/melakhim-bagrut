@@ -757,3 +757,51 @@ window.QUOTES_DATA = [
       "הפסוק החותם את ספר מלכים — אויל מרודך משחרר את יהויכין. נקודת תקווה בחשכת הגלות; שושלת דוד לא נכחדה.",
   },
 ];
+
+// =========================================================================
+// Cross-ref derivation for quotes. No prose generation.
+//
+// Derivations (each consumes only fields already on the quote entry):
+//   related_kings  = {speaker_id, addressee_id} ∩ KING_IDS
+//   related_events = [context_event_id]                  (if present)
+//
+// speaker_id is the source-of-truth link from a quote to a character;
+// it remains untouched. KING_IDS mirrors data/kings.js. Visible to
+// runtime AND scripts/audit-entity-links.js.
+// =========================================================================
+;(function(){
+  if (typeof window === "undefined") return;
+  var arr = window.QUOTES_DATA;
+  if (!Array.isArray(arr)) return;
+
+  var KING_IDS = {
+    shlomo:1, rehavam:1, aviyam:1, asa:1, yehoshafat:1, yoram_yehuda:1,
+    achaziah_yehuda:1, atalya:1, yehoash_yehuda:1, amatzya:1, uziyahu:1,
+    yotam:1, achaz:1, chizkiyahu:1, menashe:1, amon:1, yoshiyahu:1,
+    yehoachaz_yehuda:1, yehoyakim:1, yehoyachin:1, tzidkiyahu:1,
+    yarovam:1, nadav:1, basha:1, ela:1, zimri:1, omri:1, achav:1,
+    achaziah_yisrael:1, yoram_yisrael:1, yehu:1, yehoachaz_yisrael:1,
+    yoash_yisrael:1, yarovam_beit:1, zacharia:1, shalum:1, menachem:1,
+    pekachya:1, pekach:1, hoshea:1
+  };
+
+  arr.forEach(function(q){
+    if (!q || typeof q !== "object") return;
+
+    if (!Array.isArray(q.related_kings)) {
+      var seen = {};
+      var kings = [];
+      [q.speaker_id, q.addressee_id].forEach(function(id){
+        if (typeof id === "string" && KING_IDS[id] && !seen[id]) {
+          seen[id] = 1;
+          kings.push(id);
+        }
+      });
+      q.related_kings = kings;
+    }
+
+    if (!Array.isArray(q.related_events) && typeof q.context_event_id === "string" && q.context_event_id) {
+      q.related_events = [q.context_event_id];
+    }
+  });
+})();

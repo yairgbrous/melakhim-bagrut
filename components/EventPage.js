@@ -14,6 +14,19 @@
     return s.trim().toLowerCase().replace(/[\s_]+/g, "-").replace(/[^֐-׿a-z0-9-]/g, "");
   }
 
+  function shareEntity(type, id, label){
+    const base = (window.location.origin || '') + window.location.pathname.replace(/[^/]*$/, '');
+    const url = base + '#/' + type + '/' + encodeURIComponent(id);
+    const text = (label || '') + ' · ספר מלכים · בגרות 2551';
+    const data = { title: label || 'ספר מלכים', text, url };
+    if (navigator.share){ navigator.share(data).catch(()=>{}); return; }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(() => {
+        if (typeof window.showToast === 'function') window.showToast('📋 הקישור הועתק ללוח', 'success');
+      }).catch(()=>{});
+    } else { window.prompt('העתק את הקישור:', url); }
+  }
+
   function resolveEvent(id){
     if (!id) return null;
     const pool = window.EVENTS_DATA || [];
@@ -65,8 +78,10 @@
 
   function Chip({ type, id, label, setRoute }){
     const EL = window.EntityLinkComponent;
-    if (!EL) return <span className="kt-chip">{label || id}</span>;
-    return <EL type={type} id={id} label={label} setRoute={setRoute}/>;
+    const resolved = (typeof window.resolveDisplayName === "function") ? window.resolveDisplayName(id) : null;
+    const finalLabel = label || resolved || id;
+    if (!EL) return <span className="kt-chip">{finalLabel}</span>;
+    return <EL type={type} id={id} label={finalLabel} setRoute={setRoute}/>;
   }
   function ChipList({ ids, type, setRoute }){
     if (!Array.isArray(ids) || !ids.length) return null;
@@ -82,8 +97,37 @@
     );
   }
 
+  // Pull up to 5 quotes from window.QUOTES_DATA whose context_event_id matches.
+  function quotesForEvent(eventId){
+    const pool = (window.QUOTES_DATA || []);
+    if (!eventId || !pool.length) return [];
+    return pool.filter(q => q && q.context_event_id === eventId).slice(0, 5);
+  }
+
+  function QuotesSection({ quotes, setRoute }){
+    if (!Array.isArray(quotes) || !quotes.length) return null;
+    return (
+      <Section title="💬 ציטוטים חשובים">
+        <div className="space-y-3">
+          {quotes.map((q,i)=>(
+            <blockquote key={q.id||i}
+              className="hebrew text-on-parchment border-r-4 border-amber-500/50 pr-4 py-2 leading-relaxed"
+              style={{background:"rgba(212,165,116,.08)", borderRadius:6, padding:"10px 14px"}}>
+              <div className="text-base">{q.text_niqqud || q.text || ""}</div>
+              <div className="flex flex-wrap items-center gap-2 mt-2 text-xs text-on-parchment-muted">
+                {q.speaker_id && <Chip type="character" id={q.speaker_id} setRoute={setRoute}/>}
+                {q.addressee_id && (<><span aria-hidden="true">→</span><Chip type="character" id={q.addressee_id} setRoute={setRoute}/></>)}
+                {q.book_ref && <span className="ml-auto"><BookRefLink ref={q.book_ref}/></span>}
+              </div>
+            </blockquote>
+          ))}
+        </div>
+      </Section>
+    );
+  }
+
   function Section({ title, children, tone }){
-    const cls = tone === "parchment" ? "parchment rounded-2xl p-5 md:p-6" : "card rounded-2xl p-4 md:p-5";
+    const cls = tone === "parchment" ? "parchment rounded-2xl p-5 md:p-6 event-section" : "card rounded-2xl p-4 md:p-5 event-section";
     return (
       <section className={cls}>
         {title && <h2 className="font-display text-base md:text-lg font-bold text-on-parchment-accent mb-3 hebrew">{title}</h2>}
@@ -116,7 +160,7 @@
 
   function Hero({ title, subtitle, breadthIds, setRoute }){
     return (
-      <header className="px-4 md:px-6 pt-5 pb-4">
+      <header className="px-4 md:px-6 pt-5 pb-4 event-hero">
         <div className="text-xs text-on-parchment-muted mb-1">⚔️ אירוע</div>
         <h1 className="font-display text-3xl md:text-5xl font-black text-on-parchment-accent hebrew leading-tight"
             style={{textShadow:"0 2px 8px rgba(200,155,60,.15)"}}>
@@ -170,6 +214,7 @@
     const relatedBreadth = ev.related_breadth || [];
     const relatedRecurring = ev.related_recurring_items || [];
     const bookRefs = ev.book_refs || [];
+    const quotes = useMemo(()=>quotesForEvent(ev.id), [ev.id]);
 
     const onPractice = () => {
       try { window.dispatchEvent(new CustomEvent("practice-entity", {detail:{type:"event", id:ev.id}})); } catch {}
@@ -182,6 +227,11 @@
         <main className="max-w-3xl mx-auto w-full pb-24">
           <Hero title={title} subtitle={subtitleBits.join(" · ")} breadthIds={relatedBreadth} setRoute={setRoute}/>
 
+          <div className="px-4 md:px-6 -mt-2 mb-2 flex justify-end">
+            <button onClick={()=>shareEntity('event', ev.id, title)} className="mb-share-btn" aria-label="שתף">
+              <span aria-hidden="true">🔗</span><span>שתף</span>
+            </button>
+          </div>
           <div className="px-4 md:px-6 space-y-4">
             {ev.summary && (
               <Section title="📖 תקציר" tone="parchment">
@@ -194,6 +244,8 @@
                 <p className="hebrew text-on-parchment leading-relaxed">{ev.significance}</p>
               </Section>
             )}
+
+            <QuotesSection quotes={quotes} setRoute={setRoute}/>
 
             {(participants.length>0 || places.length>0 || relatedChars.length>0 || relatedRecurring.length>0) && (
               <Section title="🔗 קשרים">
@@ -237,6 +289,12 @@
               ⚔️ תרגל על אירוע זה
             </button>
           </div>
+
+          {window.RelatedSectionComponent && (
+            <div className="px-4 md:px-6 mt-4">
+              <window.RelatedSectionComponent type="event" id={ev.id} setRoute={setRoute}/>
+            </div>
+          )}
         </main>
       </div>
     );

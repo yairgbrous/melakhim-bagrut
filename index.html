@@ -27,6 +27,7 @@
 <link rel="stylesheet" href="assets/contrast-hotfix.css?v=500">
 <link rel="stylesheet" href="assets/layout-fix.css?v=2300">
 <link rel="stylesheet" href="assets/readability-pass.css?v=1340">
+<link rel="stylesheet" href="assets/ui-polish-5500.css?v=5500">
 <script>
 /* =========================================================================
    localStorage write hook (feature-gated downstream).
@@ -94,6 +95,7 @@
     evalFile('./data/archaeology.js', ['archaeologyFinds']),
     evalFile('./data/hebrew-dates.js', []),
     evalFile('./data/_id-aliases.js?v=1400', []),
+    evalFile('./data/breadth.js?v=3100', []),
   ]);
   const [chars, stories, flashcards, keyConcepts, kingsMod, unitDeepMod] = await Promise.all([
     importModule('./data/characters.js'),
@@ -184,27 +186,40 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <!-- Cross-entity connectivity: load BEFORE pages so window.__ENTITY_INDEX__
      has all buckets + window.EntityLinkComponent is available at render. -->
-<script src="./data/_entity-index.js?v=2000"></script>
+<script src="./data/breadth-topics.js?v=3000"></script>
+<script src="./data/events.js?v=3000"></script>
+<script src="./data/places.js?v=3000"></script>
+<script src="./data/quotes.js?v=3000"></script>
+<script src="./data/unit-deep-summaries.js?v=3100"></script>
+<script src="./data/review-questions.js?v=3100"></script>
+<script src="./data/_entity-index.js?v=3000"></script>
 <script type="module" src="./data/past-exams.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=1400"></script>
-<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=2200"></script>
-<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=3000"></script>
-<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=3000"></script>
+<script src="./assets/name-resolver.js?v=5500"></script>
+<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=5500"></script>
+<script type="text/babel" data-presets="react" src="./components/RelatedSection.js?v=4000"></script>
+<script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=5500"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=2200"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=5503"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=4000"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=2000"></script>
 <script src="./components/KingsUtils.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=3100"></script>
-<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=3000"></script>
-<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=2000"></script>
-<script src="./components/BreadthPage.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=5500"></script>
+<script type="text/babel" data-presets="react" src="./components/InstantSearch.js?v=5500"></script>
+<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=4000"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=4000"></script>
+<script src="./components/BreadthPage.js?v=3000"></script>
+<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=5500"></script>
 <script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/Toast.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/Home.js?v=1400"></script>
-<script src="./data/review-questions.js?v=4000"></script>
-<script type="text/babel" data-presets="react" src="./components/Timeline.js?v=3100"></script>
-<script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=3100"></script>
+<script type="text/babel" data-presets="react" src="./components/XpBadge.js?v=5500"></script>
+<script type="text/babel" data-presets="react" src="./components/InstantSearch.js?v=5500"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=5500"></script>
+<script type="text/babel" data-presets="react" src="./components/Timeline.js?v=4000"></script>
+<script type="text/babel" data-presets="react" src="./components/PwaShell.js?v=4000"></script>
+<script type="text/babel" data-presets="react" src="./components/NotFound.js?v=4000"></script>
+<script type="text/babel" data-presets="react" src="./components/Leaderboard.js?v=5500"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -390,6 +405,38 @@ html[data-theme='light'] .hmb{color:#8B6F1F;background:rgba(139,111,71,.15)}
   .mini-stats .ms{ gap:0; padding:2px 4px; border-radius:8px; background:rgba(212,165,116,.10); }
   .rank-chip{ font-size:10px; padding:2px 6px; }
 }
+/* ---- ExamSim 2551 timer color states ---- */
+.exam-timer-normal{color:#F4D58D}
+.exam-timer-warn{color:#FBBF24;background:rgba(180,83,9,.18);padding:4px 10px;border-radius:8px}
+.exam-timer-crit{color:#FCA5A5;background:rgba(127,29,29,.35);padding:4px 10px;border-radius:8px;animation:examTimerPulse 1s ease-in-out infinite}
+@keyframes examTimerPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(1.05)}}
+
+/* ---- Mobile ExamSim: fullscreen + sticky timer + sticky nav tabs ---- */
+@media (max-width:640px){
+  .exam-run-wrap{position:fixed;inset:0;z-index:45;padding:10px 10px calc(72px + env(safe-area-inset-bottom));margin:0;max-width:none;background:linear-gradient(180deg,#0A1628 0%,#0F1F3A 100%);overflow-y:auto;-webkit-overflow-scrolling:touch}
+  html[data-theme='light'] .exam-run-wrap{background:linear-gradient(180deg,#F7F1E1 0%,#EEE2C4 100%)}
+  .exam-run-wrap > *{max-width:680px;margin-inline:auto}
+  .exam-run-timer{top:0!important;position:sticky}
+  .exam-run-tabs{position:sticky;bottom:0;z-index:30;background:rgba(10,22,40,.95);backdrop-filter:blur(10px);margin:0 -10px;padding:8px;border-radius:0;border-top:1px solid rgba(212,165,116,.35)}
+  html[data-theme='light'] .exam-run-tabs{background:rgba(247,241,225,.95)}
+}
+
+/* ---- PWA offline banner + install prompt ---- */
+.pwa-offline-banner{position:fixed;top:0;inset-inline:0;z-index:55;padding:10px 14px;background:linear-gradient(135deg,#A83240,#6B1F2B);color:#FDEEEE;font-size:13px;font-weight:800;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.4);transform:translateY(-100%);transition:transform .25s ease}
+.pwa-offline-banner.visible{transform:translateY(0)}
+.pwa-install-card{position:fixed;inset-inline:16px;bottom:calc(80px + env(safe-area-inset-bottom));z-index:44;max-width:480px;margin-inline:auto;padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,#F7F1E1 0%,#EEE2C4 100%);color:#1A1611;border:2px solid #D4A574;box-shadow:0 12px 40px rgba(0,0,0,.55);display:flex;align-items:center;gap:12px;animation:fadeUp .3s ease}
+.pwa-install-card .pwa-icon{font-size:32px;flex-shrink:0}
+.pwa-install-card .pwa-body{flex:1;min-width:0}
+.pwa-install-card .pwa-title{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:15px;line-height:1.2}
+.pwa-install-card .pwa-sub{font-size:12px;color:#4A3829;margin-top:2px;line-height:1.3}
+.pwa-install-card .pwa-btns{display:flex;gap:6px;flex-shrink:0}
+.pwa-install-card .pwa-btn{padding:8px 14px;border-radius:10px;font-size:13px;font-weight:800;border:none;cursor:pointer;background:linear-gradient(135deg,#D4A574,#8B6F47);color:#1A1611}
+.pwa-install-card .pwa-btn-ghost{background:transparent;border:1px solid rgba(139,111,31,.5);color:#8B6F1F}
+
+/* ---- Share button on entity pages ---- */
+.mb-share-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:12px;background:rgba(212,165,116,.15);border:1px solid rgba(212,165,116,.45);color:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s}
+.mb-share-btn:hover{background:rgba(212,165,116,.3);transform:translateY(-1px)}
+
 /* Service worker update toast already uses .toast */
 
 /* ---- Entity chips + drawer (integrate-clickables) ---- */
@@ -2242,8 +2289,19 @@ function StudyHub({setRoute}){
 
 // ============ ME TAB — leaderboard FIRST, then achievements, then profile ============
 function MeTab({S, update, setRoute}){
+  const onShare = () => {
+    if (typeof window !== 'undefined' && window.MelakhimAuth && window.MelakhimAuth.shareApp){
+      window.MelakhimAuth.shareApp();
+    }
+  };
   return (
     <div className="space-y-6">
+      <section className="card rounded-xl p-4 flex items-center justify-between gap-3 flex-wrap">
+        <div className="text-on-parchment text-sm font-bold">הזמן חברים מהשכבה ללמוד יחד</div>
+        <button onClick={onShare} className="gold-btn px-4 py-2 rounded-lg font-bold" aria-label="שתף עם השכבה">
+          📤 שתף עם השכבה
+        </button>
+      </section>
       <section className="space-y-3">
         <h2 className="font-display text-xl md:text-2xl font-bold text-amber-300 flex items-center gap-2">
           <span aria-hidden="true">🏆</span><span>דירוג הכיתה</span>
@@ -2432,20 +2490,28 @@ function App(){
 
   // Hash router — deep-link any page via #/path/:id. Bidirectional sync:
   // URL hash change → setRoute; setRoute → window.location.hash.
+  //
+  // Every user-driven route change pushes a new history entry so the
+  // browser's back/forward buttons (and history.back() calls) walk the
+  // user's path through the app. Only the initial-load hash write uses
+  // replaceState so we don't seed an extra entry on boot.
   useEffect(() => {
     const PAGE_FROM_SLUG = {
       home: 'home', learn: 'study', study: 'study',
-      timeline: 'timeline', themes: 'themes', maps: 'maps',
+      timeline: 'timeline', 'kings-table': 'timeline',
+      themes: 'themes', maps: 'maps',
       quiz: 'quiz', 'exam-sim': 'exam', exam: 'exam',
       flashcards: 'flashcards', quotes: 'quotes', profile: 'profile', class: 'class',
-      daily: 'daily'
+      daily: 'daily', book: 'book',
+      leaderboard: 'leaderboard'
     };
     const SLUG_FROM_PAGE = {
       home: 'home', study: 'learn', timeline: 'timeline', themes: 'themes',
       maps: 'maps', quiz: 'quiz', exam: 'exam-sim', flashcards: 'flashcards',
       quotes: 'quotes', profile: 'profile', class: 'class',
       character: 'character', event: 'event', place: 'place', unit: 'unit', lesson: 'lesson',
-      daily: 'daily'
+      king: 'king', breadth: 'breadth', map: 'map', book: 'book',
+      daily: 'daily', leaderboard: 'leaderboard'
     };
     const parseHash = () => {
       const raw = (window.location.hash || '').replace(/^#\/?/, '').trim();
@@ -2455,8 +2521,13 @@ function App(){
       const slug = parts[0];
       const id = parts[1] ? decodeURIComponent(parts[1]) : null;
       if (slug === 'character' && id) return {page:'character', id};
+      // Kings render through CharacterPage — keep `page:'king'` so the
+      // URL round-trips, and have the render branch pick CharacterPage.
+      if (slug === 'king' && id)      return {page:'king', id};
       if (slug === 'event' && id)     return {page:'event', id};
       if (slug === 'place' && id)     return {page:'place', id};
+      if (slug === 'breadth' && id)   return {page:'breadth', id};
+      if (slug === 'map' && id)       return {page:'map', id};
       if (slug === 'unit' && id)      return {page:'unit', unitId: isNaN(+id) ? id : +id};
       if (slug === 'lesson' && id)    return {page:'lesson', unitId: isNaN(+id) ? id : +id, mode: parts[2] || 'summary'};
       // #/quiz/unit/:N  →  unit-filtered practice (20 questions from review-questions.js)
@@ -2464,18 +2535,26 @@ function App(){
         const u = parts[2];
         return {page:'quizUnit', unit: isNaN(+u) ? u : +u};
       }
+      // /#/book/:chapter — :chapter is "1" or "2:12" (book:chapter) or free-form.
+      if (slug === 'book' && id)      return {page:'book', chapter: id};
       const page = PAGE_FROM_SLUG[slug];
-      return page ? {page} : null;
+      if (page) return {page};
+      // Unrecognised hash → render 404 page instead of silently falling back.
+      return {page:'notFound', attempted: raw};
     };
     const buildHash = (r) => {
       if (!r || !r.page) return '';
       const slug = SLUG_FROM_PAGE[r.page] || r.page;
       if (r.page === 'character' && r.id) return '#/character/' + encodeURIComponent(r.id);
+      if (r.page === 'king'      && r.id) return '#/king/'      + encodeURIComponent(r.id);
       if (r.page === 'event' && r.id)     return '#/event/' + encodeURIComponent(r.id);
       if (r.page === 'place' && r.id)     return '#/place/' + encodeURIComponent(r.id);
+      if (r.page === 'breadth' && r.id)   return '#/breadth/' + encodeURIComponent(r.id);
+      if (r.page === 'map' && r.id)       return '#/map/' + encodeURIComponent(r.id);
       if (r.page === 'unit' && r.unitId != null)   return '#/unit/' + encodeURIComponent(r.unitId);
       if (r.page === 'lesson' && r.unitId != null) return '#/lesson/' + encodeURIComponent(r.unitId) + '/' + encodeURIComponent(r.mode || 'summary');
       if (r.page === 'quizUnit' && r.unit != null) return '#/quiz/unit/' + encodeURIComponent(r.unit);
+      if (r.page === 'book' && r.chapter != null)  return '#/book/' + encodeURIComponent(r.chapter);
       return '#/' + slug;
     };
 
@@ -2487,7 +2566,7 @@ function App(){
       const next = parseHash();
       if (!next) return;
       setRoute(prev => {
-        if (prev && prev.page === next.page && prev.id === next.id && prev.unitId === next.unitId && prev.unit === next.unit) return prev;
+        if (prev && prev.page === next.page && prev.id === next.id && prev.unitId === next.unitId && prev.unit === next.unit && prev.chapter === next.chapter) return prev;
         return next;
       });
     };
@@ -2499,18 +2578,25 @@ function App(){
     };
   }, []);
 
-  // Keep URL hash in sync with current route (without triggering hashchange loop).
+  // Keep URL hash in sync with current route. We PUSH history entries
+  // for user-driven changes so history.back() walks the user's path,
+  // but REPLACE the very first entry so we don't seed an extra slot
+  // on boot.
+  const __routeInitRef = useRef(true);
   useEffect(() => {
     if (typeof window.__buildHash__ !== 'function') return;
     const want = window.__buildHash__(route);
     if (!want) return;
     const cur = window.location.hash || '';
-    if (cur === want) return;
+    if (cur === want) { __routeInitRef.current = false; return; }
+    const url = window.location.pathname + window.location.search + want;
     try {
-      history.replaceState(null, '', window.location.pathname + window.location.search + want);
+      if (__routeInitRef.current) history.replaceState(null, '', url);
+      else                        history.pushState(null, '', url);
     } catch (e) {
       window.location.hash = want;
     }
+    __routeInitRef.current = false;
   }, [route]);
 
   const update = u => setS(p => typeof u === 'function' ? u(p) : {...p, ...u});
@@ -2547,7 +2633,7 @@ function App(){
   const bottomNavs = [
     {p:"home",l:"בית",i:"🏠"},
     {p:"quiz",l:"אזור בחינה",i:"✍️"},
-    {p:"study",l:"למידה",i:"📚"},
+    {p:"leaderboard",l:"מובילים",i:"🏆"},
     {p:"profile",l:"אישי",i:"👤"}
   ];
   const go = p => { setRoute({page:p}); setDrawerOpen(false); };
@@ -2588,32 +2674,68 @@ function App(){
       </header>
 
       {drawerOpen && (()=>{
-        const primaryNavs = [
-          {p:"home",     l:"ראשי",        i:"🏠"},
-          {p:"study",    l:"מרכז למידה",   i:"📚"},
-          {p:"timeline", l:"ציר מלכים",    i:"📜"},
-          {p:"maps",     l:"מפות",        i:"🗺️"},
-          {p:"exam-sim", l:"אזור בחינה",   i:"✍️"}
-        ];
+        const unitNavs = (typeof MELAKHIM_DATA !== 'undefined' && MELAKHIM_DATA.units)
+          ? MELAKHIM_DATA.units.map(u => ({ id:u.id, num:u.num, title:u.title, icon:u.icon || '📖' }))
+          : [];
+        const goUnit = (unitId) => { setRoute({page:'unit', unitId}); setDrawerOpen(false); };
+        const openSearch = () => {
+          setDrawerOpen(false);
+          if (typeof window !== 'undefined' && typeof window.openInstantSearch === 'function') window.openInstantSearch();
+        };
         return (
         <>
           <div className="drawer-overlay" onClick={()=>setDrawerOpen(false)} aria-hidden="true"/>
-          <aside className="drawer" role="dialog" aria-label="תפריט ניווט">
+          <aside className="drawer drawer-wide" role="dialog" aria-label="תפריט ניווט">
             <div className="flex items-center justify-between mb-4">
               <div className="font-display text-lg font-bold text-amber-300">📖 תפריט</div>
               <button onClick={()=>setDrawerOpen(false)} className="hmb" aria-label="סגור תפריט">✕</button>
             </div>
             <div className="space-y-1">
-              {primaryNavs.map(n => (
-                <button key={n.p} onClick={()=>go(n.p)} className={`drawer-link ${route.page===n.p?"active":""}`}>
-                  <span className="dico">{n.i}</span><span>{n.l}</span>
-                </button>
-              ))}
+              <button onClick={()=>go("home")} className={`drawer-link ${route.page==="home"?"active":""}`}>
+                <span className="dico">🏠</span><span>ראשי</span>
+              </button>
+
+              {unitNavs.length > 0 && (
+                <>
+                  <div className="text-[11px] font-bold text-amber-200/80 px-3 mt-2 mb-1">📚 יחידות</div>
+                  {unitNavs.map(u => (
+                    <button key={'u'+u.id} onClick={()=>goUnit(u.id)}
+                      className={`drawer-link ${route.page==="unit" && route.unitId===u.id?"active":""}`}>
+                      <span className="dico">{u.icon}</span>
+                      <span>יחידה {u.num} · {u.title}</span>
+                    </button>
+                  ))}
+                </>
+              )}
+
+              <div className="text-[11px] font-bold text-amber-200/80 px-3 mt-2 mb-1">🧭 ניווט</div>
+              <button onClick={()=>go("timeline")} className={`drawer-link ${route.page==="timeline"?"active":""}`}>
+                <span className="dico">👑</span><span>טבלת מלכים</span>
+              </button>
+              <button onClick={openSearch} className="drawer-link">
+                <span className="dico">👥</span><span>דמויות (חיפוש)</span>
+              </button>
+              <button onClick={()=>go("maps")} className={`drawer-link ${route.page==="maps"?"active":""}`}>
+                <span className="dico">🗺️</span><span>מפות</span>
+              </button>
+              <button onClick={()=>go("themes")} className={`drawer-link ${route.page==="themes"?"active":""}`}>
+                <span className="dico">🌐</span><span>נושאי רוחב</span>
+              </button>
+              <button onClick={()=>go("timeline")} className={`drawer-link ${route.page==="timeline"?"active":""}`}>
+                <span className="dico">📜</span><span>ציר זמן</span>
+              </button>
+              <button onClick={()=>go("exam-sim")} className={`drawer-link ${route.page==="exam-sim"?"active":""}`}>
+                <span className="dico">✍️</span><span>בחינה</span>
+              </button>
+              <button onClick={()=>go("flashcards")} className={`drawer-link ${route.page==="flashcards"?"active":""}`}>
+                <span className="dico">🃏</span><span>קלפים</span>
+              </button>
+              <button onClick={()=>go("profile")} className={`drawer-link ${route.page==="profile"?"active":""}`}>
+                <span className="dico">👤</span><span>פרופיל</span>
+              </button>
+
               <div className="divider my-2"/>
               <div className="text-[11px] font-bold text-amber-200/80 px-3 mb-1">⚙ הגדרות</div>
-              <button onClick={()=>go("profile")} className={`drawer-link ${route.page==="profile"?"active":""}`}>
-                <span className="dico">👤</span><span>הפרופיל שלי</span>
-              </button>
               <button onClick={toggleSound} className="drawer-link" aria-pressed={soundOn}>
                 <span className="dico">{soundOn?"🔊":"🔇"}</span><span>צלילים: {soundOn?"מופעל":"כבוי"}</span>
               </button>
@@ -2640,7 +2762,7 @@ function App(){
           const n = typeof route.unitId === "number" ? route.unitId : parseInt(route.unitId, 10);
           const UP = window.UnitPageComponent;
           if (UP && Number.isFinite(n) && n>=1 && n<=6) {
-            return <UP n={n} setRoute={setRoute}/>;
+            return <UP n={n} unitId={route.unitId} S={S} setRoute={setRoute} awardXP={awardXP} update={update}/>;
           }
           return <UnitDetail unitId={route.unitId} S={S} setRoute={setRoute} awardXP={awardXP} update={update}/>;
         })()}
@@ -2655,8 +2777,16 @@ function App(){
         {route.page==="quizPlay" && <QuizRun params={route} S={S} setRoute={setRoute} awardXP={awardXP} update={update} publishActivity={publishActivity} soundOn={soundOn}/>}
         {route.page==="quizResult" && <QuizResult {...route} S={S} setRoute={setRoute}/>}
         {route.page==="themes" && (window.BreadthPage ? React.createElement(window.BreadthPage, {setRoute}) : <Themes S={S} update={update}/>)}
+        {route.page==="breadth" && (window.BreadthPage ? React.createElement(window.BreadthPage, {setRoute, focusBreadthId: route.id}) : <Themes S={S} update={update}/>)}
+        {route.page==="king" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף מלך...</div>; })()}
+        {route.page==="map" && <MapsPage S={S} update={update} awardXP={awardXP} focusMapId={route.id} setRoute={setRoute}/>}
+        {route.page==="book" && <BookChapterPage chapter={route.chapter} setRoute={setRoute}/>}
         {route.page==="quotes" && <QuotesBrowser S={S} update={update} awardXP={awardXP}/>}
-        {route.page==="timeline" && <Timeline/>}
+        {route.page==="timeline" && (window.KingsTableComponent
+          ? React.createElement(window.KingsTableComponent, {setRoute})
+          : (window.TimelineComponent
+              ? React.createElement(window.TimelineComponent, {setRoute})
+              : <Timeline/>))}
         {route.page==="chronology" && (window.TimelineComponent
           ? React.createElement(window.TimelineComponent, {setRoute})
           : <div className="text-amber-300 text-center py-8">טוען ציר כרונולוגי...</div>)}
@@ -2666,6 +2796,14 @@ function App(){
         {route.page==="profile" && <MeTab S={S} update={update} setRoute={setRoute}/>}
         {route.page==="study" && <StudyHub setRoute={setRoute}/>}
         {route.page==="character" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף דמות...</div>; })()}
+        {route.page==="leaderboard" && (()=>{ const LB = window.LeaderboardComponent; return LB ? <LB setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען טבלת מובילים...</div>; })()}
+        {(() => {
+          const known = new Set(["home","path","unit","lesson","quiz","quizUnit","flashcards","exam-sim","event","place","daily","quizPlay","quizResult","themes","quotes","timeline","maps","exam","class","profile","study","character"]);
+          if (known.has(route.page)) return null;
+          const NF = window.NotFoundComponent;
+          const attempted = route.attempted || (typeof window !== 'undefined' ? (window.location.hash || '') : '');
+          return NF ? <NF setRoute={setRoute} attemptedRoute={attempted}/> : <div className="text-amber-200 text-center py-8">הדף לא נמצא</div>;
+        })()}
         </>;
           return RouteEB
             ? React.createElement(RouteEB, { onHome: onHomeReset, key: route.page }, routeContent)
@@ -2673,6 +2811,7 @@ function App(){
         })()}
       </main>
       {typeof window!=="undefined" && window.InstantSearchComponent ? <window.InstantSearchComponent setRoute={setRoute}/> : null}
+      {typeof window!=="undefined" && window.PwaShellComponent ? <window.PwaShellComponent/> : null}
 
       {!isTeacher && (
         <nav className="bottom-nav" role="navigation" aria-label="ניווט תחתון">
@@ -3758,6 +3897,63 @@ function Timeline(){
     : <div className="text-amber-300">טוען טבלת מלכים...</div>;
 }
 
+// ============ BOOK CHAPTER ============
+// /#/book/:chapter — lists every event and quote whose book_ref string
+// contains :chapter (so "12", "1:12", "מל״א יב" all match their related
+// material). Purely derived from EVENTS_DATA + QUOTES_DATA; no new data
+// file required.
+function BookChapterPage({chapter, setRoute}){
+  const ch = String(chapter || '').trim();
+  const events = (window.EVENTS_DATA || []).filter(e => {
+    const refs = [].concat(e.book_refs || [], e.chapter_ref || []);
+    return ch && refs.some(r => typeof r === 'string' && r.indexOf(ch) >= 0);
+  });
+  const quotes = (window.QUOTES_DATA || []).filter(q => {
+    const ref = q.book_ref || '';
+    return ch && ref.indexOf(ch) >= 0;
+  });
+  const EL = window.EntityLinkComponent;
+  return (
+    <div className="max-w-2xl mx-auto space-y-4 p-2">
+      <button onClick={()=>setRoute({page:'timeline'})} className="text-on-parchment-accent text-sm">→ חזרה לציר המלכים</button>
+      <header className="card rounded-2xl p-5">
+        <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">
+          📖 ספר מלכים — פרק {ch}
+        </h1>
+        <p className="text-on-parchment-muted text-sm mt-1">
+          {events.length} אירועים · {quotes.length} ציטוטים
+        </p>
+      </header>
+      {events.length > 0 && (
+        <section className="card rounded-xl p-4">
+          <h2 className="font-display text-base font-bold text-on-parchment mb-2">אירועים בפרק</h2>
+          <div className="flex flex-wrap gap-0">
+            {EL ? events.map(e => <EL key={e.id} type="event" id={e.id} setRoute={setRoute}/>) : events.map(e => <span key={e.id}>{e.title || e.id}</span>)}
+          </div>
+        </section>
+      )}
+      {quotes.length > 0 && (
+        <section className="card rounded-xl p-4">
+          <h2 className="font-display text-base font-bold text-on-parchment mb-2">ציטוטים בפרק</h2>
+          <ul className="space-y-2 text-sm">
+            {quotes.map(q => (
+              <li key={q.id} className="hebrew text-on-parchment border-e-4 border-amber-500/50 pe-3 py-1">
+                „{q.text_niqqud || q.text}"
+                <div className="text-xs text-on-parchment-muted mt-1">— {q.book_ref}</div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {events.length === 0 && quotes.length === 0 && (
+        <div className="card rounded-xl p-4 text-on-parchment-muted text-sm">
+          לא נמצא חומר עם הפניה ל־<code>{ch}</code>.
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ============ MAPS ============
 function MapsPage(props){
   const MapsImpl = typeof window !== 'undefined' ? window.MapsPageComponent : null;
@@ -4328,7 +4524,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   // it's installed so users don't need to hard-reload between deploys.
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./sw.js?v=1340').then(function(reg){
+      navigator.serviceWorker.register('./sw.js?v=3100').then(function(reg){
         if (!reg) return;
         reg.addEventListener('updatefound', function(){
           var sw = reg.installing;

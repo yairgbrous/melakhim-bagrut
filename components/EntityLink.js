@@ -36,13 +36,15 @@
   };
 
   function routeFor(type, id){
-    if (type === "character" || type === "king")  return { page: "character", id };
+    if (type === "king")                           return { page: "king",      id };
+    if (type === "character")                      return { page: "character", id };
     if (type === "place")                          return { page: "place",     id };
     if (type === "event")                          return { page: "event",     id };
-    if (type === "breadth")                        return { page: "themes",    hash: id };
+    if (type === "breadth")                        return { page: "breadth",   id };
     if (type === "recurringItem" || type === "recurring") {
       return { page: "themes", hash: "recurring-" + id };
     }
+    if (type === "quote")                          return { page: "event",     id: id }; // quotes open via event context when available
     return null;
   }
 
@@ -102,7 +104,8 @@
     const entry   = resolve(type, id);
     const isStub  = !!(entry && entry.__stub);
     const exists  = !!entry && !isStub;
-    const display = label || (entry && (entry.heading || entry.name_niqqud || entry.name || entry.title)) || id || "—";
+    const resolved = (typeof window !== "undefined" && typeof window.resolveDisplayName === "function") ? window.resolveDisplayName(id) : null;
+    const display = label || (entry && (entry.heading || entry.name_niqqud || entry.name || entry.title)) || resolved || id || "—";
     // Stubs are intentional non-entities (collective labels like "his servants")
     // — show plain tooltip, not "(אין דף עדיין)".
     const title   = exists ? (entry.summary || display) : (isStub ? display : "(אין דף עדיין)");

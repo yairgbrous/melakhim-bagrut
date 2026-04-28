@@ -1,20 +1,21 @@
 /* =========================================================================
    sw.js — offline-first service worker for ספר מלכים · בגרות 2551.
-   Strategy:
-     - Precache index.html + manifest + all components/*.js + all data/*.js
-       + all assets/*.css at install time.
-     - Navigation requests: network first, fall back to cached index.html so
-       the PWA opens offline.
-     - Other requests: stale-while-revalidate — serve cache immediately,
-       refresh in background. Falls back to cache on network error.
-     - Cross-origin (Tailwind / React / Firebase / Google Fonts) CDN: runtime
-       cache-first, so the app still boots offline after one online visit.
 
-   Bump CACHE_VERSION on every release so old caches are cleaned.
+   Strategies:
+     - Navigation: network-first → cached index.html fallback (SPA shell).
+     - JS (components/, data/):  network-first with cache fallback (always
+       gets freshest code on good connections, stays usable offline).
+     - CSS, fonts (woff/woff2/ttf), images: cache-first with background
+       refresh (fast + offline-resilient).
+     - Cross-origin CDN (Tailwind, React, Babel, Google Fonts): cache-first.
+     - Firebase auth/RTDB: pass-through (never cached).
+
+   Offline state is signalled to the app via postMessage so it can render a
+   banner. Bump CACHE_VERSION on every release so old caches drop.
    ========================================================================= */
-const CACHE_VERSION = 'melakhim-v1340';
-const RUNTIME_CACHE = 'melakhim-runtime-v1340';
-const CDN_CACHE     = 'melakhim-cdn-v1';
+const CACHE_VERSION = 'melakhim-v3100';
+const RUNTIME_CACHE = 'melakhim-runtime-v3100';
+const CDN_CACHE     = 'melakhim-cdn-v3100';
 
 const PRECACHE_URLS = [
   './',
@@ -22,10 +23,11 @@ const PRECACHE_URLS = [
   './manifest.json',
   './share.html',
 
-  // assets
+  // assets (CSS — cache-first)
   './assets/quote-cards.css',
   './assets/contrast-hotfix.css',
   './assets/layout-fix.css',
+  './assets/readability-pass.css',
 
   // components (cache-busted via ?v= in index.html; SW caches bare URLs too)
   './components/QuizEngine.js',
@@ -44,17 +46,29 @@ const PRECACHE_URLS = [
   './components/ThemeToggle.js',
   './components/ErrorBoundary.js',
   './components/Toast.js',
+  './components/DailyChallenge.js',
+  './components/XpBadge.js',
+  './components/InstantSearch.js',
+  './components/NotFound.js',
+  './components/PwaShell.js',
 
-  // data
+  // data (JS constants)
   './data/_entity-index.js',
+  './data/_id-aliases.js',
+  './data/archaeology.js',
   './data/characters.js',
+  './data/events.js',
   './data/flashcards.js',
+  './data/hebrew-dates.js',
   './data/key-concepts.js',
   './data/kings.js',
+  './data/motifs.js',
   './data/past-exams.js',
   './data/places.js',
+  './data/quotes.js',
+  './data/recurring-items.js',
   './data/review-questions.js',
-  './data/quotes.js'
+  './data/unit-deep-summaries.js'
 ];
 
 // Precache: tolerate individual 404s (file may not exist on older deploys).
@@ -82,6 +96,32 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+function broadcastOffline(isOffline){
+  self.clients.matchAll({ type:'window' }).then((clients) => {
+    clients.forEach((c) => c.postMessage({ type: isOffline ? 'offline' : 'online' }));
+  });
+}
+
+function isFontRequest(url){
+  if (/\.woff2?($|\?)/i.test(url.pathname)) return true;
+  if (/\.ttf($|\?)/i.test(url.pathname))    return true;
+  if (url.hostname === 'fonts.gstatic.com') return true;
+  if (url.hostname === 'fonts.googleapis.com') return true;
+  return false;
+}
+
+function isCssRequest(url){
+  return /\.css($|\?)/i.test(url.pathname);
+}
+
+function isJsRequest(url){
+  return /\.(js|mjs)($|\?)/i.test(url.pathname);
+}
+
+function isImageRequest(url){
+  return /\.(png|jpe?g|gif|svg|webp|avif|ico)($|\?)/i.test(url.pathname);
+}
+
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
@@ -89,22 +129,88 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   const isSameOrigin = url.origin === self.location.origin;
 
-  // Navigation: network first → cached index.html fallback so the SPA boots offline.
+  // Pass-through for Firebase auth / RTDB (never cache user data).
+  const isFirebaseData =
+    url.hostname.endsWith('firebaseio.com') ||
+    url.hostname.endsWith('firebasedatabase.app') ||
+    url.hostname.endsWith('googleapis.com') ||
+    url.hostname.endsWith('identitytoolkit.googleapis.com');
+  if (isFirebaseData) return;
+
+  // Navigation: network-first, fall back to cached index.html.
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
         .then((response) => {
           const copy = response.clone();
           caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, copy));
+          broadcastOffline(false);
           return response;
         })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match('./index.html')))
+        .catch(() => {
+          broadcastOffline(true);
+          return caches.match(request).then((cached) => cached || caches.match('./index.html'));
+        })
+    );
+    return;
+  }
+
+  // Fonts: cache-first with background refresh (cross-origin allowed).
+  if (isFontRequest(url)) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        const fetchAndStore = fetch(request).then((response) => {
+          if (response && (response.status === 200 || response.type === 'opaque')) {
+            const copy = response.clone();
+            caches.open(CDN_CACHE).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        }).catch(() => cached);
+        return cached || fetchAndStore;
+      })
     );
     return;
   }
 
   if (isSameOrigin) {
-    // Same-origin static assets: stale-while-revalidate.
+    // CSS: cache-first.
+    if (isCssRequest(url)) {
+      event.respondWith(
+        caches.match(request).then((cached) => {
+          const fetchAndStore = fetch(request).then((response) => {
+            if (response && response.status === 200) {
+              const copy = response.clone();
+              caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, copy));
+            }
+            return response;
+          }).catch(() => cached);
+          return cached || fetchAndStore;
+        })
+      );
+      return;
+    }
+
+    // JS: network-first (prefer freshest code), cache fallback.
+    if (isJsRequest(url)) {
+      event.respondWith(
+        fetch(request)
+          .then((response) => {
+            if (response && response.status === 200) {
+              const copy = response.clone();
+              caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, copy));
+            }
+            broadcastOffline(false);
+            return response;
+          })
+          .catch(() => {
+            broadcastOffline(true);
+            return caches.match(request);
+          })
+      );
+      return;
+    }
+
+    // Images + everything else same-origin: stale-while-revalidate.
     event.respondWith(
       caches.match(request).then((cached) => {
         const fetchAndUpdate = fetch(request)
@@ -122,17 +228,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cross-origin (CDN: Tailwind, React, Babel, Firebase, Google Fonts):
-  // cache-first so the app boots offline after first online visit. Never cache
-  // Firebase auth / RTDB data requests (these are dynamic and user-scoped).
-  const isFirebaseData =
-    url.hostname.endsWith('firebaseio.com') ||
-    url.hostname.endsWith('firebasedatabase.app') ||
-    url.hostname.endsWith('googleapis.com') ||
-    url.hostname.endsWith('identitytoolkit.googleapis.com');
-
-  if (isFirebaseData) return; // let the browser handle it directly
-
+  // Cross-origin (CDN): cache-first.
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached;

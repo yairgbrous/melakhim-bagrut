@@ -1,388 +1,514 @@
 /* =========================================================================
-   UnitPage — /#/unit/:N (N=1..6) · study · practice · test
-   ---------------------------------------------------------------------------
-   HERO:        number · title_niqqud · chapter range · time estimate
-   TABS:        לימוד (deep summary) · תרגול (25 review questions) · מבחן (10q)
-   SIDEBAR:     related kings · events · places · breadth-topics as chips
-   PROGRESS:    per-tab bar; persists to localStorage key
-                jarvis.melakhim.progress.unit{N}
-   CTA:         הבא → navigates /#/unit/{N+1}
-   Exposes:     window.UnitPageComponent
+   UnitPage — /#/unit/:N
+   Three tabs:
+     לימוד    — full deep summary from window.UNIT_DEEP_SUMMARIES (intro
+                paragraph, turning points, significance, breadth themes,
+                recurring items).
+     תרגול    — review questions for the unit, one at a time, with hints
+                and reveal of the model answer points.
+     מבחן     — 10 random questions, scored, with a results screen.
+
+   Sidebar: "🔗 קשרים ליחידה" — 8-12 EntityLink chips of kings, characters,
+   events, and places that match the unit. We use unit.related_* fields
+   when present; otherwise we derive from era/keyword/chapter heuristics
+   so the sidebar populates even before the data files grow new fields.
+
+   Progress: each tab persists to localStorage as
+       jarvis.melakhim.progress.unit{N}.{learn|practice|exam}
+   storing { pct: number, ts: number, ... }, mirrored at the top of the
+   page as three mini progress bars.
+
+   Exposes: window.UnitPageComponent
    ========================================================================= */
 (function(){
-  const { useMemo, useState, useEffect } = React;
+  const { useState, useMemo, useEffect, useCallback } = React;
 
-  // ---- Unit metadata (chapter ranges, time estimates, titles override) ---
-  const UNIT_META = {
-    1: { title:"מַלְכוּת שְׁלֹמֹה",             chapters:"מל״א א–יא",   minutes:120 },
-    2: { title:"פִּילוּג הַמַּמְלָכָה",         chapters:"מל״א יב–טז",  minutes:90  },
-    3: { title:"בֵּית עָמְרִי וּמַחְזוֹר אֵלִיָּהוּ", chapters:"מל״א יז–כב",  minutes:150 },
-    4: { title:"מַחְזוֹר אֱלִישָׁע וּמֶרֶד יֵהוּא",   chapters:"מל״ב א–יג",   minutes:150 },
-    5: { title:"חֻרְבַּן שֹׁמְרוֹן וּמַלְכֵי יְהוּדָה", chapters:"מל״ב יד–כ",   minutes:120 },
-    6: { title:"יֹאשִׁיָּהוּ וְחֻרְבַּן הַבַּיִת",   chapters:"מל״ב כא–כה",  minutes:150 },
-  };
+  // -----------------------------------------------------------------
+  // localStorage progress helpers — schema: jarvis.melakhim.progress.unit{N}.{tab}
+  // -----------------------------------------------------------------
+  const KEY = (n, tab) => "jarvis.melakhim.progress.unit" + n + "." + tab;
 
-  function progressKey(n){ return `jarvis.melakhim.progress.unit${n}`; }
-  function loadProgress(n){
+  function readPct(unitId, tab){
     try {
-      const raw = localStorage.getItem(progressKey(n));
-      if (!raw) return { study:0, practice:0, test:0 };
-      const j = JSON.parse(raw);
-      return { study: j.study||0, practice: j.practice||0, test: j.test||0 };
-    } catch { return { study:0, practice:0, test:0 }; }
+      const raw = localStorage.getItem(KEY(unitId, tab));
+      if (!raw) return 0;
+      const obj = JSON.parse(raw);
+      const pct = +(obj && obj.pct);
+      return Number.isFinite(pct) ? Math.max(0, Math.min(100, pct)) : 0;
+    } catch (e) { return 0; }
   }
-  function saveProgress(n, p){
+  function writePct(unitId, tab, pct, extra){
     try {
-      localStorage.setItem(progressKey(n), JSON.stringify(p));
-      localStorage.setItem("jarvis.melakhim.currentUnit", String(n));
-    } catch {}
+      const payload = Object.assign({ pct: Math.max(0, Math.min(100, pct)), ts: Date.now() }, extra || {});
+      localStorage.setItem(KEY(unitId, tab), JSON.stringify(payload));
+    } catch (e) {}
   }
 
-  // ---- aggregate related entity ids from turning_points -------------------
-  function aggregateIds(unit){
-    const tps = (unit && unit.turning_points) || [];
-    const bag = { chars:new Set(), places:new Set(), events:new Set() };
-    tps.forEach(tp => {
-      (tp.participants || []).forEach(x => bag.chars.add(x));
-      (tp.places || []).forEach(x => bag.places.add(x));
-      (tp.events || []).forEach(x => bag.events.add(x));
+  // -----------------------------------------------------------------
+  // Helpers
+  // -----------------------------------------------------------------
+  function findDeep(unitId){
+    const arr = (typeof window !== "undefined" && Array.isArray(window.UNIT_DEEP_SUMMARIES)) ? window.UNIT_DEEP_SUMMARIES : [];
+    return arr.find(u => +u.unit === +unitId) || null;
+  }
+  function findUnit(unitId){
+    const md = (typeof MELAKHIM_DATA !== "undefined") ? MELAKHIM_DATA : null;
+    if (md && Array.isArray(md.units)) return md.units.find(x => +x.id === +unitId) || null;
+    return null;
+  }
+  function reviewQuestionsForUnit(unitId){
+    const all = (typeof window !== "undefined" && Array.isArray(window.REVIEW_QUESTIONS)) ? window.REVIEW_QUESTIONS : [];
+    return all.filter(q => +q.unit === +unitId);
+  }
+
+  // Build the connections list — union of the deep summary's
+  // turning_points (kings/characters/events/places), the unit's
+  // declared related_* (if any), plus an era-based fallback for kings.
+  function connectionsForUnit(unitId, deep, unit){
+    const idx = (typeof window !== "undefined" && window.__ENTITY_INDEX__) || {};
+    const seen = { king: new Set(), character: new Set(), event: new Set(), place: new Set() };
+
+    // 1. From deep summary turning points.
+    (deep && deep.turning_points || []).forEach(tp => {
+      (tp.participants || []).forEach(pid => {
+        if (idx.king && idx.king[pid])           seen.king.add(pid);
+        else if (idx.character && idx.character[pid]) seen.character.add(pid);
+      });
+      (tp.places || []).forEach(p => seen.place.add(p));
+      (tp.events || []).forEach(e => seen.event.add(e));
     });
+
+    // 2. Era-based fallback: every king whose .era matches the unit.
+    if (Array.isArray(window.KINGS_DATA)) {
+      window.KINGS_DATA.filter(k => +k.era === +unitId).forEach(k => seen.king.add(k.id));
+    }
+
+    // 3. Unit's hand-authored related_* if present.
+    if (unit) {
+      (unit.related_kings || []).forEach(x => seen.king.add(x));
+      (unit.related_characters || []).forEach(x => seen.character.add(x));
+      (unit.related_events || []).forEach(x => seen.event.add(x));
+      (unit.related_places || []).forEach(x => seen.place.add(x));
+    }
+
     return {
-      chars:  [...bag.chars],
-      places: [...bag.places],
-      events: [...bag.events],
-      breadth: (unit && (unit.breadth_themes || unit.related_breadth)) || [],
-      recurring: (unit && unit.recurring_items) || [],
+      kings:      Array.from(seen.king),
+      characters: Array.from(seen.character),
+      events:     Array.from(seen.event),
+      places:     Array.from(seen.place)
     };
   }
 
-  // ---- tiny chip helpers --------------------------------------------------
-  function Chip({ type, id, label, setRoute }){
-    const EL = window.EntityLinkComponent;
-    if (!EL) return <span className="kt-chip">{label || id}</span>;
-    return <EL type={type} id={id} label={label} setRoute={setRoute}/>;
-  }
-  function ChipGroup({ title, ids, type, setRoute }){
-    if (!Array.isArray(ids) || !ids.length) return null;
-    return (
-      <div>
-        <div className="text-xs text-on-parchment-muted mb-1 hebrew">{title}</div>
-        <div className="flex flex-wrap gap-0">
-          {ids.map((raw,i) => {
-            const id = typeof raw === "string" ? raw : (raw && raw.id);
-            if (!id) return null;
-            return <Chip key={i+":"+id} type={type} id={id} setRoute={setRoute}/>;
-          })}
-        </div>
-      </div>
-    );
-  }
-
-  // ---- progress bar -------------------------------------------------------
-  function ProgressBar({ value }){
-    const pct = Math.max(0, Math.min(100, Math.round(value||0)));
-    return (
-      <div className="w-full h-2 bg-amber-500/10 rounded-full overflow-hidden">
-        <div className="h-full transition-all duration-500"
-             style={{ width: `${pct}%`, background:"linear-gradient(90deg, #d97706, #f59e0b)" }}/>
-      </div>
-    );
+  // Round-robin sample to keep all four types represented.
+  function sampleConnections(conn, max){
+    const groups = [
+      { type: "king",      ids: conn.kings },
+      { type: "character", ids: conn.characters },
+      { type: "event",     ids: conn.events },
+      { type: "place",     ids: conn.places }
+    ];
+    const out = [];
+    const pos = groups.map(() => 0);
+    let active = groups.filter(g => g.ids.length).length;
+    while (out.length < max && active > 0) {
+      active = 0;
+      for (let gi = 0; gi < groups.length; gi++) {
+        const g = groups[gi];
+        if (pos[gi] >= g.ids.length) continue;
+        out.push({ type: g.type, id: g.ids[pos[gi]] });
+        pos[gi]++;
+        if (pos[gi] < g.ids.length) active++;
+        if (out.length >= max) return out;
+      }
+    }
+    return out;
   }
 
-  // ---- tab content --------------------------------------------------------
-  function StudyTab({ unit, progress, onAdvance }){
-    if (!unit) return <div className="p-6 text-on-parchment-muted hebrew">אין סיכום ליחידה זו.</div>;
-    const tps = unit.turning_points || [];
-    const [read, setRead] = useState(Math.floor((progress||0)/100 * tps.length));
-    useEffect(() => { onAdvance((read / Math.max(1,tps.length)) * 100); }, [read]);
-    return (
-      <div className="space-y-4">
-        {unit.intro && (
-          <section className="parchment rounded-2xl p-5">
-            <h3 className="font-display text-base font-bold text-amber-900 mb-2 hebrew">📖 פתיחה</h3>
-            <p className="hebrew text-amber-950 leading-relaxed">{stripTokens(unit.intro)}</p>
-          </section>
-        )}
-        {tps.length > 0 && (
-          <section className="card rounded-2xl p-4 md:p-5">
-            <h3 className="font-display text-base font-bold text-on-parchment-accent mb-3 hebrew">⚡ נקודות מפנה</h3>
-            <ol className="space-y-3">
-              {tps.map((tp,i) => (
-                <li key={i} className={`hebrew border-r-4 pr-3 py-2 ${i < read ? "border-emerald-500/70 opacity-100" : "border-amber-500/40 opacity-90"}`}>
-                  <div className="text-sm text-on-parchment">{tp.fact}</div>
-                </li>
-              ))}
-            </ol>
-            <div className="mt-4 flex items-center justify-between">
-              <div className="text-xs text-on-parchment-muted hebrew">{read}/{tps.length} נקודות</div>
-              <div className="flex gap-2">
-                <button onClick={()=>setRead(Math.max(0, read-1))}
-                  className="px-3 py-1 text-xs rounded border border-amber-500/40 text-on-parchment">← חזור</button>
-                <button onClick={()=>setRead(Math.min(tps.length, read+1))}
-                  className="gold-btn px-3 py-1 text-xs rounded font-bold">סמן כקראתי →</button>
-              </div>
-            </div>
-          </section>
-        )}
-        {unit.significance && (
-          <section className="card rounded-2xl p-4 md:p-5">
-            <h3 className="font-display text-base font-bold text-on-parchment-accent mb-2 hebrew">✨ משמעות</h3>
-            <p className="hebrew text-on-parchment leading-relaxed">{stripTokens(unit.significance)}</p>
-          </section>
-        )}
-      </div>
-    );
-  }
-
+  // Strip {{type:id|label}} bio tokens for plain rendering.
   function stripTokens(t){
     if (typeof t !== "string") return t || "";
     return t.replace(/\{\{[a-zA-Zא-ת_]+:[^|}]+\|([^}]+)\}\}/g, "$1");
   }
 
-  function PracticeTab({ unitN, progress, onAdvance, setRoute }){
-    const questions = useMemo(() => {
-      const all = (window.REVIEW_QUESTIONS_DATA || window.reviewQuestions || []);
-      const pool = all.filter(q => q && (q.unit === unitN || (Array.isArray(q.units) && q.units.includes(unitN))));
-      return pool.slice(0, 25);
-    }, [unitN]);
-    const [answered, setAnswered] = useState(Math.floor((progress||0)/100 * questions.length));
-    useEffect(() => { onAdvance((answered / Math.max(1,questions.length)) * 100); }, [answered]);
-    if (!questions.length) {
+  // -----------------------------------------------------------------
+  // Sub-components
+  // -----------------------------------------------------------------
+  function ProgressBar({ label, pct, color }){
+    const p = Math.max(0, Math.min(100, +pct || 0));
+    return (
+      <div className="space-y-1">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-bold text-on-parchment">{label}</span>
+          <span className="text-on-parchment-muted" dir="ltr">{p}%</span>
+        </div>
+        <div style={{height:8, background:"rgba(212,165,116,.18)", borderRadius:999, overflow:"hidden"}}>
+          <div style={{height:"100%", width:p+"%", background:color, transition:"width .3s ease"}}/>
+        </div>
+      </div>
+    );
+  }
+
+  function Connections({ unitId, deep, unit, setRoute }){
+    const conn = useMemo(() => connectionsForUnit(unitId, deep, unit), [unitId, deep, unit]);
+    const total = conn.kings.length + conn.characters.length + conn.events.length + conn.places.length;
+    if (total === 0) return null;
+    const picked = sampleConnections(conn, 12);
+    const EL = window.EntityLinkComponent;
+    return (
+      <section className="card rounded-2xl p-4">
+        <h3 className="font-display text-base font-bold text-on-parchment mb-2">🔗 קשרים ליחידה</h3>
+        <div className="flex flex-wrap gap-0">
+          {EL && picked.map((c, i) => (
+            <EL key={c.type+":"+c.id+":"+i} type={c.type} id={c.id} setRoute={setRoute}/>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  function LearnTab({ deep, unit, unitId, setRoute, onComplete }){
+    if (!deep) {
       return (
-        <div className="card rounded-2xl p-6 text-center hebrew">
-          <div className="text-3xl mb-2">📝</div>
-          <div className="font-bold text-on-parchment-accent mb-2">אין עדיין שאלות תרגול ליחידה זו</div>
-          <div className="text-sm text-on-parchment-muted">data/review-questions.js עדיין לא מסונן ליחידה {unitN}.</div>
+        <div className="card rounded-xl p-4 text-on-parchment-muted text-sm">
+          סיכום מעמיק ליחידה זו טרם הוזן ל-<code>window.UNIT_DEEP_SUMMARIES</code>.
         </div>
       );
     }
-    return (
-      <div className="space-y-3">
-        {questions.map((q,i) => {
-          const done = i < answered;
-          const text = q.prompt || q.question || q.text || q.title || `שאלה ${i+1}`;
-          return (
-            <div key={q.id || i} className={`card rounded-xl p-4 hebrew ${done?"opacity-70":""}`}>
-              <div className="text-xs text-on-parchment-muted mb-1">שאלה {i+1} / {questions.length}</div>
-              <div className="text-on-parchment">{text}</div>
-              {q.expected_answer_points && Array.isArray(q.expected_answer_points) && (
-                <details className="mt-2">
-                  <summary className="text-xs text-on-parchment-accent cursor-pointer">הצג תשובה מוסברת</summary>
-                  <ul className="mt-2 list-disc pr-5 text-sm text-on-parchment-muted">
-                    {q.expected_answer_points.map((p,j)=><li key={j}>{p}</li>)}
-                  </ul>
-                </details>
-              )}
-            </div>
-          );
-        })}
-        <div className="flex items-center justify-between pt-2">
-          <div className="text-xs text-on-parchment-muted hebrew">{answered}/{questions.length} תורגלו</div>
-          <button onClick={()=>setAnswered(Math.min(questions.length, answered+1))}
-            className="gold-btn px-4 py-2 text-sm rounded font-bold">סמן כתורגלה →</button>
-        </div>
-      </div>
-    );
-  }
-
-  function TestTab({ unitN, progress, onAdvance, setRoute }){
-    const questions = useMemo(() => {
-      const all = (window.REVIEW_QUESTIONS_DATA || window.reviewQuestions || []);
-      const pool = all.filter(q => q && (q.unit === unitN || (Array.isArray(q.units) && q.units.includes(unitN))));
-      return pool.slice(0, 10);
-    }, [unitN]);
-    const onStart = () => {
-      try { window.dispatchEvent(new CustomEvent("practice-entity", {detail:{type:"unit", id:`unit-${unitN}`, count:10}})); } catch {}
-      onAdvance(Math.min(100, (progress||0)+10));
-      if (setRoute) setRoute({ page:"quiz", hash:`unit/${unitN}` });
-    };
+    const turning = Array.isArray(deep.turning_points) ? deep.turning_points : [];
     return (
       <div className="space-y-4">
-        <section className="parchment rounded-2xl p-5 text-center">
-          <div className="text-4xl mb-2">⚔️</div>
-          <h3 className="font-display text-xl font-bold text-amber-900 hebrew">מבחן קצר · 10 שאלות</h3>
-          <div className="text-sm text-amber-800 hebrew mt-1">{questions.length} שאלות זמינות ליחידה {unitN}</div>
-          <button onClick={onStart}
-            className="gold-btn mt-4 px-6 py-3 rounded-xl font-bold">התחל מבחן</button>
+        <section className="parchment rounded-2xl p-5 md:p-6">
+          <h2 className="font-display text-xl font-bold text-amber-900 mb-2">{deep.title}</h2>
+          <p className="hebrew text-amber-950 leading-loose text-base">{stripTokens(deep.intro)}</p>
         </section>
-        <div className="card rounded-xl p-4 hebrew text-sm text-on-parchment-muted">
-          💡 המבחן יוצג בממשק QuizEngine; ציון יישמר והתקדמות היחידה תתעדכן אוטומטית.
-        </div>
-      </div>
-    );
-  }
 
-  // ---- sticky header ------------------------------------------------------
-  function StickyHeader({ n, setRoute }){
-    const goBack = () => {
-      try { if (window.history.length > 1) return window.history.back(); } catch {}
-      if (setRoute) setRoute({ page: "home" });
-    };
-    return (
-      <div className="sticky top-0 z-30 backdrop-blur bg-[var(--bg-surface,#0A1628)]/85 border-b border-amber-500/20 px-3 py-2 flex items-center justify-between">
-        <nav className="text-xs md:text-sm hebrew text-on-parchment-muted truncate">
-          <a href="#/home" className="hover:text-on-parchment-accent">ראשי</a>
-          <span className="mx-2 opacity-60">›</span>
-          <a href="#/study" className="hover:text-on-parchment-accent">לימוד</a>
-          <span className="mx-2 opacity-60">›</span>
-          <span className="text-on-parchment-accent font-bold">יחידה {n}</span>
-        </nav>
-        <button onClick={goBack}
-          className="shrink-0 px-3 py-1.5 rounded-lg border border-amber-500/40 text-on-parchment-accent text-sm font-bold hover:bg-amber-500/10">
-          ← חזור
+        {turning.length > 0 && (
+          <section className="card rounded-2xl p-4">
+            <h3 className="font-display text-base font-bold text-on-parchment mb-2">🔑 נקודות מפנה</h3>
+            <ol className="space-y-2 list-decimal pr-5 text-sm text-on-parchment hebrew">
+              {turning.map((tp, i) => (
+                <li key={i} className="leading-relaxed">{stripTokens(tp.fact)}</li>
+              ))}
+            </ol>
+          </section>
+        )}
+
+        {deep.significance && (
+          <section className="card rounded-2xl p-4">
+            <h3 className="font-display text-base font-bold text-on-parchment mb-2">✨ משמעות לספר</h3>
+            <p className="hebrew text-on-parchment-muted leading-relaxed">{stripTokens(deep.significance)}</p>
+          </section>
+        )}
+
+        {Array.isArray(deep.breadth_themes) && deep.breadth_themes.length > 0 && (
+          <section className="card rounded-2xl p-4">
+            <h3 className="font-display text-base font-bold text-on-parchment mb-2">🌐 נושאי רוחב</h3>
+            <div className="flex flex-wrap gap-0">
+              {window.EntityLinkComponent && deep.breadth_themes.map(b =>
+                <window.EntityLinkComponent key={b} type="breadth" id={b} setRoute={setRoute}/>
+              )}
+            </div>
+          </section>
+        )}
+
+        {Array.isArray(deep.recurring_items) && deep.recurring_items.length > 0 && (
+          <section className="card rounded-2xl p-4">
+            <h3 className="font-display text-base font-bold text-on-parchment mb-2">🔁 פריטים חוזרים</h3>
+            <div className="flex flex-wrap gap-0">
+              {window.EntityLinkComponent && deep.recurring_items.map(r =>
+                <window.EntityLinkComponent key={r} type="recurringItem" id={r} setRoute={setRoute}/>
+              )}
+            </div>
+          </section>
+        )}
+
+        <button
+          onClick={onComplete}
+          className="gold-btn w-full py-3 rounded-xl text-base font-bold">
+          ✅ סמן כנלמד
         </button>
       </div>
     );
   }
 
-  // ---- main component -----------------------------------------------------
-  function UnitPage({ n, setRoute }){
-    const unitN = Math.max(1, Math.min(6, parseInt(n, 10) || 1));
-    const meta = UNIT_META[unitN];
-    const unit = useMemo(() => {
-      const arr = (window.UNIT_DEEP_SUMMARIES || window.unitDeepSummaries || []);
-      return arr.find(u => u && u.unit === unitN) || null;
-    }, [unitN]);
-    const title = unit && unit.title ? unit.title : meta.title;
+  function PracticeTab({ unitId, setRoute, onProgress }){
+    const all = useMemo(() => reviewQuestionsForUnit(unitId), [unitId]);
+    const [i, setI] = useState(0);
+    const [revealed, setRevealed] = useState(false);
+    const [seen, setSeen] = useState(new Set());
 
-    const ids = useMemo(() => aggregateIds(unit), [unit]);
+    if (all.length === 0) {
+      return (
+        <div className="card rounded-xl p-4 text-on-parchment-muted text-sm">
+          אין שאלות תרגול ליחידה זו. ודא ש-<code>data/review-questions.js</code> נטען.
+        </div>
+      );
+    }
 
-    const [progress, setProgress] = useState(() => loadProgress(unitN));
-    useEffect(() => { saveProgress(unitN, progress); }, [unitN, progress]);
-    // reset tab progress memory when unit changes
-    useEffect(() => { setProgress(loadProgress(unitN)); }, [unitN]);
+    const q = all[i];
+    const goNext = () => {
+      const nextSeen = new Set(seen); nextSeen.add(q.id);
+      setSeen(nextSeen);
+      setRevealed(false);
+      setI((i + 1) % all.length);
+      const pct = Math.round((nextSeen.size / all.length) * 100);
+      onProgress && onProgress(pct, { lastQuestionId: q.id, seen: Array.from(nextSeen) });
+    };
 
-    const [tab, setTab] = useState("study");
-
-    const overall = Math.round((progress.study + progress.practice + progress.test) / 3);
-
-    const next = unitN < 6 ? unitN + 1 : null;
-    const prev = unitN > 1 ? unitN - 1 : null;
-
-    const onStudyAdvance    = v => setProgress(p => ({ ...p, study:    Math.max(p.study, Math.round(v)) }));
-    const onPracticeAdvance = v => setProgress(p => ({ ...p, practice: Math.max(p.practice, Math.round(v)) }));
-    const onTestAdvance     = v => setProgress(p => ({ ...p, test:     Math.max(p.test, Math.round(v)) }));
+    const seenCount = seen.size;
+    const pct = Math.round((seenCount / all.length) * 100);
+    const EL = window.EntityLinkComponent;
 
     return (
-      <div className="min-h-screen flex flex-col">
-        <StickyHeader n={unitN} setRoute={setRoute}/>
-
-        <main className="max-w-5xl mx-auto w-full pb-24 px-3 md:px-5">
-          {/* HERO */}
-          <header className="pt-5 pb-4">
-            <div className="text-xs text-on-parchment-muted mb-1 hebrew">יחידה</div>
-            <div className="flex items-end gap-3 flex-wrap">
-              <div className="font-display text-6xl md:text-7xl font-black text-on-parchment-accent leading-none">
-                {unitN}
-              </div>
-              <div className="flex-1 min-w-0">
-                <h1 className="font-display text-2xl md:text-4xl font-black text-on-parchment-accent hebrew leading-tight"
-                    style={{textShadow:"0 2px 8px rgba(200,155,60,.15)"}}>
-                  {title}
-                </h1>
-                <div className="text-sm text-on-parchment mt-2 hebrew">
-                  {meta.chapters} · ⏱ {meta.minutes} דקות · התקדמות כוללת {overall}%
-                </div>
-              </div>
-            </div>
-            <div className="mt-3"><ProgressBar value={overall}/></div>
-          </header>
-
-          {/* layout: body + sidebar */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
-            <div className="lg:col-span-2 space-y-4">
-              {/* TABS */}
-              <nav className="flex gap-1 border-b border-amber-500/20" role="tablist" aria-label="מצבי לימוד">
-                {[
-                  { id:"study",    label:"📖 לימוד",    value: progress.study },
-                  { id:"practice", label:"📝 תרגול",    value: progress.practice },
-                  { id:"test",     label:"⚔️ מבחן",    value: progress.test },
-                ].map(t => (
-                  <button key={t.id}
-                    role="tab" aria-selected={tab===t.id}
-                    onClick={()=>setTab(t.id)}
-                    className={`px-4 py-2 text-sm hebrew font-bold transition flex items-center gap-2 ${
-                      tab===t.id
-                        ? "border-b-2 border-amber-500 text-on-parchment-accent"
-                        : "text-on-parchment-muted hover:text-on-parchment"
-                    }`}>
-                    <span>{t.label}</span>
-                    <span className="text-[10px] opacity-70">{t.value}%</span>
-                  </button>
-                ))}
-              </nav>
-
-              <div className="space-y-4" role="tabpanel">
-                {tab==="study"    && <StudyTab    unit={unit}   progress={progress.study}    onAdvance={onStudyAdvance}/>}
-                {tab==="practice" && <PracticeTab unitN={unitN} progress={progress.practice} onAdvance={onPracticeAdvance} setRoute={setRoute}/>}
-                {tab==="test"     && <TestTab     unitN={unitN} progress={progress.test}     onAdvance={onTestAdvance}     setRoute={setRoute}/>}
-              </div>
-
-              {/* prev / next */}
-              <div className="flex items-center justify-between pt-4 border-t border-amber-500/20">
-                {prev ? (
-                  <a href={`#/unit/${prev}`} className="px-4 py-2 rounded-lg border border-amber-500/40 text-on-parchment hebrew text-sm">
-                    ← יחידה {prev}
-                  </a>
-                ) : <span/>}
-                {next ? (
-                  <a href={`#/unit/${next}`} className="gold-btn px-5 py-3 rounded-xl font-bold hebrew">
-                    הבא → יחידה {next}
-                  </a>
-                ) : (
-                  <span className="text-sm text-on-parchment-muted hebrew">🎉 סיימת את כל היחידות</span>
-                )}
-              </div>
-            </div>
-
-            {/* SIDEBAR */}
-            <aside className="lg:col-span-1 space-y-4">
-              <section className="card rounded-2xl p-4">
-                <h3 className="font-display text-base font-bold text-on-parchment-accent mb-3 hebrew">🔗 קשרים ליחידה</h3>
-                <div className="space-y-3">
-                  <ChipGroup title="👑 מלכים"           ids={ids.chars.filter(c => isKingId(c))} type="king"      setRoute={setRoute}/>
-                  <ChipGroup title="👤 דמויות"          ids={ids.chars.filter(c => !isKingId(c))} type="character" setRoute={setRoute}/>
-                  <ChipGroup title="⚔️ אירועים"         ids={ids.events}    type="event"     setRoute={setRoute}/>
-                  <ChipGroup title="📍 מקומות"          ids={ids.places}    type="place"     setRoute={setRoute}/>
-                  <ChipGroup title="🌐 נושאי רוחב"      ids={ids.breadth}   type="breadth"   setRoute={setRoute}/>
-                  <ChipGroup title="🔁 פריטים חוזרים"   ids={ids.recurring} type="recurring" setRoute={setRoute}/>
-                </div>
-              </section>
-              <section className="card rounded-2xl p-4 hebrew text-sm">
-                <h3 className="font-display text-base font-bold text-on-parchment-accent mb-2">📊 התקדמות</h3>
-                <div className="space-y-2">
-                  <div>
-                    <div className="flex justify-between text-xs mb-1"><span>📖 לימוד</span><span>{progress.study}%</span></div>
-                    <ProgressBar value={progress.study}/>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-xs mb-1"><span>📝 תרגול</span><span>{progress.practice}%</span></div>
-                    <ProgressBar value={progress.practice}/>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-xs mb-1"><span>⚔️ מבחן</span><span>{progress.test}%</span></div>
-                    <ProgressBar value={progress.test}/>
-                  </div>
-                </div>
-              </section>
-            </aside>
+      <div className="space-y-4 unit-page-polish">
+        <div className="flex items-center justify-between text-xs text-on-parchment-muted">
+          <span>שאלה <span dir="ltr">{i + 1}</span> מתוך <span dir="ltr">{all.length}</span></span>
+          <span>נצפו: <span dir="ltr">{seenCount}</span> ({pct}%)</span>
+        </div>
+        <section className="parchment rounded-2xl p-5">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-700 text-amber-100 font-bold">{q.type || "שאלה"}</span>
+            <span className="text-xs text-amber-900 font-bold">{q.difficulty || ""}</span>
           </div>
-        </main>
+          <p className="hebrew text-amber-950 leading-loose text-base">{q.prompt_niqqud || q.prompt}</p>
+        </section>
+
+        {!revealed && (
+          <button onClick={() => setRevealed(true)} className="gold-btn w-full py-3 rounded-xl text-base font-bold">
+            🔎 גלה תשובה
+          </button>
+        )}
+
+        {revealed && (
+          <section className="card rounded-2xl p-4">
+            <h4 className="text-xs font-bold text-on-parchment-accent mb-2">נקודות בתשובה הצפויה</h4>
+            <ul className="space-y-1.5 text-sm text-on-parchment hebrew list-disc pr-5">
+              {(q.answer_points || []).map((p, j) => <li key={j}>{p}</li>)}
+            </ul>
+            {Array.isArray(q.related_entities) && q.related_entities.length > 0 && EL && (
+              <div className="mt-3 pt-3 border-t border-amber-700/30">
+                <div className="text-xs font-bold text-on-parchment-accent mb-1.5">🔗 ישויות קשורות</div>
+                <div className="flex flex-wrap gap-0">
+                  {q.related_entities.map((tag, k) => {
+                    const [t, id] = String(tag).split(":");
+                    const type = t === "char" ? "character" : t;
+                    return id ? <EL key={k} type={type} id={id} setRoute={setRoute}/> : null;
+                  })}
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        <button onClick={goNext} className="card rounded-xl p-3 w-full text-center text-on-parchment-accent font-bold hover:scale-[1.01] transition">
+          ← השאלה הבאה
+        </button>
       </div>
     );
   }
 
-  // quick heuristic: if id is in window.KINGS_DATA / kings sandbox, treat as king
-  function isKingId(id){
-    const ks = window.KINGS_DATA;
-    if (Array.isArray(ks) && ks.some(k => k && k.id === id)) return true;
-    // fallback: id matches known king-name pattern from kings.js
-    const knownKings = ["shlomo","rehavam","aviyam","asa","yehoshafat","yoram_yehuda","achaziah_yehuda","atalyah_char",
-      "yehoash_yehuda","amatzya","uziyahu","yotam","achaz","chizkiyahu","menashe","amon","yoshiyahu",
-      "yehoachaz_yehuda","yehoyakim","yehoyachin","tzidkiyahu","yarovam","nadav","basha","ela","zimri",
-      "omri","achav","achaziah_yisrael","yoram_yisrael","yehu","yehoachaz_yisrael","yoash_yisrael",
-      "yarovam_beit","zacharia","shalum","menachem","pekachya","pekach","hoshea"];
-    return knownKings.includes(id);
+  function shuffle(arr){
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function ExamTab({ unitId, setRoute, onComplete }){
+    const pool = useMemo(() => reviewQuestionsForUnit(unitId), [unitId]);
+    const [run, setRun] = useState(null); // {questions:[], answers:[], i, done}
+
+    const start = () => {
+      const qs = shuffle(pool).slice(0, Math.min(10, pool.length));
+      setRun({ questions: qs, answers: qs.map(() => null), i: 0, done: false });
+    };
+
+    if (pool.length === 0) {
+      return (
+        <div className="card rounded-xl p-4 text-on-parchment-muted text-sm">
+          אין שאלות מבחן ליחידה זו. ודא ש-<code>data/review-questions.js</code> נטען.
+        </div>
+      );
+    }
+    if (!run) {
+      return (
+        <div className="space-y-3">
+          <div className="card rounded-2xl p-4">
+            <h3 className="font-display text-base font-bold text-on-parchment mb-1">📝 מבחן יחידה</h3>
+            <p className="text-sm text-on-parchment-muted">10 שאלות אקראיות מבנק יחידה זו. בכל שאלה — דרג את עצמך לאחר חשיפת התשובה.</p>
+          </div>
+          <button onClick={start} className="gold-btn w-full py-3 rounded-xl text-base font-bold">⚔️ התחל מבחן</button>
+        </div>
+      );
+    }
+    if (run.done) {
+      const correct = run.answers.filter(a => a === true).length;
+      const pct = Math.round((correct / run.questions.length) * 100);
+      onComplete && onComplete(pct, { score: correct, total: run.questions.length });
+      return (
+        <div className="space-y-3">
+          <section className="parchment rounded-2xl p-5 text-center">
+            <div className="font-display text-2xl font-bold text-amber-900 mb-1">תוצאה</div>
+            <div className="font-display text-4xl font-black text-amber-900" dir="ltr">{correct} / {run.questions.length}</div>
+            <div className="text-amber-950 text-sm mt-1" dir="ltr">{pct}%</div>
+          </section>
+          <button onClick={start} className="gold-btn w-full py-3 rounded-xl text-base font-bold">🔁 מבחן חדש</button>
+          <button onClick={() => setRun(null)} className="card rounded-xl p-3 w-full text-on-parchment-accent font-bold">→ חזרה</button>
+        </div>
+      );
+    }
+
+    const q = run.questions[run.i];
+    const grade = (correct) => {
+      const next = run.answers.slice();
+      next[run.i] = correct;
+      const ni = run.i + 1;
+      if (ni >= run.questions.length) setRun({ ...run, answers: next, done: true });
+      else                            setRun({ ...run, answers: next, i: ni });
+    };
+
+    return (
+      <div className="space-y-3">
+        <div className="text-xs text-on-parchment-muted text-center">
+          שאלה <span dir="ltr">{run.i + 1}</span> מתוך <span dir="ltr">{run.questions.length}</span>
+        </div>
+        <section className="parchment rounded-2xl p-5">
+          <p className="hebrew text-amber-950 leading-loose">{q.prompt_niqqud || q.prompt}</p>
+        </section>
+        <details className="card rounded-2xl p-4">
+          <summary className="cursor-pointer font-bold text-on-parchment-accent">🔎 גלה תשובה צפויה</summary>
+          <ul className="mt-2 space-y-1.5 text-sm text-on-parchment hebrew list-disc pr-5">
+            {(q.answer_points || []).map((p, j) => <li key={j}>{p}</li>)}
+          </ul>
+        </details>
+        <div className="grid grid-cols-2 gap-2">
+          <button onClick={() => grade(false)}
+            className="card rounded-xl p-3 text-center font-bold border border-red-500/40 text-red-200 hover:scale-[1.01] transition">
+            ❌ לא ידעתי
+          </button>
+          <button onClick={() => grade(true)}
+            className="card rounded-xl p-3 text-center font-bold border border-emerald-500/40 text-emerald-200 hover:scale-[1.01] transition">
+            ✅ ידעתי
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // -----------------------------------------------------------------
+  // Top-level UnitPage
+  // -----------------------------------------------------------------
+  function UnitPage(props){
+    const unitId = props && props.unitId;
+    const setRoute = (props && props.setRoute) || (typeof window !== "undefined" ? (window.__appSetRoute__ || window.__setRoute) : null);
+
+    const deep = useMemo(() => findDeep(unitId), [unitId]);
+    const unit = useMemo(() => findUnit(unitId), [unitId]);
+    const [tab, setTab] = useState("learn");
+
+    const [pct, setPct] = useState({
+      learn:    readPct(unitId, "learn"),
+      practice: readPct(unitId, "practice"),
+      exam:     readPct(unitId, "exam")
+    });
+    useEffect(() => {
+      setTab("learn");
+      setPct({
+        learn:    readPct(unitId, "learn"),
+        practice: readPct(unitId, "practice"),
+        exam:     readPct(unitId, "exam")
+      });
+    }, [unitId]);
+
+    const onTabClick = useCallback((e, id) => {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      setTab(id);
+    }, []);
+
+    const updatePct = useCallback((key, value, extra) => {
+      writePct(unitId, key, value, extra);
+      setPct(prev => Object.assign({}, prev, { [key]: Math.max(prev[key] || 0, value) }));
+    }, [unitId]);
+
+    if (!unitId) {
+      return <div className="text-on-parchment-muted text-sm p-4">חסר מזהה יחידה.</div>;
+    }
+
+    const headerColor = ({1:"#D4A574",2:"#A83240",3:"#3E8E7E",4:"#6B5B95",5:"#8B4513",6:"#2C3E50"})[unitId] || "#D4A574";
+    const title = (deep && deep.title) || (unit && unit.title) || ("יחידה " + unitId);
+
+    return (
+      <div className="max-w-3xl mx-auto space-y-4 p-2">
+        <button onClick={() => setRoute && setRoute({ page: "path" })} className="text-on-parchment-accent text-sm">→ חזרה למסלול</button>
+
+        <header className="card rounded-2xl p-5" style={{borderColor: headerColor + "55"}}>
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <div className="text-xs font-bold px-2.5 py-0.5 rounded-full inline-block mb-2" style={{background: headerColor, color:"#fff"}}>
+                יחידה <span dir="ltr">{unitId}</span>
+              </div>
+              <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment">{title}</h1>
+              {unit && unit.subtitle && <p className="text-sm text-on-parchment-muted mt-1">{unit.subtitle}</p>}
+              {unit && unit.range && <p className="text-xs text-on-parchment-muted mt-1 font-mono">{unit.range}</p>}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 mt-4">
+            <ProgressBar label="לימוד"   pct={pct.learn}    color="#3E8E7E"/>
+            <ProgressBar label="תרגול"   pct={pct.practice} color="#D4A574"/>
+            <ProgressBar label="מבחן"    pct={pct.exam}     color="#A83240"/>
+          </div>
+        </header>
+
+        <Connections unitId={unitId} deep={deep} unit={unit} setRoute={setRoute}/>
+
+        <div role="tablist" aria-label="לשוניות יחידה" className="grid grid-cols-3 gap-2 sticky top-0 z-20 py-1" style={{background:"linear-gradient(180deg,rgba(10,22,40,.85),rgba(10,22,40,.65))",backdropFilter:"blur(6px)"}}>
+          {[
+            { id: "learn",    label: "📖 לימוד" },
+            { id: "practice", label: "🔁 תרגול" },
+            { id: "exam",     label: "📝 מבחן"  }
+          ].map(t => {
+            const active = tab === t.id;
+            return (
+              <button key={t.id} type="button" role="tab"
+                aria-selected={active} aria-controls={"tabpanel-" + t.id}
+                id={"tab-" + t.id}
+                onClick={(e) => onTabClick(e, t.id)}
+                className={"px-3 py-2 rounded-xl text-sm font-bold border transition relative " +
+                  (active
+                    ? "tab-active border-amber-500 ring-2 ring-amber-400/60"
+                    : "card border-amber-700/30 text-on-parchment hover:scale-[1.01]")
+                }>
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div role="tabpanel" id={"tabpanel-" + tab} aria-labelledby={"tab-" + tab} key={"panel-" + unitId + "-" + tab}>
+          {tab === "learn" && (
+            <LearnTab
+              deep={deep} unit={unit} unitId={unitId} setRoute={setRoute}
+              onComplete={() => updatePct("learn", 100, { completedAt: Date.now() })}
+            />
+          )}
+          {tab === "practice" && (
+            <PracticeTab
+              unitId={unitId} setRoute={setRoute}
+              onProgress={(p, extra) => updatePct("practice", p, extra)}
+            />
+          )}
+          {tab === "exam" && (
+            <ExamTab
+              unitId={unitId} setRoute={setRoute}
+              onComplete={(p, extra) => updatePct("exam", p, extra)}
+            />
+          )}
+        </div>
+      </div>
+    );
   }
 
   if (typeof window !== "undefined") window.UnitPageComponent = UnitPage;

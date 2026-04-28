@@ -18,12 +18,16 @@
   "_comment_structure": [
     "Structure this app writes:",
     "  users/{uid}/progress/<encoded-key> : string   # localStorage mirror",
+    "  users/{uid}/class                  : string   # יא1|יא2|יא3|יא6|מורה",
     "  users/{uid}/meta                   : object   # optional future use",
-    "  classes/{code}/members/{name}      : object   # existing leaderboard",
-    "  classes/{code}/activity/{push-id}  : object   # existing activity feed",
+    "  classes/{code}/members/{name}      : object   # legacy leaderboard",
+    "  classes/{code}/activity/{push-id}  : object   # legacy activity feed",
+    "  leaderboard/{class}/{uid}          : object   # new bagrut leaderboard",
     "",
     "Security goals:",
     "  - A signed-in user can read/write ONLY their own users/{uid}/*.",
+    "  - The leaderboard is publicly readable, but each user can only write",
+    "    their own row (keyed by uid).",
     "  - Anyone can still read the classes/* board (keeps current leaderboard",
     "    behaviour). If you want to lock that down too, replace the classes",
     "    rules below with '.read': 'auth != null' and '.write': 'auth != null'."
@@ -38,6 +42,14 @@
     "classes": {
       ".read":  true,
       ".write": true
+    },
+    "leaderboard": {
+      ".read": true,
+      "$class": {
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid"
+        }
+      }
     }
   }
 }
