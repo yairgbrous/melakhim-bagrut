@@ -95,6 +95,11 @@
 
   // ---- 2. HERO CARD ------------------------------------------------------
   function HeroCard({setRoute}){
+    const onShare = () => {
+      if (typeof window !== 'undefined' && window.MelakhimAuth && window.MelakhimAuth.shareApp){
+        window.MelakhimAuth.shareApp();
+      }
+    };
     return (
       <section className="mb-home-hero parchment hero-parchment">
         <div className="mb-home-hero-inner">
@@ -112,16 +117,17 @@
             </button>
             <button
               type="button"
+              onClick={onShare}
+              className="mb-home-hero-cta-share"
+              aria-label="שתף עם השכבה">
+              📤 שתף עם השכבה
+            </button>
+            <button
+              type="button"
               onClick={()=>setRoute({page:'exam-sim'})}
               className="mb-home-hero-cta-secondary"
               aria-label="תרגל מתכונת">
               📝 תרגל מתכונת
-            </button>
-            <button
-              onClick={()=>setRoute({page:"quizUnit", unit: (currentUnit && currentUnit.id) || 1})}
-              className="w-full md:w-auto md:px-10 py-2.5 rounded-xl text-sm border-2 border-amber-500/40 text-on-parchment font-bold hover:bg-amber-500/10 transition"
-              aria-label="תרגל את היחידה">
-              ⚔️ תרגל את היחידה
             </button>
           </div>
         </div>
@@ -182,13 +188,13 @@
       }
     };
     const tiles = [
-      { icon:'👑', label:'טבלת מלכים', onClick:()=>setRoute({page:'timeline'}) },
-      { icon:'🗺', label:'מפות',        onClick:()=>setRoute({page:'maps'}) },
-      { icon:'👥', label:'דמויות',      onClick:openSearch },
-      { icon:'🌐', label:'נושאי רוחב',  onClick:()=>setRoute({page:'themes'}) },
-      { icon:'📜', label:'ציר זמן',     onClick:()=>setRoute({page:'timeline'}) },
-      { icon:'🃏', label:'פלאשקארדס',   onClick:()=>setRoute({page:'flashcards'}) },
-      { icon:'📝', label:'אזור בחינה',  onClick:()=>setRoute({page:'exam-sim'}) }
+      { icon:'🏆', label:'מובילי השכבה', onClick:()=>setRoute({page:'leaderboard'}) },
+      { icon:'👑', label:'טבלת מלכים',  onClick:()=>setRoute({page:'timeline'}) },
+      { icon:'🗺', label:'מפות',         onClick:()=>setRoute({page:'maps'}) },
+      { icon:'👥', label:'דמויות',       onClick:openSearch },
+      { icon:'🌐', label:'נושאי רוחב',   onClick:()=>setRoute({page:'themes'}) },
+      { icon:'🃏', label:'פלאשקארדס',    onClick:()=>setRoute({page:'flashcards'}) },
+      { icon:'📝', label:'אזור בחינה',   onClick:()=>setRoute({page:'exam-sim'}) }
     ];
     return (
       <section className="mb-home-section">
@@ -352,12 +358,14 @@
 .mb-home-hero-cta-primary{padding:14px 20px;border-radius:16px;font-size:16px;font-weight:800;cursor:pointer}
 .mb-home-hero-cta-secondary{padding:12px 20px;border-radius:16px;font-size:15px;font-weight:700;cursor:pointer;background:transparent;border:1.5px solid #8B6F1F;color:#8B6F1F;transition:all .18s}
 .mb-home-hero-cta-secondary:hover{background:rgba(212,165,116,.12)}
+.mb-home-hero-cta-share{padding:12px 20px;border-radius:16px;font-size:15px;font-weight:800;cursor:pointer;background:rgba(139,111,31,.12);border:1.5px solid #8B6F1F;color:#1A1611;transition:all .18s}
+.mb-home-hero-cta-share:hover{background:rgba(212,165,116,.28)}
 @media (min-width:640px){
   .mb-home-hero{padding:32px 28px}
   .mb-home-hero h2{font-size:32px}
   .mb-home-hero-sub{font-size:14px}
   .mb-home-hero-ctas{flex-direction:row;justify-content:center;gap:12px}
-  .mb-home-hero-cta-primary,.mb-home-hero-cta-secondary{padding:14px 28px;min-width:200px}
+  .mb-home-hero-cta-primary,.mb-home-hero-cta-secondary,.mb-home-hero-cta-share{padding:14px 28px;min-width:200px}
 }
 
 /* Section */

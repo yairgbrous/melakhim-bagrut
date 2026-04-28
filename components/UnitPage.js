@@ -414,12 +414,18 @@
       exam:     readPct(unitId, "exam")
     });
     useEffect(() => {
+      setTab("learn");
       setPct({
         learn:    readPct(unitId, "learn"),
         practice: readPct(unitId, "practice"),
         exam:     readPct(unitId, "exam")
       });
     }, [unitId]);
+
+    const onTabClick = useCallback((e, id) => {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      setTab(id);
+    }, []);
 
     const updatePct = useCallback((key, value, extra) => {
       writePct(unitId, key, value, extra);
@@ -458,42 +464,49 @@
 
         <Connections unitId={unitId} deep={deep} unit={unit} setRoute={setRoute}/>
 
-        <div role="tablist" className="grid grid-cols-3 gap-2">
+        <div role="tablist" aria-label="לשוניות יחידה" className="grid grid-cols-3 gap-2 sticky top-0 z-20 py-1" style={{background:"linear-gradient(180deg,rgba(10,22,40,.85),rgba(10,22,40,.65))",backdropFilter:"blur(6px)"}}>
           {[
             { id: "learn",    label: "📖 לימוד" },
             { id: "practice", label: "🔁 תרגול" },
             { id: "exam",     label: "📝 מבחן"  }
-          ].map(t => (
-            <button key={t.id} role="tab" aria-selected={tab === t.id}
-              onClick={() => setTab(t.id)}
-              className={"px-3 py-2 rounded-xl text-sm font-bold border transition " +
-                (tab === t.id
-                  ? "tab-active border-amber-500"
-                  : "card border-amber-700/30 text-on-parchment hover:scale-[1.01]")
-              }>
-              {t.label}
-            </button>
-          ))}
+          ].map(t => {
+            const active = tab === t.id;
+            return (
+              <button key={t.id} type="button" role="tab"
+                aria-selected={active} aria-controls={"tabpanel-" + t.id}
+                id={"tab-" + t.id}
+                onClick={(e) => onTabClick(e, t.id)}
+                className={"px-3 py-2 rounded-xl text-sm font-bold border transition relative " +
+                  (active
+                    ? "tab-active border-amber-500 ring-2 ring-amber-400/60"
+                    : "card border-amber-700/30 text-on-parchment hover:scale-[1.01]")
+                }>
+                {t.label}
+              </button>
+            );
+          })}
         </div>
 
-        {tab === "learn" && (
-          <LearnTab
-            deep={deep} unit={unit} unitId={unitId} setRoute={setRoute}
-            onComplete={() => updatePct("learn", 100, { completedAt: Date.now() })}
-          />
-        )}
-        {tab === "practice" && (
-          <PracticeTab
-            unitId={unitId} setRoute={setRoute}
-            onProgress={(p, extra) => updatePct("practice", p, extra)}
-          />
-        )}
-        {tab === "exam" && (
-          <ExamTab
-            unitId={unitId} setRoute={setRoute}
-            onComplete={(p, extra) => updatePct("exam", p, extra)}
-          />
-        )}
+        <div role="tabpanel" id={"tabpanel-" + tab} aria-labelledby={"tab-" + tab} key={"panel-" + unitId + "-" + tab}>
+          {tab === "learn" && (
+            <LearnTab
+              deep={deep} unit={unit} unitId={unitId} setRoute={setRoute}
+              onComplete={() => updatePct("learn", 100, { completedAt: Date.now() })}
+            />
+          )}
+          {tab === "practice" && (
+            <PracticeTab
+              unitId={unitId} setRoute={setRoute}
+              onProgress={(p, extra) => updatePct("practice", p, extra)}
+            />
+          )}
+          {tab === "exam" && (
+            <ExamTab
+              unitId={unitId} setRoute={setRoute}
+              onComplete={(p, extra) => updatePct("exam", p, extra)}
+            />
+          )}
+        </div>
       </div>
     );
   }

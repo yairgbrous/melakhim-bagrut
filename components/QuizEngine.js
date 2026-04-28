@@ -168,11 +168,12 @@
 
     const footerChips = () => {
       const chips = [];
+      const rdn = (typeof window !== "undefined" && typeof window.resolveDisplayName === "function") ? window.resolveDisplayName : (x => x);
       if (q.unit) chips.push({label:`יחידה ${q.unit}`, key:"u"});
       if (q.chapter) chips.push({label:q.chapter, key:"c"});
-      if (q.character) chips.push({label:`👤 ${q.character}`, key:"ch"});
-      if (q.place) chips.push({label:`📍 ${q.place}`, key:"pl"});
-      if (q.event) chips.push({label:`⚔️ ${q.event}`, key:"ev"});
+      if (q.character) chips.push({label:`👤 ${rdn(q.character)}`, key:"ch"});
+      if (q.place) chips.push({label:`📍 ${rdn(q.place)}`, key:"pl"});
+      if (q.event) chips.push({label:`⚔️ ${rdn(q.event)}`, key:"ev"});
       return chips;
     };
 
@@ -458,6 +459,16 @@
         </div>
       );
     }
+
+    // On completion, push a leaderboard snapshot (best-effort, throttled).
+    useEffect(() => {
+      if (!done) return;
+      try {
+        if (typeof window !== "undefined" && window.MelakhimAuth && window.MelakhimAuth.publishLeaderboard){
+          window.MelakhimAuth.publishLeaderboard();
+        }
+      } catch {}
+    }, [done]);
 
     if (done){
       return <Results answered={answered} questions={questions} onRestart={restart} onExit={exit}/>;
