@@ -13,6 +13,29 @@
      related_entities — array of "type:id" strings (king|char|event|place)
 
    Exposes: window.REVIEW_QUESTIONS  (consumed by QuizEngine / ExamSim)
+   =========================================================================
+
+   !!! TODO source-needed — APPLIES TO EVERY ENTRY IN THIS FILE !!!
+   ----------------------------------------------------------------------
+   None of the 120 questions below carry a `book_ref` field. The
+   `prompt_niqqud`, `answer_points`, `expected_answer`, `scoring_rubric`,
+   and `hints` fields were composed by the site team based on what we
+   *believed* about the מיקוד 2551 syllabus and past exam patterns —
+   they are NOT extracted from any official מתכונת, ניסויי, or שאלון רשמי.
+
+   Treat every question here as DRAFT until the user verifies it. In
+   particular:
+     - The niqqud in `prompt_niqqud` was NOT cross-checked against an
+       authoritative Tanakh edition. Niqqud errors are likely.
+     - Verse references inside `expected_answer` (e.g. "מל״א ג׳ ט") were
+       composed from memory/derivation, not by quoting the actual פסוק
+       from a verified text. The user must spot-check each.
+     - `expected_answer` prose may contain factual statements not present
+       in characters.js / events.js / quotes.js. Where in doubt, prefer
+       the shorter `answer_points` list and ignore prose.
+
+   When a real source becomes available, replace this header with explicit
+   provenance per question (e.g. `source: 'matkonet_2551 q4'`).
    ========================================================================= */
 (function(){
   const QUESTIONS = [

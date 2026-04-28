@@ -1,3 +1,23 @@
+/* =========================================================================
+   data/quotes.js — verse quotes used across the bagrut prep site.
+
+   !!! TODO source-needed — APPLIES TO EVERY ENTRY IN THIS FILE !!!
+   ----------------------------------------------------------------------
+   Each entry has a `book_ref` pointing to chapter/verse, but the niqqud
+   in `text_niqqud` was NOT cross-checked against an authoritative Tanakh
+   edition (Aleppo / Leningrad / Mossad HaRav Kook). Niqqud transcription
+   errors are likely. The `significance` prose was composed by the site
+   team and is editorial, not from any cited source.
+
+   Several entries carry ids prefixed `q-matkonet-…` and significance
+   text such as "ציטוט מתכונת תשפ״ו". The actual מתכונת תשפ״ו document is
+   NOT present in this repository — the labels were applied without a
+   verified source. Treat the matkonet prefix as aspirational, not as
+   evidence of provenance.
+
+   When a real source becomes available, add a `source_ref` field on each
+   entry pointing to the exact citation.
+   ========================================================================= */
 window.QUOTES_DATA = [
   {
     id: "q-matkonet-1-kav-shomron",

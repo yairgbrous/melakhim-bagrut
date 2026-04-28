@@ -1,6 +1,21 @@
 // data/past-exams.js
 // שאלות מבגרויות קודמות ודוגמאות לתרגול — בגרות 2551 (ספר מלכים).
 // הערה: הניסוחים המובאים כאן הם ניסוחי תרגול בהשראת סוגי שאלות נפוצות ולא מילה במילה מטופס רשמי.
+//
+// !!! TODO source-needed — APPLIES TO EVERY ENTRY IN THIS FILE !!!
+// ---------------------------------------------------------------
+// No actual past-exam PDF or scan is present in this repository.
+// Every `question`, `modelAnswer`, `rubric`, and `explanation` here was
+// composed by the site team in the spirit of past exams — not extracted
+// from any official שאלון רשמי. The `year` and `season` labels are
+// illustrative, not provenance: e.g. "2019-summer-q1" does NOT mean we
+// have a verified copy of the קיץ 2019 שאלון.
+//
+// EXAM_2551_DATA below is explicitly marked `source_note: "מתכונת תשפ"ו -
+// נוסח משוחזר"` — i.e. a reconstruction, NOT the official מתכונת.
+//
+// Treat every entry as DRAFT. When a real source becomes available,
+// replace this header with explicit provenance per question.
 
 export const examQuestions = [
   {
