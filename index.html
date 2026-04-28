@@ -209,7 +209,7 @@
 <script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=4000"></script>
 <script src="./components/BreadthPage.js?v=3000"></script>
-<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=2000"></script>
+<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=5500"></script>
 <script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/Toast.js?v=2000"></script>
@@ -219,6 +219,7 @@
 <script type="text/babel" data-presets="react" src="./components/Timeline.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/PwaShell.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/NotFound.js?v=4000"></script>
+<script type="text/babel" data-presets="react" src="./components/Leaderboard.js?v=5500"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -2288,8 +2289,19 @@ function StudyHub({setRoute}){
 
 // ============ ME TAB — leaderboard FIRST, then achievements, then profile ============
 function MeTab({S, update, setRoute}){
+  const onShare = () => {
+    if (typeof window !== 'undefined' && window.MelakhimAuth && window.MelakhimAuth.shareApp){
+      window.MelakhimAuth.shareApp();
+    }
+  };
   return (
     <div className="space-y-6">
+      <section className="card rounded-xl p-4 flex items-center justify-between gap-3 flex-wrap">
+        <div className="text-on-parchment text-sm font-bold">הזמן חברים מהשכבה ללמוד יחד</div>
+        <button onClick={onShare} className="gold-btn px-4 py-2 rounded-lg font-bold" aria-label="שתף עם השכבה">
+          📤 שתף עם השכבה
+        </button>
+      </section>
       <section className="space-y-3">
         <h2 className="font-display text-xl md:text-2xl font-bold text-amber-300 flex items-center gap-2">
           <span aria-hidden="true">🏆</span><span>דירוג הכיתה</span>
@@ -2490,7 +2502,8 @@ function App(){
       themes: 'themes', maps: 'maps',
       quiz: 'quiz', 'exam-sim': 'exam', exam: 'exam',
       flashcards: 'flashcards', quotes: 'quotes', profile: 'profile', class: 'class',
-      daily: 'daily', book: 'book'
+      daily: 'daily', book: 'book',
+      leaderboard: 'leaderboard'
     };
     const SLUG_FROM_PAGE = {
       home: 'home', study: 'learn', timeline: 'timeline', themes: 'themes',
@@ -2498,7 +2511,7 @@ function App(){
       quotes: 'quotes', profile: 'profile', class: 'class',
       character: 'character', event: 'event', place: 'place', unit: 'unit', lesson: 'lesson',
       king: 'king', breadth: 'breadth', map: 'map', book: 'book',
-      daily: 'daily'
+      daily: 'daily', leaderboard: 'leaderboard'
     };
     const parseHash = () => {
       const raw = (window.location.hash || '').replace(/^#\/?/, '').trim();
@@ -2620,7 +2633,7 @@ function App(){
   const bottomNavs = [
     {p:"home",l:"בית",i:"🏠"},
     {p:"quiz",l:"אזור בחינה",i:"✍️"},
-    {p:"study",l:"למידה",i:"📚"},
+    {p:"leaderboard",l:"מובילים",i:"🏆"},
     {p:"profile",l:"אישי",i:"👤"}
   ];
   const go = p => { setRoute({page:p}); setDrawerOpen(false); };
@@ -2783,6 +2796,7 @@ function App(){
         {route.page==="profile" && <MeTab S={S} update={update} setRoute={setRoute}/>}
         {route.page==="study" && <StudyHub setRoute={setRoute}/>}
         {route.page==="character" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף דמות...</div>; })()}
+        {route.page==="leaderboard" && (()=>{ const LB = window.LeaderboardComponent; return LB ? <LB setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען טבלת מובילים...</div>; })()}
         {(() => {
           const known = new Set(["home","path","unit","lesson","quiz","quizUnit","flashcards","exam-sim","event","place","daily","quizPlay","quizResult","themes","quotes","timeline","maps","exam","class","profile","study","character"]);
           if (known.has(route.page)) return null;

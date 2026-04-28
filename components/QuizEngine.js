@@ -460,6 +460,16 @@
       );
     }
 
+    // On completion, push a leaderboard snapshot (best-effort, throttled).
+    useEffect(() => {
+      if (!done) return;
+      try {
+        if (typeof window !== "undefined" && window.MelakhimAuth && window.MelakhimAuth.publishLeaderboard){
+          window.MelakhimAuth.publishLeaderboard();
+        }
+      } catch {}
+    }, [done]);
+
     if (done){
       return <Results answered={answered} questions={questions} onRestart={restart} onExit={exit}/>;
     }
