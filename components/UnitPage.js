@@ -413,6 +413,18 @@
       character_details: "פרטי דמות",
       place_events:      "אירועים במקום"
     };
+    // Group raw q.type values into the 3 high-level בגרות categories shown
+    // as pills. Without this mapping the literal-equality filter never
+    // matches anything because data/review-questions.js uses English IDs.
+    const TYPE_CATEGORY = {
+      mi_amar_lemi:      "בקיאות",
+      al_mi_neemar:      "בקיאות",
+      be_eize_hekhsher:  "בקיאות",
+      short_answer:      "ידע",
+      character_details: "ידע",
+      place_events:      "ידע"
+      // breadth/רוחב tagging happens via q.category/q.question_type below.
+    };
     const typeLabel = (t) => {
       if (!t) return "שאלה";
       const rdn = (typeof window !== "undefined" && typeof window.resolveDisplayName === "function") ? window.resolveDisplayName : null;
@@ -423,10 +435,16 @@
       }
       return String(t).replace(/_/g, " ");
     };
+    const matchesTypeFilter = (q, f) => {
+      if (f === "all") return true;
+      if (q.type === f || q.question_type === f || q.category === f) return true;
+      if (TYPE_CATEGORY[q.type] === f) return true;
+      return false;
+    };
 
     const filtered = useMemo(() => all.filter(q =>
       (diffFilter === 'all' || q.difficulty === diffFilter) &&
-      (typeFilter === 'all' || q.type === typeFilter || q.question_type === typeFilter)
+      matchesTypeFilter(q, typeFilter)
     ), [all, diffFilter, typeFilter]);
 
     useEffect(() => { setI(0); setRevealed(false); }, [diffFilter, typeFilter]);
