@@ -63,6 +63,11 @@
   }
 })();
 </script>
+<!-- Critical data: load synchronously BEFORE the entity-index bootstrap so
+     window.CHARACTERS_DATA and window.KINGS_DATA are populated up front.
+     Previous async import() path was failing silently in production. -->
+<script src="./data/characters.js?v=8000"></script>
+<script src="./data/kings.js?v=8000"></script>
 <script>
 /* =========================================================================
    Entity index bootstrap — loads data modules into window.__ENTITY_INDEX__
@@ -127,7 +132,11 @@
       heading: d.display_label_hebrew || d.id
     });
   });
-  const chArr = (chars && (chars.default || chars.characters)) || [];
+  // Prefer window.CHARACTERS_DATA (set by static <script src> above) over
+  // the dynamic import() result which was failing silently in production.
+  const chArr = (Array.isArray(window.CHARACTERS_DATA) && window.CHARACTERS_DATA.length)
+    ? window.CHARACTERS_DATA
+    : ((chars && (chars.default || chars.characters)) || []);
   chArr.forEach(c => {
     idx.character[c.id] = Object.assign({}, c, {
       summary: c.bio || c.description || '',
@@ -155,7 +164,13 @@
       heading: k.title || k.id
     });
   });
-  const kingsArr = (kingsMod && (kingsMod.default || kingsMod.kings)) || [];
+  // Prefer window.KINGS_DATA (set by static <script src> above) over the
+  // dynamic import() result. kings.js is now a non-module that assigns
+  // the global directly; this branch keeps the import() fallback for
+  // any previously-cached deployment that still serves the ES-module form.
+  const kingsArr = (Array.isArray(window.KINGS_DATA) && window.KINGS_DATA.length)
+    ? window.KINGS_DATA
+    : ((kingsMod && (kingsMod.default || kingsMod.kings)) || []);
   idx.king = idx.king || {};
   kingsArr.forEach(kk => {
     idx.king[kk.id] = Object.assign({}, kk, {
@@ -199,7 +214,7 @@
 <script type="text/babel" data-presets="react" src="./components/RelatedSection.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=6000"></script>
 <script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=2200"></script>
-<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=7000"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=8500"></script>
 <script type="text/babel" data-presets="react" src="./components/EventPage.js?v=8500"></script>
 <script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=8500"></script>
 <script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=2000"></script>

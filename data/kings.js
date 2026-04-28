@@ -6,7 +6,7 @@
 //         killed[], related_prophets[], related_places[], related_events[],
 //         book_page, short_summary.
 
-export const kings = [
+const kings = [
   {
     id: "shlomo",
     name_niqqud: "שְׁלֹמֹה",
@@ -1117,4 +1117,6 @@ export const kings = [
   },
 ];
 
-export default kings;
+if (typeof window !== 'undefined') {
+  window.KINGS_DATA = kings;
+}

@@ -334,18 +334,21 @@
   function PartASelect({ selected, onToggle }){
     const count = selected.length;
     const full = count >= MAX_A;
+    const exact = count === MAX_A;
+    const tooMany = count > MAX_A;
+    const colorClass = tooMany ? "text-red-400" : (exact ? "text-emerald-400" : "text-on-parchment-accent");
     return (
       <section className="space-y-2">
         <div className="flex items-center justify-between sticky top-[108px] z-10 bg-slate-900/90 backdrop-blur-sm rounded-xl p-3 border border-amber-500/30">
           <div className="font-display text-base font-bold text-on-parchment">פרק א — בקיאות</div>
-          <div className={`text-sm font-bold ${full?"text-emerald-400":"text-on-parchment-accent"}`}>
+          <div className={`text-sm font-bold ${colorClass}`}>
             נבחרו <span dir="ltr">{count}/{MAX_A}</span>
           </div>
         </div>
         <div className="space-y-2">
           {partAList().map(q => (
             <SelectionCard key={q.id} q={q} selected={selected.includes(q.id)}
-              onToggle={()=>onToggle(q.id)} disabled={full}/>
+              onToggle={()=>onToggle(q.id)} disabled={full && !selected.includes(q.id)}/>
           ))}
         </div>
       </section>
@@ -355,13 +358,16 @@
   function PartBCSelect({ selected, onToggle }){
     const count = selected.length;
     const full = count >= MAX_BC;
+    const exact = count === MAX_BC;
+    const tooMany = count > MAX_BC;
+    const colorClass = tooMany ? "text-red-400" : (exact ? "text-emerald-400" : "text-purple-300");
     const partB = partBCList().filter(q => q.part === "B");
     const partC = partBCList().filter(q => q.part === "C");
     return (
       <section className="space-y-2">
         <div className="flex items-center justify-between sticky top-[108px] z-10 bg-slate-900/90 backdrop-blur-sm rounded-xl p-3 border border-purple-500/30">
           <div className="font-display text-base font-bold text-purple-200">פרק ב + ג — ידע ורוחב</div>
-          <div className={`text-sm font-bold ${full?"text-emerald-400":"text-purple-300"}`}>
+          <div className={`text-sm font-bold ${colorClass}`}>
             נבחרו <span dir="ltr">{count}/{MAX_BC}</span>
           </div>
         </div>
@@ -369,13 +375,13 @@
         <div className="space-y-2">
           {partB.map(q => (
             <SelectionCard key={q.id} q={q} selected={selected.includes(q.id)}
-              onToggle={()=>onToggle(q.id)} disabled={full}/>
+              onToggle={()=>onToggle(q.id)} disabled={full && !selected.includes(q.id)}/>
           ))}
         </div>
         <div className="space-y-2">
           {partC.map(q => (
             <SelectionCard key={q.id} q={q} selected={selected.includes(q.id)}
-              onToggle={()=>onToggle(q.id)} disabled={full}/>
+              onToggle={()=>onToggle(q.id)} disabled={full && !selected.includes(q.id)}/>
           ))}
         </div>
       </section>
