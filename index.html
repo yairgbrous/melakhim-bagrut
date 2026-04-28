@@ -98,11 +98,11 @@
     evalFile('./data/breadth.js?v=3100', []),
   ]);
   const [chars, stories, flashcards, keyConcepts, kingsMod, unitDeepMod] = await Promise.all([
-    importModule('./data/characters.js?v=5500'),
+    importModule('./data/characters.js?v=7000'),
     importModule('./data/stories.js'),
     importModule('./data/flashcards.js'),
     importModule('./data/key-concepts.js'),
-    importModule('./data/kings.js'),
+    importModule('./data/kings.js?v=7000'),
     importModule('./data/unit-deep-summaries.js?v=3100')
   ]);
   if (unitDeepMod) {
