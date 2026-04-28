@@ -205,7 +205,6 @@
     const subtitleBits = [
       ev.unit != null ? `יחידה ${ev.unit}` : null,
       ev.chapter_ref || ev.chapters || null,
-      ev.date_bce != null ? `~${ev.date_bce} לפנה״ס` : null,
     ].filter(Boolean);
 
     const participants = ev.participants || [];

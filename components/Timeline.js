@@ -157,7 +157,7 @@
     return (
       <button
         onClick={() => onClick(id)}
-        title={`${label} · ${start}–${end} לפנה״ס`}
+        title={`${label}`}
         className="absolute rounded-md text-xs font-bold flex items-center justify-center hebrew transition hover:scale-[1.04] hover:z-20"
         style={{
           right: left,
@@ -319,7 +319,7 @@
               ציר הזמן של ספר מלכים
             </h1>
             <div className="text-xs text-on-parchment-muted mt-1 hebrew">
-              931–586 לפנה״ס · מפילוג הממלכה עד חורבן הבית · לחץ על מלך/נביא לדף המלא
+              מפילוג הממלכה עד חורבן הבית · לחץ על מלך/נביא לדף המלא
             </div>
           </div>
           <div className="flex items-center gap-1">

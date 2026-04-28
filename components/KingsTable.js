@@ -228,9 +228,8 @@
       ? 'מלך הממלכה המאוחדת'
       : (isJudah ? 'מלך יהודה · ' + (k.dynasty || 'בית דוד')
                  : 'מלך ישראל · ' + (k.dynasty || ''));
-    const yrs = (k.reign_start_bce && k.reign_end_bce)
-      ? (k.reign_start_bce + '–' + k.reign_end_bce)
-      : (k.reign_years ? (k.reign_years + ' שנ׳') : '');
+    const ctxSnippet = (k.context_short || '').split(/[.!?]/)[0].trim();
+    const yrs = ctxSnippet || (k.reign_years ? (k.reign_years + ' שנ׳') : '');
 
     const onCardClick = () => navTo(setRoute, 'character', k.id);
     const onKey = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onCardClick(); } };
@@ -243,7 +242,7 @@
         onClick={onCardClick}
         onKeyDown={onKey}
         aria-label={k.name_niqqud + ' · ' + tone.label + ' · ' + role}
-        title={role + (yrs ? ' · ' + yrs + ' לפנה״ס' : '')}
+        title={role + (k.context_short ? ' · ' + k.context_short : '')}
         style={{ background: tone.bg, color: tone.fg, borderColor: tone.ring }}
       >
         <div className="kt2-king-row">
@@ -398,10 +397,9 @@
               aria-selected={activeEra === b.id}
               className={'kt2-era ' + (activeEra === b.id ? 'on' : '')}
               onClick={() => setActiveEra(activeEra === b.id ? null : b.id)}
-              title={'יחידה ' + b.id + ' · ' + b.start + '–' + b.end + ' לפנה״ס'}
+              title={'יחידה ' + b.id + ' · ' + b.name}
             >
               <span>יח׳ {b.id} · {b.name}</span>
-              <span className="kt2-era-yrs">{b.start}–{b.end}</span>
             </button>
           ))}
         </div>
