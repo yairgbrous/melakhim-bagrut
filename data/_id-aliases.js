@@ -246,4 +246,48 @@ window.__ENTITY_ALIASES__ = {
     // Same as character — king IDs that are actually character IDs
     "atalyah_char": "atalyah_char",
   },
+
+  // ---------------------------------------------------------------------
+  // labels — direct ID → Hebrew display label (with niqqud).
+  // Consulted by assets/name-resolver.js BEFORE the per-bucket alias
+  // redirect logic, and BEFORE the data-store scan, so any chip rendered
+  // with one of these ids gets a proper Hebrew label even if no real
+  // entity entry exists.
+  //
+  // Keep this list flat — it's intentionally cross-cutting (events,
+  // places, characters, exam-format jargon, breadth-section codes).
+  // ---------------------------------------------------------------------
+  labels: {
+    // Solomon era — events / scenes
+    "mishpat_shlomo":      "מִשְׁפַּט שְׁלֹמֹה",
+    "solomon_dream":       "חֲלוֹם שְׁלֹמֹה בְּגִבְעוֹן",
+    "solomon_coronation":  "הַמְלָכַת שְׁלֹמֹה",
+    "temple_dedication":   "חֲנֻכַּת בֵּית הַמִּקְדָּשׁ",
+    "sheva_visit":         "בִּקּוּר מַלְכַּת שְׁבָא",
+    "achiya_prophecy":     "נְבוּאַת אֲחִיָּה הַשִּׁילוֹנִי",
+
+    // Places
+    "gichon":              "גִּיחוֹן",
+    "kodesh_hakodashim":   "קֹדֶשׁ הַקֳּדָשִׁים",
+
+    // Characters / titles
+    "navi_zaken_beit_el":  "נָבִיא זָקֵן מִבֵּית אֵל",
+    "ish_haelohim_yehuda": "אִישׁ הָאֱלֹהִים מִיהוּדָה",
+
+    // Exam format / question-type jargon (chips on QuizEngine, etc.)
+    "mi_amar_lemi":        "מִי אָמַר לְמִי",
+    "mi_natan_lemi":       "מִי נָתַן לְמִי",
+    "mi_eifa_eyfo":        "מִי אֵיפֹה",
+    "sibah_metzeget":      "סִבָּה וְתוֹצָאָה",
+    "cause_effect":        "סִבָּה וְתוֹצָאָה",
+    "compare":             "הַשְׁוָאָה",
+    "analysis":            "נִיתוּחַ",
+
+    // Breadth / section codes
+    "theme":               "נוֹשֵׂא רוֹחַב",
+    "breadth":             "נוֹשֵׂא רוֹחַב",
+    "rohav":               "נוֹשֵׂא רוֹחַב",
+    "bekiut":              "בְּקִיאוּת",
+    "yeda":                "יְדִיעָה",
+  },
 };

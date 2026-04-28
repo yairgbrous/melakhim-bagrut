@@ -81,7 +81,7 @@
       const bucket = idx[g.type] || {};
       Object.keys(bucket).forEach(id => {
         const e = bucket[id] || {};
-        const heading = e.heading || e.name_niqqud || e.name || e.title || e.label || id;
+        const heading = e.heading || e.name_niqqud || e.name || e.title || e.label || (typeof window.resolveDisplayName === 'function' ? window.resolveDisplayName(id) : id);
         const summary = e.summary || e.significance || e.description || "";
         out.push({
           type: g.type,

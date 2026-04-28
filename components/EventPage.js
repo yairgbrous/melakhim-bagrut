@@ -201,7 +201,7 @@
     const ev = useMemo(()=>resolveEvent(id), [id]);
     if (!ev || ev.__stub) return <NotFound id={id} setRoute={setRoute}/>;
 
-    const title = ev.title_niqqud || ev.title || ev.name_hebrew || ev.id;
+    const title = ev.title_niqqud || ev.title || ev.name_hebrew || (typeof window.resolveDisplayName === 'function' ? window.resolveDisplayName(ev.id) : ev.id);
     const subtitleBits = [
       ev.unit != null ? `יחידה ${ev.unit}` : null,
       ev.chapter_ref || ev.chapters || null,

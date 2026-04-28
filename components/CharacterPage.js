@@ -235,7 +235,7 @@
     if (!c || c.__stub) return <NotFound id={id} setRoute={setRoute}/>;
 
     const isKing = /king|מלך/.test(c.role || "") || !!c.kingdom && c.reign_years != null;
-    const name = c.name_niqqud || c.name || c.id;
+    const name = c.name_niqqud || c.name || (typeof window.resolveDisplayName === 'function' ? window.resolveDisplayName(c.id) : c.id);
 
     const subtitleBits = [
       c.role,

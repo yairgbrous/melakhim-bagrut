@@ -165,13 +165,14 @@
   function prophetLabel(pid){
     const idx = (window.__ENTITY_INDEX__ || {}).character || {};
     const c = idx[pid];
-    if (c) return c.name_niqqud || c.name || c.heading || pid;
+    const rdn = (typeof window.resolveDisplayName === 'function') ? window.resolveDisplayName : null;
+    if (c) return c.name_niqqud || c.name || c.heading || (rdn ? rdn(pid) : pid);
     const KU = window.KingsUtils;
     if (KU && KU.FALLBACK_PROPHETS) {
       const f = KU.FALLBACK_PROPHETS.find(p => p.id === pid);
       if (f) return f.name;
     }
-    return pid;
+    return rdn ? rdn(pid) : pid;
   }
 
   // Does the prophet id resolve through the entity index *or* the alias map?
@@ -247,7 +248,7 @@
       >
         <div className="kt2-king-row">
           <div className="kt2-king-name hebrew">
-            <span className="kt2-king-icon" aria-hidden="true">{icon}</span> {k.name_niqqud || k.id}
+            <span className="kt2-king-icon" aria-hidden="true">{icon}</span> {k.name_niqqud || (typeof window.resolveDisplayName === 'function' ? window.resolveDisplayName(k.id) : k.id)}
           </div>
           <div className="kt2-king-meta">
             {yrs && <span className="kt2-king-yrs">{yrs}</span>}

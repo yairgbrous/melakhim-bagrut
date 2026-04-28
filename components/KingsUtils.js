@@ -228,8 +228,9 @@
     // try entity-index characters
     const idx = (typeof window !== 'undefined' && window.__ENTITY_INDEX__) || {};
     const c = (idx.character || {})[id];
-    if (c) return c.name_niqqud || c.name || id;
-    return id;
+    const rdn = (typeof window !== 'undefined' && typeof window.resolveDisplayName === 'function') ? window.resolveDisplayName : null;
+    if (c) return c.name_niqqud || c.name || (rdn ? rdn(id) : id);
+    return rdn ? rdn(id) : id;
   }
 
   function prophets_by_reign(all_chars, king){

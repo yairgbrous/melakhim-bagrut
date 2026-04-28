@@ -151,7 +151,8 @@
     const width = Math.max(8, (start - end) * PX_PER_YEAR);
     const entry = ((window.CHARACTERS_DATA || []).concat(window.KINGS_DATA || []))
       .find(r => r && r.id === id);
-    const label = (entry && (entry.name_niqqud || entry.name)) || id;
+    const rdn = (typeof window.resolveDisplayName === 'function') ? window.resolveDisplayName : null;
+    const label = (entry && (entry.name_niqqud || entry.name)) || (rdn ? rdn(id) : id);
     const top = track === "top" ? 28 : 28 + KING_ROW_H + PROPHET_ROW_H;
     return (
       <button

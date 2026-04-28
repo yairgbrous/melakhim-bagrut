@@ -299,7 +299,7 @@
     const pl = useMemo(()=>resolvePlace(id), [id]);
     if (!pl || pl.__stub) return <NotFound id={id} setRoute={setRoute}/>;
 
-    const name = pl.name_niqqud || pl.name || pl.id;
+    const name = pl.name_niqqud || pl.name || (typeof window.resolveDisplayName === 'function' ? window.resolveDisplayName(pl.id) : pl.id);
     const subtitleBits = [
       pl.type,
       pl.region,
