@@ -362,31 +362,19 @@ aside.lg\:col-span-1{
   }
 }
 
-/* ---------- 8. Bottom nav: equal-width, gold dot under active -------- */
+/* ---------- 8. Bottom nav: 3 equal-width slots, compact 56px --------- */
 .bottom-nav{
-  grid-template-columns:repeat(4,1fr) !important;
+  grid-template-columns:repeat(3,1fr) !important;
   gap:0 !important;
-  padding:8px 8px calc(8px + env(safe-area-inset-bottom)) !important;
+  height:56px !important;
+  padding:0 0 env(safe-area-inset-bottom) !important;
 }
 .bn-item{
   position:relative;
-  padding:8px 4px 12px !important;
-  min-height:60px;
+  padding:6px 4px !important;
+  min-height:0 !important;
 }
 .bn-item .bn-ico{ font-size:24px !important; }
-/* gold dot underneath active item */
-.bn-item.active::after{
-  content:'';
-  position:absolute;
-  bottom:4px;
-  left:50%;
-  transform:translateX(-50%);
-  width:6px;
-  height:6px;
-  border-radius:50%;
-  background:linear-gradient(135deg,#F5D670,#C89B3C);
-  box-shadow:0 0 8px rgba(245,214,112,.6);
-}
 
 /* ---------- 9. Mobile breakpoints under 640px ------------------------ */
 @media (max-width:640px){
