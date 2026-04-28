@@ -178,6 +178,38 @@
     );
   }
 
+  // ---- 3.5 PERSONAL ROW (moved from bottom nav) --------------------------
+  function PersonalRow({setRoute}){
+    return (
+      <section className="mb-home-section">
+        <div className="mb-home-personal-row">
+          <button
+            type="button"
+            onClick={()=>setRoute({page:'profile'})}
+            className="mb-home-personal-tile parchment"
+            aria-label="האזור האישי שלי">
+            <span className="mb-home-personal-icon" aria-hidden="true">👤</span>
+            <span className="mb-home-personal-text">
+              <span className="mb-home-personal-title">אישי</span>
+              <span className="mb-home-personal-sub">הפרופיל וההתקדמות שלי</span>
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={()=>setRoute({page:'leaderboard'})}
+            className="mb-home-personal-tile parchment"
+            aria-label="טבלת מובילים">
+            <span className="mb-home-personal-icon" aria-hidden="true">🏆</span>
+            <span className="mb-home-personal-text">
+              <span className="mb-home-personal-title">מובילים</span>
+              <span className="mb-home-personal-sub">דירוג השכבה</span>
+            </span>
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   // ---- 4. QUICK ACTIONS ROW ----------------------------------------------
   function QuickActions({setRoute}){
     const openSearch = () => {
@@ -186,7 +218,6 @@
       }
     };
     const tiles = [
-      { icon:'🏆', label:'מובילי השכבה', onClick:()=>setRoute({page:'leaderboard'}) },
       { icon:'👑', label:'טבלת מלכים',  onClick:()=>setRoute({page:'timeline'}) },
       { icon:'🗺', label:'מפות',         onClick:()=>setRoute({page:'maps'}) },
       { icon:'👥', label:'דמויות',       onClick:openSearch },
@@ -317,6 +348,7 @@
       <div className="mb-home-root home-polish">
         <HeaderStrip dExam={dExam}/>
         <HeroCard setRoute={setRoute}/>
+        <PersonalRow setRoute={setRoute}/>
         <UnitGrid units={units} setRoute={setRoute}/>
         <QuickActions setRoute={setRoute}/>
         <DailyStrip setRoute={setRoute}/>
@@ -370,6 +402,20 @@
 .mb-home-section{display:flex;flex-direction:column;gap:10px}
 .mb-home-section-title{font-size:16px;font-weight:800;color:#F4D58D;margin:0;padding:0 4px}
 @media (min-width:640px){ .mb-home-section-title{font-size:18px} }
+
+/* 3.5 Personal row — 2 prominent tiles (profile + leaderboard) */
+.mb-home-personal-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.mb-home-personal-tile{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;border:1.5px solid rgba(212,165,116,.55);cursor:pointer;text-align:start;transition:all .18s}
+.mb-home-personal-tile:hover{transform:translateY(-2px);border-color:#D4A574;box-shadow:0 10px 24px rgba(0,0,0,.35)}
+.mb-home-personal-icon{font-size:30px;line-height:1;flex-shrink:0}
+.mb-home-personal-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mb-home-personal-title{font-size:16px;font-weight:900;color:#1A1611;line-height:1.2}
+.mb-home-personal-sub{font-size:12px;color:#6B5639;font-weight:600;line-height:1.2}
+@media (min-width:640px){
+  .mb-home-personal-tile{padding:16px 20px}
+  .mb-home-personal-title{font-size:18px}
+  .mb-home-personal-sub{font-size:13px}
+}
 
 /* 3. Unit grid — 1 col mobile, 2 col md, 3 col lg */
 .mb-home-unit-grid{display:grid;grid-template-columns:1fr;gap:12px}

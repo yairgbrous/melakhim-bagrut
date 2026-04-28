@@ -214,7 +214,7 @@
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/Toast.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/XpBadge.js?v=6000"></script>
-<script type="text/babel" data-presets="react" src="./components/Home.js?v=6000"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=6100"></script>
 <script type="text/babel" data-presets="react" src="./components/Timeline.js?v=6000"></script>
 <script type="text/babel" data-presets="react" src="./components/PwaShell.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/NotFound.js?v=4000"></script>
@@ -334,7 +334,7 @@ html[data-theme='light'] .eb-btn-secondary{background:rgba(107,91,149,.14);color
 @media (prefers-reduced-motion:reduce){.toast-item{animation:none}}
 /* ---- Home redesign v1 + 20 polish ---- */
 body{padding-bottom:72px}
-.bottom-nav{position:fixed;bottom:0;inset-inline:0;z-index:45;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:rgba(10,22,40,.92);backdrop-filter:blur(14px);border-top:1px solid rgba(212,165,116,.35);box-shadow:0 -4px 16px rgba(0,0,0,.35)}
+.bottom-nav{position:fixed;bottom:0;inset-inline:0;z-index:45;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:rgba(10,22,40,.92);backdrop-filter:blur(14px);border-top:1px solid rgba(212,165,116,.35);box-shadow:0 -4px 16px rgba(0,0,0,.35)}
 html[data-theme='light'] .bottom-nav{background:rgba(247,241,225,.92);border-top-color:rgba(139,111,71,.35)}
 .bn-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 4px;border-radius:12px;color:rgba(247,241,225,.55);font-size:11px;font-weight:700;transition:color .15s ease,background .15s ease;background:none;border:0;cursor:pointer;min-height:56px}
 html[data-theme='light'] .bn-item{color:rgba(26,22,17,.6)}
@@ -2631,10 +2631,8 @@ function App(){
   ];
   const bottomNavs = [
     {p:"home",l:"בית",i:"🏠"},
-    {p:"quiz",l:"אזור בחינה",i:"✍️"},
     {p:"study",l:"למידה",i:"🎓"},
-    {p:"leaderboard",l:"מובילים",i:"🏆"},
-    {p:"profile",l:"אישי",i:"👤"}
+    {p:"quiz",l:"מבחנים",i:"📝"}
   ];
   const go = p => { setRoute({page:p}); setDrawerOpen(false); };
 
