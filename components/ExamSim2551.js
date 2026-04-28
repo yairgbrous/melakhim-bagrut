@@ -365,14 +365,13 @@
             נבחרו <span dir="ltr">{count}/{MAX_BC}</span>
           </div>
         </div>
-        <div className="text-[10px] text-on-parchment-meta mt-2">פרק ב — ידע (4 סעיפים)</div>
+        <div className="text-[10px] text-on-parchment-meta mt-2">פרק ב + ג — ידע ונושאי רוחב: בחר 7 מתוך 14 שאלות · 8 נק׳ לשאלה = 56 נק׳</div>
         <div className="space-y-2">
           {partB.map(q => (
             <SelectionCard key={q.id} q={q} selected={selected.includes(q.id)}
               onToggle={()=>onToggle(q.id)} disabled={full}/>
           ))}
         </div>
-        <div className="text-[10px] text-on-parchment-meta mt-3">פרק ג — ידע ונושאי רוחב (10 סעיפים)</div>
         <div className="space-y-2">
           {partC.map(q => (
             <SelectionCard key={q.id} q={q} selected={selected.includes(q.id)}
