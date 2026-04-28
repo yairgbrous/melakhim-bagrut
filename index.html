@@ -205,7 +205,7 @@
 <script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=2000"></script>
 <script src="./components/KingsUtils.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=5500"></script>
-<script type="text/babel" data-presets="react" src="./components/InstantSearch.js?v=5500"></script>
+<script type="text/babel" data-presets="react" src="./components/InstantSearch.js?v=6000"></script>
 <script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=4000"></script>
 <script src="./components/BreadthPage.js?v=5500"></script>
@@ -213,9 +213,8 @@
 <script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/Toast.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/XpBadge.js?v=5500"></script>
-<script type="text/babel" data-presets="react" src="./components/InstantSearch.js?v=5500"></script>
-<script type="text/babel" data-presets="react" src="./components/Home.js?v=5500"></script>
+<script type="text/babel" data-presets="react" src="./components/XpBadge.js?v=6000"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=6000"></script>
 <script type="text/babel" data-presets="react" src="./components/Timeline.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/PwaShell.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/NotFound.js?v=4000"></script>
@@ -2633,6 +2632,7 @@ function App(){
   const bottomNavs = [
     {p:"home",l:"בית",i:"🏠"},
     {p:"quiz",l:"אזור בחינה",i:"✍️"},
+    {p:"study",l:"למידה",i:"🎓"},
     {p:"leaderboard",l:"מובילים",i:"🏆"},
     {p:"profile",l:"אישי",i:"👤"}
   ];
@@ -2657,7 +2657,6 @@ function App(){
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            {typeof window!=="undefined" && window.XpBadgeComponent ? <window.XpBadgeComponent compact/> : null}
             <button
               onClick={()=>{ if(typeof window!=="undefined" && typeof window.openInstantSearch==="function") window.openInstantSearch(); }}
               aria-label="חיפוש מהיר (Ctrl+K)"

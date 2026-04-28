@@ -70,7 +70,6 @@
         window.openInstantSearch();
       }
     };
-    const XpBadge = (typeof window !== 'undefined') ? window.XpBadgeComponent : null;
     return (
       <header className="mb-home-header ui-hero">
         <div className="mb-home-header-title">
@@ -80,7 +79,6 @@
           </div>
         </div>
         <div className="mb-home-header-right">
-          {XpBadge ? <XpBadge compact/> : null}
           <button
             type="button"
             onClick={openSearch}
