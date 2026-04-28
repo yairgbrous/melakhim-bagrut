@@ -289,5 +289,20 @@ window.__ENTITY_ALIASES__ = {
     "rohav":               "נוֹשֵׂא רוֹחַב",
     "bekiut":              "בְּקִיאוּת",
     "yeda":                "יְדִיעָה",
+    "context":             "הֶקְשֵׁר",
+    "open":                "שְׁאֵלָה פְּתוּחָה",
+    "citation":            "צִיטוּט",
+
+    // Motifs / breadth-topic codes that leak as chips on Unit/Character pages
+    "double_causality":    "סִבָּתִיוּת כְּפוּלָה",
+    "wisdom_motif":        "מוֹטִיב הַחָכְמָה",
+    "kingship_and_covenant": "מְלוּכָה וּבְרִית",
+    "temple_and_shechina":   "מִקְדָּשׁ וּשְׁכִינָה",
+    "torn_garment":        "קְרִיעַת הַבֶּגֶד",
+    "royal_mule":          "פִּרְדַּת הַמֶּלֶךְ",
+    "golden_age":          "תּוֹר הַזָּהָב",
+    "foreign_wives":       "נָשִׁים נָכְרִיּוֹת",
+    "dynastic_promise":    "הַבְטָחַת הַשּׁוֹשֶׁלֶת",
+    "wisdom_gift":         "מַתְּנַת הַחָכְמָה",
   },
 };
