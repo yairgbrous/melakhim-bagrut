@@ -47,6 +47,25 @@
   function backfill(){
     const idx = ensureIndex();
 
+    // Defensive: bootEntityIndex (in index.html) registers character + king
+    // by importing the ES modules — but if those imports fail (CDN cache,
+    // syntax issue) the side-effect arrays on window may still be present.
+    // Layer them in here so EntityLink / page resolvers always see the data.
+    (window.CHARACTERS_DATA || []).forEach(c => {
+      put(idx.character, c.id, Object.assign({}, c, {
+        heading: c.name_niqqud || c.name || c.id,
+        summary: c.bio || c.description || ""
+      }));
+    });
+
+    (window.KINGS_DATA || []).forEach(k => {
+      put(idx.king, k.id, Object.assign({}, k, {
+        heading: k.name_niqqud || k.name || k.id,
+        summary: k.context_short || k.short_summary || "",
+        name: k.name_niqqud || k.id
+      }));
+    });
+
     (window.PLACES_DATA || []).forEach(p => {
       put(idx.place, p.id, Object.assign({}, p, {
         heading: p.name_niqqud || p.name || p.id,

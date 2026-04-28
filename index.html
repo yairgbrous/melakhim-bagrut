@@ -98,11 +98,11 @@
     evalFile('./data/breadth.js?v=3100', []),
   ]);
   const [chars, stories, flashcards, keyConcepts, kingsMod, unitDeepMod] = await Promise.all([
-    importModule('./data/characters.js?v=7000'),
+    importModule('./data/characters.js?v=8500'),
     importModule('./data/stories.js'),
     importModule('./data/flashcards.js'),
     importModule('./data/key-concepts.js'),
-    importModule('./data/kings.js?v=7000'),
+    importModule('./data/kings.js?v=8500'),
     importModule('./data/unit-deep-summaries.js?v=3100')
   ]);
   if (unitDeepMod) {
@@ -186,13 +186,13 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <!-- Cross-entity connectivity: load BEFORE pages so window.__ENTITY_INDEX__
      has all buckets + window.EntityLinkComponent is available at render. -->
-<script src="./data/breadth-topics.js?v=7000"></script>
-<script src="./data/events.js?v=7000"></script>
-<script src="./data/places.js?v=7000"></script>
-<script src="./data/quotes.js?v=5500"></script>
+<script src="./data/breadth-topics.js?v=8500"></script>
+<script src="./data/events.js?v=8500"></script>
+<script src="./data/places.js?v=8500"></script>
+<script src="./data/quotes.js?v=8500"></script>
 <script src="./data/unit-deep-summaries.js?v=3100"></script>
 <script src="./data/review-questions.js?v=5500"></script>
-<script src="./data/_entity-index.js?v=3000"></script>
+<script src="./data/_entity-index.js?v=8500"></script>
 <script type="module" src="./data/past-exams.js?v=2000"></script>
 <script src="./assets/name-resolver.js?v=8000"></script>
 <script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=8000"></script>
@@ -200,21 +200,21 @@
 <script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=6000"></script>
 <script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=2200"></script>
 <script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=7000"></script>
-<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=6000"></script>
-<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=6000"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=8500"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=8500"></script>
 <script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=2000"></script>
 <script src="./components/KingsUtils.js?v=6000"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=6000"></script>
-<script type="text/babel" data-presets="react" src="./components/InstantSearch.js?v=6000"></script>
-<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=6000"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=8500"></script>
+<script type="text/babel" data-presets="react" src="./components/InstantSearch.js?v=8500"></script>
+<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=8500"></script>
 <script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=4000"></script>
-<script src="./components/BreadthPage.js?v=5500"></script>
+<script src="./components/BreadthPage.js?v=8500"></script>
 <script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
 <script type="text/babel" data-presets="react" src="./components/Toast.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/XpBadge.js?v=6000"></script>
-<script type="text/babel" data-presets="react" src="./components/Home.js?v=6000"></script>
+<script type="text/babel" data-presets="react" src="./components/XpBadge.js?v=8500"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=8500"></script>
 <script type="text/babel" data-presets="react" src="./components/Timeline.js?v=6000"></script>
 <script type="text/babel" data-presets="react" src="./components/PwaShell.js?v=4000"></script>
 <script type="text/babel" data-presets="react" src="./components/NotFound.js?v=4000"></script>
@@ -334,7 +334,7 @@ html[data-theme='light'] .eb-btn-secondary{background:rgba(107,91,149,.14);color
 @media (prefers-reduced-motion:reduce){.toast-item{animation:none}}
 /* ---- Home redesign v1 + 20 polish ---- */
 body{padding-bottom:72px}
-.bottom-nav{position:fixed;bottom:0;inset-inline:0;z-index:45;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:rgba(10,22,40,.92);backdrop-filter:blur(14px);border-top:1px solid rgba(212,165,116,.35);box-shadow:0 -4px 16px rgba(0,0,0,.35)}
+.bottom-nav{position:fixed;bottom:0;inset-inline:0;z-index:45;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:rgba(10,22,40,.92);backdrop-filter:blur(14px);border-top:1px solid rgba(212,165,116,.35);box-shadow:0 -4px 16px rgba(0,0,0,.35)}
 html[data-theme='light'] .bottom-nav{background:rgba(247,241,225,.92);border-top-color:rgba(139,111,71,.35)}
 .bn-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 4px;border-radius:12px;color:rgba(247,241,225,.55);font-size:11px;font-weight:700;transition:color .15s ease,background .15s ease;background:none;border:0;cursor:pointer;min-height:56px}
 html[data-theme='light'] .bn-item{color:rgba(26,22,17,.6)}
@@ -2502,8 +2502,13 @@ function App(){
       quiz: 'quiz', 'exam-sim': 'exam', exam: 'exam',
       flashcards: 'flashcards', quotes: 'quotes', profile: 'profile', class: 'class',
       daily: 'daily', book: 'book',
-      leaderboard: 'leaderboard'
+      leaderboard: 'leaderboard',
+      // Entity slugs — early-returned by parseHash with id, but listed here
+      // so window inspection / fallback lookups never report "undefined".
+      character: 'character', king: 'king', event: 'event', place: 'place',
+      breadth: 'breadth', map: 'map', quote: 'quote', unit: 'unit', lesson: 'lesson'
     };
+    if (typeof window !== 'undefined') window.PAGE_FROM_SLUG = PAGE_FROM_SLUG;
     const SLUG_FROM_PAGE = {
       home: 'home', study: 'learn', timeline: 'timeline', themes: 'themes',
       maps: 'maps', quiz: 'quiz', exam: 'exam-sim', flashcards: 'flashcards',
@@ -2797,7 +2802,7 @@ function App(){
         {route.page==="character" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף דמות...</div>; })()}
         {route.page==="leaderboard" && (()=>{ const LB = window.LeaderboardComponent; return LB ? <LB setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען טבלת מובילים...</div>; })()}
         {(() => {
-          const known = new Set(["home","path","unit","lesson","quiz","quizUnit","flashcards","exam-sim","event","place","daily","quizPlay","quizResult","themes","quotes","timeline","maps","exam","class","profile","study","character"]);
+          const known = new Set(["home","path","unit","lesson","quiz","quizUnit","flashcards","exam-sim","event","place","daily","quizPlay","quizResult","themes","quotes","timeline","maps","exam","class","profile","study","character","king","breadth","leaderboard","map","book"]);
           if (known.has(route.page)) return null;
           const NF = window.NotFoundComponent;
           const attempted = route.attempted || (typeof window !== 'undefined' ? (window.location.hash || '') : '');
