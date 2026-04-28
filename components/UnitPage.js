@@ -166,6 +166,91 @@
     );
   }
 
+  // Era band colors per unit (gold for unit 1, etc.)
+  const UNIT_BAND = {1:"#D4A574",2:"#A83240",3:"#3E8E7E",4:"#6B5B95",5:"#8B4513",6:"#2C3E50"};
+
+  // Curated key quotes per unit. Refs follow ספר/פרק/פסוק form.
+  const KEY_QUOTES = {
+    1: [
+      { text: "וְנָתַתָּ לְעַבְדְּךָ לֵב שֹׁמֵעַ לִשְׁפֹּט אֶת־עַמְּךָ", ref: "מלכים-א ג, ט" },
+      { text: "כִּי מָלֵא כְבוֹד ה' אֶת בֵּית ה'", ref: "מלכים-א ח, יא" },
+      { text: "וַיֶּאֱהַב הַמֶּלֶךְ שְׁלֹמֹה נָשִׁים נָכְרִיּוֹת רַבּוֹת", ref: "מלכים-א יא, א" }
+    ],
+    2: [
+      { text: "אָבִי הִכְבִּיד אֶת עֻלְּכֶם וַאֲנִי אוֹסִיף עַל עֻלְּכֶם", ref: "מלכים-א יב, יד" },
+      { text: "מַה לָּנוּ חֵלֶק בְּדָוִד וְלֹא נַחֲלָה בְּבֶן יִשַׁי", ref: "מלכים-א יב, טז" },
+      { text: "כִּי מֵאִתִּי נִהְיָה הַדָּבָר הַזֶּה", ref: "מלכים-א יב, כד" }
+    ],
+    3: [
+      { text: "ה' הוּא הָאֱלֹהִים, ה' הוּא הָאֱלֹהִים", ref: "מלכים-א יח, לט" },
+      { text: "וְאַחַר הָאֵשׁ — קוֹל דְּמָמָה דַקָּה", ref: "מלכים-א יט, יב" },
+      { text: "הֲרָצַחְתָּ וְגַם יָרָשְׁתָּ", ref: "מלכים-א כא, יט" }
+    ],
+    4: [
+      { text: "אָבִי אָבִי רֶכֶב יִשְׂרָאֵל וּפָרָשָׁיו", ref: "מלכים-ב ב, יב" },
+      { text: "הֲשָׁלוֹם זִמְרִי הֹרֵג אֲדֹנָיו", ref: "מלכים-ב ט, לא" },
+      { text: "וַיְהִי בִּשְׁנַת שֶׁבַע לְיֵהוּא מָלַךְ יְהוֹאָשׁ", ref: "מלכים-ב יב, ב" }
+    ],
+    5: [
+      { text: "וְלֹא הֶאֱמִינוּ בַּה' אֱלֹהֵיהֶם", ref: "מלכים-ב יז, יד" },
+      { text: "וַיִּגֶל יִשְׂרָאֵל מֵעַל אַדְמָתוֹ אַשּׁוּרָה", ref: "מלכים-ב יז, כג" },
+      { text: "וַיִּתְאַנַּף ה' מְאֹד בְּיִשְׂרָאֵל וַיְסִירֵם מֵעַל פָּנָיו", ref: "מלכים-ב יז, יח" }
+    ],
+    6: [
+      { text: "סֵפֶר הַתּוֹרָה מָצָאתִי בְּבֵית ה'", ref: "מלכים-ב כב, ח" },
+      { text: "וְכָמֹהוּ לֹא הָיָה לְפָנָיו מֶלֶךְ אֲשֶׁר שָׁב אֶל ה'", ref: "מלכים-ב כג, כה" },
+      { text: "אַךְ לֹא שָׁב ה' מֵחֲרוֹן אַפּוֹ הַגָּדוֹל", ref: "מלכים-ב כג, כו" }
+    ]
+  };
+
+  // Split a long Hebrew paragraph into 3-4 paragraphs by sentence boundaries,
+  // grouping sentences so each paragraph is ~roughly balanced.
+  function splitParagraphs(text){
+    const clean = String(text || "").trim();
+    if (!clean) return [];
+    // Split on sentence terminators (. ! ?) followed by whitespace.
+    const sentences = clean.split(/(?<=[.!?])\s+/).filter(Boolean);
+    if (sentences.length <= 1) return [clean];
+    const target = Math.min(4, Math.max(2, Math.ceil(sentences.length / 3)));
+    const perGroup = Math.ceil(sentences.length / target);
+    const out = [];
+    for (let i = 0; i < sentences.length; i += perGroup) {
+      out.push(sentences.slice(i, i + perGroup).join(" "));
+    }
+    return out;
+  }
+
+  function ChipCard({ icon, title, items, type, setRoute }){
+    const EL = window.EntityLinkComponent;
+    const [open, setOpen] = useState(true);
+    if (!items || items.length === 0) return null;
+    return (
+      <section className="card rounded-2xl overflow-hidden" style={{border:"1px solid rgba(212,165,116,.45)"}}>
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          aria-expanded={open}
+          className="w-full px-4 py-3 flex items-center justify-between gap-2 text-right transition hover:bg-amber-500/10">
+          <span className="font-display text-base md:text-lg font-bold text-on-parchment">
+            <span className="ms-2">{icon}</span>{title}
+          </span>
+          <span className="text-xs font-mono text-on-parchment-muted" dir="ltr">
+            {items.length} {open ? "▾" : "▸"}
+          </span>
+        </button>
+        {open && (
+          <div className="px-3 pb-3 pt-1 flex flex-wrap gap-0">
+            {EL && items.map((it, i) => {
+              const t = type || it.type;
+              const id = typeof it === "string" ? it : it.id;
+              return <EL key={t+":"+id+":"+i} type={t} id={id} setRoute={setRoute}/>;
+            })}
+          </div>
+        )}
+      </section>
+    );
+  }
+
   function LearnTab({ deep, unit, unitId, setRoute, onComplete }){
     if (!deep) {
       return (
@@ -174,51 +259,132 @@
         </div>
       );
     }
-    const turning = Array.isArray(deep.turning_points) ? deep.turning_points : [];
+
+    const band = UNIT_BAND[+unitId] || "#D4A574";
+    const idx = (typeof window !== "undefined" && window.__ENTITY_INDEX__) || {};
+
+    // Build clickable chip lists from turning_points + unit.related_*.
+    const peopleMap = new Map();   // id -> {type:"king"|"character", id}
+    const eventsSet = new Set();
+    const placesSet = new Set();
+    (deep.turning_points || []).forEach(tp => {
+      (tp.participants || []).forEach(pid => {
+        if (peopleMap.has(pid)) return;
+        const isKing = idx.king && idx.king[pid];
+        peopleMap.set(pid, { type: isKing ? "king" : "character", id: pid });
+      });
+      (tp.events || []).forEach(e => eventsSet.add(e));
+      (tp.places || []).forEach(p => placesSet.add(p));
+    });
+    if (unit) {
+      (unit.related_kings      || []).forEach(x => { if (!peopleMap.has(x)) peopleMap.set(x, { type:"king",      id:x }); });
+      (unit.related_characters || []).forEach(x => { if (!peopleMap.has(x)) peopleMap.set(x, { type:"character", id:x }); });
+      (unit.related_events     || []).forEach(x => eventsSet.add(x));
+      (unit.related_places     || []).forEach(x => placesSet.add(x));
+    }
+    const people  = Array.from(peopleMap.values());
+    const events  = Array.from(eventsSet).map(id => ({ type:"event", id }));
+    const places  = Array.from(placesSet).map(id => ({ type:"place", id }));
+    const breadth = (Array.isArray(deep.breadth_themes) ? deep.breadth_themes : []).map(id => ({ type:"breadth", id }));
+
+    const summaryParas = splitParagraphs(stripTokens(deep.intro));
+    const quotes = KEY_QUOTES[+unitId] || [];
+
     return (
-      <div className="space-y-4">
-        <section className="parchment rounded-2xl p-5 md:p-6">
-          <h2 className="font-display text-xl font-bold text-amber-900 mb-2">{deep.title}</h2>
-          <p className="hebrew text-amber-950 leading-loose text-base">{stripTokens(deep.intro)}</p>
+      <div className="space-y-5 unit-learn-tab">
+        {/* Hero — era band, big title, subtitle, reference badge */}
+        <section
+          className="parchment rounded-2xl p-6 md:p-8"
+          style={{borderTop:"6px solid "+band, position:"relative"}}>
+          <div
+            className="text-xs font-bold px-3 py-1 rounded-full inline-block mb-3"
+            style={{background: band, color:"#fff", letterSpacing:".02em"}}>
+            יחידה <span dir="ltr">{unitId}</span>
+          </div>
+          <h2 className="font-display font-black text-amber-900" style={{fontSize:"clamp(28px,4vw,40px)", lineHeight:1.15}}>
+            {deep.title}
+          </h2>
+          {unit && unit.subtitle && (
+            <p className="text-amber-800 mt-2" style={{fontSize:"clamp(15px,1.6vw,19px)", fontWeight:500}}>
+              {unit.subtitle}
+            </p>
+          )}
+          {unit && unit.range && (
+            <span
+              className="inline-block mt-4 text-sm font-mono px-3 py-1 rounded-full"
+              style={{background:"rgba(212,165,116,.18)", color:"#7c4a08", border:"1px solid "+band+"88"}}>
+              📚 {unit.range}
+            </span>
+          )}
         </section>
 
-        {turning.length > 0 && (
-          <section className="card rounded-2xl p-4">
-            <h3 className="font-display text-base font-bold text-on-parchment mb-2">🔑 נקודות מפנה</h3>
-            <ol className="space-y-2 list-decimal pr-5 text-sm text-on-parchment hebrew">
-              {turning.map((tp, i) => (
-                <li key={i} className="leading-relaxed">{stripTokens(tp.fact)}</li>
+        {/* Summary card */}
+        {summaryParas.length > 0 && (
+          <section
+            className="parchment rounded-2xl p-6 md:p-8 mx-auto"
+            style={{maxWidth:"720px"}}>
+            <h3 className="font-display text-xl md:text-2xl font-bold text-amber-900 mb-4">
+              📜 תקציר היחידה
+            </h3>
+            <div className="hebrew text-amber-950" style={{fontSize:"17px", lineHeight:1.7}}>
+              {summaryParas.map((p, i) => (
+                <p key={i} className="mb-4 last:mb-0">{p}</p>
               ))}
-            </ol>
+            </div>
           </section>
         )}
 
+        {/* 4 entity cards in 2x2 grid (stacks on mobile) */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <ChipCard icon="👑" title="דמויות מפתח"          items={people}  setRoute={setRoute}/>
+          <ChipCard icon="📜" title="אירועים"               items={events}  setRoute={setRoute}/>
+          <ChipCard icon="📍" title="מקומות"                items={places}  setRoute={setRoute}/>
+          <ChipCard icon="🌐" title="נושאי רוחב לשאלה"      items={breadth} setRoute={setRoute}/>
+        </div>
+
+        {/* Significance — short editorial paragraph */}
         {deep.significance && (
-          <section className="card rounded-2xl p-4">
+          <section className="card rounded-2xl p-5">
             <h3 className="font-display text-base font-bold text-on-parchment mb-2">✨ משמעות לספר</h3>
             <p className="hebrew text-on-parchment-muted leading-relaxed">{stripTokens(deep.significance)}</p>
           </section>
         )}
 
-        {Array.isArray(deep.breadth_themes) && deep.breadth_themes.length > 0 && (
-          <section className="card rounded-2xl p-4">
-            <h3 className="font-display text-base font-bold text-on-parchment mb-2">🌐 נושאי רוחב</h3>
-            <div className="flex flex-wrap gap-0">
-              {window.EntityLinkComponent && deep.breadth_themes.map(b =>
-                <window.EntityLinkComponent key={b} type="breadth" id={b} setRoute={setRoute}/>
-              )}
-            </div>
-          </section>
+        {/* Recurring items chips — keep accessible */}
+        {Array.isArray(deep.recurring_items) && deep.recurring_items.length > 0 && (
+          <ChipCard icon="🔁" title="פריטים חוזרים"
+            items={deep.recurring_items.map(id => ({ type:"recurringItem", id }))}
+            setRoute={setRoute}/>
         )}
 
-        {Array.isArray(deep.recurring_items) && deep.recurring_items.length > 0 && (
-          <section className="card rounded-2xl p-4">
-            <h3 className="font-display text-base font-bold text-on-parchment mb-2">🔁 פריטים חוזרים</h3>
-            <div className="flex flex-wrap gap-0">
-              {window.EntityLinkComponent && deep.recurring_items.map(r =>
-                <window.EntityLinkComponent key={r} type="recurringItem" id={r} setRoute={setRoute}/>
-              )}
-            </div>
+        {/* Key quotes — gold border, easy to scan */}
+        {quotes.length > 0 && (
+          <section
+            className="rounded-2xl p-5 md:p-6"
+            style={{
+              background:"linear-gradient(135deg,#FFF8E7 0%,#FCEFC9 100%)",
+              border:"2px solid #D4A574",
+              boxShadow:"0 4px 16px rgba(212,165,116,.25)"
+            }}>
+            <h3 className="font-display text-xl md:text-2xl font-bold text-amber-900 mb-4">
+              📖 ציטוטי מפתח
+            </h3>
+            <ul className="space-y-3">
+              {quotes.map((q, i) => (
+                <li
+                  key={i}
+                  className="hebrew leading-relaxed"
+                  style={{
+                    fontSize:"17px",
+                    paddingInlineStart:"16px",
+                    borderInlineStart:"4px solid #D4A574",
+                    color:"#3a2410"
+                  }}>
+                  <div className="font-bold" style={{lineHeight:1.6}}>״{q.text}״</div>
+                  <div className="text-sm font-mono mt-1" style={{color:"#7c4a08"}}>{q.ref}</div>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
 
