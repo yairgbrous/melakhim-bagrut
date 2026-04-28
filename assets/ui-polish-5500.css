@@ -1,0 +1,453 @@
+/* =========================================================================
+   ui-polish-5500.css — site-wide UI polish layer (?v=5500)
+   ---------------------------------------------------------------------------
+   ADDITIVE only. No layout restructuring. Loaded AFTER all other stylesheets
+   (quote-cards, contrast-hotfix, layout-fix, readability-pass) so its rules
+   win where they overlap. Visual identity:
+     · Parchment cream  #F7F1E1 / #EEE2C4 (radial)
+     · Gold accents     #D4A574 / #8B6F1F / #C89B3C
+     · Hebrew display   'Frank Ruhl Libre', serif
+     · Hebrew body      'Heebo', sans-serif
+     · RTL throughout
+     · Cards            cream bg · gold 1px · subtle hover lift
+   ========================================================================= */
+
+/* ---------- 0. global typography + RTL safety ------------------------- */
+html, body { font-family:'Heebo','Frank Ruhl Libre','Noto Serif Hebrew',sans-serif; }
+.font-display, .hebrew, h1, h2, h3, h4, .ui-display {
+  font-family:'Frank Ruhl Libre','Noto Serif Hebrew',Georgia,serif;
+}
+body, #root { direction:rtl; }
+html[data-theme='light'] body {
+  background:
+    radial-gradient(circle at 18% 22%, #EEE2C4 0%, transparent 55%),
+    radial-gradient(circle at 82% 78%, #EEE2C4 0%, transparent 55%),
+    #F7F1E1;
+}
+
+/* ---------- 1. universal card polish (cream + gold + hover) ----------- */
+html[data-theme='light'] .card,
+html[data-theme='light'] .parchment {
+  background:linear-gradient(135deg,#FBF6EB 0%,#EEE2C4 100%);
+  border:1px solid rgba(139,111,31,.45);
+  box-shadow:0 2px 6px rgba(139,111,31,.08);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+html[data-theme='light'] .card:hover,
+html[data-theme='light'] .parchment:hover {
+  border-color:rgba(139,111,31,.7);
+  box-shadow:0 8px 22px rgba(139,111,31,.18);
+}
+
+/* generous padding default for parchment / card containers */
+html[data-theme='light'] .parchment.p-4,
+html[data-theme='light'] .card.p-4   { padding:1.25rem; }
+html[data-theme='light'] .parchment.p-5,
+html[data-theme='light'] .card.p-5   { padding:1.5rem; }
+
+/* ---------- 2. Home — hero + units + quick actions polish ------------ */
+.hero-parchment{
+  padding:1.75rem 1.5rem !important;
+  border:1.5px solid rgba(139,111,31,.45) !important;
+}
+@media (min-width:768px){
+  .hero-parchment{ padding:2.25rem 2rem !important; }
+}
+.hero-countdown{
+  background:linear-gradient(135deg,#7B1A1A,#A83240);
+  color:#FFF7ED;
+  padding:.4rem .9rem;
+  border-radius:999px;
+  font-weight:800;
+}
+
+/* ensure 6-unit grid actually feels like a grid even without overrides */
+.progress-strip-rail{ gap:10px; }
+@media (min-width:1024px){ .progress-strip-rail{ gap:12px; } }
+.progress-strip-node{
+  padding:14px 12px 16px;
+  min-height:96px;
+}
+
+/* daily challenge / today's focus polish */
+.today-focus-card{
+  padding:16px 14px;
+  border-width:1.5px;
+}
+.today-focus-card:hover{
+  box-shadow:0 8px 22px rgba(139,111,31,.22);
+}
+
+/* quick actions card — generous spacing */
+.quick-action-card{ padding:18px 14px; gap:8px; }
+
+/* ---------- 3. KingsTable — kingdom labels + hover ------------------- */
+.kt-wrap{ padding:0 4px; }
+.kt-tl-head > div{
+  font-family:'Frank Ruhl Libre',serif !important;
+  font-size:14px !important;
+  letter-spacing:.02em;
+}
+/* When two kingdoms share the timeline, give each kingdom column
+   a faint cream background + visible vertical divider so the eye groups
+   "מלכי יהודה" right and "מלכי ישראל" left without confusion. */
+.kt-tl-king{
+  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  cursor:pointer;
+}
+.kt-tl-king:hover{
+  transform:translateY(-1px) scale(1.02);
+  box-shadow:0 4px 12px rgba(139,111,31,.22);
+  z-index:6;
+}
+html[data-theme='light'] .kt-tl{
+  background:linear-gradient(180deg,#FBF6EB 0%,#F4ECD3 100%) !important;
+  border-color:rgba(139,111,31,.45) !important;
+}
+html[data-theme='light'] .kt-tl-head{
+  background:rgba(247,241,225,.96) !important;
+  border-bottom-color:rgba(139,111,31,.45) !important;
+  color:#5A4517 !important;
+}
+
+/* Old non-timeline cell view (when the legacy table renders) */
+.kt-king{
+  transition:transform .12s ease, box-shadow .15s ease, border-color .15s ease !important;
+}
+.kt-king:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 16px rgba(139,111,31,.25);
+}
+
+/* small helper for kingdom column headers (used optionally in JSX) */
+.kt-col-label{
+  display:inline-block;
+  padding:.25rem .85rem;
+  border-radius:999px;
+  background:linear-gradient(135deg,#F5D670,#C89B3C);
+  color:#1A1611;
+  font-family:'Frank Ruhl Libre',serif;
+  font-weight:900;
+  font-size:13px;
+  letter-spacing:.02em;
+  border:1px solid #F4D58D;
+}
+
+/* ---------- 4. Character / Event / Place — hero + dividers + chips --- */
+/* hero name big */
+.char-hero h1, .event-hero h1, .place-hero h1,
+header.px-4 > h1.font-display, header.px-4 > h1.font-display.text-3xl{
+  font-size:clamp(28px, 6vw, 44px);
+  letter-spacing:.005em;
+}
+
+/* gold divider line — applied on character / event / place page sections */
+.char-section + .char-section::before,
+.event-section + .event-section::before,
+.place-section + .place-section::before{
+  content:'';
+  display:block;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#D4A574,transparent);
+  margin:8px auto 4px;
+  width:60%;
+}
+
+/* quote cards — parchment with gold left border */
+blockquote.hebrew{
+  background:linear-gradient(135deg,#FBF6EB,#F2E6C8) !important;
+  border-inline-start:4px solid #C89B3C !important;
+  border-inline-end:0 !important;
+  border-radius:10px;
+  padding:12px 16px !important;
+  color:#1A1611 !important;
+  box-shadow:0 2px 6px rgba(139,111,31,.10);
+}
+html[data-theme='dark'] blockquote.hebrew{
+  background:linear-gradient(135deg,rgba(245,230,200,.15),rgba(212,165,116,.10)) !important;
+  color:#F5E6C8 !important;
+}
+
+/* EntityLink chips — rounded-full with gold background */
+.entity-chip,
+.kt-chip,
+.kt-foreign-chip{
+  display:inline-flex !important;
+  align-items:center;
+  gap:4px;
+  padding:4px 12px !important;
+  margin:3px 3px !important;
+  border-radius:999px !important;
+  background:linear-gradient(135deg,#F5E0AD,#D4A574) !important;
+  color:#1A1611 !important;
+  border:1px solid #C89B3C !important;
+  font-family:'Heebo',sans-serif;
+  font-weight:700;
+  font-size:12.5px;
+  text-decoration:none;
+  cursor:pointer;
+  transition:transform .12s ease, box-shadow .15s ease;
+}
+.entity-chip:hover,
+.kt-chip:hover{
+  transform:translateY(-1px);
+  box-shadow:0 4px 10px rgba(139,111,31,.28);
+}
+/* keep the danger / role chip variants distinct — only override base appearance */
+.kt-foreign-chip{
+  background:linear-gradient(135deg,#F1B5BE,#C97082) !important;
+  color:#3a0c14 !important;
+  border-color:#A83240 !important;
+}
+.kt-kill-chip{
+  background:linear-gradient(135deg,#F1B5BE,#C97082) !important;
+  color:#3a0c14 !important;
+  border-color:#8b2d2d !important;
+  border-radius:999px !important;
+}
+.kt-chip-prophet{
+  background:linear-gradient(135deg,#D6CAEB,#9C8AC9) !important;
+  color:#241640 !important;
+  border-color:#6B5B95 !important;
+}
+
+/* ---------- 5. UnitPage — tabs + progress + sidebar polish ----------- */
+/* tab nav — gold underline for active, transparent for others */
+nav[role="tablist"]{
+  border-bottom:1.5px solid rgba(139,111,31,.35) !important;
+  gap:.25rem !important;
+  padding:0 .25rem;
+}
+nav[role="tablist"] button[role="tab"]{
+  padding:.75rem 1.1rem !important;
+  font-family:'Frank Ruhl Libre',serif !important;
+  font-size:15px !important;
+  font-weight:900 !important;
+  border-bottom:3px solid transparent !important;
+  margin-bottom:-1.5px;
+  border-radius:8px 8px 0 0;
+  transition:color .15s ease, background .15s ease, border-color .15s ease;
+}
+nav[role="tablist"] button[role="tab"][aria-selected="true"]{
+  border-bottom-color:#C89B3C !important;
+  color:#8B6F1F !important;
+  background:linear-gradient(180deg,rgba(212,165,116,.12),transparent);
+}
+nav[role="tablist"] button[role="tab"]:hover{
+  background:rgba(212,165,116,.10);
+  color:#8B6F1F;
+}
+
+/* progress bars: gold fill on cream track (UnitPage uses a generic h-2 bar) */
+.h-2.bg-amber-500\/10{
+  background:rgba(212,165,116,.18) !important;
+  border:1px solid rgba(139,111,31,.25);
+  border-radius:999px;
+  overflow:hidden;
+}
+.h-2.bg-amber-500\/10 > div{
+  background:linear-gradient(90deg,#C89B3C 0%,#F5D670 100%) !important;
+}
+
+/* sidebar separation */
+.unit-sidebar,
+aside.lg\:col-span-1{
+  position:relative;
+}
+@media (min-width:1024px){
+  aside.lg\:col-span-1{
+    border-inline-start:1px dashed rgba(139,111,31,.30);
+    padding-inline-start:1rem;
+  }
+}
+
+/* ---------- 6. MapsPage — full-width map + parchment legend ---------- */
+.mp-canvas-wrap{
+  width:100% !important;
+  max-width:100%;
+  border-radius:18px;
+  border:1.5px solid rgba(139,111,31,.45);
+  background:linear-gradient(180deg,#FBF6EB 0%,#F0E4C4 100%) !important;
+  box-shadow:0 4px 16px rgba(139,111,31,.18);
+}
+.mp-full{ width:100%; padding:0 4px; }
+.mp-canvas{ width:100% !important; height:100% !important; }
+
+/* legend → parchment chip cluster, anchored bottom-right inside .mp-full */
+.mp-full-list{
+  position:relative;
+  background:linear-gradient(135deg,#FBF6EB 0%,#F0E4C4 100%) !important;
+  border:1.5px solid rgba(139,111,31,.40);
+  border-radius:14px;
+  padding:14px 16px !important;
+  margin-top:14px;
+  box-shadow:0 4px 14px rgba(139,111,31,.15);
+}
+.mp-full-list-h{
+  font-family:'Frank Ruhl Libre',serif !important;
+  color:#5A4517 !important;
+  font-weight:900;
+  font-size:16px;
+  margin-bottom:8px;
+}
+@media (min-width:1024px){
+  .mp-full-list{
+    max-width:420px;
+    margin-inline-start:auto;
+    margin-inline-end:0;
+  }
+}
+.mp-place-pill{
+  background:linear-gradient(135deg,#FFF7E2,#F0E4C4) !important;
+  border:1px solid rgba(139,111,31,.4) !important;
+  border-radius:10px;
+  padding:8px 10px;
+  color:#1A1611 !important;
+}
+.mp-card{
+  background:linear-gradient(180deg,#FBF6EB 0%,#F0E4C4 100%) !important;
+  color:#1A1611 !important;
+  border:1.5px solid rgba(139,111,31,.40) !important;
+}
+.mp-card:hover{
+  border-color:rgba(139,111,31,.7) !important;
+  box-shadow:0 10px 28px rgba(139,111,31,.20) !important;
+}
+
+/* ---------- 7. ExamSim2551 — mobile fullscreen + sticky timer -------- */
+/* Sticky exam header (mock + running) — pin to top with generous padding */
+.exam-sticky-bar{
+  position:sticky;
+  top:0;
+  z-index:30;
+  background:linear-gradient(135deg,#FBF6EB,#EEE2C4);
+  border:1.5px solid rgba(139,111,31,.40);
+  border-radius:14px;
+  padding:.75rem 1rem !important;
+  box-shadow:0 4px 14px rgba(139,111,31,.18);
+}
+/* timer: monospace + larger */
+.exam-timer{
+  font-family:'JetBrains Mono','SFMono-Regular',Consolas,monospace !important;
+  font-weight:900;
+  font-size:18px;
+  color:#1A1611;
+  padding:.25rem .75rem;
+  border-radius:8px;
+  background:rgba(212,165,116,.20);
+  border:1px solid rgba(139,111,31,.35);
+}
+/* red accent for last 30 minutes */
+.exam-timer.danger{
+  color:#FFF !important;
+  background:linear-gradient(135deg,#A83240,#7B1A1A) !important;
+  border-color:#A83240 !important;
+  animation:examTimerPulse 1.4s ease-in-out infinite;
+}
+@keyframes examTimerPulse{
+  0%,100%{ box-shadow:0 0 0 0 rgba(168,50,64,.55); }
+  50%{ box-shadow:0 0 0 6px rgba(168,50,64,0); }
+}
+/* mobile fullscreen — no max-width restriction; sticky stays glued */
+@media (max-width:640px){
+  .exam-sticky-bar{
+    border-radius:0;
+    margin:-12px -12px 8px;
+    border-inline:0;
+    border-top:0;
+  }
+  .exam-fullscreen{
+    min-height:100vh;
+    padding:0 12px 88px;
+  }
+}
+
+/* ---------- 8. Bottom nav: equal-width, gold dot under active -------- */
+.bottom-nav{
+  grid-template-columns:repeat(4,1fr) !important;
+  gap:0 !important;
+  padding:8px 8px calc(8px + env(safe-area-inset-bottom)) !important;
+}
+.bn-item{
+  position:relative;
+  padding:8px 4px 12px !important;
+  min-height:60px;
+}
+.bn-item .bn-ico{ font-size:24px !important; }
+/* gold dot underneath active item */
+.bn-item.active::after{
+  content:'';
+  position:absolute;
+  bottom:4px;
+  left:50%;
+  transform:translateX(-50%);
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#F5D670,#C89B3C);
+  box-shadow:0 0 8px rgba(245,214,112,.6);
+}
+
+/* ---------- 9. Mobile breakpoints under 640px ------------------------ */
+@media (max-width:640px){
+  /* every grid that uses cols-2/3/4 collapses to 1 (with a few exceptions) */
+  .quick-actions-grid{ grid-template-columns:1fr !important; gap:10px !important; }
+  /* progress strip already 3-col on mobile; bump to 2 below 480 */
+}
+@media (max-width:480px){
+  .progress-strip-rail{ grid-template-columns:repeat(2,1fr) !important; }
+}
+@media (max-width:640px){
+  /* generic "two-col card grid" classes used across pages */
+  .grid-2-cards{ grid-template-columns:1fr !important; }
+  /* CharacterPage / EventPage / PlacePage main column should be edge-to-edge */
+  main.max-w-3xl{ padding-inline:.75rem; }
+  /* MapsPage card grid → single column */
+  .mp-section .grid{ grid-template-columns:1fr !important; }
+  /* Tighten hero on tiny screens */
+  .hero-parchment{ padding:1.25rem 1rem !important; }
+  /* Bottom nav already 4-col; ensure icons don't crowd */
+  .bn-item{ font-size:10.5px !important; }
+}
+
+/* ---------- 10. Misc polish ----------------------------------------- */
+/* gold scrollbar */
+.fancy-scroll::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb{ background:#C89B3C; }
+/* improve tap targets for any small button */
+button, [role="button"], a.btn, .ab, .btn{ min-height:36px; }
+/* universal selection */
+::selection{ background:#D4A574; color:#1A1611; }
+
+/* ---------- 11. Dark mode readability (v5500) ----------------------- */
+[data-theme="dark"] body,
+[data-theme="dark"] p,
+[data-theme="dark"] li,
+[data-theme="dark"] span:not(.text-amber-300):not(.text-amber-400) {
+  color: #f5e6c8 !important;
+  font-size: 1.05rem;
+}
+[data-theme="dark"] h1 { color: #D4A574; font-size: 2.5rem; }
+[data-theme="dark"] h2 { color: #D4A574; font-size: 2rem; }
+[data-theme="dark"] h3 { color: #E8C896; font-size: 1.5rem; }
+[data-theme="dark"] .card {
+  background: rgba(212,165,116,0.06);
+  border: 1px solid rgba(212,165,116,0.25);
+}
+[data-theme="dark"] .chip {
+  background: rgba(212,165,116,0.15);
+  color: #f5e6c8;
+  border: 1px solid rgba(212,165,116,0.35);
+  padding: 0.4rem 0.9rem;
+}
+[data-theme="dark"] button:not(.gold-btn) {
+  color: #f5e6c8;
+  border-color: rgba(212,165,116,0.4);
+}
+[data-theme="dark"] .text-amber-100 { color: #f5e6c8 !important; }
+[data-theme="dark"] .text-amber-200 { color: #fae5b8 !important; }
+.hebrew {
+  font-family: 'Frank Ruhl Libre', 'Heebo', serif;
+  font-size: 1.1em;
+  line-height: 1.8;
+}

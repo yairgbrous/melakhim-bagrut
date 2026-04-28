@@ -1,10 +1,12 @@
 /* =========================================================================
    ExamSim2551 — authentic בגרות מתכונת תשפ"ו for ספר מלכים (שאלון 2551).
-   Real structure:
-     Part A (בקיאות)    : 5 of 8     @ 9 pts each → 45
+   Real structure (canonical 2551 תשפ"ו spec):
+     Part A (בקיאות)    : 5 of 9     @ 9 pts each → 45
      Parts B+C          : 7 of 14    @ 8 pts each → 56
      Total                                         = 101
    Duration: 2:15 standard (8100s) / 2:35 with 15% accommodation (≈9315s).
+   NO-INVENTION RULE: questions come from data/past-exams.js EXAM_2551_DATA.
+   If A pool < 9, render what exists + TODO warning. Don't fake.
 
    This commit: selection state + Part A render (5-of-8) with hardcoded pool
    per Yair's uploaded מתכונת. Questions wired to clickable toggle cards with
@@ -66,6 +68,60 @@
   }
   function partAList(){ const p = getPools().A; return p.length ? p : PART_A_POOL_FALLBACK; }
   function partBCList(){ const p = getPools().BC; return p.length ? p : PART_BC_POOL_FALLBACK; }
+
+  // --- Practice Mode helpers ---
+  // Topic→unit heuristic. Uses word-level keyword match on q.title (topic_he).
+  // Source: unit-deep-summaries.js: 1=שלמה, 2=פילוג, 3=אליהו/אלישע, 4=מהפכות,
+  // 5=אשורי, 6=חורבן.
+  const UNIT_KEYWORDS = {
+    1: ["שלמה","גבעון","מקדש","חכמה","מלכת שבא","חירם","משפט שלמה","חלום","יכין","בועז","ארון"],
+    2: ["פילוג","ירבעם","רחבעם","שכם","עגל","בית־אל","בית-אל","דן","אחיה","נבט","אסא","פנואל"],
+    3: ["אליהו","אלישע","איזבל","כרמל","נבות","חורב","צרפית","שונמית","נעמן","צפחת","בעל"],
+    4: ["יהוא","מהפכ","חזאל","יואש","עתליה","אמציה","דמי יזרעאל"],
+    5: ["חזקיהו","סנחריב","רבשקה","ישעיהו","נקבה","השילוח","אשור","הושע בן אלה","שומרון","תגלת"],
+    6: ["יאשיהו","חולדה","מנשה","ספר התורה","חורבן","צדקיהו","נבוכדנאצר","יהויכין","גלות","יהויקים","חלקיהו","שפן"]
+  };
+  function unitForQuestion(q){
+    const hay = `${q.title||""} ${q.prompt||""}`;
+    for (const u of [1,2,3,4,5,6]) {
+      const kws = UNIT_KEYWORDS[u];
+      for (const k of kws) if (hay.indexOf(k) !== -1) return u;
+    }
+    return null;
+  }
+  // Heuristic difficulty by part: A (recall) = קל, B (knowledge) = בינוני, C (analysis) = קשה.
+  function difficultyForQuestion(q){
+    if (q.part === "A") return 1;
+    if (q.part === "B") return 2;
+    if (q.part === "C") return 3;
+    return 2;
+  }
+  // Practice "type" derived from part: A→bekiut, B→yeda, C→rohav.
+  function typeForQuestion(q){
+    if (q.part === "A") return "bekiut";
+    if (q.part === "B") return "yeda";
+    if (q.part === "C") return "rohav";
+    return "other";
+  }
+  function buildPracticePool(){
+    return [...partAList(), ...partBCList()];
+  }
+  function applyPracticeFilters(pool, filters){
+    return pool.filter(q => {
+      if (filters.difficulty !== "all" && difficultyForQuestion(q) !== filters.difficulty) return false;
+      if (filters.type !== "all" && typeForQuestion(q) !== filters.type) return false;
+      if (filters.unit !== "all" && unitForQuestion(q) !== filters.unit) return false;
+      return true;
+    });
+  }
+  function shuffleSample(arr, n){
+    const a = [...arr];
+    for (let i = a.length-1; i>0; i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a.slice(0, Math.min(n, a.length));
+  }
 
   // --- legacy hardcoded fallback kept only if window.EXAM_2551_DATA is absent ---
   const PART_A_POOL_FALLBACK = [
@@ -152,6 +208,8 @@
 
   const MAX_A = 5;
   const MAX_BC = 7;
+  const SPEC_A_TOTAL = 9;   // canonical 2551 spec (5 of 9)
+  const SPEC_BC_TOTAL = 14; // canonical 2551 spec (7 of 14)
 
   function loadAccommodation(){ try { return localStorage.getItem(ACCOMMODATION_KEY)==="1"; } catch { return false; } }
   function saveAccommodation(v){ try { localStorage.setItem(ACCOMMODATION_KEY, v?"1":"0"); } catch {} }
@@ -250,28 +308,23 @@
     );
   }
 
-  function PartTabBar({ tab, onTab, selectedA, selectedBC }){
-    const tabs = [
-      { id: "A", label: "חלק א׳ · בקיאות",      n: selectedA.length,  max: MAX_A },
-      { id: "B", label: "חלק ב׳ · ידע",         n: null,              max: null  },
-      { id: "C", label: "חלק ג׳ · ניתוח/רוחב",  n: null,              max: null  },
-      { id: "BC",label: "ב+ג · מצרפי",           n: selectedBC.length, max: MAX_BC }
+  function PartStepBar({ step, doneA, countA, countBC }){
+    const steps = [
+      { id: "A",  label: "פרק א׳ · בקיאות",        n: countA,  max: MAX_A,  done: doneA },
+      { id: "BC", label: "פרק ב+ג · ידע ורוחב",   n: countBC, max: MAX_BC, done: countBC===MAX_BC }
     ];
     return (
-      <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30">
-        {tabs.map(t => {
-          const active = tab === t.id;
+      <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30">
+        {steps.map(s => {
+          const active = step === s.id;
           const cls = active
             ? "bg-amber-600 text-white font-bold"
-            : "bg-white/10 text-on-parchment hover:bg-white/20";
+            : s.done ? "bg-emerald-700/60 text-white" : "bg-white/10 text-on-parchment";
           return (
-            <button key={t.id} onClick={()=>onTab(t.id)}
-              className={`text-[11px] md:text-xs px-2 py-1.5 rounded-lg transition ${cls}`}>
-              <div className="hebrew leading-tight">{t.label}</div>
-              {t.n !== null && (
-                <div className="text-[10px] opacity-90" dir="ltr">{t.n}/{t.max}</div>
-              )}
-            </button>
+            <div key={s.id} className={`text-xs md:text-sm px-2 py-1.5 rounded-lg ${cls}`}>
+              <div className="hebrew leading-tight">{s.done ? "✓ " : ""}{s.label}</div>
+              <div className="text-[10px] opacity-90" dir="ltr">נבחרו {s.n}/{s.max}</div>
+            </div>
           );
         })}
       </div>
@@ -330,37 +383,67 @@
     );
   }
 
-  function ExamIntro({ onStart, setRoute }){
+  function ExamIntro({ onStart, onStartPractice, setRoute }){
     const [shabbat, setShabbat] = useState(() => isInShabbat());
     const [accommodation, setAccommodation] = useState(() => loadAccommodation());
+    const [mode, setMode] = useState("full"); // "full" | "practice"
     useEffect(() => {
       const iv = setInterval(() => setShabbat(isInShabbat()), 60*1000);
       return () => clearInterval(iv);
     }, []);
     const durationSec = accommodation ? DURATION_EXTENDED : DURATION_STANDARD;
+    const poolA  = partAList();
+    const poolBC = partBCList();
+    const missingA  = Math.max(0, SPEC_A_TOTAL  - poolA.length);
+    const missingBC = Math.max(0, SPEC_BC_TOTAL - poolBC.length);
     return (
       <div className="max-w-2xl mx-auto space-y-4">
         {shabbat && <ShabbatModal onDismiss={()=>setRoute && setRoute({page:"quiz"})}/>}
         <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment-accent">📝 מתכונת בגרות · שאלון 2551 · תשפ"ו</h1>
+        <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30">
+          <button onClick={()=>setMode("full")} type="button"
+            className={`text-xs md:text-sm px-3 py-2 rounded-lg transition hebrew ${mode==="full"?"bg-amber-600 text-white font-bold":"bg-white/10 text-on-parchment hover:bg-white/20"}`}>
+            🏛 מתכונת מלאה
+          </button>
+          <button onClick={()=>setMode("practice")} type="button"
+            className={`text-xs md:text-sm px-3 py-2 rounded-lg transition hebrew ${mode==="practice"?"bg-amber-600 text-white font-bold":"bg-white/10 text-on-parchment hover:bg-white/20"}`}>
+            ⚡ תרגול קצר
+          </button>
+        </div>
+        {mode === "practice" && (
+          <PracticeConfig onStart={onStartPractice}/>
+        )}
+        {mode !== "practice" && (
+        <>
         <div className="text-sm md:text-base text-on-parchment hebrew leading-relaxed" style={{background:"rgba(0,0,0,.25)",padding:"0.75rem 1rem",borderRadius:"0.75rem"}}>
-          בחינת מתכונת תשפ״ו · 22 שאלות · בחר 5 מתוך 8 חלק א · 7 מתוך 14 חלקים ב+ג · 101 נק׳ · 2:15 (או 2:35 התאמה)
+          בחינת מתכונת תשפ״ו · בחר 5 מתוך 9 בפרק א · 7 מתוך 14 בפרקים ב+ג · 101 נק׳ · 2:15 (או 2:35 בהתאמת 15%)
         </div>
         <div className="parchment rounded-2xl p-5 md:p-7 space-y-3">
           <h2 className="font-display text-xl font-bold text-amber-900">ספר מלכים · מתכונת מלאה</h2>
           <div className="text-sm text-amber-950 space-y-1.5">
             <div><strong>⏱ זמן מוקצה:</strong> <span dir="ltr">{fmtHMS(durationSec)}</span></div>
-            <div><strong>📊 ניקוד:</strong> 101 נק׳</div>
+            <div><strong>📊 ניקוד מקסימלי:</strong> 101 נק׳</div>
             <div><strong>📖 חומר עזר:</strong> תנ"ך שלם בלי פירושים</div>
           </div>
           <div className="divider"/>
           <div className="space-y-2">
             <div className="bg-white/50 rounded-lg p-3" style={{borderRight:"4px solid #D4A574"}}>
               <div className="font-bold text-amber-950">פרק א — בקיאות</div>
-              <div className="text-xs text-amber-800">ענה על 5 מתוך 8 שאלות · 9 נק׳ לשאלה = 45 נק׳</div>
+              <div className="text-xs text-amber-800">ענה על 5 מתוך 9 שאלות · 9 נק׳ לשאלה × 5 = 45 נק׳</div>
+              {missingA > 0 && (
+                <div className="text-[11px] mt-1 px-2 py-1 rounded bg-red-100 text-red-900 font-mono" dir="ltr">
+                  {`// TODO: need ${missingA} more bekiut question${missingA>1?"s":""} in past-exams.js (have ${poolA.length}/${SPEC_A_TOTAL})`}
+                </div>
+              )}
             </div>
             <div className="bg-white/50 rounded-lg p-3" style={{borderRight:"4px solid #6B5B95"}}>
               <div className="font-bold text-amber-950">פרק ב + ג — ידע ונושאי רוחב</div>
-              <div className="text-xs text-amber-800">ענה על 7 מתוך 14 סעיפים · 8 נק׳ לסעיף = 56 נק׳</div>
+              <div className="text-xs text-amber-800">ענה על 7 מתוך 14 סעיפים · 8 נק׳ לסעיף × 7 = 56 נק׳</div>
+              {missingBC > 0 && (
+                <div className="text-[11px] mt-1 px-2 py-1 rounded bg-red-100 text-red-900 font-mono" dir="ltr">
+                  {`// TODO: need ${missingBC} more yeda+rohav question${missingBC>1?"s":""} in past-exams.js (have ${poolBC.length}/${SPEC_BC_TOTAL})`}
+                </div>
+              )}
             </div>
           </div>
           <div className="pt-2">
@@ -370,6 +453,80 @@
         <button onClick={()=>onStart({accommodation, durationSec})} disabled={shabbat}
           className={`w-full py-4 rounded-2xl text-lg font-bold ${shabbat?"bg-slate-700 text-slate-400 cursor-not-allowed":"gold-btn glow"}`}>
           {shabbat ? "🕯 חסום בשבת" : `🚀 התחל סימולציה · ${fmtHMS(durationSec)}`}
+        </button>
+        </>
+        )}
+      </div>
+    );
+  }
+
+  function PracticeConfig({ onStart }){
+    const [difficulty, setDifficulty] = useState("all"); // 1|2|3|"all"
+    const [type, setType]             = useState("all"); // bekiut|yeda|rohav|all
+    const [unit, setUnit]             = useState("all"); // 1..6|all
+    const [count, setCount]           = useState(10);    // 5|10|15|25
+    const filters = { difficulty, type, unit };
+    const pool = applyPracticeFilters(buildPracticePool(), filters);
+    const available = pool.length;
+    const willGet = Math.min(count, available);
+    const opts = (label, val, current, set, vals) => (
+      <div>
+        <div className="text-[11px] text-amber-900 font-bold mb-1 hebrew">{label}</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
+          {vals.map(v => (
+            <button key={String(v.id)} type="button" onClick={()=>set(v.id)}
+              className={`text-xs px-2 py-2 rounded-lg font-bold transition ${current===v.id?"bg-amber-700 text-white":"bg-white/60 text-amber-900 hover:bg-amber-200"}`}>
+              {v.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+    const start = () => {
+      const sample = shuffleSample(pool, count);
+      if (sample.length === 0) return;
+      onStart && onStart({ filters, count: sample.length, questions: sample });
+    };
+    return (
+      <div className="parchment rounded-2xl p-5 md:p-7 space-y-3">
+        <h2 className="font-display text-xl font-bold text-amber-900">⚡ תרגול קצר</h2>
+        <p className="text-xs text-amber-800 hebrew">בחר מסננים ומספר שאלות. אין מגבלת זמן.</p>
+        {opts("רמה", difficulty, difficulty, setDifficulty, [
+          {id:"all", label:"הכל"},
+          {id:1,     label:"קל"},
+          {id:2,     label:"בינוני"},
+          {id:3,     label:"קשה"}
+        ])}
+        {opts("סוג", type, type, setType, [
+          {id:"all",    label:"הכל"},
+          {id:"bekiut", label:"בקיאות"},
+          {id:"yeda",   label:"ידע"},
+          {id:"rohav",  label:"רוחב"}
+        ])}
+        {opts("יחידה", unit, unit, setUnit, [
+          {id:"all", label:"הכל"},
+          {id:1,     label:"1 · שלמה"},
+          {id:2,     label:"2 · פילוג"},
+          {id:3,     label:"3 · אליהו ואלישע"},
+          {id:4,     label:"4 · מהפכות"},
+          {id:5,     label:"5 · אשור"},
+          {id:6,     label:"6 · חורבן"}
+        ])}
+        {opts("מספר שאלות", count, count, setCount, [
+          {id:5,  label:"5"},
+          {id:10, label:"10"},
+          {id:15, label:"15"},
+          {id:25, label:"25"}
+        ])}
+        <div className="text-xs text-amber-900 hebrew">
+          זמינות עם המסננים: <span dir="ltr" className="font-bold">{available}</span> שאלות
+          {willGet < count && available > 0 && (
+            <span className="text-red-700"> · רק {willGet} זמינות</span>
+          )}
+        </div>
+        <button onClick={start} disabled={available === 0}
+          className={`w-full py-3 rounded-2xl text-base font-bold ${available===0?"bg-slate-300 text-slate-500 cursor-not-allowed":"gold-btn glow"}`}>
+          {available === 0 ? "אין שאלות מתאימות" : `▶ התחל תרגול · ${willGet} שאלות`}
         </button>
       </div>
     );
@@ -407,8 +564,14 @@
     const [draft, setDraft] = useState(() => loadInProgress());
     const [resumeData, setResumeData] = useState(null);
     const [finalRun, setFinalRun] = useState(null);
+    const [practiceCfg, setPracticeCfg] = useState(null);
+    const [practiceFinal, setPracticeFinal] = useState(null);
 
     const startExam = (cfg) => { setExamCfg(cfg); setPhase("select"); };
+    const startPractice = (cfg) => {
+      setPracticeCfg(cfg);
+      setPhase("practice-running");
+    };
 
     const resumeDraft = () => {
       if (!draft) return;
@@ -437,85 +600,114 @@
       return (
         <>
           {draft && <ResumeModal draft={draft} onResume={resumeDraft} onDiscard={discardDraft}/>}
-          <ExamIntro setRoute={setRoute} onStart={startExam}/>
+          <ExamIntro setRoute={setRoute} onStart={startExam} onStartPractice={startPractice}/>
         </>
       );
     }
 
+    if (phase === "practice-running") {
+      return <PracticeRunning
+        questions={(practiceCfg&&practiceCfg.questions)||[]}
+        filters={(practiceCfg&&practiceCfg.filters)||{}}
+        onFinish={(payload)=>{ setPracticeFinal(payload); setPhase("practice-grade"); }}
+        onExit={()=>{ setPracticeCfg(null); setPracticeFinal(null); setPhase("intro"); }}
+      />;
+    }
+
+    if (phase === "practice-grade") {
+      return <PracticeGrade
+        questions={(practiceCfg&&practiceCfg.questions)||[]}
+        answers={(practiceFinal&&practiceFinal.answers)||{}}
+        onDone={()=>{
+          setPracticeCfg(null); setPracticeFinal(null);
+          setPhase("intro");
+        }}
+        onRetry={()=>{
+          setPracticeCfg(null); setPracticeFinal(null);
+          setPhase("intro");
+        }}
+      />;
+    }
+
     if (phase === "select") {
-      const ready = selectedA.length === MAX_A && selectedBC.length === MAX_BC;
-      const tab = selectTab;
+      const step = selectTab === "BC" ? "BC" : "A";
       const partB = partBCList().filter(q => q.part === "B");
       const partC = partBCList().filter(q => q.part === "C");
+      const poolA = partAList();
       const fullA  = selectedA.length  >= MAX_A;
       const fullBC = selectedBC.length >= MAX_BC;
+      const aDone  = selectedA.length === MAX_A;
+      const bcDone = selectedBC.length === MAX_BC;
+      const missingA  = Math.max(0, SPEC_A_TOTAL  - poolA.length);
+      const missingBC = Math.max(0, SPEC_BC_TOTAL - (partB.length + partC.length));
+
       return (
         <div className="max-w-2xl mx-auto space-y-4">
-          <div className="card rounded-xl p-3 flex items-center justify-between text-sm">
-            <div className="font-bold text-on-parchment">שלב בחירת שאלות</div>
-            <div className="text-xs text-on-parchment">
-              <span dir="ltr" className="font-bold">{selectedA.length}/{MAX_A}</span> בחלק א · <span dir="ltr" className="font-bold">{selectedBC.length}/{MAX_BC}</span> בחלקים ב+ג
-            </div>
-          </div>
-          <PartTabBar tab={tab} onTab={setSelectTab} selectedA={selectedA} selectedBC={selectedBC}/>
-          {tab === "A" && (
+          <PartStepBar step={step} doneA={aDone} countA={selectedA.length} countBC={selectedBC.length}/>
+
+          {step === "A" && (
             <section className="space-y-2">
-              <div className="text-sm font-bold text-on-parchment-accent hebrew">
-                חלק א׳ — בקיאות · בחר 5 מתוך 8 · <span dir="ltr">{selectedA.length}/{MAX_A} נבחרו</span>
+              <div className={`sticky top-[108px] z-10 rounded-xl p-3 backdrop-blur-sm border flex items-center justify-between ${aDone?"bg-emerald-900/80 border-emerald-500/40":"bg-slate-900/90 border-amber-500/30"}`}>
+                <div className="font-bold text-on-parchment hebrew text-sm">פרק א — בקיאות · בחר 5 מתוך 9</div>
+                <div className={`text-sm font-bold ${aDone?"text-emerald-300":"text-amber-300"}`} dir="ltr">
+                  נבחרו {selectedA.length}/{MAX_A}
+                </div>
               </div>
-              {partAList().map(q => (
+              {missingA > 0 && (
+                <div className="text-[11px] px-2 py-1 rounded bg-red-100 text-red-900 font-mono" dir="ltr">
+                  {`// TODO: need ${missingA} more bekiut question${missingA>1?"s":""} in past-exams.js (have ${poolA.length}/${SPEC_A_TOTAL})`}
+                </div>
+              )}
+              {poolA.map(q => (
                 <SelectionCard key={q.id} q={q} selected={selectedA.includes(q.id)}
                   onToggle={()=>toggleA(q.id)} disabled={fullA}/>
               ))}
+              <button onClick={()=>setSelectTab("BC")} disabled={!aDone}
+                className={`w-full py-3 rounded-2xl text-base font-bold mt-2 ${aDone?"gold-btn glow":"bg-slate-700 text-slate-400 cursor-not-allowed"}`}>
+                {aDone ? "המשך לפרק ב+ג ←" : `בחר עוד ${MAX_A-selectedA.length} שאלות כדי להמשיך`}
+              </button>
             </section>
           )}
-          {tab === "B" && (
+
+          {step === "BC" && (
             <section className="space-y-2">
-              <div className="text-sm font-bold text-purple-200 hebrew">
-                חלק ב׳ — ידע וזיכרון · נספר למכסת ב+ג · <span dir="ltr">{selectedBC.length}/{MAX_BC} נבחרו</span>
+              <div className={`sticky top-[108px] z-10 rounded-xl p-3 backdrop-blur-sm border flex items-center justify-between ${bcDone?"bg-emerald-900/80 border-emerald-500/40":"bg-slate-900/90 border-purple-500/30"}`}>
+                <div className="font-bold text-on-parchment hebrew text-sm">פרק ב+ג — ידע ורוחב · בחר 7 מתוך 14</div>
+                <div className={`text-sm font-bold ${bcDone?"text-emerald-300":"text-purple-300"}`} dir="ltr">
+                  נבחרו {selectedBC.length}/{MAX_BC}
+                </div>
               </div>
-              {partB.map(q => (
-                <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
-                  onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
-              ))}
-            </section>
-          )}
-          {tab === "C" && (
-            <section className="space-y-2">
-              <div className="text-sm font-bold text-purple-200 hebrew">
-                חלק ג׳ — ניתוח ורוחב · נספר למכסת ב+ג · <span dir="ltr">{selectedBC.length}/{MAX_BC} נבחרו</span>
-              </div>
-              {partC.map(q => (
-                <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
-                  onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
-              ))}
-            </section>
-          )}
-          {tab === "BC" && (
-            <section className="space-y-3">
-              <div className="text-sm font-bold text-purple-200 hebrew">
-                בחר 7 מתוך 14 (ב+ג) · <span dir="ltr">{selectedBC.length}/{MAX_BC} נבחרו</span>
-              </div>
-              <div className="text-[10px] text-on-parchment-meta">פרק ב׳</div>
+              {missingBC > 0 && (
+                <div className="text-[11px] px-2 py-1 rounded bg-red-100 text-red-900 font-mono" dir="ltr">
+                  {`// TODO: need ${missingBC} more yeda+rohav question${missingBC>1?"s":""} in past-exams.js`}
+                </div>
+              )}
+              <div className="text-[10px] text-on-parchment-meta mt-2">פרק ב — ידע וזיכרון ({partB.length} סעיפים)</div>
               <div className="space-y-2">
                 {partB.map(q => (
                   <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
                     onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
                 ))}
               </div>
-              <div className="text-[10px] text-on-parchment-meta mt-3">פרק ג׳</div>
+              <div className="text-[10px] text-on-parchment-meta mt-3">פרק ג — ניתוח ונושאי רוחב ({partC.length} סעיפים)</div>
               <div className="space-y-2">
                 {partC.map(q => (
                   <SelectionCard key={q.id} q={q} selected={selectedBC.includes(q.id)}
                     onToggle={()=>toggleBC(q.id)} disabled={fullBC}/>
                 ))}
               </div>
+              <div className="grid grid-cols-2 gap-2 pt-2">
+                <button onClick={()=>setSelectTab("A")}
+                  className="card py-3 rounded-2xl text-on-parchment font-bold">
+                  → חזרה לפרק א
+                </button>
+                <button onClick={()=>setPhase("running")} disabled={!bcDone}
+                  className={`py-3 rounded-2xl text-base font-bold ${bcDone?"gold-btn glow":"bg-slate-700 text-slate-400 cursor-not-allowed"}`}>
+                  {bcDone ? `🏁 התחל · ${fmtHMS(examCfg&&examCfg.durationSec||DURATION_STANDARD)}` : `בחר עוד ${MAX_BC-selectedBC.length}`}
+                </button>
+              </div>
             </section>
           )}
-          <button onClick={()=>setPhase("running")} disabled={!ready}
-            className={`w-full py-4 rounded-2xl text-lg font-bold ${ready?"gold-btn glow":"bg-slate-700 text-slate-400 cursor-not-allowed"}`}>
-            {ready ? `🏁 התחל מבחן · ${fmtHMS(examCfg&&examCfg.durationSec||DURATION_STANDARD)}` : `בחר ${MAX_A-selectedA.length} בפרק א ו-${MAX_BC-selectedBC.length} בפרקים ב+ג`}
-          </button>
         </div>
       );
     }
@@ -554,10 +746,19 @@
     return null;
   }
 
+  function countWords(s){
+    if (!s) return 0;
+    const trimmed = String(s).trim();
+    if (!trimmed) return 0;
+    return trimmed.split(/\s+/).length;
+  }
+
   function ExamRunning({ selectedA, selectedBC, tab, onTab, durationSec, accommodation, resume, onFinish, onExit }){
     const [timeLeft, setTimeLeft] = useState(() => (resume && typeof resume.timeLeft === "number") ? resume.timeLeft : durationSec);
     const [answers, setAnswers]   = useState(() => (resume && resume.answers) || {});
+    const [flagged, setFlagged]   = useState(() => (resume && resume.flagged) || {});
     const [startTime]             = useState(() => (resume && resume.startTime) || Date.now());
+    const cardRefs                = React.useRef({});
 
     useEffect(() => {
       if (timeLeft <= 0) { onFinish({ answers, elapsedSec: durationSec }); return; }
@@ -569,13 +770,13 @@
     useEffect(() => {
       const iv = setInterval(() => {
         saveInProgress({
-          selectedA, selectedBC, answers,
+          selectedA, selectedBC, answers, flagged,
           startTime, elapsedSec: durationSec - timeLeft,
           timeLeft, durationSec, accommodation, savedAt: Date.now()
         });
       }, 30*1000);
       return () => clearInterval(iv);
-    }, [selectedA, selectedBC, answers, startTime, timeLeft, durationSec, accommodation]);
+    }, [selectedA, selectedBC, answers, flagged, startTime, timeLeft, durationSec, accommodation]);
 
     const finish = () => {
       clearInProgress();
@@ -586,72 +787,129 @@
     const partBQs  = partBCList().filter(q => selectedBC.includes(q.id) && q.part === "B");
     const partCQs  = partBCList().filter(q => selectedBC.includes(q.id) && q.part === "C");
     const partBCQs = [...partBQs, ...partCQs];
-    const mins = Math.floor(timeLeft/60), secs = timeLeft%60;
+
+    // Three-stage timer color: normal / amber-warn (≤30:00) / red-pulse (≤5:00).
+    const timerStage = timeLeft <= 5*60 ? "crit" : timeLeft <= 30*60 ? "warn" : "normal";
+    const timerCls   = `exam-timer-${timerStage}`;
+    const hh = Math.floor(timeLeft/3600);
+    const mm = Math.floor((timeLeft%3600)/60);
+    const ss = timeLeft%60;
+    const timerText = `${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
 
     const setAns = (id, v) => setAnswers(a => ({...a, [id]: v}));
-    const activeTab = tab || "A";
+    const toggleFlag = (id) => setFlagged(f => ({...f, [id]: !f[id]}));
 
-    function RunningCard({ q }){
+    const allQs = [...partAQs, ...partBCQs];
+    const answeredCount = allQs.filter(q => (answers[q.id]||"").trim()).length;
+
+    const scrollToQ = (id) => {
+      const el = cardRefs.current[id];
+      if (el && typeof el.scrollIntoView === "function") {
+        el.scrollIntoView({behavior:"smooth", block:"start"});
+        const ta = el.querySelector("textarea");
+        if (ta) setTimeout(() => ta.focus(), 350);
+      }
+    };
+    const nextOf = (id) => {
+      const idx = allQs.findIndex(q => q.id === id);
+      if (idx >= 0 && idx < allQs.length-1) scrollToQ(allQs[idx+1].id);
+    };
+
+    function RunningCard({ q, isLast }){
       const isA = q.part === "A";
+      const ans = answers[q.id] || "";
+      const words = countWords(ans);
+      const flag = !!flagged[q.id];
+      const refs = Array.isArray(q.book_refs) ? q.book_refs : [];
       return (
-        <div className="parchment rounded-xl p-4 space-y-3">
-          <div className="flex items-center gap-2 text-xs">
+        <div ref={el => { if (el) cardRefs.current[q.id] = el; }}
+          className={`parchment rounded-xl p-4 space-y-3 ${flag ? "ring-2 ring-amber-400" : ""}`}>
+          <div className="flex items-center gap-2 text-xs flex-wrap">
             <span className={`px-2 py-0.5 rounded-full text-white font-bold ${isA?"bg-amber-700":"bg-purple-700"}`}>
               {isA ? `שאלה ${q.n}` : `סעיף ${q.n}`}
             </span>
-            <span className="text-amber-800">{q.points} נק׳</span>
-            <span className="text-amber-900 font-bold mr-auto">{isA ? q.title : `פרק ${q.part} · ${q.title}`}</span>
+            <span className="text-amber-800 font-bold">{q.points} נק׳</span>
+            <span className="text-amber-900 font-bold">
+              {isA ? q.title : `פרק ${q.part} · ${q.title}`}
+            </span>
+            {refs.map((r, i) => (
+              <span key={i} className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-bold">📖 {r}</span>
+            ))}
+            <button onClick={()=>toggleFlag(q.id)} type="button"
+              className={`mr-auto px-2 py-0.5 rounded-full text-[11px] font-bold ${flag?"bg-amber-500 text-amber-950":"bg-white/60 text-amber-800 hover:bg-amber-200"}`}>
+              {flag ? "🚩 מסומן לחזרה" : "סמן לחזרה"}
+            </button>
           </div>
           {Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0 && (
             <VerbatimQuotes quotes={q.verbatim_quotes}/>
           )}
-          <div className="hebrew text-amber-950 leading-relaxed" style={{fontSize:"1.15rem"}}>{q.prompt}</div>
-          <textarea value={answers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)}
-            rows={5} placeholder="כתוב את תשובתך כאן..."
-            className="w-full px-3 py-2 rounded-lg bg-white/80 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"/>
+          <div className="hebrew text-amber-950 leading-relaxed" style={{fontSize:"1.18rem"}}>{q.prompt}</div>
+          <textarea value={ans} onChange={e=>setAns(q.id, e.target.value)}
+            placeholder="כתוב את תשובתך כאן..."
+            className="w-full px-3 py-2 rounded-lg bg-white/85 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"
+            style={{minHeight:"200px", resize:"vertical"}}/>
+          <div className="flex items-center justify-between text-xs">
+            <div className="text-amber-800" dir="ltr">{words} מילים</div>
+            <button onClick={()=>nextOf(q.id)} type="button" disabled={isLast}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${isLast?"bg-slate-300 text-slate-500 cursor-not-allowed":"bg-amber-700 text-white hover:bg-amber-800"}`}>
+              {isLast ? "השאלה האחרונה" : "💾 שמור והמשך ←"}
+            </button>
+          </div>
         </div>
       );
     }
 
-    const tabs = [
-      { id:"A", label:`חלק א׳ (${partAQs.length})`,   color:"amber"  },
-      { id:"B", label:`חלק ב׳ (${partBQs.length})`,   color:"purple" },
-      { id:"C", label:`חלק ג׳ (${partCQs.length})`,   color:"purple" }
-    ];
-    const visibleQs = activeTab === "A" ? partAQs : activeTab === "B" ? partBQs : partCQs;
+    function NavPill({ q, isA }){
+      const filled = !!(answers[q.id]||"").trim();
+      const flag   = !!flagged[q.id];
+      const base = isA ? "border-amber-600/40" : "border-purple-500/40";
+      const fill = filled
+        ? (isA ? "bg-amber-600 text-white" : "bg-purple-600 text-white")
+        : "bg-white/10 text-on-parchment";
+      const ring = flag ? "ring-2 ring-amber-300" : "";
+      return (
+        <button onClick={()=>scrollToQ(q.id)} type="button"
+          className={`relative w-9 h-9 rounded-lg border ${base} ${fill} ${ring} text-xs font-bold transition hover:opacity-80`}
+          title={q.title}>
+          <span dir="ltr">{q.n}</span>
+          {flag && <span className="absolute -top-1 -right-1 text-[10px]">🚩</span>}
+        </button>
+      );
+    }
 
     return (
       <div className="max-w-3xl mx-auto space-y-4 exam-fullscreen exam-run-wrap">
-        <div className="sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between exam-sticky-bar exam-run-timer">
+        <div className="sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between gap-2 exam-sticky-bar exam-run-timer">
           <div className="text-sm text-on-parchment">
-            נענו: <span dir="ltr" className="font-bold">{Object.keys(answers).filter(k=>answers[k]&&answers[k].trim()).length}/{partAQs.length+partBCQs.length}</span>
+            נענו: <span dir="ltr" className="font-bold">{answeredCount}/{allQs.length}</span>
           </div>
-          <div className={`font-mono font-bold text-lg exam-timer ${timeLeft<1800?"danger":""}`}>
-            ⏱ <span dir="ltr">{String(Math.floor(mins/60)).padStart(1,"0")}:{String(mins%60).padStart(2,"0")}:{String(secs).padStart(2,"0")}</span>
+          <div className={`font-mono font-bold text-xl exam-timer ${timerCls}`}>
+            ⏱ <span dir="ltr">{timerText}</span>
+            {timerStage === "warn" && <span className="text-xs font-normal mr-2 hebrew">· פחות מחצי שעה</span>}
+            {timerStage === "crit" && <span className="text-xs font-normal mr-2 hebrew">· הגשה קרבה!</span>}
           </div>
           <button onClick={finish} className="px-3 py-1.5 rounded-lg bg-red-700 text-white text-xs font-bold">הגשה</button>
         </div>
 
-        <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-slate-900/60 border border-amber-700/30 exam-run-tabs">
-          {tabs.map(t => {
-            const active = activeTab === t.id;
-            const cls = active
-              ? "bg-amber-600 text-white font-bold"
-              : "bg-white/10 text-on-parchment hover:bg-white/20";
-            return (
-              <button key={t.id} onClick={()=>onTab && onTab(t.id)}
-                className={`text-xs md:text-sm px-2 py-2 rounded-lg transition hebrew ${cls}`}>
-                {t.label}
-              </button>
-            );
-          })}
+        <div className="card rounded-xl p-3 space-y-2">
+          <div className="text-[11px] text-on-parchment-meta hebrew">ניווט מהיר · לחץ על שאלה לקפיצה</div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] text-amber-300 font-bold">פרק א:</span>
+            {partAQs.map(q => <NavPill key={q.id} q={q} isA={true}/>)}
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] text-purple-300 font-bold">פרק ב+ג:</span>
+            {partBCQs.map(q => <NavPill key={q.id} q={q} isA={false}/>)}
+          </div>
         </div>
 
-        <section className="space-y-2">
-          {visibleQs.map(q => <RunningCard key={q.id} q={q}/>)}
-          {visibleQs.length === 0 && (
+        <section className="space-y-3">
+          {allQs.map((q, i) => (
+            <RunningCard key={q.id} q={q} isLast={i === allQs.length-1}/>
+          ))}
+          {allQs.length === 0 && (
             <div className="text-center text-on-parchment-meta text-sm py-6 hebrew">
-              אין שאלות שנבחרו עבור חלק זה
+              לא נבחרו שאלות
             </div>
           )}
         </section>
@@ -681,6 +939,26 @@
     try { localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(list)); } catch {}
   }
 
+  function gradeBand(score){
+    if (score >= 90) return { label:"מעולה",    color:"#16a34a", emoji:"🏆" };
+    if (score >= 80) return { label:"טוב מאוד", color:"#65a30d", emoji:"✨" };
+    if (score >= 70) return { label:"טוב",      color:"#d97706", emoji:"👍" };
+    if (score >= 60) return { label:"מספיק",    color:"#b45309", emoji:"⚖" };
+    return { label:"נכשל", color:"#b91c1c", emoji:"⚠" };
+  }
+
+  function RubricList({ q }){
+    const points = Array.isArray(q.expected_points) ? q.expected_points : [];
+    if (points.length === 0) return (
+      <div className="text-[11px] text-amber-800 hebrew italic">אין רובריקה זמינה לסעיף זה.</div>
+    );
+    return (
+      <ul className="list-disc pr-5 text-xs text-emerald-950 hebrew leading-relaxed space-y-1">
+        {points.map((p,i)=><li key={i}>{p}</li>)}
+      </ul>
+    );
+  }
+
   function ExamGrade({ selectedA, selectedBC, answers, elapsedSec, accommodation, onDone }){
     const partAQs  = partAList().filter(q => selectedA.includes(q.id));
     const partBCQs = partBCList().filter(q => selectedBC.includes(q.id));
@@ -688,34 +966,43 @@
 
     const [editAnswers, setEditAnswers] = useState(() => ({...answers}));
     const [grades, setGrades] = useState({});
+    const [openRubrics, setOpenRubrics] = useState({});
     const [saved, setSaved] = useState(false);
 
     const setGrade = (id, g) => setGrades(prev => ({...prev, [id]: g}));
     const setAns   = (id, v) => setEditAnswers(prev => ({...prev, [id]: v}));
+    const toggleRubric = (id) => setOpenRubrics(prev => ({...prev, [id]: !prev[id]}));
 
-    const partAScore = partAQs.reduce((s,q) => s + scoreForGrade(grades[q.id], q.points||9), 0);
+    const partAScore  = partAQs.reduce((s,q)  => s + scoreForGrade(grades[q.id], q.points||9), 0);
     const partBCScore = partBCQs.reduce((s,q) => s + scoreForGrade(grades[q.id], q.points||8), 0);
     const total = partAScore + partBCScore;
+    const totalRound = Math.round(total*10)/10;
     const allGraded = allQs.every(q => grades[q.id]);
+    const band = gradeBand(totalRound);
 
     const weakTopics = allQs.filter(q => grades[q.id] === "dont").map(q => q.title);
 
     const submit = () => {
+      const ts = Date.now();
       const rec = {
-        date: new Date().toISOString(),
-        total: Math.round(total*10)/10,
+        ts,
+        date: new Date(ts).toISOString(),
+        total: totalRound,
         partA: Math.round(partAScore*10)/10,
         partBC: Math.round(partBCScore*10)/10,
+        band: band.label,
         accommodation,
         elapsedSec,
         weakTopics,
         grades,
+        answers: editAnswers,
         selectedA, selectedBC
       };
       pushAttempt(rec);
+      try { localStorage.setItem(`jarvis.melakhim.exams.${ts}`, JSON.stringify(rec)); } catch {}
       setSaved(true);
       if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
-        window.showToast('💾 הבחינה נשמרה בהיסטוריה · ציון ' + (Math.round(total*10)/10) + '/101', 'success');
+        window.showToast(`💾 הבחינה נשמרה · ${totalRound}/101 (${band.label})`, 'success');
       }
       try {
         if (typeof window !== 'undefined' && window.MelakhimAuth && window.MelakhimAuth.publishLeaderboard){
@@ -726,17 +1013,22 @@
 
     return (
       <div className="max-w-3xl mx-auto space-y-4">
-        <div className="card rounded-xl p-4 flex items-center justify-between flex-wrap gap-2">
+        <div className="card rounded-2xl p-5 flex items-center justify-between flex-wrap gap-3"
+          style={{borderTop:`4px solid ${band.color}`}}>
           <div>
-            <h2 className="font-display text-xl font-bold text-on-parchment-accent">📝 דירוג עצמי מול תשובות מצופות</h2>
+            <h2 className="font-display text-xl font-bold text-on-parchment-accent">📝 ציון מלא · מתכונת 2551 תשפ"ו</h2>
             <div className="text-xs text-on-parchment">
               זמן שלקח: <span dir="ltr">{fmtHMS(elapsedSec)}</span> · מצב התאמה: {accommodation?"פעיל":"רגיל"}
             </div>
           </div>
           <div className="text-left">
-            <div className="text-xs text-on-parchment">ציון נוכחי</div>
-            <div className="font-mono font-bold text-on-parchment-accent text-2xl" dir="ltr">
-              {Math.round(total*10)/10}/101
+            <div className="font-mono font-extrabold text-5xl md:text-6xl"
+              dir="ltr"
+              style={{color:"#F4D58D", textShadow:"0 2px 12px rgba(0,0,0,.45)"}}>
+              {totalRound}<span className="text-2xl opacity-70">/101</span>
+            </div>
+            <div className="font-bold text-base mt-1" style={{color:band.color}}>
+              {band.emoji} {band.label}
             </div>
             <div className="text-[10px] text-on-parchment-meta">
               א: <span dir="ltr">{Math.round(partAScore*10)/10}/45</span> · ב+ג: <span dir="ltr">{Math.round(partBCScore*10)/10}/56</span>
@@ -746,16 +1038,23 @@
 
         {allQs.map(q => {
           const g = grades[q.id];
+          const gainedPts = scoreForGrade(g, q.points || (q.part==="A"?9:8));
+          const open = !!openRubrics[q.id];
           return (
             <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
-              <div className="flex items-center gap-2 text-xs">
+              <div className="flex items-center gap-2 text-xs flex-wrap">
                 <span className={`px-2 py-0.5 rounded-full text-white font-bold ${q.part==="A"?"bg-amber-700":"bg-purple-700"}`}>
                   {q.part==="A" ? `שאלה ${q.n}` : `סעיף ${q.n}`}
                 </span>
-                <span className="text-amber-800">{q.points} נק׳</span>
-                <span className="text-amber-900 font-bold mr-auto">
+                <span className="text-amber-800 font-bold">{q.points} נק׳</span>
+                <span className="text-amber-900 font-bold">
                   {q.part==="A" ? q.title : `פרק ${q.part} · ${q.title}`}
                 </span>
+                {g && (
+                  <span className="mr-auto px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 font-mono text-[11px]" dir="ltr">
+                    +{gainedPts}/{q.points}
+                  </span>
+                )}
               </div>
               {Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0 && (
                 <VerbatimQuotes quotes={q.verbatim_quotes}/>
@@ -765,22 +1064,23 @@
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
                   <div className="text-[10px] font-bold text-amber-800 mb-1">התשובה שלך:</div>
-                  <textarea value={editAnswers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)} rows={4}
-                    className="w-full px-2 py-1.5 rounded-lg bg-white/80 border border-amber-700/40 text-amber-950 hebrew text-sm leading-relaxed"/>
+                  <textarea value={editAnswers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)} rows={5}
+                    placeholder="(לא נכתבה תשובה)"
+                    className="w-full px-2 py-1.5 rounded-lg bg-white/85 border border-amber-700/40 text-amber-950 hebrew text-sm leading-relaxed"/>
                 </div>
                 <div>
                   <div className="text-[10px] font-bold text-emerald-800 mb-1">תשובה מצופה (מהספר):</div>
-                  <ul className="list-disc pr-5 text-xs text-emerald-950 hebrew leading-relaxed space-y-1 bg-emerald-50/60 rounded-lg p-2">
-                    {(q.expected_points||[]).map((p,i)=><li key={i}>{p}</li>)}
-                  </ul>
+                  <div className="bg-emerald-50/70 rounded-lg p-2">
+                    <RubricList q={q}/>
+                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-2 pt-2">
                 {[
-                  {g:"know",    label:"✅ יודע",   cls:g==="know"   ?"bg-emerald-600 text-white":"bg-white/60 text-emerald-900"},
-                  {g:"partial", label:"⚠ חלקי",   cls:g==="partial"?"bg-amber-600 text-white":"bg-white/60 text-amber-900"},
-                  {g:"dont",    label:"❌ לא יודע", cls:g==="dont"   ?"bg-red-700 text-white":"bg-white/60 text-red-900"}
+                  {g:"know",    label:`✅ יודע (+${q.points})`,  cls:g==="know"   ?"bg-emerald-600 text-white":"bg-white/60 text-emerald-900"},
+                  {g:"partial", label:`⚠ חלקי (+${q.points/2})`, cls:g==="partial"?"bg-amber-600 text-white":"bg-white/60 text-amber-900"},
+                  {g:"dont",    label:"❌ לא יודע (+0)",          cls:g==="dont"   ?"bg-red-700 text-white":"bg-white/60 text-red-900"}
                 ].map(b => (
                   <button key={b.g} onClick={()=>setGrade(q.id, b.g)}
                     className={`rounded-lg py-2 text-sm font-bold transition ${b.cls}`}>
@@ -788,6 +1088,22 @@
                   </button>
                 ))}
               </div>
+
+              <button type="button" onClick={()=>toggleRubric(q.id)}
+                className="w-full text-right text-xs px-2 py-1 rounded-lg bg-amber-50 text-amber-900 font-bold hover:bg-amber-100 transition">
+                {open ? "▼ סגור רובריקה מלאה" : "▶ פתח רובריקה מלאה"}
+              </button>
+              {open && (
+                <div className="rounded-lg bg-white/50 p-3 space-y-1 border border-amber-700/20">
+                  <div className="text-[11px] font-bold text-amber-900">קריטריוני ניקוד:</div>
+                  <RubricList q={q}/>
+                  {Array.isArray(q.book_refs) && q.book_refs.length > 0 && (
+                    <div className="text-[10px] text-amber-800 pt-1">
+                      📖 הפניות: {q.book_refs.join(" · ")}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}
@@ -795,7 +1111,7 @@
         {!saved ? (
           <button onClick={submit} disabled={!allGraded}
             className={`w-full py-3 rounded-xl text-base font-bold ${allGraded?"gold-btn":"bg-slate-700 text-slate-400 cursor-not-allowed"}`}>
-            {allGraded ? `💾 שמור ציון ${Math.round(total*10)/10}/101 בהיסטוריה` : "דרג את כל הסעיפים כדי לשמור"}
+            {allGraded ? `💾 שמור ציון ${totalRound}/101 (${band.label}) בהיסטוריה` : "דרג את כל הסעיפים כדי לשמור"}
           </button>
         ) : (
           <div className="card rounded-xl p-4 space-y-2">
@@ -822,6 +1138,216 @@
               <button onClick={onDone} className="gold-btn py-2 rounded-lg font-bold">המשך</button>
             </div>
           </div>
+        )}
+      </div>
+    );
+  }
+
+  // ===== Practice Mode (no timer, no formal score band) =====
+  function PracticeRunning({ questions, filters, onFinish, onExit }){
+    const [answers, setAnswers] = useState({});
+    const [flagged, setFlagged] = useState({});
+    const cardRefs = React.useRef({});
+
+    const setAns = (id, v) => setAnswers(a => ({...a, [id]: v}));
+    const toggleFlag = (id) => setFlagged(f => ({...f, [id]: !f[id]}));
+    const answeredCount = questions.filter(q => (answers[q.id]||"").trim()).length;
+
+    const scrollToQ = (id) => {
+      const el = cardRefs.current[id];
+      if (el && typeof el.scrollIntoView === "function") {
+        el.scrollIntoView({behavior:"smooth", block:"start"});
+        const ta = el.querySelector("textarea");
+        if (ta) setTimeout(() => ta.focus(), 350);
+      }
+    };
+    const nextOf = (id) => {
+      const idx = questions.findIndex(q => q.id === id);
+      if (idx >= 0 && idx < questions.length-1) scrollToQ(questions[idx+1].id);
+    };
+
+    const submit = () => onFinish({ answers });
+
+    return (
+      <div className="max-w-3xl mx-auto space-y-4 exam-fullscreen exam-run-wrap">
+        <div className="sticky top-[108px] z-20 card rounded-xl p-3 flex items-center justify-between gap-2 exam-sticky-bar exam-run-timer">
+          <div className="text-sm text-on-parchment">
+            ⚡ תרגול · נענו: <span dir="ltr" className="font-bold">{answeredCount}/{questions.length}</span>
+          </div>
+          <div className="text-xs text-on-parchment-meta hebrew">בלי הגבלת זמן</div>
+          <button onClick={submit} className="px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold">סיים</button>
+        </div>
+
+        <div className="card rounded-xl p-3 space-y-1">
+          <div className="text-[11px] text-on-parchment-meta hebrew">ניווט מהיר</div>
+          <div className="flex items-center gap-2 flex-wrap">
+            {questions.map((q, i) => {
+              const filled = !!(answers[q.id]||"").trim();
+              const flag = !!flagged[q.id];
+              return (
+                <button key={q.id} onClick={()=>scrollToQ(q.id)} type="button"
+                  className={`relative w-9 h-9 rounded-lg border border-amber-600/40 text-xs font-bold transition hover:opacity-80 ${filled?"bg-amber-600 text-white":"bg-white/10 text-on-parchment"} ${flag?"ring-2 ring-amber-300":""}`}>
+                  <span dir="ltr">{i+1}</span>
+                  {flag && <span className="absolute -top-1 -right-1 text-[10px]">🚩</span>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <section className="space-y-3">
+          {questions.map((q, i) => {
+            const ans = answers[q.id]||"";
+            const flag = !!flagged[q.id];
+            const refs = Array.isArray(q.book_refs) ? q.book_refs : [];
+            const isLast = i === questions.length-1;
+            const typeLabel = typeForQuestion(q)==="bekiut" ? "בקיאות" : typeForQuestion(q)==="yeda" ? "ידע" : typeForQuestion(q)==="rohav" ? "רוחב" : "כללי";
+            const u = unitForQuestion(q);
+            return (
+              <div key={q.id} ref={el => { if (el) cardRefs.current[q.id] = el; }}
+                className={`parchment rounded-xl p-4 space-y-3 ${flag?"ring-2 ring-amber-400":""}`}>
+                <div className="flex items-center gap-2 text-xs flex-wrap">
+                  <span className="px-2 py-0.5 rounded-full bg-amber-700 text-white font-bold">שאלה {i+1}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold">{typeLabel}</span>
+                  {u && <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-bold">יחידה {u}</span>}
+                  <span className="text-amber-900 font-bold">{q.title}</span>
+                  {refs.map((r, j) => (
+                    <span key={j} className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 text-[11px] font-bold">📖 {r}</span>
+                  ))}
+                  <button onClick={()=>toggleFlag(q.id)} type="button"
+                    className={`mr-auto px-2 py-0.5 rounded-full text-[11px] font-bold ${flag?"bg-amber-500 text-amber-950":"bg-white/60 text-amber-800 hover:bg-amber-200"}`}>
+                    {flag ? "🚩 מסומן" : "סמן לחזרה"}
+                  </button>
+                </div>
+                {Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0 && (
+                  <VerbatimQuotes quotes={q.verbatim_quotes}/>
+                )}
+                <div className="hebrew text-amber-950 leading-relaxed" style={{fontSize:"1.18rem"}}>{q.prompt}</div>
+                <textarea value={ans} onChange={e=>setAns(q.id, e.target.value)}
+                  placeholder="כתוב את תשובתך כאן..."
+                  className="w-full px-3 py-2 rounded-lg bg-white/85 border border-amber-700/40 text-amber-950 hebrew leading-relaxed"
+                  style={{minHeight:"180px", resize:"vertical"}}/>
+                <div className="flex items-center justify-between text-xs">
+                  <div className="text-amber-800" dir="ltr">{countWords(ans)} מילים</div>
+                  <button onClick={()=>nextOf(q.id)} type="button" disabled={isLast}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold ${isLast?"bg-slate-300 text-slate-500 cursor-not-allowed":"bg-amber-700 text-white hover:bg-amber-800"}`}>
+                    {isLast ? "האחרונה" : "המשך ←"}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </section>
+
+        <div className="grid grid-cols-2 gap-2">
+          <button onClick={onExit} className="card py-3 rounded-xl text-on-parchment">← יציאה</button>
+          <button onClick={submit} className="gold-btn py-3 rounded-xl font-bold">📤 בדוק תשובות</button>
+        </div>
+      </div>
+    );
+  }
+
+  function PracticeGrade({ questions, answers, onDone, onRetry }){
+    const [editAnswers, setEditAnswers] = useState(() => ({...answers}));
+    const [grades, setGrades] = useState({});
+    const [openRubrics, setOpenRubrics] = useState({});
+    const setGrade = (id, g) => setGrades(prev => ({...prev, [id]: g}));
+    const setAns   = (id, v) => setEditAnswers(prev => ({...prev, [id]: v}));
+    const toggleRubric = (id) => setOpenRubrics(prev => ({...prev, [id]: !prev[id]}));
+
+    const totalMax = questions.reduce((s,q) => s + (q.points || 8), 0);
+    const totalGain = questions.reduce((s,q) => s + scoreForGrade(grades[q.id], q.points || 8), 0);
+    const pctRound = totalMax === 0 ? 0 : Math.round(totalGain/totalMax*100);
+    const allGraded = questions.every(q => grades[q.id]);
+    const band = gradeBand(pctRound);
+
+    return (
+      <div className="max-w-3xl mx-auto space-y-4">
+        <div className="card rounded-2xl p-5 flex items-center justify-between flex-wrap gap-3"
+          style={{borderTop:`4px solid ${band.color}`}}>
+          <div>
+            <h2 className="font-display text-xl font-bold text-on-parchment-accent">⚡ תרגול קצר · ציון</h2>
+            <div className="text-xs text-on-parchment hebrew">{questions.length} שאלות · ללא מגבלת זמן</div>
+          </div>
+          <div className="text-left">
+            <div className="font-mono font-extrabold text-5xl md:text-6xl"
+              dir="ltr"
+              style={{color:"#F4D58D", textShadow:"0 2px 12px rgba(0,0,0,.45)"}}>
+              {Math.round(totalGain*10)/10}<span className="text-2xl opacity-70">/{totalMax}</span>
+            </div>
+            <div className="font-bold text-base mt-1" style={{color:band.color}}>
+              {band.emoji} {pctRound}% · {band.label}
+            </div>
+          </div>
+        </div>
+
+        {questions.map((q, idx) => {
+          const g = grades[q.id];
+          const open = !!openRubrics[q.id];
+          const points = q.points || 8;
+          const gain = scoreForGrade(g, points);
+          return (
+            <div key={q.id} className="parchment rounded-xl p-4 space-y-2">
+              <div className="flex items-center gap-2 text-xs flex-wrap">
+                <span className="px-2 py-0.5 rounded-full bg-amber-700 text-white font-bold">שאלה {idx+1}</span>
+                <span className="text-amber-900 font-bold">{q.title}</span>
+                {g && (
+                  <span className="mr-auto px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 font-mono text-[11px]" dir="ltr">
+                    +{gain}/{points}
+                  </span>
+                )}
+              </div>
+              {Array.isArray(q.verbatim_quotes) && q.verbatim_quotes.length > 0 && (
+                <VerbatimQuotes quotes={q.verbatim_quotes}/>
+              )}
+              <div className="hebrew text-amber-950 leading-relaxed" style={{fontSize:"1.05rem"}}>{q.prompt}</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div>
+                  <div className="text-[10px] font-bold text-amber-800 mb-1">התשובה שלך:</div>
+                  <textarea value={editAnswers[q.id]||""} onChange={e=>setAns(q.id, e.target.value)} rows={5}
+                    placeholder="(לא נכתבה תשובה)"
+                    className="w-full px-2 py-1.5 rounded-lg bg-white/85 border border-amber-700/40 text-amber-950 hebrew text-sm leading-relaxed"/>
+                </div>
+                <div>
+                  <div className="text-[10px] font-bold text-emerald-800 mb-1">תשובה מצופה:</div>
+                  <div className="bg-emerald-50/70 rounded-lg p-2"><RubricList q={q}/></div>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2 pt-2">
+                {[
+                  {g:"know",    label:`✅ יודע (+${points})`,   cls:g==="know"   ?"bg-emerald-600 text-white":"bg-white/60 text-emerald-900"},
+                  {g:"partial", label:`⚠ חלקי (+${points/2})`,  cls:g==="partial"?"bg-amber-600 text-white":"bg-white/60 text-amber-900"},
+                  {g:"dont",    label:"❌ לא יודע (+0)",         cls:g==="dont"   ?"bg-red-700 text-white":"bg-white/60 text-red-900"}
+                ].map(b => (
+                  <button key={b.g} onClick={()=>setGrade(q.id, b.g)}
+                    className={`rounded-lg py-2 text-sm font-bold transition ${b.cls}`}>
+                    {b.label}
+                  </button>
+                ))}
+              </div>
+              <button type="button" onClick={()=>toggleRubric(q.id)}
+                className="w-full text-right text-xs px-2 py-1 rounded-lg bg-amber-50 text-amber-900 font-bold hover:bg-amber-100 transition">
+                {open ? "▼ סגור רובריקה מלאה" : "▶ פתח רובריקה מלאה"}
+              </button>
+              {open && (
+                <div className="rounded-lg bg-white/50 p-3 space-y-1 border border-amber-700/20">
+                  <div className="text-[11px] font-bold text-amber-900">קריטריוני ניקוד:</div>
+                  <RubricList q={q}/>
+                  {Array.isArray(q.book_refs) && q.book_refs.length > 0 && (
+                    <div className="text-[10px] text-amber-800 pt-1">📖 {q.book_refs.join(" · ")}</div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        <div className="grid grid-cols-2 gap-2">
+          <button onClick={onRetry} className="card py-3 rounded-xl text-on-parchment font-bold">⚡ תרגול נוסף</button>
+          <button onClick={onDone} className="gold-btn py-3 rounded-xl font-bold">חזרה למסך הפתיחה</button>
+        </div>
+        {!allGraded && (
+          <div className="text-center text-[11px] text-amber-300 hebrew">דרג את כל הסעיפים לקבלת ציון מלא</div>
         )}
       </div>
     );
