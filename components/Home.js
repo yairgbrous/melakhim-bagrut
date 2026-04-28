@@ -117,12 +117,6 @@
               aria-label="תרגל מתכונת">
               📝 תרגל מתכונת
             </button>
-            <button
-              onClick={()=>setRoute({page:"quizUnit", unit: (currentUnit && currentUnit.id) || 1})}
-              className="w-full md:w-auto md:px-10 py-2.5 rounded-xl text-sm border-2 border-amber-500/40 text-on-parchment font-bold hover:bg-amber-500/10 transition"
-              aria-label="תרגל את היחידה">
-              ⚔️ תרגל את היחידה
-            </button>
           </div>
         </div>
       </section>
@@ -186,9 +180,7 @@
       { icon:'🗺', label:'מפות',        onClick:()=>setRoute({page:'maps'}) },
       { icon:'👥', label:'דמויות',      onClick:openSearch },
       { icon:'🌐', label:'נושאי רוחב',  onClick:()=>setRoute({page:'themes'}) },
-      { icon:'📜', label:'ציר זמן',     onClick:()=>setRoute({page:'timeline'}) },
-      { icon:'🃏', label:'פלאשקארדס',   onClick:()=>setRoute({page:'flashcards'}) },
-      { icon:'📝', label:'אזור בחינה',  onClick:()=>setRoute({page:'exam-sim'}) }
+      { icon:'🃏', label:'פלאשקארדס',   onClick:()=>setRoute({page:'flashcards'}) }
     ];
     return (
       <section className="mb-home-section">
