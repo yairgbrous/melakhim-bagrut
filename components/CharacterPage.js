@@ -61,6 +61,15 @@
     const swapped = id.indexOf("_")>=0 ? id.replace(/_/g,"-") : id.replace(/-/g,"_");
     const swap = pool.find(x => x && x.id === swapped);
     if (swap) return swap;
+    // Fallback: __ENTITY_INDEX__ buckets are populated even when raw
+    // CHARACTERS_DATA / KINGS_DATA globals fail to attach (dynamic import
+    // succeeded but static <script> didn't on live).
+    const idx = (window.__ENTITY_INDEX__ || {});
+    const fromIdx = (idx.character && idx.character[id])
+                 || (idx.king && idx.king[id])
+                 || (idx.character && idx.character[swapped])
+                 || (idx.king && idx.king[swapped]);
+    if (fromIdx) return fromIdx;
     return null;
   }
 

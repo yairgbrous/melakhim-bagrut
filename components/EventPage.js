@@ -42,6 +42,10 @@
     const swapped = id.indexOf("_")>=0 ? id.replace(/_/g,"-") : id.replace(/-/g,"_");
     const swap = pool.find(x => x && x.id === swapped);
     if (swap) return swap;
+    // Fallback: __ENTITY_INDEX__.event populated even if EVENTS_DATA missed.
+    const idx = (window.__ENTITY_INDEX__ || {}).event || {};
+    if (idx[id]) return idx[id];
+    if (idx[swapped]) return idx[swapped];
     return null;
   }
 
