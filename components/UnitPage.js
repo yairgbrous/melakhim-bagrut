@@ -411,8 +411,10 @@
       be_eize_hekhsher:  "באיזה הקשר",
       al_mi_neemar:      "על מי נאמר",
       character_details: "פרטי דמות",
-      place_events:      "אירועים במקום"
+      place_events:      "אירועים במקום",
+      multiple_choice:   "רב־ברירה"
     };
+    const [mcPick, setMcPick] = useState(null);
     const typeLabel = (t) => {
       if (!t) return "שאלה";
       const rdn = (typeof window !== "undefined" && typeof window.resolveDisplayName === "function") ? window.resolveDisplayName : null;
@@ -440,7 +442,7 @@
       matchesTypeFilter(q, typeFilter)
     ), [all, diffFilter, typeFilter]);
 
-    useEffect(() => { setI(0); setRevealed(false); }, [diffFilter, typeFilter]);
+    useEffect(() => { setI(0); setRevealed(false); setMcPick(null); }, [diffFilter, typeFilter]);
 
     if (all.length === 0) {
       return (
@@ -485,6 +487,7 @@
         <div className="flex flex-wrap gap-1.5 items-center">
           <span className="text-sm font-bold text-on-parchment-muted ms-1">סוג:</span>
           <TypePill value="all"               label="כל הסוגים" count={all.length}/>
+          <TypePill value="multiple_choice"   label="רב־ברירה" count={typeCounts.multiple_choice}/>
           <TypePill value="short_answer"      label="תשובה קצרה" count={typeCounts.short_answer}/>
           <TypePill value="mi_amar_lemi"      label="מי אמר למי" count={typeCounts.mi_amar_lemi}/>
           <TypePill value="be_eize_hekhsher"  label="באיזה הקשר" count={typeCounts.be_eize_hekhsher}/>
@@ -512,13 +515,19 @@
 
     const safeI = i % filtered.length;
     const q = filtered[safeI];
+    const isMC = q.type === "multiple_choice" && Array.isArray(q.options) && q.options.length > 0;
     const goNext = () => {
       const nextSeen = new Set(seen); nextSeen.add(q.id);
       setSeen(nextSeen);
       setRevealed(false);
+      setMcPick(null);
       setI((safeI + 1) % filtered.length);
       const pct = Math.round((nextSeen.size / all.length) * 100);
       onProgress && onProgress(pct, { lastQuestionId: q.id, seen: Array.from(nextSeen) });
+    };
+    const pickMC = (idx) => {
+      setMcPick(idx);
+      setRevealed(true);
     };
 
     const seenCount = seen.size;
@@ -540,7 +549,43 @@
           <p className="hebrew text-amber-950 leading-loose text-base">{q.prompt_niqqud || q.prompt}</p>
         </section>
 
-        {!revealed && (
+        {isMC && (
+          <div className="space-y-2">
+            {q.options.map((opt, j) => {
+              const picked = mcPick === j;
+              const correct = q.correct_index === j;
+              let cls = "w-full text-right card rounded-xl p-3 text-base font-bold border transition hebrew leading-relaxed ";
+              if (revealed) {
+                if (correct) cls += "bg-emerald-500/30 border-emerald-500 text-emerald-100";
+                else if (picked) cls += "bg-red-500/30 border-red-500 text-red-100";
+                else cls += "border-amber-700/30 text-on-parchment opacity-80";
+              } else {
+                cls += "border-amber-700/30 text-on-parchment hover:scale-[1.01]";
+              }
+              return (
+                <button key={j} type="button"
+                  disabled={revealed}
+                  onClick={() => pickMC(j)}
+                  className={cls}>
+                  <span className="text-xs ms-2 opacity-70">{j+1}.</span> {opt}
+                  {revealed && correct && <span className="ms-2">✅</span>}
+                  {revealed && picked && !correct && <span className="ms-2">❌</span>}
+                </button>
+              );
+            })}
+            {revealed && (
+              <div className={"text-sm font-bold p-3 rounded-xl " + (mcPick === q.correct_index
+                ? "bg-emerald-500/20 text-emerald-200"
+                : "bg-red-500/20 text-red-200")}>
+                {mcPick === q.correct_index
+                  ? "✅ כל הכבוד! תשובה נכונה."
+                  : `❌ התשובה הנכונה: ${q.options[q.correct_index]}`}
+              </div>
+            )}
+          </div>
+        )}
+
+        {!isMC && !revealed && (
           <button onClick={() => setRevealed(true)} className="gold-btn w-full py-3 rounded-xl text-base font-bold">
             🔎 גלה תשובה
           </button>
@@ -548,7 +593,7 @@
 
         {revealed && (
           <section className="card rounded-2xl p-4">
-            <h4 className="text-xs font-bold text-on-parchment-accent mb-2">נקודות בתשובה הצפויה</h4>
+            <h4 className="text-sm font-bold text-on-parchment-accent mb-2">נקודות בתשובה הצפויה</h4>
             <ul className="space-y-1.5 text-sm text-on-parchment hebrew list-disc pr-5">
               {(q.answer_points || []).map((p, j) => <li key={j}>{p}</li>)}
             </ul>

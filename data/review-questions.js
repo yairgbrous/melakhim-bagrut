@@ -7,7 +7,10 @@
      unit             — 1..6
      type             — "short_answer" | "mi_amar_lemi" | "be_eize_hekhsher"
                         | "al_mi_neemar" | "character_details" | "place_events"
+                        | "multiple_choice"
      prompt_niqqud    — question text with niqqud
+     options          — (multiple_choice only) 4 distractors
+     correct_index    — (multiple_choice only) 0-based correct option
      answer_points    — array of key answer points (student should hit N of them)
      difficulty       — "קל" | "בינוני" | "קשה"
      related_entities — array of "type:id" strings (king|char|event|place)
@@ -2683,8 +2686,218 @@
         "מה גורלו האישי של יאשיהו לפי הציטוט?"
       ],
       related_entities:["char:yoshiyahu","char:menashe","event:gzirat_churban"]
+    },
+
+    // === שאלות רב־ברירה (multiple_choice) — 2 ליחידה × 6 = 12 ===
+    {
+      id:"rq-u1-mc-001", unit:1, type:"multiple_choice", difficulty:"קל",
+      prompt_niqqud:"מָה בִּקֵּשׁ שְׁלֹמֹה מֵה׳ בַּהִתְגַּלּוּת בְּגִבְעוֹן?",
+      options:[
+        "עוֹשֶׁר וְכָבוֹד",
+        "לֵב שׁוֹמֵעַ לִשְׁפֹּט אֶת הָעָם",
+        "אֲרִיכוּת יָמִים",
+        "נִצָּחוֹן עַל אוֹיְבָיו"
+      ],
+      correct_index:1,
+      answer_points:[
+        "שלמה ביקש ״לב שומע לשפוט את עמך״ (מל״א ג׳ ט)",
+        "ה׳ העניק לו גם עושר וכבוד שלא ביקש"
+      ],
+      related_entities:["char:shlomo","event:hitgalut_givon","place:givon"]
+    },
+    {
+      id:"rq-u1-mc-002", unit:1, type:"multiple_choice", difficulty:"קל",
+      prompt_niqqud:"מִי נִסָּה לְהַמְלִיךְ אֶת עַצְמוֹ לִפְנֵי הַמְלָכַת שְׁלֹמֹה?",
+      options:[
+        "אַבְשָׁלוֹם",
+        "אֲדֹנִיָּהוּ בֶּן חַגִּית",
+        "יוֹאָב בֶּן צְרוּיָה",
+        "שִׁמְעִי בֶּן גֵּרָא"
+      ],
+      correct_index:1,
+      answer_points:[
+        "אדוניה בן חגית, האח הבכור החי של שלמה, ניסה למלוך",
+        "תמכו בו יואב שר הצבא ואביתר הכהן",
+        "התעקש להמליך את עצמו על אף שלא ניתנה לו רשות מאביו דוד"
+      ],
+      related_entities:["char:adoniya","char:shlomo","char:david","char:yoav"]
+    },
+
+    {
+      id:"rq-u2-mc-001", unit:2, type:"multiple_choice", difficulty:"קל",
+      prompt_niqqud:"כְּנֶגֶד אֵיזֶה מֶלֶךְ פָּרְצָה הַמַּחֲלֹקֶת שֶׁהוֹבִילָה לִפְלוּג הַמַּמְלָכָה?",
+      options:[
+        "שְׁלֹמֹה",
+        "רְחַבְעָם בֶּן שְׁלֹמֹה",
+        "אֲבִיָּם בֶּן רְחַבְעָם",
+        "אָסָא בֶּן אֲבִיָּם"
+      ],
+      correct_index:1,
+      answer_points:[
+        "ירבעם והעם ביקשו מרחבעם להקל בעול",
+        "רחבעם דחה את עצת הזקנים וקיבל את עצת הילדים",
+        "תוצאה: עשרת השבטים פרשו והקימו את ממלכת ישראל"
+      ],
+      related_entities:["char:rechavam","char:yeravam","event:plug_hamamlacha"]
+    },
+    {
+      id:"rq-u2-mc-002", unit:2, type:"multiple_choice", difficulty:"בינוני",
+      prompt_niqqud:"מַהוּ ״חֵטְא יָרָבְעָם״ שֶׁמְלַוֶּה אֶת מַמְלֶכֶת יִשְׂרָאֵל לְכָל אֹרְכָּהּ?",
+      options:[
+        "חִלּוּל הַשַּׁבָּת",
+        "הֲקָמַת שְׁתֵּי עֶגְלֵי הַזָּהָב בְּבֵית־אֵל וּבְדָן",
+        "נְשִׂיאַת נָשִׁים נָכְרִיּוֹת",
+        "בִּטּוּל קָרְבַּן הַתָּמִיד"
+      ],
+      correct_index:1,
+      answer_points:[
+        "ירבעם הקים שני עגלי זהב בבית־אל ובדן",
+        "המטרה: למנוע מהעם לעלות לירושלים לבית המקדש",
+        "ביטוי חוזר בספר: ״ויחטא וְיַחֲטִיא אֶת יִשְׂרָאֵל״"
+      ],
+      related_entities:["char:yeravam","place:beit_el","place:dan","event:eglei_zahav"]
+    },
+
+    {
+      id:"rq-u3-mc-001", unit:3, type:"multiple_choice", difficulty:"קל",
+      prompt_niqqud:"כֵּיצַד הוֹכִיחַ אֵלִיָּהוּ אֶת אֱלֹהוּת ה׳ בְּמַעֲמַד הַר הַכַּרְמֶל?",
+      options:[
+        "בַּעֲצִירַת הַגֶּשֶׁם",
+        "בִּירִידַת אֵשׁ מִן הַשָּׁמַיִם עַל הָעוֹלָה",
+        "בִּתְחִיַּת מֵתִים",
+        "בְּרִפּוּי מְצֹרָע"
+      ],
+      correct_index:1,
+      answer_points:[
+        "אש ירדה מן השמים ואכלה את העולה, את העצים ואת המים שבתעלה",
+        "תגובת העם: ״ה׳ הוא האלוהים, ה׳ הוא האלוהים״",
+        "המעמד הוכיח שה׳ הוא האלוהים האמיתי מול נביאי הבעל"
+      ],
+      related_entities:["char:eliyahu","place:karmel","event:har_karmel"]
+    },
+    {
+      id:"rq-u3-mc-002", unit:3, type:"multiple_choice", difficulty:"קל",
+      prompt_niqqud:"מִי הָיְתָה אֵשֶׁת אַחְאָב שֶׁהֵפִיצָה אֶת עֲבוֹדַת הַבַּעַל בְּיִשְׂרָאֵל?",
+      options:[
+        "עֲתַלְיָה",
+        "אִיזֶבֶל בַּת אֶתְבַּעַל",
+        "תִּרְצָה",
+        "מַעֲכָה"
+      ],
+      correct_index:1,
+      answer_points:[
+        "איזבל בת אתבעל מלך הצידונים",
+        "הכניסה את עבודת הבעל לישראל",
+        "רדפה את נביאי ה׳ והרגה אותם"
+      ],
+      related_entities:["char:izevel","char:achav","char:eliyahu"]
+    },
+
+    {
+      id:"rq-u4-mc-001", unit:4, type:"multiple_choice", difficulty:"בינוני",
+      prompt_niqqud:"אֶת אֵיזֶה מֶלֶךְ הָרַג יֵהוּא בַּמַּהְפֵּכָה לְעַלִּיָּתוֹ לַכֵּס?",
+      options:[
+        "אַחְאָב",
+        "יוֹרָם בֶּן אַחְאָב",
+        "יְהוֹשָׁפָט",
+        "מְנַחֵם"
+      ],
+      correct_index:1,
+      answer_points:[
+        "יהוא הרג את יורם בן אחאב מלך ישראל בחץ",
+        "הרג גם את אחזיה בן אחזיה מלך יהודה שהיה אצלו",
+        "השמיד את כל בית אחאב כפי שניבא אליהו"
+      ],
+      related_entities:["char:yehu","char:yoram","event:mahapekhat_yehu"]
+    },
+    {
+      id:"rq-u4-mc-002", unit:4, type:"multiple_choice", difficulty:"קל",
+      prompt_niqqud:"מַהוּ הַנֵּס שֶׁעָשָׂה אֱלִישָׁע לָאִשָּׁה הַשּׁוּנַמִּית?",
+      options:[
+        "רִבָּה אֶת שֶׁמֶן הַפַּךְ",
+        "בִּשֵּׂר עַל לֵדַת בֵּן וְהֵקִים אוֹתוֹ לִתְחִיָּה",
+        "טִהֵר אֶת מֵי הָאֵיתָן",
+        "הִכָּה צָרַעַת"
+      ],
+      correct_index:1,
+      answer_points:[
+        "אלישע הבטיח לשונמית בן ביום מועד למרות שאישה היה זקן",
+        "הילד מת לאחר שגדל ואלישע הקימו לתחייה",
+        "הנס מבטא את גמילות ההכנסת אורחים שלה"
+      ],
+      related_entities:["char:elisha","char:hashunamit","place:shunem"]
+    },
+
+    {
+      id:"rq-u5-mc-001", unit:5, type:"multiple_choice", difficulty:"בינוני",
+      prompt_niqqud:"מִי הִתְנַפֵּל עַל יְרוּשָׁלַיִם בִּימֵי חִזְקִיָּהוּ הַמֶּלֶךְ?",
+      options:[
+        "תִּגְלַת פִּלְאֶסֶר מֶלֶךְ אַשּׁוּר",
+        "סַנְחֵרִיב מֶלֶךְ אַשּׁוּר",
+        "בֶּן הֲדַד מֶלֶךְ אֲרָם",
+        "שַׁלְמַנְאֶסֶר מֶלֶךְ אַשּׁוּר"
+      ],
+      correct_index:1,
+      answer_points:[
+        "סנחריב מלך אשור צר על ירושלים",
+        "שלח את רב שקה לחרף את ה׳ ואת חזקיהו",
+        "מלאך ה׳ הכה במחנה אשור 185,000 איש בלילה אחד"
+      ],
+      related_entities:["char:sancheriv","char:chizkiyahu","event:hitkafat_sancheriv","place:yerushalayim"]
+    },
+    {
+      id:"rq-u5-mc-002", unit:5, type:"multiple_choice", difficulty:"בינוני",
+      prompt_niqqud:"כַּמָּה שָׁנִים נוֹסְפוּ לְחַיֵּי חִזְקִיָּהוּ אַחֲרֵי שֶׁהִתְפַּלֵּל וְנֶעֱנָה?",
+      options:[
+        "10 שָׁנִים",
+        "15 שָׁנִים",
+        "20 שָׁנִים",
+        "5 שָׁנִים"
+      ],
+      correct_index:1,
+      answer_points:[
+        "ה׳ הוסיף לחזקיהו 15 שנה לחייו (מל״ב כ׳ ו)",
+        "האות לכך: השמש שבה 10 מעלות אחורנית במעלות אחז",
+        "באותן שנים נולד מנשה"
+      ],
+      related_entities:["char:chizkiyahu","char:yeshayahu","event:macholat_chizkiyahu"]
+    },
+
+    {
+      id:"rq-u6-mc-001", unit:6, type:"multiple_choice", difficulty:"בינוני",
+      prompt_niqqud:"מִי גִּלָּה אֶת סֵפֶר הַתּוֹרָה בַּמִּקְדָּשׁ בִּימֵי יֹאשִׁיָּהוּ?",
+      options:[
+        "שָׁפָן הַסּוֹפֵר",
+        "חִלְקִיָּהוּ הַכֹּהֵן הַגָּדוֹל",
+        "חֻלְדָּה הַנְּבִיאָה",
+        "עֲשָׂיָה עֶבֶד הַמֶּלֶךְ"
+      ],
+      correct_index:1,
+      answer_points:[
+        "חלקיהו הכוהן הגדול מצא את ספר התורה במקדש בעת השיפוץ",
+        "מסר אותו לשפן הסופר שקרא לפני המלך",
+        "המציאה הובילה לרפורמה הדתית של יאשיהו"
+      ],
+      related_entities:["char:chilkiyahu","char:shafan","char:yoshiyahu","event:gilui_sefer_torah"]
+    },
+    {
+      id:"rq-u6-mc-002", unit:6, type:"multiple_choice", difficulty:"קל",
+      prompt_niqqud:"מִי הַמֶּלֶךְ הָאַחֲרוֹן שֶׁל יְהוּדָה לִפְנֵי חֻרְבַּן הַבַּיִת הָרִאשׁוֹן?",
+      options:[
+        "יְהוֹיָקִים",
+        "יְהוֹיָכִין",
+        "צִדְקִיָּהוּ",
+        "יְהוֹאָחָז"
+      ],
+      correct_index:2,
+      answer_points:[
+        "צדקיהו, דודו של יהויכין, הומלך על ידי נבוכדנצר",
+        "מרד בנבוכדנצר ובכך גרם לחורבן",
+        "נתפס בערבות יריחו, עיניו עוורו ובניו נשחטו לעיניו"
+      ],
+      related_entities:["char:tzidkiyahu","char:nevuchadnetzar","event:churban_bayit_rishon","place:yerushalayim"]
     }
-    // --- end of 120 questions (20 per unit × 6) ---
+    // --- end of 132 questions (20 per unit × 6 + 12 multiple_choice) ---
   ];
   if (typeof window !== 'undefined'){
     window.REVIEW_QUESTIONS = QUESTIONS;
