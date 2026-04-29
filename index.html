@@ -2000,10 +2000,10 @@ function EntityDetail({type, id, label}){
           <div>{parseTokens(data.what_it_proves)}</div>
         </div>
       )}
-      {data.period_bce && (
+      {data.location_hebrew && (
         <div className="sect">
-          <div className="sect-h">תקופה</div>
-          <div>{data.period_bce}{data.discovered_year?` · התגלה ${data.discovered_year}`:''}{data.location_hebrew?` · ${data.location_hebrew}`:''}</div>
+          <div className="sect-h">מקום</div>
+          <div>{data.location_hebrew}</div>
         </div>
       )}
       {data.related_biblical_events && Array.isArray(data.related_biblical_events) && data.related_biblical_events.length>0 && (
@@ -2044,12 +2044,7 @@ function EntityDetail({type, id, label}){
           {data.modern_commemoration && <div className="mt-1"><strong>ציון בימינו:</strong> {data.modern_commemoration}</div>}
         </div>
       )}
-      {data.gregorian_approx && (
-        <div className="sect">
-          <div className="sect-h">תאריך לועזי</div>
-          <div>{data.gregorian_approx}</div>
-        </div>
-      )}
+      {/* gregorian_approx intentionally NOT rendered — exam rule prohibits years/לפנה"ס */}
       {data.front && data.back && (
         <div className="sect">
           <div className="sect-h">תשובה</div>
@@ -2267,8 +2262,7 @@ function StudyCard({item, type}){
         <div className="sc-title">{item.heading}</div>
         {item.role && <div className="sc-sub">{item.role}{item.era?' · '+item.era:''}</div>}
         {item.reference && <div className="sc-sub">{item.reference}</div>}
-        {item.period_bce && <div className="sc-sub">{item.period_bce}</div>}
-        {item.gregorian_approx && <div className="sc-sub">{item.gregorian_approx}</div>}
+        {/* period_bce + gregorian_approx intentionally NOT rendered — exam rule prohibits years/לפנה"ס */}
         {item.domain && <div className="sc-sub">{item.domain}</div>}
         {item.category && <div className="sc-sub">{item.category}</div>}
         <div className="sc-body">{parseTokens((item.summary||'').slice(0, 160))}{(item.summary||'').length>160?'…':''}</div>
