@@ -413,18 +413,6 @@
       character_details: "פרטי דמות",
       place_events:      "אירועים במקום"
     };
-    // Group raw q.type values into the 3 high-level בגרות categories shown
-    // as pills. Without this mapping the literal-equality filter never
-    // matches anything because data/review-questions.js uses English IDs.
-    const TYPE_CATEGORY = {
-      mi_amar_lemi:      "בקיאות",
-      al_mi_neemar:      "בקיאות",
-      be_eize_hekhsher:  "בקיאות",
-      short_answer:      "ידע",
-      character_details: "ידע",
-      place_events:      "ידע"
-      // breadth/רוחב tagging happens via q.category/q.question_type below.
-    };
     const typeLabel = (t) => {
       if (!t) return "שאלה";
       const rdn = (typeof window !== "undefined" && typeof window.resolveDisplayName === "function") ? window.resolveDisplayName : null;
@@ -438,9 +426,14 @@
     const matchesTypeFilter = (q, f) => {
       if (f === "all") return true;
       if (q.type === f || q.question_type === f || q.category === f) return true;
-      if (TYPE_CATEGORY[q.type] === f) return true;
       return false;
     };
+
+    const typeCounts = useMemo(() => {
+      const c = {};
+      all.forEach(q => { const k = q.type || "other"; c[k] = (c[k] || 0) + 1; });
+      return c;
+    }, [all]);
 
     const filtered = useMemo(() => all.filter(q =>
       (diffFilter === 'all' || q.difficulty === diffFilter) &&
@@ -460,7 +453,7 @@
     const DiffPill = ({value, label}) => (
       <button type="button"
         onClick={()=>setDiffFilter(value)}
-        className={"text-xs px-3 py-1.5 rounded-full font-bold border transition " +
+        className={"text-sm px-3 py-1.5 rounded-full font-bold border transition " +
           (diffFilter === value
             ? "bg-amber-500 text-amber-950 border-amber-600"
             : "card border-amber-700/30 text-on-parchment hover:scale-[1.02]")
@@ -468,35 +461,39 @@
         {label}
       </button>
     );
-    const TypePill = ({value, label}) => (
+    const TypePill = ({value, label, count}) => (
       <button type="button"
         onClick={()=>setTypeFilter(value)}
-        className={"text-xs px-3 py-1.5 rounded-full font-bold border transition " +
+        className={"text-sm px-3 py-1.5 rounded-full font-bold border transition " +
           (typeFilter === value
             ? "bg-amber-500 text-amber-950 border-amber-600"
             : "card border-amber-700/30 text-on-parchment hover:scale-[1.02]")
         }>
-        {label}
+        {label}{typeof count === "number" ? ` (${count})` : ""}
       </button>
     );
 
     const filterRows = (
       <div className="space-y-2">
         <div className="flex flex-wrap gap-1.5 items-center">
-          <span className="text-xs font-bold text-on-parchment-muted ms-1">רמה:</span>
+          <span className="text-sm font-bold text-on-parchment-muted ms-1">רמה:</span>
           <DiffPill value="all"    label="כל הרמות"/>
           <DiffPill value="קל"     label="קל"/>
           <DiffPill value="בינוני" label="בינוני"/>
           <DiffPill value="קשה"    label="קשה"/>
         </div>
         <div className="flex flex-wrap gap-1.5 items-center">
-          <span className="text-xs font-bold text-on-parchment-muted ms-1">סוג:</span>
-          <TypePill value="all"     label="כל הסוגים"/>
-          <TypePill value="בקיאות"  label="בקיאות"/>
-          <TypePill value="ידע"     label="ידע"/>
-          <TypePill value="רוחב"    label="רוחב"/>
+          <span className="text-sm font-bold text-on-parchment-muted ms-1">סוג:</span>
+          <TypePill value="all"               label="כל הסוגים" count={all.length}/>
+          <TypePill value="short_answer"      label="תשובה קצרה" count={typeCounts.short_answer}/>
+          <TypePill value="mi_amar_lemi"      label="מי אמר למי" count={typeCounts.mi_amar_lemi}/>
+          <TypePill value="be_eize_hekhsher"  label="באיזה הקשר" count={typeCounts.be_eize_hekhsher}/>
+          <TypePill value="al_mi_neemar"      label="על מי נאמר" count={typeCounts.al_mi_neemar}/>
+          <TypePill value="character_details" label="פרטי דמות" count={typeCounts.character_details}/>
+          <TypePill value="place_events"      label="אירועים במקום" count={typeCounts.place_events}/>
+          <TypePill value="רוחב"              label="רוחב"/>
         </div>
-        <div className="text-xs text-on-parchment-muted">
+        <div className="text-sm text-on-parchment-muted">
           מציג <span dir="ltr">{filtered.length}</span> שאלות מתוך <span dir="ltr">{all.length}</span>
         </div>
       </div>

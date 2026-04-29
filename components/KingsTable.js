@@ -63,50 +63,51 @@
     s.textContent = `
       .kt2-wrap{direction:rtl;display:flex;flex-direction:column;gap:14px;padding:8px}
       .kt2-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px}
-      .kt2-title{font-family:'Frank Ruhl Libre',serif;font-size:24px;font-weight:900;color:#F4D58D}
+      .kt2-title{font-family:'Frank Ruhl Libre',serif;font-size:28px;font-weight:900;color:#F4D58D}
       html[data-theme='light'] .kt2-title{color:#5A4517}
-      .kt2-sub{font-size:13px;opacity:.78}
+      .kt2-sub{font-size:15px;opacity:.85}
 
       .kt2-era-bar{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;direction:rtl;
         background:rgba(10,22,40,.55);border:1px solid rgba(212,165,116,.3);border-radius:12px;padding:6px}
       html[data-theme='light'] .kt2-era-bar{background:rgba(247,241,225,.55)}
-      .kt2-era{padding:8px 6px;border-radius:8px;text-align:center;font-size:12px;font-weight:800;
+      .kt2-era{padding:10px 6px;border-radius:8px;text-align:center;font-size:14px;font-weight:800;
         background:rgba(212,165,116,.14);color:#F5D670;border:1px solid rgba(212,165,116,.3);cursor:pointer;transition:transform .12s}
       .kt2-era:hover{transform:translateY(-1px);background:rgba(212,165,116,.22)}
       .kt2-era.on{background:linear-gradient(135deg,#D4A574,#8B6F47);color:#1A1611;border-color:#F4D58D}
-      .kt2-era-yrs{display:block;font-size:10px;font-weight:600;opacity:.78;margin-top:2px;direction:ltr}
+      .kt2-era-yrs{display:block;font-size:12px;font-weight:600;opacity:.85;margin-top:2px;direction:ltr}
       html[data-theme='light'] .kt2-era{color:#5A4517;background:rgba(212,165,116,.18)}
 
       .kt2-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;direction:rtl}
       .kt2-col{display:flex;flex-direction:column;gap:10px;min-width:0}
       .kt2-col-head{position:sticky;top:0;z-index:2;backdrop-filter:blur(4px);
-        background:rgba(10,22,40,.85);padding:8px 12px;border-radius:10px;
-        border:1px solid rgba(212,165,116,.3);font-weight:900;font-size:16px;
+        background:rgba(10,22,40,.85);padding:10px 14px;border-radius:10px;
+        border:1px solid rgba(212,165,116,.3);font-weight:900;font-size:18px;
         color:#F5D670;text-align:center;font-family:'Frank Ruhl Libre',serif}
       html[data-theme='light'] .kt2-col-head{background:rgba(247,241,225,.92);color:#5A4517}
       .kt2-col-head .kt2-col-icon{margin-inline-end:6px}
-      .kt2-col-head-count{font-size:11px;opacity:.78;font-weight:600;margin-inline-start:6px}
+      .kt2-col-head-count{font-size:13px;opacity:.85;font-weight:600;margin-inline-start:6px}
 
-      .kt2-king{position:relative;border-radius:14px;padding:12px 14px;cursor:pointer;
+      .kt2-king{position:relative;border-radius:14px;padding:14px 16px;cursor:pointer;
         transition:transform .12s,box-shadow .15s;border:1px solid transparent;
         box-shadow:0 4px 14px -6px rgba(0,0,0,.45);min-width:0}
       .kt2-king:hover{transform:translateY(-2px);box-shadow:0 8px 22px -8px rgba(0,0,0,.55)}
       .kt2-king:focus-visible{outline:3px solid #C89B3C;outline-offset:2px}
       .kt2-king-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
-      .kt2-king-name{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:22px;line-height:1.15;letter-spacing:.01em}
-      .kt2-king-meta{display:flex;align-items:center;gap:6px;font-size:12px;opacity:.92;flex-wrap:wrap}
-      .kt2-king-yrs{font-variant-numeric:tabular-nums;direction:ltr;display:inline-block;
-        background:rgba(0,0,0,.18);padding:2px 8px;border-radius:999px;font-weight:700;font-size:11px}
-      .kt2-king-icon{font-size:13px;opacity:.85}
-      .kt2-king-role{margin-top:6px;font-size:13px;line-height:1.35;opacity:.95;
-        display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
-      .kt2-pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:10px;
-        font-weight:800;letter-spacing:.02em;background:rgba(0,0,0,.25)}
+      .kt2-king-name{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:24px;line-height:1.15;letter-spacing:.01em}
+      .kt2-king-meta{display:flex;align-items:center;gap:6px;font-size:14px;opacity:1;flex-wrap:wrap}
+      .kt2-king-yrs{font-variant-numeric:tabular-nums;display:inline-block;
+        background:rgba(0,0,0,.22);padding:3px 10px;border-radius:999px;font-weight:800;font-size:13px}
+      .kt2-king-icon{font-size:15px;opacity:.92}
+      .kt2-king-role{margin-top:6px;font-size:15px;line-height:1.4;opacity:.98;font-weight:600}
+      .kt2-king-ctx{margin-top:6px;font-size:14px;line-height:1.55;opacity:.92;
+        display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+      .kt2-pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;
+        font-weight:800;letter-spacing:.02em;background:rgba(0,0,0,.28)}
 
-      .kt2-prophets{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
-      .kt2-prophet-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;
+      .kt2-prophets{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+      .kt2-prophet-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;
         border-radius:999px;background:rgba(124,58,237,.28);color:#e9d5ff;
-        border:1px solid rgba(124,58,237,.55);font-size:11px;font-weight:700;cursor:pointer;
+        border:1px solid rgba(124,58,237,.55);font-size:13px;font-weight:700;cursor:pointer;
         transition:transform .1s,background .15s}
       .kt2-prophet-chip:hover{background:rgba(124,58,237,.5);transform:scale(1.04)}
       .kt2-prophet-chip[disabled]{opacity:.55;cursor:not-allowed}
@@ -115,8 +116,8 @@
       .kt2-toggle{display:none;direction:rtl;background:rgba(10,22,40,.6);
         border:1px solid rgba(212,165,116,.3);border-radius:999px;padding:4px;gap:4px}
       html[data-theme='light'] .kt2-toggle{background:rgba(247,241,225,.7)}
-      .kt2-toggle button{flex:1;padding:8px 14px;border-radius:999px;border:none;
-        background:transparent;color:#F5D670;font-weight:800;font-size:14px;cursor:pointer}
+      .kt2-toggle button{flex:1;padding:10px 14px;border-radius:999px;border:none;
+        background:transparent;color:#F5D670;font-weight:800;font-size:16px;cursor:pointer}
       html[data-theme='light'] .kt2-toggle button{color:#5A4517}
       .kt2-toggle button.on{background:linear-gradient(135deg,#D4A574,#8B6F47);color:#1A1611}
 
@@ -135,7 +136,9 @@
         .kt2-col.kt2-hidden{display:none}
         .kt2-toggle{display:flex}
         .kt2-era-bar{grid-template-columns:repeat(3,1fr)}
-        .kt2-king-name{font-size:20px}
+        .kt2-king-name{font-size:22px}
+        .kt2-king-role{font-size:14px}
+        .kt2-king-ctx{font-size:13px}
       }
     `;
     document.head.appendChild(s);
@@ -229,7 +232,9 @@
       : (isJudah ? 'מלך יהודה · ' + (k.dynasty || 'בית דוד')
                  : 'מלך ישראל · ' + (k.dynasty || ''));
     const ctxSnippet = (k.context_short || '').split(/[.!?]/)[0].trim();
-    const yrs = ctxSnippet || (k.reign_years ? (k.reign_years + ' שנ׳') : '');
+    const reignText = (k.reign_years != null)
+      ? ('מלך ' + k.reign_years + ' ' + (k.reign_years === 1 ? 'שנה' : 'שנים'))
+      : '';
 
     const onCardClick = () => navTo(setRoute, 'character', k.id);
     const onKey = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onCardClick(); } };
@@ -250,11 +255,12 @@
             <span className="kt2-king-icon" aria-hidden="true">{icon}</span> {k.name_niqqud || (typeof window.resolveDisplayName === 'function' ? window.resolveDisplayName(k.id) : k.id)}
           </div>
           <div className="kt2-king-meta">
-            {yrs && <span className="kt2-king-yrs">{yrs}</span>}
+            {reignText && <span className="kt2-king-yrs">{reignText}</span>}
             <span className="kt2-pill">{tone.label}</span>
           </div>
         </div>
         <div className="kt2-king-role">{role}</div>
+        {ctxSnippet && <div className="kt2-king-ctx">{ctxSnippet}</div>}
         {(() => {
           const prophets = gatherProphets(k);
           if (!prophets.length) return null;
