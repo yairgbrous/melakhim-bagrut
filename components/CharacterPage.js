@@ -359,5 +359,12 @@
     );
   }
 
-  if (typeof window !== "undefined") window.CharacterPageComponent = CharacterPage;
+  if (typeof window !== "undefined") {
+    window.CharacterPageComponent = CharacterPage;
+    // Aliases for any consumer that looks up window.CharacterPage / window.KingPage.
+    // Kings render through this same component (router's route.page==="king"
+    // branch reuses window.CharacterPageComponent) so KingPage aliases it too.
+    window.CharacterPage = CharacterPage;
+    window.KingPage      = CharacterPage;
+  }
 })();
