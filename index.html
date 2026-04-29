@@ -14,7 +14,7 @@
 <meta name="twitter:card" content="summary_large_image"/>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E📖%3C/text%3E%3C/svg%3E"/>
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E📖%3C/text%3E%3C/svg%3E"/>
-<link rel="manifest" href="manifest.json?v=1100"/>
+<link rel="manifest" href="manifest.json?v=14000"/>
 <meta name="theme-color" content="#C89B3C"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
@@ -23,11 +23,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;700;800;900&family=Noto+Serif+Hebrew:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/quote-cards.css?v=500">
-<link rel="stylesheet" href="assets/contrast-hotfix.css?v=500">
-<link rel="stylesheet" href="assets/layout-fix.css?v=2300">
-<link rel="stylesheet" href="assets/readability-pass.css?v=1340">
-<link rel="stylesheet" href="assets/ui-polish-5500.css?v=12000">
+<link rel="stylesheet" href="assets/quote-cards.css?v=14000">
+<link rel="stylesheet" href="assets/contrast-hotfix.css?v=14000">
+<link rel="stylesheet" href="assets/layout-fix.css?v=14000">
+<link rel="stylesheet" href="assets/readability-pass.css?v=14000">
+<link rel="stylesheet" href="assets/ui-polish-5500.css?v=14000">
 <script>
 /* =========================================================================
    localStorage write hook (feature-gated downstream).
@@ -66,8 +66,8 @@
 <!-- Critical data: load synchronously BEFORE the entity-index bootstrap so
      window.CHARACTERS_DATA and window.KINGS_DATA are populated up front.
      Previous async import() path was failing silently in production. -->
-<script src="./data/characters.js?v=13100"></script>
-<script src="./data/kings.js?v=13100"></script>
+<script src="./data/characters.js?v=14000"></script>
+<script src="./data/kings.js?v=14000"></script>
 <script>
 /* =========================================================================
    Entity index bootstrap — loads data modules into window.__ENTITY_INDEX__
@@ -99,16 +99,16 @@
     evalFile('./data/motifs.js', ['motifs']),
     evalFile('./data/archaeology.js', ['archaeologyFinds']),
     evalFile('./data/hebrew-dates.js', []),
-    evalFile('./data/_id-aliases.js?v=6500', []),
-    evalFile('./data/breadth.js?v=3100', []),
+    evalFile('./data/_id-aliases.js?v=14000', []),
+    evalFile('./data/breadth.js?v=14000', []),
   ]);
   const [chars, stories, flashcards, keyConcepts, kingsMod, unitDeepMod] = await Promise.all([
-    importModule('./data/characters.js?v=8500'),
+    importModule('./data/characters.js?v=14000'),
     importModule('./data/stories.js'),
     importModule('./data/flashcards.js'),
     importModule('./data/key-concepts.js'),
-    importModule('./data/kings.js?v=8500'),
-    importModule('./data/unit-deep-summaries.js?v=3100')
+    importModule('./data/kings.js?v=14000'),
+    importModule('./data/unit-deep-summaries.js?v=14000')
   ]);
   if (unitDeepMod) {
     window.UNIT_DEEP_SUMMARIES = unitDeepMod.default || unitDeepMod.unitDeepSummaries || [];
@@ -201,39 +201,39 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <!-- Cross-entity connectivity: load BEFORE pages so window.__ENTITY_INDEX__
      has all buckets + window.EntityLinkComponent is available at render. -->
-<script src="./data/breadth-topics.js?v=13100"></script>
-<script src="./data/events.js?v=13100"></script>
-<script src="./data/places.js?v=13100"></script>
-<script src="./data/quotes.js?v=13100"></script>
-<script src="./data/unit-deep-summaries.js?v=3100"></script>
-<script src="./data/review-questions.js?v=5500"></script>
-<script src="./data/_entity-index.js?v=8500"></script>
-<script type="module" src="./data/past-exams.js?v=2000"></script>
-<script src="./assets/name-resolver.js?v=8000"></script>
-<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=13100"></script>
-<script type="text/babel" data-presets="react" src="./components/RelatedSection.js?v=13100"></script>
-<script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=7000"></script>
-<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=2200"></script>
-<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=8500"></script>
-<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=13100"></script>
-<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=13100"></script>
-<script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=2000"></script>
-<script src="./components/KingsUtils.js?v=6000"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=8500"></script>
-<script type="text/babel" data-presets="react" src="./components/InstantSearch.js?v=8500"></script>
-<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=13100"></script>
-<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=4000"></script>
-<script src="./components/BreadthPage.js?v=13100"></script>
-<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/Toast.js?v=2000"></script>
-<script type="text/babel" data-presets="react" src="./components/XpBadge.js?v=8500"></script>
-<script type="text/babel" data-presets="react" src="./components/Home.js?v=8500"></script>
-<script type="text/babel" data-presets="react" src="./components/Timeline.js?v=6000"></script>
-<script type="text/babel" data-presets="react" src="./components/PwaShell.js?v=4000"></script>
-<script type="text/babel" data-presets="react" src="./components/NotFound.js?v=4000"></script>
-<script type="text/babel" data-presets="react" src="./components/Leaderboard.js?v=5500"></script>
+<script src="./data/breadth-topics.js?v=14000"></script>
+<script src="./data/events.js?v=14000"></script>
+<script src="./data/places.js?v=14000"></script>
+<script src="./data/quotes.js?v=14000"></script>
+<script src="./data/unit-deep-summaries.js?v=14000"></script>
+<script src="./data/review-questions.js?v=14000"></script>
+<script src="./data/_entity-index.js?v=14000"></script>
+<script type="module" src="./data/past-exams.js?v=14000"></script>
+<script src="./assets/name-resolver.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/RelatedSection.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=14000"></script>
+<script src="./components/KingsUtils.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/InstantSearch.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=14000"></script>
+<script src="./components/BreadthPage.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/Toast.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/XpBadge.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/Timeline.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/PwaShell.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/NotFound.js?v=14000"></script>
+<script type="text/babel" data-presets="react" src="./components/Leaderboard.js?v=14000"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -994,7 +994,7 @@ html[data-theme='dark'] .stats-cell{
 <body>
 <div id="root"></div>
 <!-- Tab D: authentic quiz / exam-sim / flashcards components (attach to window before main render) -->
-<script type="text/babel" data-presets="react" src="./components/FlashcardDrill.js?v=2200"></script>
+<script type="text/babel" data-presets="react" src="./components/FlashcardDrill.js?v=14000"></script>
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
@@ -4542,7 +4542,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   // it's installed so users don't need to hard-reload between deploys.
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./sw.js?v=13100').then(function(reg){
+      navigator.serviceWorker.register('./sw.js?v=14000').then(function(reg){
         if (!reg) return;
         reg.addEventListener('updatefound', function(){
           var sw = reg.installing;
