@@ -222,9 +222,6 @@
           <button onClick={()=>setRoute && setRoute({page:"home"})}
             className="w-full gold-btn py-3 rounded-xl font-bold">חזרה לדף הראשי</button>
         </div>
-        {window.RelatedSectionComponent && c && c.id && (
-          <window.RelatedSectionComponent type={isKing ? 'king' : 'character'} id={c.id} setRoute={setRoute}/>
-        )}
       </div>
     );
   }
