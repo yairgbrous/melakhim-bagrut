@@ -70,6 +70,22 @@
                  || (idx.character && idx.character[swapped])
                  || (idx.king && idx.king[swapped]);
     if (fromIdx) return fromIdx;
+    // Diagnostic — fires only when ALL lookup paths fail. Tells us, from the
+    // user's actual browser, why resolveEntry returned null. Safe to leave in
+    // production: only logs on miss, never on hit.
+    try {
+      console.warn('[CharacterPage.resolveEntry] miss', {
+        id,
+        swapped,
+        CHARACTERS_DATA_len: (window.CHARACTERS_DATA || []).length,
+        KINGS_DATA_len:      (window.KINGS_DATA || []).length,
+        idx_character_count: idx.character ? Object.keys(idx.character).length : 0,
+        idx_king_count:      idx.king ? Object.keys(idx.king).length : 0,
+        has_alias_map:       !!(window.__ENTITY_ALIASES__ && (window.__ENTITY_ALIASES__.character || window.__ENTITY_ALIASES__.king)),
+        first_5_char_ids:    (window.CHARACTERS_DATA || []).slice(0,5).map(x=>x && x.id),
+        first_5_king_ids:    (window.KINGS_DATA || []).slice(0,5).map(x=>x && x.id),
+      });
+    } catch(e){}
     return null;
   }
 
