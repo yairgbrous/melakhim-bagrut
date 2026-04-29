@@ -280,6 +280,27 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .diff-hard{background:linear-gradient(135deg,#A83240,#7a1f2a);color:#fff}
 details summary{cursor:pointer;list-style:none}
 details summary::-webkit-details-marker{display:none}
+/* ---- v=13500 polish: tap targets, contrast, RTL safety ---- */
+.bn-item{min-height:44px}
+button,[role="button"]{min-height:44px}
+.bn-item.active{background:linear-gradient(135deg,rgba(212,165,116,.18),rgba(245,214,112,.10))}
+html[data-theme='dark'] .bn-item.active{background:linear-gradient(135deg,rgba(212,165,116,.30),rgba(245,214,112,.18))}
+/* Body min font + readable line-height for Hebrew prose */
+body{font-size:16px;line-height:1.55}
+.hebrew{font-size:17px;line-height:1.7}
+/* Stronger contrast for gold-on-parchment */
+.text-on-parchment-accent{color:#7c4a08}
+html[data-theme='dark'] .text-on-parchment-accent{color:#F4D58D}
+/* StudyHub cards */
+.study-hub .card{padding:16px;min-height:auto}
+.study-hub button.card{cursor:pointer;transition:transform .12s ease, box-shadow .12s ease}
+.study-hub button.card:hover{transform:translateY(-2px);box-shadow:0 8px 20px -8px rgba(139,111,31,.35)}
+.study-hub button.card:active{transform:scale(.99)}
+/* Mobile: prevent horizontal overflow on narrow screens */
+@media (max-width:380px){
+  .study-hub .grid{gap:10px}
+  .study-hub .hrow{grid-auto-columns:minmax(160px,auto)}
+}
 /* ---- 20-fix batch additions ---- */
 .al{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#F5D670,#8B6F1F);color:#1A1611;font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:18px;border:2px solid #C89B3C;box-shadow:inset 0 0 8px rgba(255,255,255,.35),0 2px 6px rgba(0,0,0,.25);flex-shrink:0;text-shadow:0 1px 0 rgba(255,255,255,.35)}
 .next-btn{position:sticky;bottom:16px;z-index:30}
