@@ -112,7 +112,7 @@
     importModule('./data/unit-deep-summaries.js?v=14000')
   ]);
   if (unitDeepMod) {
-    window.UNIT_DEEP_SUMMARIES = unitDeepMod.default || unitDeepMod.unitDeepSummaries || [];
+    window.UNIT_DEEP_SUMMARIES = unitDeepMod.default || unitDeepMod.unitDeepSummaries || window.UNIT_DEEP_SUMMARIES || [];
   }
   const idx = window.__ENTITY_INDEX__;
   (window.motifs||[]).forEach(m => {
