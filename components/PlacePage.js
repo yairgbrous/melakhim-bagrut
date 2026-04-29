@@ -99,6 +99,10 @@
     const swapped = id.indexOf("_")>=0 ? id.replace(/_/g,"-") : id.replace(/-/g,"_");
     const swap = pool.find(x => x && x.id === swapped);
     if (swap) return swap;
+    // Fallback: __ENTITY_INDEX__.place populated even if PLACES_DATA missed.
+    const idx = (window.__ENTITY_INDEX__ || {}).place || {};
+    if (idx[id]) return idx[id];
+    if (idx[swapped]) return idx[swapped];
     return null;
   }
 
