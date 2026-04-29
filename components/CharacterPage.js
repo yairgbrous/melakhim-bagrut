@@ -210,13 +210,33 @@
   }
 
   // ---- Hero ------------------------------------------------------------
-  function Hero({ name_niqqud, subtitle, breadthIds, setRoute }){
+  function AssessmentPill({ assessment }){
+    if (!assessment) return null;
+    const map = {
+      "טוב":   { label:"מלך טוב",  bg:"#2f6b4f", fg:"#E9F8EE", border:"#5FB39F" },
+      "רע":    { label:"מלך רע",   bg:"#7a1f2a", fg:"#FFE6E9", border:"#D94E5F" },
+      "מעורב": { label:"מעורב",    bg:"#8B6F1F", fg:"#FFF6D9", border:"#F4D58D" },
+    };
+    const m = map[assessment];
+    if (!m) return null;
+    return (
+      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ms-0 hebrew"
+            style={{background:m.bg, color:m.fg, border:`1px solid ${m.border}`}}>
+        {m.label}
+      </span>
+    );
+  }
+
+  function Hero({ name_niqqud, subtitle, breadthIds, assessment, setRoute }){
     return (
       <header className="px-4 md:px-6 pt-5 pb-4 char-hero">
-        <h1 className="font-display text-3xl md:text-5xl font-black text-on-parchment-accent hebrew leading-tight"
-            style={{textShadow:"0 2px 8px rgba(200,155,60,.15)"}}>
-          {name_niqqud}
-        </h1>
+        <div className="flex items-start gap-3 flex-wrap">
+          <h1 className="font-display text-3xl md:text-5xl font-black text-on-parchment-accent hebrew leading-tight flex-1"
+              style={{textShadow:"0 2px 8px rgba(200,155,60,.15)"}}>
+            {name_niqqud}
+          </h1>
+          <AssessmentPill assessment={assessment}/>
+        </div>
         {subtitle && <div className="text-sm md:text-base text-on-parchment mt-2 hebrew">{subtitle}</div>}
         {Array.isArray(breadthIds) && breadthIds.length>0 && (
           <div className="mt-3">
@@ -293,7 +313,7 @@
         <StickyHeader crumb={{section:"דמויות", leaf:name}} setRoute={setRoute}/>
 
         <main className="max-w-3xl mx-auto w-full pb-24">
-          <Hero name_niqqud={name} subtitle={subtitleBits.join(" · ")} breadthIds={relatedBreadth} setRoute={setRoute}/>
+          <Hero name_niqqud={name} subtitle={subtitleBits.join(" · ")} breadthIds={relatedBreadth} assessment={c.assessment} setRoute={setRoute}/>
 
           <div className="px-4 md:px-6 space-y-4">
             {significance && (
