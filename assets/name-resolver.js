@@ -36,6 +36,12 @@ Object.assign(window.__DIRECT_HEBREW_LABELS__, {
   "navi-zaken-beit-el":       "נָבִיא זָקֵן מִבֵּית אֵל",
   "ish_haelohim_yehuda":      "אִישׁ הָאֱלֹהִים מִיהוּדָה",
   "ish-haelohim-yehuda":      "אִישׁ הָאֱלֹהִים מִיהוּדָה",
+  "ben_hadad":                "בֶּן הֲדַד",
+  "ben-hadad":                "בֶּן הֲדַד",
+  "shemaya_ish_haelohim":     "שְׁמַעְיָה אִישׁ הָאֱלֹהִים",
+  "shemaya-ish-haelohim":     "שְׁמַעְיָה אִישׁ הָאֱלֹהִים",
+  "yehu_ben_chanani":         "יֵהוּא בֶּן חֲנָנִי",
+  "yehu-ben-chanani":         "יֵהוּא בֶּן חֲנָנִי",
 
   // Breadth themes
   "double_causality":         "סִבָּתִיוּת כְּפוּלָה",
