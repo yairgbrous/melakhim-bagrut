@@ -252,7 +252,9 @@
   }
 
   // ---- Main component -------------------------------------------------
-  function CharacterPage({ id, setRoute }){
+  function CharacterPage(props){
+    const { setRoute } = props;
+    const id = props.characterId || props.kingId || props.id;
     const c = useMemo(()=>resolveEntry(id), [id]);
     if (!c || c.__stub) return <NotFound id={id} setRoute={setRoute}/>;
 

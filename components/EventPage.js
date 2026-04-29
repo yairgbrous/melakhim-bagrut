@@ -201,7 +201,9 @@
     );
   }
 
-  function EventPage({ id, setRoute }){
+  function EventPage(props){
+    const { setRoute } = props;
+    const id = props.eventId || props.id;
     const ev = useMemo(()=>resolveEvent(id), [id]);
     if (!ev || ev.__stub) return <NotFound id={id} setRoute={setRoute}/>;
 

@@ -299,7 +299,9 @@
     );
   }
 
-  function PlacePage({ id, setRoute }){
+  function PlacePage(props){
+    const { setRoute } = props;
+    const id = props.placeId || props.id;
     const pl = useMemo(()=>resolvePlace(id), [id]);
     if (!pl || pl.__stub) return <NotFound id={id} setRoute={setRoute}/>;
 

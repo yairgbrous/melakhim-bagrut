@@ -14,7 +14,7 @@
 <meta name="twitter:card" content="summary_large_image"/>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E📖%3C/text%3E%3C/svg%3E"/>
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E📖%3C/text%3E%3C/svg%3E"/>
-<link rel="manifest" href="manifest.json?v=14500"/>
+<link rel="manifest" href="manifest.json?v=14600"/>
 <meta name="theme-color" content="#C89B3C"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
@@ -23,11 +23,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;700;800;900&family=Noto+Serif+Hebrew:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/quote-cards.css?v=14500">
-<link rel="stylesheet" href="assets/contrast-hotfix.css?v=14500">
-<link rel="stylesheet" href="assets/layout-fix.css?v=14500">
-<link rel="stylesheet" href="assets/readability-pass.css?v=14500">
-<link rel="stylesheet" href="assets/ui-polish-5500.css?v=14500">
+<link rel="stylesheet" href="assets/quote-cards.css?v=14600">
+<link rel="stylesheet" href="assets/contrast-hotfix.css?v=14600">
+<link rel="stylesheet" href="assets/layout-fix.css?v=14600">
+<link rel="stylesheet" href="assets/readability-pass.css?v=14600">
+<link rel="stylesheet" href="assets/ui-polish-5500.css?v=14600">
 <script>
 /* =========================================================================
    localStorage write hook (feature-gated downstream).
@@ -66,8 +66,8 @@
 <!-- Critical data: load synchronously BEFORE the entity-index bootstrap so
      window.CHARACTERS_DATA and window.KINGS_DATA are populated up front.
      Previous async import() path was failing silently in production. -->
-<script src="./data/characters.js?v=14500"></script>
-<script src="./data/kings.js?v=14500"></script>
+<script src="./data/characters.js?v=14600"></script>
+<script src="./data/kings.js?v=14600"></script>
 <script>
 /* =========================================================================
    Entity index bootstrap — loads data modules into window.__ENTITY_INDEX__
@@ -114,16 +114,16 @@
     evalFile('./data/motifs.js', ['motifs']),
     evalFile('./data/archaeology.js', ['archaeologyFinds']),
     evalFile('./data/hebrew-dates.js', []),
-    evalFile('./data/_id-aliases.js?v=14500', []),
-    evalFile('./data/breadth.js?v=14500', []),
+    evalFile('./data/_id-aliases.js?v=14600', []),
+    evalFile('./data/breadth.js?v=14600', []),
   ]);
   const [chars, stories, flashcards, keyConcepts, kingsMod, unitDeepMod] = await Promise.all([
-    importModule('./data/characters.js?v=14500'),
+    importModule('./data/characters.js?v=14600'),
     importModule('./data/stories.js'),
     importModule('./data/flashcards.js'),
     importModule('./data/key-concepts.js'),
-    importModule('./data/kings.js?v=14500'),
-    importModule('./data/unit-deep-summaries.js?v=14500')
+    importModule('./data/kings.js?v=14600'),
+    importModule('./data/unit-deep-summaries.js?v=14600')
   ]);
   if (unitDeepMod) {
     window.UNIT_DEEP_SUMMARIES = unitDeepMod.default || unitDeepMod.unitDeepSummaries || window.UNIT_DEEP_SUMMARIES || [];
@@ -216,39 +216,39 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <!-- Cross-entity connectivity: load BEFORE pages so window.__ENTITY_INDEX__
      has all buckets + window.EntityLinkComponent is available at render. -->
-<script src="./data/breadth-topics.js?v=14500"></script>
-<script src="./data/events.js?v=14500"></script>
-<script src="./data/places.js?v=14500"></script>
-<script src="./data/quotes.js?v=14500"></script>
-<script src="./data/unit-deep-summaries.js?v=14500"></script>
-<script src="./data/review-questions.js?v=14500"></script>
-<script src="./data/_entity-index.js?v=14500"></script>
-<script type="module" src="./data/past-exams.js?v=14500"></script>
-<script src="./assets/name-resolver.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/RelatedSection.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=14500"></script>
-<script src="./components/KingsUtils.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/InstantSearch.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=14500"></script>
-<script src="./components/BreadthPage.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/Toast.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/XpBadge.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/Home.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/Timeline.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/PwaShell.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/NotFound.js?v=14500"></script>
-<script type="text/babel" data-presets="react" src="./components/Leaderboard.js?v=14500"></script>
+<script src="./data/breadth-topics.js?v=14600"></script>
+<script src="./data/events.js?v=14600"></script>
+<script src="./data/places.js?v=14600"></script>
+<script src="./data/quotes.js?v=14600"></script>
+<script src="./data/unit-deep-summaries.js?v=14600"></script>
+<script src="./data/review-questions.js?v=14600"></script>
+<script src="./data/_entity-index.js?v=14600"></script>
+<script type="module" src="./data/past-exams.js?v=14600"></script>
+<script src="./assets/name-resolver.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/EntityLink.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/RelatedSection.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/UnitPage.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/QuizEngine.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/ExamSim2551.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/EventPage.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/PlacePage.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/DailyChallenge.js?v=14600"></script>
+<script src="./components/KingsUtils.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/KingsTable.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/InstantSearch.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/CharacterPage.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/MapsPage.js?v=14600"></script>
+<script src="./components/BreadthPage.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/AuthProvider.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/ThemeToggle.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/ErrorBoundary.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/Toast.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/XpBadge.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/Home.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/Timeline.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/PwaShell.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/NotFound.js?v=14600"></script>
+<script type="text/babel" data-presets="react" src="./components/Leaderboard.js?v=14600"></script>
 <style>
   *:focus-visible{outline:2px solid #C89B3C;outline-offset:2px;border-radius:6px}
   ::selection{background:#C89B3C;color:#fff}
@@ -1030,7 +1030,7 @@ html[data-theme='dark'] .stats-cell{
 <body>
 <div id="root"></div>
 <!-- Tab D: authentic quiz / exam-sim / flashcards components (attach to window before main render) -->
-<script type="text/babel" data-presets="react" src="./components/FlashcardDrill.js?v=14500"></script>
+<script type="text/babel" data-presets="react" src="./components/FlashcardDrill.js?v=14600"></script>
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
@@ -2865,14 +2865,14 @@ function App(){
         {route.page==="quizUnit" && (()=>{ const X=window.QuizEngineComponent; return X ? <X mode={"unit-"+route.unit} unit={route.unit} S={S} update={update} setRoute={setRoute} onComplete={()=>setRoute({page:"path"})}/> : <div className="text-amber-200 text-center py-8">טוען תרגול יחידה...</div>; })()}
         {route.page==="flashcards" && (()=>{ const X=window.FlashcardDrillComponent; return X ? <X S={S} update={update} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען כרטיסיות...</div>; })()}
         {route.page==="exam-sim" && (()=>{ const X=window.ExamSim2551; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute} publishActivity={publishActivity}/> : <div className="text-amber-200 text-center py-8">טוען מתכונת...</div>; })()}
-        {route.page==="event" && (()=>{ const X=window.EventPage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אירוע...</div>; })()}
-        {route.page==="place" && (()=>{ const X=window.PlacePage; return X ? <X id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען מקום...</div>; })()}
+        {route.page==="event" && (()=>{ const X=window.EventPage; return X ? <X eventId={route.id} id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אירוע...</div>; })()}
+        {route.page==="place" && (()=>{ const X=window.PlacePage; return X ? <X placeId={route.id} id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען מקום...</div>; })()}
         {route.page==="daily" && (()=>{ const X=window.DailyChallenge; return X ? <X S={S} update={update} awardXP={awardXP} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען אתגר יומי...</div>; })()}
         {route.page==="quizPlay" && <QuizRun params={route} S={S} setRoute={setRoute} awardXP={awardXP} update={update} publishActivity={publishActivity} soundOn={soundOn}/>}
         {route.page==="quizResult" && <QuizResult {...route} S={S} setRoute={setRoute}/>}
         {route.page==="themes" && (window.BreadthPage ? React.createElement(window.BreadthPage, {setRoute}) : <Themes S={S} update={update}/>)}
         {route.page==="breadth" && (window.BreadthPage ? React.createElement(window.BreadthPage, {setRoute, focusBreadthId: route.id}) : <Themes S={S} update={update}/>)}
-        {route.page==="king" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף מלך...</div>; })()}
+        {route.page==="king" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP characterId={route.id} kingId={route.id} isKing={true} id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף מלך...</div>; })()}
         {route.page==="map" && <MapsPage S={S} update={update} awardXP={awardXP} focusMapId={route.id} setRoute={setRoute}/>}
         {route.page==="book" && <BookChapterPage chapter={route.chapter} setRoute={setRoute}/>}
         {route.page==="quotes" && <QuotesBrowser S={S} update={update} awardXP={awardXP}/>}
@@ -2889,7 +2889,7 @@ function App(){
         {route.page==="class" && <ClassBoard S={S} update={update} setRoute={setRoute}/>}
         {route.page==="profile" && <MeTab S={S} update={update} setRoute={setRoute}/>}
         {route.page==="study" && <StudyHub setRoute={setRoute}/>}
-        {route.page==="character" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף דמות...</div>; })()}
+        {route.page==="character" && (()=>{ const CP = window.CharacterPageComponent; return CP ? <CP characterId={route.id} id={route.id} setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען דף דמות...</div>; })()}
         {route.page==="leaderboard" && (()=>{ const LB = window.LeaderboardComponent; return LB ? <LB setRoute={setRoute}/> : <div className="text-amber-200 text-center py-8">טוען טבלת מובילים...</div>; })()}
         {(() => {
           const known = new Set(["home","path","unit","lesson","quiz","quizUnit","flashcards","exam-sim","event","place","daily","quizPlay","quizResult","themes","quotes","timeline","maps","exam","class","profile","study","character","king","breadth","leaderboard","map","book"]);
@@ -4618,7 +4618,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   // it's installed so users don't need to hard-reload between deploys.
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./sw.js?v=14500').then(function(reg){
+      navigator.serviceWorker.register('./sw.js?v=14600').then(function(reg){
         if (!reg) return;
         reg.addEventListener('updatefound', function(){
           var sw = reg.installing;
