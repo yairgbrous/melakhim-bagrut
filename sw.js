@@ -13,9 +13,9 @@
    Offline state is signalled to the app via postMessage so it can render a
    banner. Bump CACHE_VERSION on every release so old caches drop.
    ========================================================================= */
-const CACHE_VERSION = 'melakhim-v12000';
-const RUNTIME_CACHE = 'melakhim-runtime-v12000';
-const CDN_CACHE     = 'melakhim-cdn-v12000';
+const CACHE_VERSION = 'melakhim-v13100';
+const RUNTIME_CACHE = 'melakhim-runtime-v13100';
+const CDN_CACHE     = 'melakhim-cdn-v13100';
 
 const PRECACHE_URLS = [
   './',
