@@ -74,6 +74,7 @@
    Fails gracefully per-file. Dispatches 'entity-index-ready' when done.
    Non-module files (motifs.js, archaeology.js, hebrew-dates.js) are eval'd
    in a Function scope; module files via dynamic import.
+   ========================================================================= */
 (async function bootEntityIndex(){
   window.__ENTITY_INDEX__ = {
     motif:{}, date:{}, archaeology:{}, character:{},
@@ -279,6 +280,27 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .diff-hard{background:linear-gradient(135deg,#A83240,#7a1f2a);color:#fff}
 details summary{cursor:pointer;list-style:none}
 details summary::-webkit-details-marker{display:none}
+/* ---- v=13500 polish: tap targets, contrast, RTL safety ---- */
+.bn-item{min-height:44px}
+button,[role="button"]{min-height:44px}
+.bn-item.active{background:linear-gradient(135deg,rgba(212,165,116,.18),rgba(245,214,112,.10))}
+html[data-theme='dark'] .bn-item.active{background:linear-gradient(135deg,rgba(212,165,116,.30),rgba(245,214,112,.18))}
+/* Body min font + readable line-height for Hebrew prose */
+body{font-size:16px;line-height:1.55}
+.hebrew{font-size:17px;line-height:1.7}
+/* Stronger contrast for gold-on-parchment */
+.text-on-parchment-accent{color:#7c4a08}
+html[data-theme='dark'] .text-on-parchment-accent{color:#F4D58D}
+/* StudyHub cards */
+.study-hub .card{padding:16px;min-height:auto}
+.study-hub button.card{cursor:pointer;transition:transform .12s ease, box-shadow .12s ease}
+.study-hub button.card:hover{transform:translateY(-2px);box-shadow:0 8px 20px -8px rgba(139,111,31,.35)}
+.study-hub button.card:active{transform:scale(.99)}
+/* Mobile: prevent horizontal overflow on narrow screens */
+@media (max-width:380px){
+  .study-hub .grid{gap:10px}
+  .study-hub .hrow{grid-auto-columns:minmax(160px,auto)}
+}
 /* ---- 20-fix batch additions ---- */
 .al{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#F5D670,#8B6F1F);color:#1A1611;font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:18px;border:2px solid #C89B3C;box-shadow:inset 0 0 8px rgba(255,255,255,.35),0 2px 6px rgba(0,0,0,.25);flex-shrink:0;text-shadow:0 1px 0 rgba(255,255,255,.35)}
 .next-btn{position:sticky;bottom:16px;z-index:30}
@@ -2253,51 +2275,91 @@ function StudyCard({item, type}){
 }
 
 function StudyHub({setRoute}){
-  const go = (page) => { if(setRoute) setRoute({page}); };
-  const cards = [
-    {
-      key:"path", page:"path", span:2, icon:"🎓",
-      title:"למידה לפי יחידות",
-      subtitle:"6 יחידות עם תקציר, דמויות, אירועים ומבחן",
-      accent:"#D4A574"
-    },
-    {
-      key:"themes", page:"themes", span:2, icon:"🌐",
-      title:"נושאי רוחב במיקוד",
-      subtitle:"7 נושאי רוחב + חפצים וביטויים חוזרים",
-      accent:"#6B5B95"
-    },
-    {
-      key:"timeline", page:"timeline", span:1, icon:"📜",
-      title:"ציר מלכים",
-      subtitle:"טבלת כל המלכים עם נביאים ומעצמות",
-      accent:"#A83240"
-    }
+  const go = (page, extra) => { if(setRoute) setRoute(Object.assign({page}, extra||{})); };
+  const days = daysTo(EXAM_DATE);
+  const units = [
+    {n:1, name:"מלכות שלמה",     tag:"תור הזהב של ישראל",        ref:'מל"א א-יא'},
+    {n:2, name:"פילוג הממלכה",   tag:"שתי ממלכות, שני מסלולים",   ref:'מל"א יב-יד'},
+    {n:3, name:"אליהו ואחאב",    tag:"מאבק נביא ומלך",           ref:'מל"א יז-כב'},
+    {n:4, name:"מהפכת יהוא",     tag:"סוף שושלת אחאב",           ref:'מל"ב ט-יב'},
+    {n:5, name:"עליית אשור",     tag:"חורבן ממלכת ישראל",        ref:'מל"ב יד-יח'},
+    {n:6, name:"יהודה לבדה",     tag:"מחזקיהו עד החורבן",         ref:'מל"ב יח-כה'}
+  ];
+  const breadthChips = [
+    {id:"sibatiyut_kfula",       label:"סיבתיות כפולה"},
+    {id:"mikdash",               label:"מקדש ושכינה"},
+    {id:"melech_navi",           label:"נביאים מול מלכים"},
+    {id:"dynastic_promise",      label:"הבטחת השושלת לדוד"},
+    {id:"idolatry_and_justice",  label:"עבודה זרה וצדק"},
+    {id:"prayer_and_repentance", label:"תפילה ותשובה"},
+    {id:"divine_election",       label:"בחירה אלוהית"}
+  ];
+  const tools = [
+    {icon:"📜", label:"ציר המלכים", page:"timeline"},
+    {icon:"🗺️", label:"מפות",       page:"maps"},
+    {icon:"🎴", label:"פלאשקארדס",  page:"flashcards"},
+    {icon:"🏆", label:"מובילים",    page:"leaderboard"}
   ];
   return (
-    <div className="space-y-5">
-      <div>
-        <h1 className="font-display text-2xl md:text-3xl font-bold text-amber-300">📚 מרכז הלמידה</h1>
-        <p className="text-amber-100/70 text-sm mt-1">בחר איך ללמוד היום — לפי יחידות, לפי נושאי רוחב, או דרך טבלת המלכים.</p>
-      </div>
-      <div className="hub-grid">
-        {cards.map(c => (
-          <button
-            key={c.key}
-            onClick={()=>go(c.page)}
-            className={`hub-card hub-span-${c.span}`}
-            style={{"--hub-accent": c.accent}}
-            aria-label={c.title}>
-            <div className="hub-glow" aria-hidden="true"/>
-            <div className="hub-card-inner">
-              <div className="hub-icon" aria-hidden="true">{c.icon}</div>
-              <div className="hub-title font-display">{c.title}</div>
-              <div className="hub-sub">{c.subtitle}</div>
-              <div className="hub-arrow" aria-hidden="true">←</div>
-            </div>
-          </button>
-        ))}
-      </div>
+    <div className="space-y-6 study-hub">
+      <header className="card rounded-2xl p-5 md:p-6" style={{background:"linear-gradient(135deg,#F7F1E1,#EEE2C4)"}}>
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <h1 className="font-display text-2xl md:text-3xl font-bold text-on-parchment">📚 מרכז הלמידה</h1>
+            <p className="text-sm md:text-base text-on-parchment-muted mt-1">ספר מלכים · בגרות 2551 · 30.4.2026</p>
+          </div>
+          <div className="rank-chip" style={{fontSize:13, padding:"6px 12px"}}>📅 נותרו {days} ימים</div>
+        </div>
+      </header>
+
+      <section>
+        <h2 className="font-display text-lg md:text-xl font-bold text-amber-300 mb-3">📖 שש יחידות הלימוד</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {units.map(u => (
+            <button key={u.n} onClick={()=>go("unit", {unitId:u.n})}
+              className="card rounded-2xl p-4 text-right hover:shadow-lg transition relative overflow-hidden"
+              style={{minHeight:128}}
+              aria-label={`יחידה ${u.n} — ${u.name}`}>
+              <span className="rank-chip" style={{position:"absolute", top:10, insetInlineEnd:10, fontSize:11}}>יחידה {u.n}</span>
+              <div className="font-display text-lg font-bold text-on-parchment mt-6">{u.name}</div>
+              <div className="text-sm text-on-parchment-muted mt-1">{u.tag}</div>
+              <div className="flex items-center justify-between mt-3">
+                <span className="text-xs font-bold text-on-parchment-accent">{u.ref}</span>
+                <span className="text-on-parchment-accent text-sm font-bold">המשך ←</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="font-display text-lg md:text-xl font-bold text-amber-300 mb-3">🌐 נושאי רוחב</h2>
+        <div className="hrow" style={{gridAutoColumns:"minmax(180px,auto)"}}>
+          {breadthChips.map(b => (
+            <button key={b.id} onClick={()=>go("breadth", {id:b.id})}
+              className="card rounded-2xl px-4 py-3 text-right hover:shadow-lg transition"
+              aria-label={b.label}>
+              <span className="font-bold text-on-parchment text-sm">{b.label}</span>
+              <span className="block text-xs text-on-parchment-accent mt-1">פתח ←</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="font-display text-lg md:text-xl font-bold text-amber-300 mb-3">🛠️ כלי לימוד</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {tools.map(t => (
+            <button key={t.page} onClick={()=>go(t.page)}
+              className="card rounded-2xl p-4 text-right hover:shadow-lg transition"
+              style={{minHeight:80}}
+              aria-label={t.label}>
+              <div className="text-3xl">{t.icon}</div>
+              <div className="font-display text-base font-bold text-on-parchment mt-1">{t.label}</div>
+            </button>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
