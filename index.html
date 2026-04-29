@@ -27,7 +27,7 @@
 <link rel="stylesheet" href="assets/contrast-hotfix.css?v=500">
 <link rel="stylesheet" href="assets/layout-fix.css?v=2300">
 <link rel="stylesheet" href="assets/readability-pass.css?v=1340">
-<link rel="stylesheet" href="assets/ui-polish-5500.css?v=5500">
+<link rel="stylesheet" href="assets/ui-polish-5500.css?v=12000">
 <script>
 /* =========================================================================
    localStorage write hook (feature-gated downstream).
@@ -348,15 +348,16 @@ html[data-theme='light'] .eb-btn-secondary{background:rgba(107,91,149,.14);color
 @keyframes toastInUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
 @media (prefers-reduced-motion:reduce){.toast-item{animation:none}}
 /* ---- Home redesign v1 + 20 polish ---- */
-body{padding-bottom:72px}
-.bottom-nav{position:fixed;bottom:0;inset-inline:0;z-index:45;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:rgba(10,22,40,.92);backdrop-filter:blur(14px);border-top:1px solid rgba(212,165,116,.35);box-shadow:0 -4px 16px rgba(0,0,0,.35)}
-html[data-theme='light'] .bottom-nav{background:rgba(247,241,225,.92);border-top-color:rgba(139,111,71,.35)}
-.bn-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 4px;border-radius:12px;color:rgba(247,241,225,.55);font-size:11px;font-weight:700;transition:color .15s ease,background .15s ease;background:none;border:0;cursor:pointer;min-height:56px}
-html[data-theme='light'] .bn-item{color:rgba(26,22,17,.6)}
-.bn-item .bn-ico{font-size:22px;line-height:1;filter:grayscale(.3);transition:filter .18s ease,transform .18s ease,text-shadow .18s ease}
-.bn-item.active{color:#F4D58D;background:rgba(212,165,116,.12)}
-.bn-item.active .bn-ico{filter:drop-shadow(0 0 6px rgba(244,213,141,.85)) drop-shadow(0 0 2px #F5D670);text-shadow:0 0 18px rgba(244,213,141,.9),0 0 8px #FFD77A;transform:scale(1.08)}
-html[data-theme='light'] .bn-item.active{color:#8B6F1F;background:rgba(212,165,116,.28)}
+body{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
+.bottom-nav{position:fixed;bottom:0;inset-inline:0;z-index:50;display:grid;grid-template-columns:repeat(3,1fr);gap:0;height:56px;padding:0 0 env(safe-area-inset-bottom);background:rgba(247,241,225,.96);backdrop-filter:blur(14px);border-top:1px solid rgba(139,111,71,.35);box-shadow:0 -2px 10px rgba(0,0,0,.18)}
+html[data-theme='dark'] .bottom-nav{background:rgba(10,22,40,.94);border-top-color:rgba(212,165,116,.35)}
+.bn-item{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 4px;color:rgba(26,22,17,.62);font-size:12px;font-weight:600;line-height:1;background:none;border:0;cursor:pointer;transition:color .15s ease}
+html[data-theme='dark'] .bn-item{color:rgba(247,241,225,.6)}
+.bn-item .bn-ico{font-size:24px;line-height:1;transition:transform .18s ease}
+.bn-item.active{color:#8B6F1F;font-weight:800}
+html[data-theme='dark'] .bn-item.active{color:#F4D58D}
+.bn-item.active::after{content:"";position:absolute;left:18%;right:18%;bottom:6px;height:3px;border-radius:3px;background:linear-gradient(90deg,#F5D670,#C89B3C)}
+.bn-item.active .bn-ico{transform:scale(1.06)}
 /* Drawer */
 .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:60;animation:fadeUp .2s ease-out}
 .drawer{position:fixed;top:0;bottom:0;inset-inline-end:0;width:min(320px,85vw);background:linear-gradient(180deg,#0A1628 0%,#0F1F3A 100%);border-inline-start:1px solid rgba(212,165,116,.35);z-index:61;padding:18px 14px calc(18px + env(safe-area-inset-bottom));overflow-y:auto;animation:drawerIn .22s cubic-bezier(.3,.8,.3,1)}
@@ -2514,7 +2515,7 @@ function App(){
       home: 'home', learn: 'study', study: 'study',
       timeline: 'timeline', 'kings-table': 'timeline',
       themes: 'themes', maps: 'maps',
-      quiz: 'quiz', 'exam-sim': 'exam', exam: 'exam',
+      quiz: 'quiz', 'exam-sim': 'exam-sim', exam: 'exam',
       flashcards: 'flashcards', quotes: 'quotes', profile: 'profile', class: 'class',
       daily: 'daily', book: 'book',
       leaderboard: 'leaderboard',
@@ -2525,7 +2526,7 @@ function App(){
     };
     if (typeof window !== 'undefined') window.PAGE_FROM_SLUG = PAGE_FROM_SLUG;
     const SLUG_FROM_PAGE = {
-      home: 'home', study: 'learn', timeline: 'timeline', themes: 'themes',
+      home: 'home', study: 'study', timeline: 'timeline', themes: 'themes',
       maps: 'maps', quiz: 'quiz', exam: 'exam-sim', flashcards: 'flashcards',
       quotes: 'quotes', profile: 'profile', class: 'class',
       character: 'character', event: 'event', place: 'place', unit: 'unit', lesson: 'lesson',
@@ -2651,10 +2652,8 @@ function App(){
   ];
   const bottomNavs = [
     {p:"home",l:"בית",i:"🏠"},
-    {p:"quiz",l:"אזור בחינה",i:"✍️"},
     {p:"study",l:"למידה",i:"🎓"},
-    {p:"leaderboard",l:"מובילים",i:"🏆"},
-    {p:"profile",l:"אישי",i:"👤"}
+    {p:"exam-sim",l:"מבחן",i:"✍️"}
   ];
   const go = p => { setRoute({page:p}); setDrawerOpen(false); };
 
@@ -4543,7 +4542,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   // it's installed so users don't need to hard-reload between deploys.
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./sw.js?v=3100').then(function(reg){
+      navigator.serviceWorker.register('./sw.js?v=12000').then(function(reg){
         if (!reg) return;
         reg.addEventListener('updatefound', function(){
           var sw = reg.installing;
